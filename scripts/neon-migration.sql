@@ -1,0 +1,22 @@
+-- Neon-compatible migration script
+-- Add new columns for event management
+ALTER TABLE projects 
+ADD COLUMN IF NOT EXISTS event_date DATE,
+ADD COLUMN IF NOT EXISTS event_location VARCHAR(500),
+ADD COLUMN IF NOT EXISTS event_type VARCHAR(100),
+ADD COLUMN IF NOT EXISTS attendee_count INTEGER DEFAULT 0,
+ADD COLUMN IF NOT EXISTS speaker_fee DECIMAL(10,2) DEFAULT 0.00,
+ADD COLUMN IF NOT EXISTS travel_required BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS accommodation_required BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS av_requirements TEXT,
+ADD COLUMN IF NOT EXISTS catering_requirements TEXT,
+ADD COLUMN IF NOT EXISTS special_requirements TEXT,
+ADD COLUMN IF NOT EXISTS event_agenda JSONB,
+ADD COLUMN IF NOT EXISTS marketing_materials JSONB,
+ADD COLUMN IF NOT EXISTS contact_person VARCHAR(255),
+ADD COLUMN IF NOT EXISTS venue_contact VARCHAR(255),
+ADD COLUMN IF NOT EXISTS contract_signed BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS invoice_sent BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS payment_received BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS presentation_ready BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS materials_sent BOOLEAN DEFAULT false;

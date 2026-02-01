@@ -1,0 +1,79 @@
+{
+  "timestamp": "2025-08-15T03:01:45.276Z",
+  "baseUrl": "http://localhost:3000",
+  "summary": {
+    "pagesAudited": 7,
+    "averageScore": 98,
+    "averageLoadTime": 701.4285714285714,
+    "averageSize": 243955.85714285713,
+    "averageFirstByte": 696.4285714285714
+  },
+  "issues": [],
+  "pages": [
+    {
+      "path": "/",
+      "score": 87,
+      "grade": "B",
+      "loadTime": 1943,
+      "size": 217231,
+      "issues": [
+        "Slow server response: -13.4"
+      ]
+    },
+    {
+      "path": "/speakers",
+      "score": 100,
+      "grade": "A",
+      "loadTime": 541,
+      "size": 416476,
+      "issues": []
+    },
+    {
+      "path": "/contact",
+      "score": 100,
+      "grade": "A",
+      "loadTime": 569,
+      "size": 78489,
+      "issues": []
+    },
+    {
+      "path": "/our-services",
+      "score": 100,
+      "grade": "A",
+      "loadTime": 246,
+      "size": 127279,
+      "issues": []
+    },
+    {
+      "path": "/blog",
+      "score": 99,
+      "grade": "A",
+      "loadTime": 660,
+      "size": 613581,
+      "issues": [
+        "Slow server response: -0.6"
+      ]
+    },
+    {
+      "path": "/speakers/adam-cheyer",
+      "score": 100,
+      "grade": "A",
+      "loadTime": 644,
+      "size": 86254,
+      "issues": [
+        "Slow server response: -0.4"
+      ]
+    },
+    {
+      "path": "/top-ai-speakers-2025",
+      "score": 100,
+      "grade": "A",
+      "loadTime": 307,
+      "size": 168381,
+      "issues": []
+    }
+  ],
+  "recommendations": [
+    "Improve server response time (consider caching, CDN, or server optimization)"
+  ]
+}

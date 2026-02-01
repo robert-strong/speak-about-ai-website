@@ -1,0 +1,40 @@
+# Robots.txt for speakabout.ai
+# Last updated: December 2025
+
+User-agent: *
+Allow: /
+Allow: /_next/static/
+
+# Block admin and internal pages
+Disallow: /api/
+Disallow: /admin/
+Disallow: /portal/
+Disallow: /debug*
+Disallow: /test*
+Disallow: /apply
+
+# Block URLs with tracking parameters to avoid duplicate content
+Disallow: /*?source=
+Disallow: /*?utm_
+
+# Allow all crawlers to access the site
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: SemrushBot
+Allow: /
+
+User-agent: AhrefsBot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Sitemap location
+Sitemap: https://speakabout.ai/sitemap.xml

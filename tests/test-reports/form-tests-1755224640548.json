@@ -1,0 +1,143 @@
+{
+  "timestamp": "2025-08-15T02:24:00.548Z",
+  "baseUrl": "http://localhost:3000",
+  "summary": {
+    "total": 26,
+    "passed": 19,
+    "failed": 7,
+    "successRate": "73.1",
+    "duration": "19.13"
+  },
+  "results": [
+    {
+      "test": "Contact form - Valid submission",
+      "status": "FAILED",
+      "details": "Failed: Name and email are required"
+    },
+    {
+      "test": "Contact form - Invalid email format",
+      "status": "PASSED",
+      "details": "Correctly rejected invalid email"
+    },
+    {
+      "test": "Contact form - Empty submission rejected",
+      "status": "PASSED",
+      "details": "Correctly rejected empty form"
+    },
+    {
+      "test": "Contact form - XSS prevention",
+      "status": "PASSED",
+      "details": "XSS attempt handled safely"
+    },
+    {
+      "test": "Contact form - SQL injection prevention",
+      "status": "PASSED",
+      "details": "SQL injection attempt handled safely"
+    },
+    {
+      "test": "Speaker application - Valid submission",
+      "status": "FAILED",
+      "details": "Failed: Missing required fields"
+    },
+    {
+      "test": "Speaker application - Duplicate email handling",
+      "status": "PASSED",
+      "details": "Duplicate email handled appropriately"
+    },
+    {
+      "test": "Speaker application - Required fields validation",
+      "status": "PASSED",
+      "details": "Missing fields correctly rejected"
+    },
+    {
+      "test": "Speaker application - URL validation",
+      "status": "PASSED",
+      "details": "Invalid URLs handled"
+    },
+    {
+      "test": "Newsletter - Valid signup",
+      "status": "PASSED",
+      "details": "Successfully subscribed"
+    },
+    {
+      "test": "Newsletter - Invalid email rejected",
+      "status": "PASSED",
+      "details": "Invalid email format rejected"
+    },
+    {
+      "test": "Newsletter - Empty email rejected",
+      "status": "PASSED",
+      "details": "Empty email rejected"
+    },
+    {
+      "test": "Newsletter - Duplicate subscription handling",
+      "status": "FAILED",
+      "details": "Duplicate subscription handled gracefully"
+    },
+    {
+      "test": "Speaker login - Invalid credentials rejected",
+      "status": "PASSED",
+      "details": "Invalid credentials properly rejected"
+    },
+    {
+      "test": "Speaker login - Missing password rejected",
+      "status": "PASSED",
+      "details": "Missing password rejected"
+    },
+    {
+      "test": "Speaker login - SQL injection prevention",
+      "status": "PASSED",
+      "details": "SQL injection attempt blocked"
+    },
+    {
+      "test": "Speaker login - Rate limiting",
+      "status": "FAILED",
+      "details": "Rate limiting may not be configured"
+    },
+    {
+      "test": "Client login - Invalid credentials rejected",
+      "status": "FAILED",
+      "details": "Invalid client credentials rejected"
+    },
+    {
+      "test": "Client login - Empty credentials rejected",
+      "status": "PASSED",
+      "details": "Empty credentials rejected"
+    },
+    {
+      "test": "Client login - XSS prevention",
+      "status": "PASSED",
+      "details": "XSS attempt blocked"
+    },
+    {
+      "test": "Search tracking - Valid search recorded",
+      "status": "PASSED",
+      "details": "Search successfully tracked"
+    },
+    {
+      "test": "Search tracking - Empty query handling",
+      "status": "PASSED",
+      "details": "Empty search query handled"
+    },
+    {
+      "test": "Search tracking - XSS prevention",
+      "status": "PASSED",
+      "details": "XSS in search handled safely"
+    },
+    {
+      "test": "Password reset - Valid request",
+      "status": "PASSED",
+      "details": "Reset request processed"
+    },
+    {
+      "test": "Password reset - Invalid email rejected",
+      "status": "FAILED",
+      "details": "Invalid email format rejected"
+    },
+    {
+      "test": "Password reset - Rate limiting",
+      "status": "FAILED",
+      "details": "Rate limiting may not be configured"
+    }
+  ]
+}

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contract - CTR-202508-7016</title>
+  <style>
+    /* Enhanced print styles */
+    @media print {
+      @page {
+        size: letter;
+        margin: 0.5in;
+      }
+      body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+    }
+    
+    /* Instructions overlay for HTML download */
+    .pdf-instructions {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #0066cc;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .pdf-instructions button {
+      background: white;
+      color: #0066cc;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 15px;
+    }
+    
+    .pdf-instructions button:hover {
+      background: #f0f0f0;
+    }
+    
+    @media print {
+      .pdf-instructions {
+        display: none;
+      }
+    }
+  </style>
+  <script>
+    // Auto-trigger print dialog when page loads
+    window.addEventListener('load', function() {
+      // Give user time to see the instructions
+      setTimeout(function() {
+        window.print();
+      }, 1000);
+    });
+    
+    function printContract() {
+      window.print();
+    }
+    
+    function hideInstructions() {
+      document.querySelector('.pdf-instructions').style.display = 'none';
+    }
+  </script>
+</head>
+<body>
+  <div class="pdf-instructions">
+    📄 To save as PDF: Click "Print" below, then choose "Save as PDF" in the print dialog
+    <button onclick="printContract()">Print / Save as PDF</button>
+    <button onclick="hideInstructions()">Hide Instructions</button>
+  </div>
+  
+
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speaker/Client/Agent Agreement - CTR-202508-7016</title>
+  <style>
+    @page {
+      size: letter;
+      margin: 1in;
+    }
+    
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .no-print {
+        display: none;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, 'Helvetica Neue', sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #000;
+      max-width: 8.5in;
+      margin: 0 auto;
+      padding: 1in;
+      background: white;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    
+    .logo {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 120px;
+    }
+    
+    h1 {
+      font-size: 16pt;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .parties {
+      margin-bottom: 25px;
+      line-height: 1.8;
+    }
+    
+    .section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      margin-top: 15px;
+    }
+    
+    .highlight {
+      color: #0066cc;
+      font-weight: 600;
+    }
+    
+    .contract-details {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    
+    .contract-details p {
+      margin-bottom: 5px;
+    }
+    
+    .deliverables {
+      margin-left: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .deliverables li {
+      margin-bottom: 5px;
+      list-style-type: disc;
+    }
+    
+    .sub-deliverables {
+      margin-left: 40px;
+      margin-top: 5px;
+    }
+    
+    .sub-deliverables li {
+      list-style-type: circle;
+      margin-bottom: 3px;
+    }
+    
+    .signature-section {
+      margin-top: 50px;
+      page-break-inside: avoid;
+    }
+    
+    .signature-block {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .signature-line {
+      width: 45%;
+    }
+    
+    .signature-line input {
+      border: none;
+      border-bottom: 1px solid #000;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 9pt;
+      color: #666;
+    }
+    
+    .terms-section {
+      margin-top: 20px;
+      font-size: 10pt;
+    }
+    
+    .terms-section h3 {
+      font-size: 12pt;
+      margin-top: 15px;
+      margin-bottom: 10px;
+    }
+    
+    .legal-text {
+      font-size: 9pt;
+      line-height: 1.4;
+    }
+    
+    strong {
+      font-weight: 600;
+    }
+  </style>
+
+
+  <div class="header">
+    <svg class="logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="90" fill="#0066cc"/>
+      <text x="100" y="90" text-anchor="middle" fill="white" font-size="48" font-weight="bold">AI</text>
+      <text x="100" y="120" text-anchor="middle" fill="white" font-size="16">Speak About</text>
+    </svg>
+    <h1>SPEAKER/CLIENT/AGENT AGREEMENT</h1>
+  </div>
+
+  <div class="parties">
+    This agreement is entered into by and between<br>
+    <div style="margin-left: 20px; margin-top: 10px;">
+      a) <strong>Speak About AI</strong>, a division of Strong Entertainment, LLC ("Agent" for the Speaker),<br>
+      b) <strong class="highlight">Noah Cheyer</strong> ("Speaker"), and<br>
+      c) <strong class="highlight">TechCorp Inc</strong> ("Client") for the purposes of engaging the Speaker for:
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">1. Contract details:</div>
+    <div class="contract-details">
+      <p><strong>Event Reference:</strong> <span class="highlight">CTR-202508-7016</span></p>
+      <p><strong>Client & Name of Event:</strong> <span class="highlight">TechCorp Inc / AI Innovation Summit 2025</span> ("Event")</p>
+      <p><strong>Date(s)/Time(s):</strong> <span class="highlight">Saturday, March 15, 2025 from 9:00 am to 1:00 pm</span></p>
+      <p><strong>Location(s):</strong> <span class="highlight">San Francisco, CA</span></p>
+      <p><strong>The fee and any other consideration payable to the Agent:</strong> <span class="highlight">$25,000 USD</span></p>
+      
+    </div>
+    
+    <p style="margin-top: 15px;"><strong>For that fee, the Speaker will provide:</strong></p>
+    <ul class="deliverables">
+      <li>A <strong>45-minute</strong> keynote on the topic of, "<strong class="highlight">The Future of AI: Transforming Industries</strong>"</li>
+      <li>A <strong>15-minute</strong> Q&A</li>
+      <li>Attendance at the main event:
+        <ul class="sub-deliverables">
+          <li>9:00 am - Speaker Arrival/Load-in (Tech check TBD)</li>
+          <li>Speaker's Keynote (Exact time TBD)</li>
+          <li>Speaker's Q&A</li>
+          <li>1:00 pm: Speaker's departure from venue (Confirmed)</li>
+        </ul>
+      </li>
+      <li>The Speaker will also attend one 30-minute virtual alignment meeting before the event, and a tech-check if requested.</li>
+    </ul>
+  </div>
+
+  <div class="section terms-section">
+    <h3>2. Taxation</h3>
+    <p>The Speaker agrees to act as an independent contractor under the terms of this agreement and assumes all responsibility for Social Security, State, and Federal Income Tax, etc., as governed by the laws of the federal government of the United States and the Speaker's state of residence. The Client is not responsible for any additional expenses or costs.</p>
+
+    <h3>3. Deposit and Payment</h3>
+    <p>A <strong>50% Deposit</strong> is due at the time of execution/signing of this agreement. The 50% Balance Payment is due net-30 days from the Client's receipt of invoice by the Agent. If this contract is executed within 45 days of the event, the client will receive one invoice combining the deposit and balance. This agreement is entered into in good faith by all parties. However, cancellation by the client shall make the client liable for the amount of the 50% deposit. If the contract is canceled by the Speaker, the Speaker and the Agent will refund all payments made.</p>
+
+    <h3>4. Permission to Photograph and Record</h3>
+    <p>Any use of the Speaker's name, likeness, presentation content, or Recordings (as that term is defined in this section) for commercial purposes (and the section below marked "Permissible Use" is not considered to be commercial purposes) is expressly prohibited. No Trademark license is granted.</p>
+    
+    
+    <p style="margin-top: 10px;"><strong>Permissible Use:</strong> All parties agree that the client may use the recorded video footage (the "Recording") of the Speaker for this Event. The Client may, without further fee or payment, use the Speaker's name and likeness for up to 12 months after the talk is delivered in marketing and promotion, but that does not suggest Speaker affiliation or endorsement.</p>
+    
+    <p style="margin-top: 10px;">For example, the Client may share short snippets (up to 3-minute clips) from or about the event and talk that reference or include the Speaker. However, those snippets may not suggest endorsement by the speaker of the Client's products or the Client itself. The Recording in its entirety may be shared internally and  via a private link for the 12 months after the initial airing date of Saturday, March 15, 2025. The Client agrees that they will not use the Recording for the purpose of training artificial intelligence models or digital twins of the Speaker.</p>
+    
+  </div>
+
+  <div class="footer">
+    Speak About AI is a division of Strong Entertainment, LLC, 651 Homer Avenue, Palo Alto, CA 94301
+  </div>
+
+  <div class="page-break"></div>
+
+  <div class="section terms-section">
+    <h3>5. Cancellation</h3>
+    <p>This contract is binding and may be canceled only if:</p>
+    <ul style="margin-left: 20px; margin-top: 10px;">
+      <li>a) there is a mutual agreement between the parties; or</li>
+      <li>b) by force majeure; or</li>
+      <li>c) If the Speaker is delayed by airline delay/cancellation, accident due to travel, or incapacitated due to illness; or</li>
+      <li>d) An immediate family member is stricken by serious injury, illness, or death.</li>
+    </ul>
+
+    <h3>6. Limitation of Liability</h3>
+    <div class="legal-text">
+      <p><strong>6.1 EXCLUSION OF CERTAIN DAMAGES.</strong> NOTWITHSTANDING ANYTHING TO THE CONTRARY IN THIS AGREEMENT AND TO THE FULLEST EXTENT PERMITTED UNDER APPLICABLE LAWS, IN NO EVENT WILL EITHER PARTY BE LIABLE TO THE OTHER PARTY OR TO ANY THIRD PARTY UNDER ANY TORT, CONTRACT, NEGLIGENCE, STRICT LIABILITY, OR OTHER LEGAL OR EQUITABLE THEORY FOR</p>
+      <ul style="margin-left: 20px; margin-top: 10px;">
+        <li>(1) INDIRECT, INCIDENTAL, CONSEQUENTIAL, EXEMPLARY, REPUTATIONAL, SPECIAL OR PUNITIVE DAMAGES OF ANY KIND;</li>
+        <li>(2) COSTS OF PROCUREMENT, COVER, OR SUBSTITUTE SERVICES;</li>
+        <li>(3) LOSS OF USE OR CORRUPTION OF DATA, CONTENT OR INFORMATION; OR</li>
+        <li>(4) LOSS OF BUSINESS OPPORTUNITIES, REVENUES, PROFITS, GOODWILL, OR SAVINGS, EVEN IF THE PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH LOSS OR DAMAGES OR SUCH OR LOSS DAMAGES COULD HAVE BEEN REASONABLY FORESEEN.</li>
+      </ul>
+      
+      <p style="margin-top: 15px;"><strong>6.2 LIMITATION OF LIABILITY.</strong> NEITHER PARTY SHALL BE LIABLE FOR CUMULATIVE, AGGREGATE DAMAGES THAT EXCEED THE AMOUNT ACTUALLY PAID OR PAYABLE BY CLIENT TO SPEAKER OR AGENCY FOR THE APPLICABLE SERVICES.</p>
+    </div>
+
+    <h3>7. Miscellaneous</h3>
+    <p>This agreement represents the entire understanding between all parties, and supersedes all prior negotiations, representations, and agreements made by or between parties. No alterations, amendments, or modifications to any of the terms and conditions of this agreement shall be valid unless made in writing and signed by each party. Any controversy, dispute, or claim shall be resolved at the request of any party to this Agreement by final and binding arbitration administered by Judicial Arbitration & Mediation Services, Inc., and judgment upon any award rendered by the arbitrator may be entered by any State or Federal Court having jurisdiction thereof. This Agreement shall be governed by California law without reference to its conflicts of law principles. Any such arbitration shall occur exclusively in the County of Santa Clara, California.</p>
+  </div>
+
+  <div class="signature-section">
+    <div class="signature-block">
+      <div class="signature-line">
+        <p>Date: _____________</p>
+        <p>Client Signature: _____________________________</p>
+        <p>Title: _____________________________</p>
+        <p>Company: TechCorp Inc</p>
+      </div>
+    </div>
+    
+    <div class="signature-block">
+      <div class="signature-line">
+        <p>Date: _____________</p>
+        <p>Agent Signature: _____________________________</p>
+        <p>Title: _____________________________</p>
+        <p>Company: Speak About AI</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer" style="margin-top: 50px;">
+    Speak About AI is a division of Strong Entertainment, LLC, 651 Homer Avenue, Palo Alto, CA 94301
+  </div>
+
+
+  
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "functions": {
+    "app/api/speakers/route.ts": {
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/speakers",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=3600, stale-while-revalidate"
+        }
+      ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/auto-tasks",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/sync-gmail",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-task-roundup",
+      "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/cron/deal-summary",
+      "schedule": "0 16 * * 1,3,5"
+    }
+  ]
+}
