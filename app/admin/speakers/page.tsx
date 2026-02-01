@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -666,7 +666,7 @@ export default function AdminSpeakersPage() {
         {/* Speakers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSpeakers.map((speaker) => (
-            <Card key={speaker.id} className="hover:shadow-lg transition-shadow flex flex-col">
+            <Card key={speaker.id} className="hover:shadow-lg transition-shadow flex flex-col h-full">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
@@ -691,7 +691,7 @@ export default function AdminSpeakersPage() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3 flex-1 flex flex-col">
+              <CardContent className="space-y-3 flex-1">
                 <div className="text-sm text-gray-600">
                   <div className="flex items-center gap-2 mb-1">
                     <Mail className="h-3 w-3" />
@@ -733,34 +733,32 @@ export default function AdminSpeakersPage() {
                   </div>
                 )}
 
-                <div className="pt-2 mt-auto">
-                  <div className="text-xs text-gray-500 text-center mb-3">
-                    {speaker.videos?.length || 0} videos • {speaker.testimonials?.length || 0} testimonials
-                  </div>
-                  <div className="flex gap-2 justify-center">
-                    <Link href={`/admin/speakers/${speaker.id}`}>
-                      <Button size="sm" variant="outline">
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </Button>
-                    </Link>
-                    <Link href={`/admin/speakers/${speaker.id}/edit`}>
-                      <Button size="sm">
-                        <Edit className="h-3 w-3 mr-1" />
-                        Edit
-                      </Button>
-                    </Link>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDeleteSpeaker(speaker.id, speaker.name)}
-                    >
-                      <Trash2 className="h-3 w-3 mr-1" />
-                      Delete
-                    </Button>
-                  </div>
+                <div className="text-xs text-gray-500 text-center pt-2">
+                  {speaker.videos?.length || 0} videos • {speaker.testimonials?.length || 0} testimonials
                 </div>
               </CardContent>
+              <CardFooter className="mt-auto justify-center gap-2">
+                <Link href={`/admin/speakers/${speaker.id}`}>
+                  <Button size="sm" variant="outline">
+                    <Eye className="h-3 w-3 mr-1" />
+                    View
+                  </Button>
+                </Link>
+                <Link href={`/admin/speakers/${speaker.id}/edit`}>
+                  <Button size="sm">
+                    <Edit className="h-3 w-3 mr-1" />
+                    Edit
+                  </Button>
+                </Link>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDeleteSpeaker(speaker.id, speaker.name)}
+                >
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  Delete
+                </Button>
+              </CardFooter>
             </Card>
           ))}
         </div>
