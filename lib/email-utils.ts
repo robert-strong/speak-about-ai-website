@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless'
 import { Deal, DealFormData } from './deals-utils'
+import { getAdminEmails } from './admin-emails'
 
 // Initialize Neon client
 let sql: any = null
@@ -26,7 +27,7 @@ export interface EmailNotification {
  * Send email notification for new deal
  */
 export async function sendNewDealNotification(deal: Deal, formData: DealFormData): Promise<boolean> {
-  const recipients = ['human@speakabout.ai', 'noah@speakabout.ai']
+  const recipients = await getAdminEmails()
   const subject = `New Deal Submission: ${deal.clientName} - ${deal.organizationName || 'Organization TBD'}`
   
   const emailBody = generateNewDealEmailBody(deal, formData)

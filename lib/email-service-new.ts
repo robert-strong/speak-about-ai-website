@@ -1,5 +1,6 @@
 // Resend email service configuration
 import { Deal, DealFormData } from './deals-utils'
+import { getAdminEmails } from './admin-emails'
 
 // Initialize Resend client - optional dependency
 let resend: any = null
@@ -18,7 +19,7 @@ if (typeof window === 'undefined') { // Only on server side
  */
 export async function sendNewInquiryEmail(deal: Deal, formData: DealFormData): Promise<boolean> {
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'hello@speakabout.ai'
-  const adminEmails = ['human@speakabout.ai', 'noah@speakabout.ai']
+  const adminEmails = await getAdminEmails()
 
   if (!resend) {
     console.warn('Resend not configured - skipping email notification')

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import { revalidatePath } from 'next/cache'
 import { requireAdminAuth } from '@/lib/auth-middleware'
-import { getAllSpeakers } from '@/lib/speakers-data'
+import { getAllSpeakers, clearSpeakersCache } from '@/lib/speakers-data'
 
 // Get SQL client for each request to avoid connection issues
 const getSqlClient = () => {
@@ -67,9 +67,14 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       await sql`
         DELETE FROM speakers WHERE id = ${speakerId}
       `
-      
+
+      // Clear the speakers cache
+      clearSpeakersCache()
+      revalidatePath('/speakers')
+      revalidatePath('/')
+
       console.log(`Admin speaker delete: Successfully deleted speaker ${speakerId} (${speakerName})`)
-      
+
       return NextResponse.json({
         success: true,
         message: `Speaker ${speakerName} deleted successfully`,
@@ -393,12 +398,14 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     console.log(`Successfully updated speaker ${speakerId}`)
     
-    // Revalidate the public speaker page cache
+    // Clear the in-memory speakers cache and revalidate pages
     try {
+      clearSpeakersCache()
       if (updatedSpeaker.slug) {
         revalidatePath(`/speakers/${updatedSpeaker.slug}`)
         revalidatePath('/speakers') // Also revalidate the speakers list
-        console.log(`Revalidated cache for /speakers/${updatedSpeaker.slug}`)
+        revalidatePath('/') // Revalidate home page for featured speakers
+        console.log(`Cleared speakers cache and revalidated pages for /speakers/${updatedSpeaker.slug}`)
       }
     } catch (revalidateError) {
       console.error('Failed to revalidate cache:', revalidateError)

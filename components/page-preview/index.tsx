@@ -6,7 +6,7 @@ import { EditableText, EditableImage, LogoListEditor, OfferingsListEditor, Simpl
 import { Button } from "@/components/ui/button"
 
 interface PagePreviewProps {
-  page: "home" | "services" | "team" | "speakers" | "workshops" | "contact" | "footer"
+  page: "home" | "services" | "team" | "speakers" | "workshops" | "contact" | "footer" | "settings"
   content: Record<string, string>
   originalContent: Record<string, string>
   onContentChange: (key: string, value: string) => void
@@ -2554,6 +2554,91 @@ function ContactPreview({
   )
 }
 
+// Settings Preview Component
+function SettingsPreview({
+  content,
+  originalContent,
+  onContentChange,
+  editorMode = true
+}: Omit<PagePreviewProps, 'page'>) {
+  const adminEmails = content['settings.emails.admin_emails'] || 'human@speakabout.ai, noah@speakabout.ai'
+
+  return (
+    <div className="min-h-[600px] bg-gray-50 py-12">
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Site Settings</h1>
+          <p className="text-gray-600">Configure system-wide settings for your website</p>
+        </div>
+
+        {/* Email Settings Card */}
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Inquiry Form Email Recipients</h2>
+              <p className="text-sm text-gray-500">Configure who receives email notifications when inquiry forms are submitted</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Admin Email Addresses
+              </label>
+              <p className="text-xs text-gray-500 mb-3">
+                Enter comma-separated email addresses. These addresses will receive notifications when someone submits an inquiry form.
+              </p>
+              <EditableText
+                value={adminEmails}
+                onChange={(v) => onContentChange('settings.emails.admin_emails', v)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50"
+                isModified={isModified('settings.emails.admin_emails', content, originalContent)}
+                editorMode={editorMode}
+                multiline
+              />
+            </div>
+
+            {/* Preview of parsed emails */}
+            <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+              <p className="text-sm font-medium text-gray-700 mb-2">Current Recipients:</p>
+              <div className="flex flex-wrap gap-2">
+                {adminEmails.split(',').map((email, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                  >
+                    {email.trim()}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Info Box */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="text-sm text-blue-800 font-medium">How this works</p>
+              <p className="text-sm text-blue-700 mt-1">
+                When visitors submit inquiry forms (keynote speaker or workshop requests), notification emails will be sent to all addresses listed above. Make sure all email addresses are valid and actively monitored.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Footer Preview Component
 function FooterPreview({
   content,
@@ -2948,6 +3033,17 @@ export function PagePreview({ page, content, originalContent, onContentChange, e
   if (page === 'footer') {
     return (
       <FooterPreview
+        content={content}
+        originalContent={originalContent}
+        onContentChange={onContentChange}
+        editorMode={editorMode}
+      />
+    )
+  }
+
+  if (page === 'settings') {
+    return (
+      <SettingsPreview
         content={content}
         originalContent={originalContent}
         onContentChange={onContentChange}

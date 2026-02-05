@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import { revalidatePath } from 'next/cache'
 import { clearContentCache } from '@/lib/website-content'
+import { clearAdminEmailsCache } from '@/lib/admin-emails'
 
 // Default content for seeding - extracted from actual page components
 const DEFAULT_CONTENT = [
@@ -364,6 +365,10 @@ const DEFAULT_CONTENT = [
   // Footer - Bottom Bar
   { page: 'footer', section: 'bottom', content_key: 'copyright', content_value: '© 2026 Speak About AI. All rights reserved.' },
   { page: 'footer', section: 'bottom', content_key: 'linkedin_url', content_value: 'https://www.linkedin.com/company/speakabout-ai/' },
+
+  // Settings - Email Configuration
+  { page: 'settings', section: 'emails', content_key: 'admin_emails', content_value: 'human@speakabout.ai, noah@speakabout.ai' },
+  { page: 'settings', section: 'emails', content_key: 'admin_emails_description', content_value: 'Comma-separated list of email addresses that receive inquiry form submissions' },
 ]
 
 export async function GET(request: Request) {
@@ -391,8 +396,8 @@ export async function GET(request: Request) {
       )
     `
 
-    // Ensure footer and contact defaults exist (only these since other pages already seeded)
-    const defaultsToSeed = DEFAULT_CONTENT.filter(item => item.page === 'footer' || item.page === 'contact')
+    // Ensure footer, contact, and settings defaults exist (only these since other pages already seeded)
+    const defaultsToSeed = DEFAULT_CONTENT.filter(item => item.page === 'footer' || item.page === 'contact' || item.page === 'settings')
     for (const item of defaultsToSeed) {
       await sql`
         INSERT INTO website_content (page, section, content_key, content_value)
@@ -510,6 +515,7 @@ export async function PUT(request: Request) {
 
       // Clear cache and revalidate pages after updates
       clearContentCache()
+      clearAdminEmailsCache()
       revalidatePath('/', 'layout')
       revalidatePath('/services', 'layout')
       revalidatePath('/team', 'layout')
@@ -547,6 +553,7 @@ export async function PUT(request: Request) {
 
     // Clear cache and revalidate pages after single update
     clearContentCache()
+    clearAdminEmailsCache()
     revalidatePath('/', 'layout')
     revalidatePath('/services', 'layout')
     revalidatePath('/team', 'layout')

@@ -469,6 +469,20 @@ let allSpeakersCache: Speaker[] | null = null
 let lastFetchTime: number | null = null
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
+// Cache for individual speaker lookups (moved here so clearSpeakersCache can access it)
+const speakerBySlugCache = new Map<string, { speaker: Speaker | undefined; timestamp: number }>()
+const SPEAKER_CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+
+/**
+ * Clear the speakers cache - call this when speakers are created, updated, or deleted
+ */
+export function clearSpeakersCache(): void {
+  allSpeakersCache = null
+  lastFetchTime = null
+  speakerBySlugCache.clear()
+  console.log('Speakers cache cleared')
+}
+
 async function fetchAllSpeakersFromDatabase(): Promise<Speaker[]> {
   try {
     // For server-side rendering, try to use the database directly
@@ -618,10 +632,6 @@ export async function getFeaturedSpeakers(limit = 8): Promise<Speaker[]> {
     return []
   }
 }
-
-// Cache for individual speaker lookups
-const speakerBySlugCache = new Map<string, { speaker: Speaker | undefined; timestamp: number }>()
-const SPEAKER_CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
 export async function getSpeakerBySlug(slug: string): Promise<Speaker | undefined> {
   try {

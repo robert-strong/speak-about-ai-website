@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
+import { revalidatePath } from 'next/cache'
 import { requireAdminAuth } from '@/lib/auth-middleware'
-import { getAllSpeakers } from '@/lib/speakers-data'
+import { getAllSpeakers, clearSpeakersCache } from '@/lib/speakers-data'
 
 // Get SQL client for each request to avoid connection issues
 const getSqlClient = () => {
@@ -86,7 +87,12 @@ export async function POST(request: NextRequest) {
     `
     
     console.log('Admin speakers: Created new speaker:', result[0])
-    
+
+    // Clear speakers cache and revalidate pages
+    clearSpeakersCache()
+    revalidatePath('/speakers')
+    revalidatePath('/')
+
     return NextResponse.json({
       success: true,
       speaker: result[0]

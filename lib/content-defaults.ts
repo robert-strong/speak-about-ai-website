@@ -299,6 +299,12 @@ export const CONTENT_DEFAULTS = {
       og_description: 'Meet the team at Speak About AI - the premier AI-exclusive speaker bureau.',
     },
   },
+  settings: {
+    emails: {
+      admin_emails: 'human@speakabout.ai, noah@speakabout.ai',
+      admin_emails_description: 'Comma-separated list of email addresses that receive inquiry form submissions',
+    },
+  },
   footer: {
     company: {
       logo: '/speak-about-ai-light-logo.png',

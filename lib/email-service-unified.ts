@@ -50,9 +50,11 @@ async function logEmailNotification(data: {
   }
 }
 
+// Import admin emails utility
+import { getAdminEmails } from './admin-emails'
+
 // Email configuration
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'hello@speakabout.ai'
-const ADMIN_EMAILS = ['human@speakabout.ai', 'noah@speakabout.ai']
 const TEST_MODE = process.env.EMAIL_TEST_MODE === 'true' // Set to prevent actual sending
 
 interface EmailOptions {
@@ -300,8 +302,9 @@ export async function sendProposalAcceptedEmail(proposal: any): Promise<boolean>
   `
 
   // Send to admins
+  const adminEmails = await getAdminEmails()
   await sendEmail({
-    to: ADMIN_EMAILS,
+    to: adminEmails,
     subject: `✅ Proposal Accepted: ${proposal.clientName} - ${proposal.speakerName}`,
     html: adminHtml,
     text: adminHtml.replace(/<[^>]*>/g, '')
@@ -338,8 +341,9 @@ export async function sendProposalRejectedEmail(proposal: any, reason?: string):
     </html>
   `
 
+  const adminEmails = await getAdminEmails()
   return sendEmail({
-    to: ADMIN_EMAILS,
+    to: adminEmails,
     subject: `❌ Proposal Declined: ${proposal.clientName} - ${proposal.speakerName}`,
     html: adminHtml,
     text: adminHtml.replace(/<[^>]*>/g, '')
@@ -451,8 +455,9 @@ export async function sendContractCompletedEmail(contract: any): Promise<boolean
   `
 
   // Notify admins
+  const adminEmails = await getAdminEmails()
   await sendEmail({
-    to: ADMIN_EMAILS,
+    to: adminEmails,
     subject: `✅ Contract Signed: ${contract.clientName} & ${contract.speakerName}`,
     html: adminHtml,
     text: adminHtml.replace(/<[^>]*>/g, '')

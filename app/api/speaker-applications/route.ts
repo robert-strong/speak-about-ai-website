@@ -2,10 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { neon } from "@neondatabase/serverless"
 import { requireAdminAuth } from "@/lib/auth-middleware"
 import { sendEmail } from "@/lib/email"
+import { getAdminEmails } from "@/lib/admin-emails"
 
 const sql = neon(process.env.DATABASE_URL!)
-
-const ADMIN_EMAIL = 'human@speakabout.ai'
 
 // Public endpoint for submitting applications
 export async function POST(request: NextRequest) {
@@ -232,8 +231,9 @@ Application ID: ${application.id}
 Review at: https://speakabout.ai/admin/speaker-applications
       `.trim()
 
+      const adminEmails = await getAdminEmails()
       await sendEmail({
-        to: ADMIN_EMAIL,
+        to: adminEmails,
         subject: `🎤 New Speaker Application: ${body.first_name} ${body.last_name}`,
         html: adminHtml,
         text: adminText

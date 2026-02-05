@@ -21,7 +21,8 @@ import {
   Mic,
   BookOpen,
   LayoutGrid,
-  Mail
+  Mail,
+  Settings
 } from "lucide-react"
 import { EditHistoryPanel } from "@/components/edit-history-panel"
 import { authPut, authPost } from "@/lib/auth-fetch"
@@ -44,7 +45,7 @@ export default function WebsiteEditorPage() {
   const [saving, setSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [activeTab, setActiveTab] = useState<"home" | "services" | "team" | "speakers" | "workshops" | "contact" | "footer">("home")
+  const [activeTab, setActiveTab] = useState<"home" | "services" | "team" | "speakers" | "workshops" | "contact" | "footer" | "settings">("home")
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   useEffect(() => {
@@ -163,6 +164,7 @@ export default function WebsiteEditorPage() {
     if (page === 'workshops') return '/ai-workshops'
     if (page === 'contact') return '/contact'
     if (page === 'footer') return '/'
+    if (page === 'settings') return '/admin/website-editor'
     return '/'
   }
 
@@ -303,6 +305,13 @@ export default function WebsiteEditorPage() {
                 >
                   <LayoutGrid className="w-4 h-4 mr-2" />
                   Footer
+                </TabsTrigger>
+                <TabsTrigger
+                  value="settings"
+                  className="h-12 px-4 data-[state=active]:bg-gray-100 data-[state=active]:shadow-none rounded-t-lg border-b-2 data-[state=active]:border-blue-600 border-transparent"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
                 </TabsTrigger>
               </TabsList>
             </Tabs>
