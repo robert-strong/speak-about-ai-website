@@ -54,7 +54,7 @@ interface FeaturedContentCardProps {
 
 function FeaturedContentCard({ item, size }: FeaturedContentCardProps) {
   const featuredImageUrl = item.featuredImage?.url ? getImageUrl(item.featuredImage.url) : null
-  const linkHref = item.type === 'blog' ? `/blog/${item.slug}` : `/lp/${item.slug}`
+  const linkHref = item.type === 'blog' ? `/resources/${item.slug}` : `/lp/${item.slug}`
   
   const isLarge = size === "large"
   const cardClasses = isLarge 

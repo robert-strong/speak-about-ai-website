@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/blog`,
+      url: `${BASE_URL}/resources`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.85,
@@ -117,7 +117,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   
   // Individual blog post pages from Contentful
   const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${BASE_URL}/blog/${post.slug}`,
+    url: `${BASE_URL}/resources/${post.slug}`,
     lastModified: new Date(post.publishedDate),
     changeFrequency: "monthly" as const,
     priority: 0.7,

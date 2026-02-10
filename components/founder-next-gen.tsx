@@ -8,14 +8,14 @@ export default function FounderNextGen() {
       icon: Brain,
       title: "Free AI GPTs for Events",
       description: "5 custom AI tools to help you plan better events, write better copy, and save time",
-      link: "/blog",
+      link: "/resources",
       status: "Get Access",
     },
     {
       icon: BookOpen,
       title: "Event Planning Resources",
       description: "Guides, templates, and best practices for booking speakers and running successful events",
-      link: "/blog",
+      link: "/resources",
       status: "Explore",
     },
   ]

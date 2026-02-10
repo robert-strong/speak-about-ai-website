@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
           existingPosts = entries.items.map((item: any) => ({
             title: item.fields.title,
             slug: item.fields.slug,
-            url: `https://speakabout.ai/blog/${item.fields.slug}`
+            url: `https://speakabout.ai/resources/${item.fields.slug}`
           }))
           console.log(`Found ${existingPosts.length} selected blog posts`)
         }
@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
           existingPosts = entries.items.map((item: any) => ({
             title: item.fields.title,
             slug: item.fields.slug,
-            url: `https://speakabout.ai/blog/${item.fields.slug}`
+            url: `https://speakabout.ai/resources/${item.fields.slug}`
           }))
         }
       }

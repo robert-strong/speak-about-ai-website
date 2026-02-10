@@ -396,7 +396,7 @@ export async function generateMetadata({ params }: BlogPostPageProps, parent: Re
     description: description,
     keywords: post.categories?.map((cat) => cat.name).join(", "),
     alternates: {
-      canonical: `https://speakabout.ai/blog/${post.slug}`,
+      canonical: `https://speakabout.ai/resources/${post.slug}`,
     },
     openGraph: {
       title: post.title,
@@ -523,11 +523,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <article className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
-          href="/blog"
+          href="/resources"
           className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-6 group"
         >
           <ArrowLeft className="mr-2 h-5 w-5 transition-transform group-hover:-translate-x-1" />
-          Back to Blog
+          Back to Resources
         </Link>
 
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 leading-tight text-gray-900 dark:text-white">
@@ -550,7 +550,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         {post.categories && post.categories.length > 0 && (
           <div className="mb-6 flex flex-wrap gap-2">
             {post.categories.map((category) => (
-              <Link href={`/blog/category/${category.slug}`} key={category.slug}>
+              <Link href={`/resources/category/${category.slug}`} key={category.slug}>
                 <Badge
                   variant="secondary"
                   className="bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"

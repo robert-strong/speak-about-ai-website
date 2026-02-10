@@ -65,10 +65,10 @@ export function SpeakerRelatedBlogPosts({ speakerName, speakerSlug, limit = 3 }:
       {posts.length >= limit && (
         <div className="mt-6 text-center">
           <Link
-            href="/blog"
+            href="/resources"
             className="inline-block text-[#1E68C6] hover:underline font-semibold"
           >
-            View All Blog Posts →
+            View All Resources →
           </Link>
         </div>
       )}

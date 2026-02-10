@@ -345,7 +345,7 @@ const DEFAULT_CONTENT = [
     { text: 'Our Services', url: '/our-services' },
     { text: 'Our Team', url: '/our-team' },
     { text: 'Contact Us', url: '/contact' },
-    { text: 'Blog', url: '/blog' },
+    { text: 'Resources', url: '/resources' },
     { text: 'Sitemap', url: '/sitemap.xml' }
   ]) },
 

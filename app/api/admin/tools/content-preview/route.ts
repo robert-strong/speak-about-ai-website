@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
             blogPosts = entries.items.map((item: any) => ({
               title: item.fields.title,
               slug: item.fields.slug,
-              url: `https://speakabout.ai/blog/${item.fields.slug}`
+              url: `https://speakabout.ai/resources/${item.fields.slug}`
             }))
           }
         } catch (error) {
@@ -353,7 +353,7 @@ IMPORTANT: Only return the JSON array, nothing else.`
         blogPosts = entries.items.map((item: any) => ({
           title: item.fields.title,
           slug: item.fields.slug,
-          url: `https://speakabout.ai/blog/${item.fields.slug}`
+          url: `https://speakabout.ai/resources/${item.fields.slug}`
         }))
       }
     } catch (error) {

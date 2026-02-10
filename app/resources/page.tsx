@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "Discover expert articles, cutting-edge tools, and resources for AI-powered events. Stay informed with insights from leading AI speakers.",
   alternates: {
-    canonical: "https://speakabout.ai/blog"
+    canonical: "https://speakabout.ai/resources"
   }
 }
 

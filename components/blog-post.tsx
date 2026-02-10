@@ -119,7 +119,7 @@ export function BlogPostComponent({ post, relatedPosts }: BlogPostProps) {
 
   return (
     <article className="container px-4 py-12 md:px-6 md:py-16">
-      <Link href="/blog" className="inline-flex items-center text-[#1E68C6] hover:underline mb-6">
+      <Link href="/resources" className="inline-flex items-center text-[#1E68C6] hover:underline mb-6">
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to all articles
       </Link>

@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
     '/speakers',
     '/contact',
     '/about',
-    '/blog',
+    '/resources',
     '/our-services',
     '/our-team',
     '/partners',
@@ -68,7 +68,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Convert speaker and blog slugs to lowercase
-  if (pathname.startsWith('/speakers/') || pathname.startsWith('/blog/')) {
+  if (pathname.startsWith('/speakers/') || pathname.startsWith('/resources/')) {
     const lowerPathname = pathname.toLowerCase()
     if (pathname !== lowerPathname) {
       url.pathname = lowerPathname

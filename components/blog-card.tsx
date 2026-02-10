@@ -24,7 +24,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
       }`}
     >
       {featuredImageUrl && (
-        <Link href={`/blog/${post.slug}`} className="block aspect-[16/9] relative overflow-hidden">
+        <Link href={`/resources/${post.slug}`} className="block aspect-[16/9] relative overflow-hidden">
           <Image
             src={featuredImageUrl || "/placeholder.svg?width=400&height=225&query=blog+thumbnail"}
             alt={post.featuredImage?.alt || post.title}
@@ -38,7 +38,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
         <h3
           className={`font-semibold mb-2 leading-tight flex-1 ${featured ? "text-xl md:text-2xl" : "text-lg md:text-xl"}`}
         >
-          <Link href={`/blog/${post.slug}`} className="hover:text-blue-600 transition-colors">
+          <Link href={`/resources/${post.slug}`} className="hover:text-blue-600 transition-colors">
             {post.title}
           </Link>
         </h3>
@@ -60,7 +60,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
               (
                 category, // Show up to 3 categories
               ) => (
-                <Link key={category.slug} href={`/blog/category/${category.slug}`}>
+                <Link key={category.slug} href={`/resources/category/${category.slug}`}>
                   <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full hover:bg-gray-200 transition-colors">
                     {category.name}
                   </span>
@@ -70,7 +70,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
           </div>
         )}
         <Link
-          href={`/blog/${post.slug}`}
+          href={`/resources/${post.slug}`}
           className="text-sm text-blue-600 hover:underline font-semibold mt-auto self-start"
         >
           Read more &rarr;

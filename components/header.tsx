@@ -42,7 +42,7 @@ export default function Header() {
             <Link href="/our-team" className="font-semibold transition-colors hover:opacity-80" style={{ color: '#ffffff' }}>
               About Us
             </Link>
-            <Link href="/blog" className="font-semibold transition-colors hover:opacity-80" style={{ color: '#ffffff' }}>
+            <Link href="/resources" className="font-semibold transition-colors hover:opacity-80" style={{ color: '#ffffff' }}>
               Resources
             </Link>
           </nav>
@@ -110,7 +110,7 @@ export default function Header() {
                 About Us
               </Link>
               <Link
-                href="/blog"
+                href="/resources"
                 className="font-semibold hover:opacity-80"
                 style={{ color: '#ffffff' }}
                 onClick={() => setIsMenuOpen(false)}

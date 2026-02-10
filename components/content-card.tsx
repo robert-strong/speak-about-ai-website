@@ -11,7 +11,7 @@ interface ContentCardProps {
 
 export function ContentCard({ item }: ContentCardProps) {
   const featuredImageUrl = item.featuredImage?.url ? getImageUrl(item.featuredImage.url) : null
-  const linkHref = item.type === 'blog' ? `/blog/${item.slug}` : `/lp/${item.slug}`
+  const linkHref = item.type === 'blog' ? `/resources/${item.slug}` : `/lp/${item.slug}`
 
   return (
     <article className="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-gray-200 transform hover:-translate-y-1">

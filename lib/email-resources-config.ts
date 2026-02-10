@@ -146,7 +146,7 @@ export const defaultEmailContent = {
     
     <p>In the meantime, explore our most popular resources:</p>
     <ul>
-      <li><a href="https://speakabout.ai/blog" style="color: #1E68C6;">AI Insights Blog</a> - Latest trends and tips</li>
+      <li><a href="https://speakabout.ai/resources" style="color: #1E68C6;">AI Insights & Resources</a> - Latest trends and tips</li>
       <li><a href="https://speakabout.ai/speakers" style="color: #1E68C6;">Browse AI Speakers</a> - Find the perfect speaker</li>
       <li><a href="https://speakabout.ai/contact" style="color: #1E68C6;">Contact Us</a> - Get personalized assistance</li>
     </ul>

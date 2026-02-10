@@ -2659,7 +2659,7 @@ function FooterPreview({
     { text: 'Our Services', url: '/our-services' },
     { text: 'Our Team', url: '/our-team' },
     { text: 'Contact Us', url: '/contact' },
-    { text: 'Blog', url: '/blog' }
+    { text: 'Resources', url: '/resources' }
   ]
   const quickLinksTitle = content['footer.quick-links.title'] || 'Quick Links'
   const quickLinksJson = content['footer.quick-links.links']
