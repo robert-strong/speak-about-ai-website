@@ -21,8 +21,10 @@ import {
   AlertCircle,
   MessageSquare,
   Send,
-  Users
+  Users,
+  Download
 } from "lucide-react"
+import { AdminSidebar } from "@/components/admin-sidebar"
 import {
   Dialog,
   DialogContent,
@@ -187,7 +189,39 @@ export default function WhatsAppApplicationsPage() {
 
   const counts = getApplicationCounts()
 
+  const exportToCSV = () => {
+    const headers = ['Name', 'Email', 'Phone', 'LinkedIn', 'Role', 'Status', 'Applied Date', 'Value Expectations', 'Admin Notes']
+    const csvData = filteredApplications.map(a => [
+      a.full_name,
+      a.email,
+      a.phone_number,
+      a.linkedin_url,
+      a.primary_role,
+      a.status,
+      new Date(a.created_at).toLocaleDateString(),
+      (a.value_expectations || []).join('; '),
+      a.admin_notes || ''
+    ])
+
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `whatsapp-applications-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+
   return (
+    <div className="flex h-screen bg-gray-50">
+      <AdminSidebar />
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-8">
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">WhatsApp Group Applications</h1>
@@ -218,15 +252,21 @@ export default function WhatsAppApplicationsPage() {
         </Card>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-        <Input
-          placeholder="Search by name, email, or role..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
+      {/* Search and Export */}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Search by name, email, or role..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Button variant="outline" onClick={exportToCSV}>
+          <Download className="h-4 w-4 mr-2" />
+          Download CSV
+        </Button>
       </div>
 
       {/* Tabs and Application List */}
@@ -501,6 +541,9 @@ export default function WhatsAppApplicationsPage() {
           </DialogContent>
         </Dialog>
       )}
+    </div>
+        </div>
+      </div>
     </div>
   )
 }
