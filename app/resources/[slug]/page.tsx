@@ -1,5 +1,8 @@
 import { getBlogPostBySlug, getBlogPosts } from "@/lib/blog-data"
 import Image from "next/image"
+
+// Revalidate every 60 seconds so new/updated posts appear without a full redeploy
+export const revalidate = 60
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { marked } from "marked"

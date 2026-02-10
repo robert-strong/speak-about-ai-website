@@ -2,6 +2,9 @@ import BlogClientPage from "./blog-client-page"
 import { getCombinedContent } from "@/lib/combined-content"
 import type { Metadata } from "next"
 
+// Revalidate every 60 seconds so new Contentful posts appear without a full redeploy
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: "AI Insights & Tools - Expert Articles | Speak About AI",
   description:
