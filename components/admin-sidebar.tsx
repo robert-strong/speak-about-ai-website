@@ -107,6 +107,14 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           description: "Active Deals",
           color: "text-blue-600",
           bgColor: "bg-blue-50"
+        },
+        {
+          title: "Prospects",
+          href: "/admin/prospects",
+          icon: Users,
+          description: "All Contacts",
+          color: "text-blue-600",
+          bgColor: "bg-blue-50"
         }
       ]
     },
