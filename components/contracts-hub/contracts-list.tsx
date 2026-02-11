@@ -179,10 +179,10 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
   }
 
   const filteredContracts = contracts.filter(contract => {
-    const matchesSearch = 
-      contract.contract_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contract.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contract.event_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch =
+      (contract.contract_number || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (contract.client_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (contract.event_title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (contract.speaker_name && contract.speaker_name.toLowerCase().includes(searchTerm.toLowerCase()))
     
     const matchesStatus = statusFilter === "all" || contract.status === statusFilter
@@ -341,7 +341,7 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <DollarSign className="w-4 h-4 text-gray-400" />
-                        ${contract.total_amount.toLocaleString()}
+                        ${(contract.total_amount || 0).toLocaleString()}
                       </div>
                     </TableCell>
                     <TableCell>
