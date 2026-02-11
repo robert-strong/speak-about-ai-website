@@ -380,7 +380,7 @@ export default function AdminCRMPage() {
       
       // Generate preview directly in the client
       const speakerFee = parseFloat(contractFormData.speaker_fee) || contractDeal.deal_value || 0
-      const eventDate = new Date(contractDeal.event_date + 'T00:00:00')
+      const eventDate = new Date(contractDeal.event_date.includes('T') ? contractDeal.event_date : contractDeal.event_date + 'T00:00:00')
       const eventDateFormatted = eventDate.toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
@@ -1938,7 +1938,7 @@ d) An immediate family member is stricken by serious injury, illness, or death.
                     const dealsByDate: Record<string, Deal[]> = {}
                     deals.forEach(deal => {
                       if (deal.event_date) {
-                        const eventDate = new Date(deal.event_date + 'T00:00:00')
+                        const eventDate = new Date(deal.event_date.includes('T') ? deal.event_date : deal.event_date + 'T00:00:00')
                         if (eventDate.getFullYear() === year && eventDate.getMonth() === month) {
                           const dayKey = eventDate.getDate().toString()
                           if (!dealsByDate[dayKey]) dealsByDate[dayKey] = []
