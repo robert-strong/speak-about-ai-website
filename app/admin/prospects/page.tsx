@@ -99,7 +99,7 @@ export default function ContactsPage() {
       const response = await fetch("/api/speakers")
       if (response.ok) {
         const data = await response.json()
-        setSpeakers(data || [])
+        setSpeakers(data.speakers || [])
       }
     } catch (error) {
       console.error("Error fetching speakers:", error)
