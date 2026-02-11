@@ -1166,19 +1166,18 @@ export default function EnhancedProjectManagementPage() {
               <h1 className="text-3xl font-bold text-gray-900">Project Management</h1>
               <p className="mt-2 text-gray-600">Manage live projects, invoicing, and event logistics</p>
             </div>
-            <div className="flex gap-4">
-              <Button onClick={loadData} variant="outline">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Refresh
+            <div className="flex gap-3">
+              <Button onClick={() => setShowCreateProject(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                New Project
               </Button>
-              <Button onClick={() => {
-                const invoiceSection = document.getElementById('invoice-creation-section')
-                if (invoiceSection) {
-                  invoiceSection.scrollIntoView({ behavior: 'smooth' })
-                }
-              }}>
+              <Button onClick={() => setShowCreateInvoice(true)} variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
                 New Invoice
+              </Button>
+              <Button onClick={() => window.location.href = '/admin/contracts'} variant="outline">
+                <FileText className="mr-2 h-4 w-4" />
+                New Contract
               </Button>
             </div>
           </div>
@@ -1402,12 +1401,6 @@ export default function EnhancedProjectManagementPage() {
                       </Button>
                     </div>
                     <Dialog open={showCreateProject} onOpenChange={setShowCreateProject}>
-                      <DialogTrigger asChild>
-                        <Button>
-                          <Plus className="h-4 w-4 mr-2" />
-                          New Project
-                        </Button>
-                      </DialogTrigger>
                       <DialogContent className="max-w-2xl">
                         <DialogHeader>
                           <DialogTitle>Create New Project</DialogTitle>
@@ -3566,15 +3559,96 @@ export default function EnhancedProjectManagementPage() {
         </div>
       )}
 
-      {/* Create Project Dialog */}
-      <Dialog open={showCreateProject} onOpenChange={setShowCreateProject}>
-        <DialogContent className="max-w-2xl">
+      {/* Create Invoice Dialog */}
+      <Dialog open={showCreateInvoice} onOpenChange={setShowCreateInvoice}>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Create New Project</DialogTitle>
-            <DialogDescription>Add a new event project to the system</DialogDescription>
+            <DialogTitle>Create New Invoice</DialogTitle>
+            <DialogDescription>Generate an invoice for a project</DialogDescription>
           </DialogHeader>
-          <div className="p-4">
-            <p>Project creation form would go here</p>
+          <div className="space-y-4 mt-4">
+            <div>
+              <Label htmlFor="invoice-project">Project *</Label>
+              <Select value={invoiceFormData.project_id} onValueChange={(value) => setInvoiceFormData({...invoiceFormData, project_id: value})}>
+                <SelectTrigger id="invoice-project">
+                  <SelectValue placeholder="Select a project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.filter(p => p.status !== 'cancelled' && p.status !== 'completed').map(p => (
+                    <SelectItem key={p.id} value={p.id.toString()}>
+                      {p.project_name} - {p.client_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="invoice-type">Invoice Type *</Label>
+                <Select value={invoiceFormData.invoice_type} onValueChange={(value) => setInvoiceFormData({...invoiceFormData, invoice_type: value})}>
+                  <SelectTrigger id="invoice-type">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="deposit">Deposit (50%)</SelectItem>
+                    <SelectItem value="final">Final Balance</SelectItem>
+                    <SelectItem value="standard">Standard</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="invoice-amount">Amount ($) *</Label>
+                <Input
+                  id="invoice-amount"
+                  type="number"
+                  placeholder="0.00"
+                  value={invoiceFormData.amount}
+                  onChange={(e) => setInvoiceFormData({...invoiceFormData, amount: e.target.value})}
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="invoice-due-date">Due Date *</Label>
+              <Input
+                id="invoice-due-date"
+                type="date"
+                value={invoiceFormData.due_date}
+                onChange={(e) => setInvoiceFormData({...invoiceFormData, due_date: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="invoice-notes">Notes</Label>
+              <Textarea
+                id="invoice-notes"
+                placeholder="Additional notes..."
+                rows={2}
+                value={invoiceFormData.notes}
+                onChange={(e) => setInvoiceFormData({...invoiceFormData, notes: e.target.value})}
+              />
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button variant="outline" onClick={() => setShowCreateInvoice(false)}>
+                Cancel
+              </Button>
+              <Button onClick={async () => {
+                if (!invoiceFormData.project_id || !invoiceFormData.amount) {
+                  toast({ title: "Validation Error", description: "Please select a project and enter an amount", variant: "destructive" })
+                  return
+                }
+                await handleCreateInvoice(parseInt(invoiceFormData.project_id), parseFloat(invoiceFormData.amount))
+                setInvoiceFormData({
+                  project_id: "",
+                  invoice_type: "",
+                  amount: "",
+                  due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                  payment_terms: "net-30",
+                  notes: ""
+                })
+              }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Invoice
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
