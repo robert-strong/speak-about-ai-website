@@ -1867,6 +1867,14 @@ export default function EnhancedProjectManagementPage() {
                                                   Step {targetStage.step}: {targetStage.label}
                                                 </DropdownMenuItem>
                                               ))}
+                                              <DropdownMenuSeparator />
+                                              <DropdownMenuItem
+                                                className="text-red-600 focus:text-red-600"
+                                                onClick={() => handleDeleteProject(project.id)}
+                                              >
+                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                Delete Project
+                                              </DropdownMenuItem>
                                             </DropdownMenuContent>
                                           </DropdownMenu>
                                         </div>

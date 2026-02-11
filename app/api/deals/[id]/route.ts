@@ -105,8 +105,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                        deal.event_type === "Keynote" ? "Speaking" :
                        deal.event_type === "Consulting" ? "Consulting" : "Other",
           description: `Event: ${deal.event_title}\nLocation: ${deal.event_location}\nAttendees: ${deal.attendee_count}\n\n${deal.notes}`,
-          // Set status to invoicing for new projects (deals just won need invoicing first)
-          status: "invoicing" as const,
+          // Set status to contracting for new projects (deals just won need contracts first)
+          status: "contracts_signed" as const,
           priority: deal.priority,
           start_date: new Date().toISOString().split('T')[0],
           deadline: deal.event_date,
@@ -241,8 +241,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
                        deal.event_type === "Keynote" ? "Speaking" :
                        deal.event_type === "Consulting" ? "Consulting" : "Other",
           description: `Event: ${deal.event_title}\nLocation: ${deal.event_location}\nAttendees: ${deal.attendee_count}\n\n${deal.notes}`,
-          // Set status to invoicing for new projects (deals just won need invoicing first)
-          status: "invoicing" as const,
+          // Set status to contracting for new projects (deals just won need contracts first)
+          status: "contracts_signed" as const,
           priority: deal.priority,
           start_date: new Date().toISOString().split('T')[0],
           deadline: deal.event_date,

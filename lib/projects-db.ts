@@ -22,7 +22,7 @@ export interface Project {
   company?: string
   project_type: string
   description?: string
-  status: "invoicing" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled" | "2plus_months" | "1to2_months" | "less_than_month" | "final_week"
+  status: "contracts_signed" | "invoicing" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled" | "2plus_months" | "1to2_months" | "less_than_month" | "final_week"
   priority: "low" | "medium" | "high" | "urgent"
   start_date: string
   end_date?: string
@@ -213,21 +213,20 @@ export async function createProject(projectData: Omit<Project, "id" | "created_a
   try {
     const sql = getSQL()
 
-    // Use the status provided or default to invoicing
+    // Use the status provided or default to contracts_signed (first workflow stage)
     const finalProjectData = {
       ...projectData,
-      status: projectData.status || "invoicing" // Use provided status or default to invoicing
+      status: projectData.status || "contracts_signed"
     }
-    // Initialize stage_completion with invoicing tasks marked as due (false = not completed)
+    // Initialize stage_completion with contracting tasks marked as due (false = not completed)
     const initialStageCompletion = {
-      invoicing: {
-        initial_invoice_sent: false,
-        final_invoice_sent: false,
-        kickoff_meeting_planned: false,
-        client_contacts_documented: false,
-        project_folder_created: false,
-        internal_team_briefed: false,
-        event_details_confirmed: false
+      contracts_signed: {
+        prepare_client_contract: false,
+        send_contract_to_client: false,
+        client_contract_signed: false,
+        prepare_speaker_agreement: false,
+        obtain_speaker_signature: false,
+        file_all_signed_contracts: false
       }
     }
     

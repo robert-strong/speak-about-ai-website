@@ -132,6 +132,23 @@ export async function POST(request: NextRequest) {
       results.push({ migration: "008_whatsapp_table", status: "error", error: error instanceof Error ? error.message : "Unknown error" })
     }
 
+    // Migration 4: Update projects status constraint to include workflow stages
+    try {
+      console.log("Running migration 009: Update projects status constraint...")
+      await sql`ALTER TABLE projects DROP CONSTRAINT IF EXISTS projects_status_check`
+      await sql`
+        ALTER TABLE projects ADD CONSTRAINT projects_status_check
+        CHECK (status IN (
+          '2plus_months', '1to2_months', 'less_than_month', 'final_week',
+          'contracts_signed', 'invoicing', 'logistics_planning', 'pre_event',
+          'event_week', 'follow_up', 'completed', 'cancelled'
+        ))
+      `
+      results.push({ migration: "009_projects_status_constraint", status: "success" })
+    } catch (error) {
+      results.push({ migration: "009_projects_status_constraint", status: "error", error: error instanceof Error ? error.message : "Unknown error" })
+    }
+
     console.log("All migrations completed!")
 
     return NextResponse.json({
