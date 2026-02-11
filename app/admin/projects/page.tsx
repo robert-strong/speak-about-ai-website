@@ -1175,7 +1175,7 @@ export default function EnhancedProjectManagementPage() {
                 <Plus className="mr-2 h-4 w-4" />
                 New Invoice
               </Button>
-              <Button onClick={() => window.location.href = '/admin/contracts'} variant="outline">
+              <Button onClick={() => router.push('/admin/contracts')} variant="outline">
                 <FileText className="mr-2 h-4 w-4" />
                 New Contract
               </Button>
