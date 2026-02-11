@@ -247,7 +247,9 @@ export default function AdminCRMPage() {
   // Date formatting helper
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'TBD'
-    const date = new Date(dateString)
+    // Append T00:00:00 to date-only strings to prevent UTC timezone shift
+    const normalized = dateString.includes('T') ? dateString : dateString + 'T00:00:00'
+    const date = new Date(normalized)
     // Check for invalid date or Unix epoch (1969/1970)
     if (isNaN(date.getTime()) || date.getFullYear() < 1990) return 'TBD'
     return date.toLocaleDateString('en-US', {
@@ -378,7 +380,7 @@ export default function AdminCRMPage() {
       
       // Generate preview directly in the client
       const speakerFee = parseFloat(contractFormData.speaker_fee) || contractDeal.deal_value || 0
-      const eventDate = new Date(contractDeal.event_date)
+      const eventDate = new Date(contractDeal.event_date + 'T00:00:00')
       const eventDateFormatted = eventDate.toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
@@ -680,8 +682,13 @@ d) An immediate family member is stricken by serious injury, illness, or death.
     // Format dates for input fields (YYYY-MM-DD format)
     const formatDateForInput = (dateString: string) => {
       if (!dateString) return ""
-      const date = new Date(dateString)
-      return date.toISOString().split('T')[0]
+      // Append T00:00:00 to date-only strings to prevent UTC timezone shift
+      const normalized = dateString.includes('T') ? dateString : dateString + 'T00:00:00'
+      const date = new Date(normalized)
+      const year = date.getFullYear()
+      const month = (date.getMonth() + 1).toString().padStart(2, '0')
+      const day = date.getDate().toString().padStart(2, '0')
+      return `${year}-${month}-${day}`
     }
     
     setFormData({
@@ -1931,7 +1938,7 @@ d) An immediate family member is stricken by serious injury, illness, or death.
                     const dealsByDate: Record<string, Deal[]> = {}
                     deals.forEach(deal => {
                       if (deal.event_date) {
-                        const eventDate = new Date(deal.event_date)
+                        const eventDate = new Date(deal.event_date + 'T00:00:00')
                         if (eventDate.getFullYear() === year && eventDate.getMonth() === month) {
                           const dayKey = eventDate.getDate().toString()
                           if (!dealsByDate[dayKey]) dealsByDate[dayKey] = []
