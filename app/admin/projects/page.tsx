@@ -1753,12 +1753,13 @@ export default function EnhancedProjectManagementPage() {
                                 return (
                                   <div key={project.id} className="space-y-0">
                                     <div
-                                      className={`flex items-center justify-between p-4 rounded-lg border ${
+                                      className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer ${
                                         timeInfo.urgency === 'today' ? 'bg-red-50 border-red-200' :
                                         timeInfo.urgency === 'urgent' ? 'bg-orange-50 border-orange-200' :
                                         timeInfo.urgency === 'soon' ? 'bg-yellow-50 border-yellow-200' :
                                         'bg-white border-gray-200'
                                       } ${isExpanded ? 'rounded-b-none border-b-0' : ''} hover:shadow-md transition-shadow`}
+                                      onClick={() => setExpandedProjectId(isExpanded ? null : project.id)}
                                     >
                                       <div className="flex items-center gap-4">
                                         <div>
@@ -1825,7 +1826,7 @@ export default function EnhancedProjectManagementPage() {
                                           </div>
                                           <div className="text-xs text-gray-500">{project.event_location || "Location TBD"}</div>
                                         </div>
-                                        <div className="flex gap-1">
+                                        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                                           <Button
                                             size="sm"
                                             variant={isExpanded ? "default" : "ghost"}
@@ -2200,7 +2201,7 @@ export default function EnhancedProjectManagementPage() {
                           unknown: ""
                         }
                         return (
-                        <TableRow key={project.id} className={rowUrgencyClasses[timeInfo.urgency] || ""}>
+                        <TableRow key={project.id} className={`cursor-pointer hover:bg-gray-50 ${rowUrgencyClasses[timeInfo.urgency] || ""}`} onClick={() => setSelectedProject(project)}>
                           <TableCell>
                             <div>
                               <div className="font-medium">{project.event_name || project.event_title || project.project_name}</div>
@@ -2324,7 +2325,7 @@ export default function EnhancedProjectManagementPage() {
                               )
                             })()}
                           </TableCell>
-                          <TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
                             <div className="space-y-1">
                               {(() => {
                                 const projectInvoices = invoices.filter(inv => inv.project_id === project.id)
@@ -2472,7 +2473,7 @@ export default function EnhancedProjectManagementPage() {
                               )}
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
