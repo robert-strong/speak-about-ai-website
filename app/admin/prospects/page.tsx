@@ -5,7 +5,15 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import {
   Search,
   Download,
@@ -18,6 +26,8 @@ import {
   Linkedin,
   Mic,
   MapPin,
+  Pencil,
+  Trash2,
 } from "lucide-react"
 import { AdminSidebar } from "@/components/admin-sidebar"
 
@@ -74,6 +84,15 @@ export default function ContactsPage() {
     whatsapp: 0,
   })
 
+  // Edit state
+  const [editingContact, setEditingContact] = useState<Prospect | null>(null)
+  const [editForm, setEditForm] = useState({ name: "", email: "", phone: "", company: "", linkedin: "" })
+  const [saving, setSaving] = useState(false)
+
+  // Delete state
+  const [deletingContact, setDeletingContact] = useState<Prospect | null>(null)
+  const [deleting, setDeleting] = useState(false)
+
   useEffect(() => {
     fetchProspects()
     fetchSpeakers()
@@ -108,8 +127,83 @@ export default function ContactsPage() {
     }
   }
 
+  const openEdit = (prospect: Prospect) => {
+    setEditingContact(prospect)
+    setEditForm({
+      name: prospect.name,
+      email: prospect.email,
+      phone: prospect.phone,
+      company: prospect.company,
+      linkedin: prospect.linkedin,
+    })
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingContact) return
+    setSaving(true)
+    try {
+      const response = await fetch(`/api/admin/prospects/${editingContact.source_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: editingContact.source,
+          ...editForm,
+        }),
+      })
+      if (response.ok) {
+        // Update local state
+        setProspects((prev) =>
+          prev.map((p) =>
+            p.source === editingContact.source && p.source_id === editingContact.source_id
+              ? { ...p, ...editForm }
+              : p
+          )
+        )
+        setEditingContact(null)
+      }
+    } catch (error) {
+      console.error("Error updating contact:", error)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!deletingContact) return
+    setDeleting(true)
+    try {
+      const response = await fetch(
+        `/api/admin/prospects/${deletingContact.source_id}?source=${encodeURIComponent(deletingContact.source)}`,
+        { method: "DELETE" }
+      )
+      if (response.ok) {
+        setProspects((prev) =>
+          prev.filter(
+            (p) => !(p.source === deletingContact.source && p.source_id === deletingContact.source_id)
+          )
+        )
+        // Update stats
+        const sourceKey = {
+          Deal: "deals",
+          "Form Submission": "form_submissions",
+          Newsletter: "newsletter",
+          WhatsApp: "whatsapp",
+        }[deletingContact.source] as keyof Stats
+        setStats((prev) => ({
+          ...prev,
+          total: prev.total - 1,
+          [sourceKey]: (prev[sourceKey] as number) - 1,
+        }))
+        setDeletingContact(null)
+      }
+    } catch (error) {
+      console.error("Error deleting contact:", error)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   const filteredProspects = prospects.filter((p) => {
-    // Tab filter
     if (activeTab !== "all") {
       const sourceMap: Record<string, string> = {
         deals: "Deal",
@@ -120,7 +214,6 @@ export default function ContactsPage() {
       if (p.source !== sourceMap[activeTab]) return false
     }
 
-    // Search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
       return (
@@ -141,8 +234,8 @@ export default function ContactsPage() {
       s.name?.toLowerCase().includes(term) ||
       s.email?.toLowerCase().includes(term) ||
       s.location?.toLowerCase().includes(term) ||
-      s.topics?.some(t => t.toLowerCase().includes(term)) ||
-      s.programs?.some(p => p.toLowerCase().includes(term))
+      s.topics?.some((t) => t.toLowerCase().includes(term)) ||
+      s.programs?.some((p) => p.toLowerCase().includes(term))
     )
   })
 
@@ -183,25 +276,12 @@ export default function ContactsPage() {
 
   const exportToCSV = () => {
     const headers = [
-      "Name",
-      "Email",
-      "Phone",
-      "Company",
-      "LinkedIn",
-      "Source",
-      "Relationship",
-      "Deal Value",
-      "Date",
-      "Status",
+      "Name", "Email", "Phone", "Company", "LinkedIn",
+      "Source", "Relationship", "Deal Value", "Date", "Status",
     ]
     const csvData = filteredProspects.map((p) => [
-      p.name,
-      p.email,
-      p.phone,
-      p.company,
-      p.linkedin,
-      p.source,
-      p.relationship,
+      p.name, p.email, p.phone, p.company, p.linkedin,
+      p.source, p.relationship,
       p.deal_value != null ? p.deal_value.toString() : "",
       p.date ? new Date(p.date).toLocaleDateString() : "",
       p.status,
@@ -226,14 +306,9 @@ export default function ContactsPage() {
   const exportSpeakersToCSV = () => {
     const headers = ["Name", "Email", "Location", "Topics", "Programs", "Fee Range", "LinkedIn", "Website"]
     const csvData = filteredSpeakers.map((s) => [
-      s.name,
-      s.email,
-      s.location || "",
-      (s.topics || []).join("; "),
-      (s.programs || []).join("; "),
-      s.fee || "",
-      s.linkedinUrl || "",
-      s.website || "",
+      s.name, s.email, s.location || "",
+      (s.topics || []).join("; "), (s.programs || []).join("; "),
+      s.fee || "", s.linkedinUrl || "", s.website || "",
     ])
 
     const csvContent = [
@@ -398,6 +473,9 @@ export default function ContactsPage() {
                                 <th className="text-left p-3 font-medium text-gray-600">
                                   Date
                                 </th>
+                                <th className="text-left p-3 font-medium text-gray-600 w-20">
+                                  Actions
+                                </th>
                               </tr>
                             </thead>
                             <tbody>
@@ -408,7 +486,9 @@ export default function ContactsPage() {
                                 >
                                   <td className="p-3">
                                     <div className="font-medium text-gray-900">
-                                      {prospect.name || "\u2014"}
+                                      {prospect.name && prospect.name !== "Website Visitor"
+                                        ? prospect.name
+                                        : <span className="text-gray-400 italic">{prospect.name || "\u2014"}</span>}
                                     </div>
                                     {prospect.deal_value != null && (
                                       <div className="text-xs text-green-600 font-medium">
@@ -457,10 +537,30 @@ export default function ContactsPage() {
                                   </td>
                                   <td className="p-3 text-gray-500 text-xs whitespace-nowrap">
                                     {prospect.date
-                                      ? new Date(
-                                          prospect.date
-                                        ).toLocaleDateString()
+                                      ? new Date(prospect.date).toLocaleDateString()
                                       : "\u2014"}
+                                  </td>
+                                  <td className="p-3">
+                                    <div className="flex gap-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7"
+                                        onClick={() => openEdit(prospect)}
+                                        title="Edit contact"
+                                      >
+                                        <Pencil className="h-3.5 w-3.5 text-gray-500" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 hover:bg-red-50"
+                                        onClick={() => setDeletingContact(prospect)}
+                                        title="Delete contact"
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5 text-red-400" />
+                                      </Button>
+                                    </div>
                                   </td>
                                 </tr>
                               ))}
@@ -490,7 +590,7 @@ export default function ContactsPage() {
                       <div className="text-sm text-gray-600">Locations</div>
                     </div>
                     <div className="text-2xl font-bold text-purple-700">
-                      {new Set(speakers.filter(s => s.location).map(s => s.location)).size}
+                      {new Set(speakers.filter((s) => s.location).map((s) => s.location)).size}
                     </div>
                   </Card>
                   <Card className="p-4 border-blue-200 bg-blue-50">
@@ -499,7 +599,7 @@ export default function ContactsPage() {
                       <div className="text-sm text-gray-600">With Email</div>
                     </div>
                     <div className="text-2xl font-bold text-blue-700">
-                      {speakers.filter(s => s.email).length}
+                      {speakers.filter((s) => s.email).length}
                     </div>
                   </Card>
                 </div>
@@ -660,6 +760,107 @@ export default function ContactsPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Contact Dialog */}
+      <Dialog open={!!editingContact} onOpenChange={(open) => !open && setEditingContact(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Contact</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="flex items-center gap-2 mb-2">
+              {editingContact && getSourceBadge(editingContact.source)}
+              {editingContact && (
+                <span className="text-xs text-gray-500">{editingContact.relationship}</span>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Name</Label>
+              <Input
+                id="edit-name"
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                placeholder="Contact name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-email">Email</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                placeholder="Email address"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-phone">Phone</Label>
+              <Input
+                id="edit-phone"
+                value={editForm.phone}
+                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                placeholder="Phone number"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-company">Company</Label>
+              <Input
+                id="edit-company"
+                value={editForm.company}
+                onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
+                placeholder="Company name"
+              />
+            </div>
+            {editingContact?.source === "WhatsApp" && (
+              <div className="space-y-2">
+                <Label htmlFor="edit-linkedin">LinkedIn URL</Label>
+                <Input
+                  id="edit-linkedin"
+                  value={editForm.linkedin}
+                  onChange={(e) => setEditForm({ ...editForm, linkedin: e.target.value })}
+                  placeholder="LinkedIn profile URL"
+                />
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingContact(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={saving}>
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deletingContact} onOpenChange={(open) => !open && setDeletingContact(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Contact</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-600">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-gray-900">
+                {deletingContact?.name || deletingContact?.email}
+              </span>
+              ? This will permanently remove the record from the{" "}
+              <span className="font-semibold">{deletingContact?.source}</span> source.
+            </p>
+            <p className="text-sm text-red-600 mt-2">This action cannot be undone.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletingContact(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+              {deleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

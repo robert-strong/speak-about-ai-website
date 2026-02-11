@@ -103,9 +103,37 @@ export async function submitLandingPageForm(formData: FormData): Promise<{ succe
   console.log("[Server Action] Form data keys:", Object.keys(formData))
 
   // Normalize field names (handle both lowercase and capitalized versions)
+  // Also detect name from dynamic Contentful field names (e.g. "Full Name", "Your Name", "firstName")
+  const detectName = (): string | undefined => {
+    // Check standard variations first
+    const standard = formData.name || formData.Name || formData.NAME
+    if (standard) return standard
+
+    // Check common alternative field names from dynamic forms
+    const nameKeys = ['fullName', 'full_name', 'Full Name', 'Your Name', 'your_name',
+      'firstName', 'first_name', 'First Name', 'full name', 'yourName']
+    for (const key of nameKeys) {
+      if (formData[key]) return formData[key] as string
+    }
+
+    // Last resort: scan all keys for any that contain "name" (but not "organization", "company", "user_agent")
+    for (const [key, value] of Object.entries(formData)) {
+      if (typeof value === 'string' && value.trim() &&
+        key.toLowerCase().includes('name') &&
+        !key.toLowerCase().includes('organization') &&
+        !key.toLowerCase().includes('company') &&
+        !key.toLowerCase().includes('user') &&
+        !key.toLowerCase().includes('field') &&
+        key !== 'landingPageTitle') {
+        return value
+      }
+    }
+    return undefined
+  }
+
   const normalizedData: FormData = {
     email: formData.email || formData.Email || formData.EMAIL || '',
-    name: formData.name || formData.Name || formData.NAME,
+    name: detectName(),
     phone: formData.phone || formData.Phone || formData.PHONE,
     organizationName: formData.organizationName || formData.OrganizationName || formData.company || formData.Company,
     message: formData.message || formData.Message || formData.MESSAGE,
