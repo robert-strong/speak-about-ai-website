@@ -382,6 +382,8 @@ export default function EnhancedProjectManagementPage() {
   const [showCreateProject, setShowCreateProject] = useState(false)
   const [selectedInvoiceForPDF, setSelectedInvoiceForPDF] = useState<{id: number, number: string} | null>(null)
   const [selectedInvoiceForEdit, setSelectedInvoiceForEdit] = useState<number | null>(null)
+  const [calendarMonth, setCalendarMonth] = useState(new Date())
+  const [calendarSelectedProject, setCalendarSelectedProject] = useState<Project | null>(null)
   const [newProjectData, setNewProjectData] = useState({
     project_name: "",
     event_date: "",
@@ -1236,9 +1238,10 @@ export default function EnhancedProjectManagementPage() {
 
           {/* Main Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 max-w-3xl">
+            <TabsList className="grid w-full grid-cols-6 max-w-4xl">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="calendar">Calendar</TabsTrigger>
               <TabsTrigger value="tasks">Tasks</TabsTrigger>
               <TabsTrigger value="logistics">Logistics</TabsTrigger>
               <TabsTrigger value="details">Details</TabsTrigger>
@@ -2524,6 +2527,182 @@ export default function EnhancedProjectManagementPage() {
               )}
             </TabsContent>
 
+            {/* Calendar View Tab */}
+            <TabsContent value="calendar" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                      <CardTitle>Calendar View</CardTitle>
+                      <CardDescription>
+                        View all projects by their event dates
+                      </CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const current = new Date(calendarMonth)
+                          current.setMonth(current.getMonth() - 1)
+                          setCalendarMonth(current)
+                        }}
+                      >
+                        ← Previous
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCalendarMonth(new Date())}
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const current = new Date(calendarMonth)
+                          current.setMonth(current.getMonth() + 1)
+                          setCalendarMonth(current)
+                        }}
+                      >
+                        Next →
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const year = calendarMonth.getFullYear()
+                    const month = calendarMonth.getMonth()
+                    const firstDay = new Date(year, month, 1)
+                    const lastDay = new Date(year, month + 1, 0)
+                    const startPadding = firstDay.getDay()
+                    const daysInMonth = lastDay.getDate()
+
+                    // Group all projects by date
+                    const projectsByDate: Record<string, Project[]> = {}
+                    projects.forEach(project => {
+                      if (project.event_date) {
+                        const eventDate = new Date(project.event_date.split('T')[0] + 'T00:00:00')
+                        if (eventDate.getFullYear() === year && eventDate.getMonth() === month) {
+                          const dayKey = eventDate.getDate().toString()
+                          if (!projectsByDate[dayKey]) projectsByDate[dayKey] = []
+                          projectsByDate[dayKey].push(project)
+                        }
+                      }
+                    })
+
+                    const monthNames = ["January", "February", "March", "April", "May", "June",
+                                       "July", "August", "September", "October", "November", "December"]
+                    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+                    const today = new Date()
+                    const isToday = (day: number) =>
+                      today.getFullYear() === year &&
+                      today.getMonth() === month &&
+                      today.getDate() === day
+
+                    return (
+                      <div>
+                        <h3 className="text-xl font-semibold text-center mb-4">
+                          {monthNames[month]} {year}
+                        </h3>
+
+                        {/* Calendar Grid */}
+                        <div className="grid grid-cols-7 gap-1">
+                          {/* Day headers */}
+                          {dayNames.map(day => (
+                            <div key={day} className="text-center font-semibold text-gray-600 py-3 text-base">
+                              {day}
+                            </div>
+                          ))}
+
+                          {/* Empty cells for padding */}
+                          {Array.from({ length: startPadding }).map((_, i) => (
+                            <div key={`pad-${i}`} className="min-h-[120px] bg-gray-50 rounded" />
+                          ))}
+
+                          {/* Calendar days */}
+                          {Array.from({ length: daysInMonth }).map((_, i) => {
+                            const day = i + 1
+                            const dayProjects = projectsByDate[day.toString()] || []
+
+                            return (
+                              <div
+                                key={day}
+                                className={`min-h-[120px] border rounded p-2 ${
+                                  isToday(day) ? 'bg-blue-50 border-blue-300' : 'bg-white'
+                                }`}
+                              >
+                                <div className={`text-base font-semibold mb-2 ${
+                                  isToday(day) ? 'text-blue-600' : 'text-gray-700'
+                                }`}>
+                                  {day}
+                                </div>
+                                <div className="space-y-1.5">
+                                  {dayProjects.slice(0, 3).map(project => (
+                                    <div
+                                      key={project.id}
+                                      className={`text-sm p-1.5 rounded cursor-pointer hover:opacity-80 ${
+                                        project.status === 'completed'
+                                          ? 'bg-emerald-100 text-emerald-800 border-l-3 border-emerald-500'
+                                          : project.status === 'cancelled'
+                                          ? 'bg-gray-100 text-gray-600 border-l-3 border-gray-400'
+                                          : project.priority === 'high' || project.priority === 'urgent'
+                                          ? 'bg-red-100 text-red-800 border-l-3 border-red-500'
+                                          : project.priority === 'medium'
+                                          ? 'bg-yellow-100 text-yellow-800 border-l-3 border-yellow-500'
+                                          : 'bg-blue-100 text-blue-800 border-l-3 border-blue-500'
+                                      }`}
+                                      title={`${project.project_name} - ${project.client_name} (${PROJECT_STATUSES[project.status]?.label || project.status})`}
+                                      onClick={() => setCalendarSelectedProject(project)}
+                                    >
+                                      <div className="font-medium truncate">{project.project_name}</div>
+                                      <div className="text-xs opacity-75 truncate">{project.client_name}</div>
+                                    </div>
+                                  ))}
+                                  {dayProjects.length > 3 && (
+                                    <div className="text-sm text-gray-500 text-center font-medium">
+                                      +{dayProjects.length - 3} more
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+
+                        {/* Legend */}
+                        <div className="flex flex-wrap gap-6 mt-6 justify-center text-base">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-emerald-100 border-l-3 border-emerald-500 rounded" />
+                            <span>Completed</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-gray-100 border-l-3 border-gray-400 rounded" />
+                            <span>Cancelled</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-red-100 border-l-3 border-red-500 rounded" />
+                            <span>High/Urgent</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-yellow-100 border-l-3 border-yellow-500 rounded" />
+                            <span>Medium</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-blue-100 border-l-3 border-blue-500 rounded" />
+                            <span>Low</span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             {/* Tasks Tab */}
             <TabsContent value="tasks" className="space-y-6">
               <Card>
@@ -3219,6 +3398,173 @@ export default function EnhancedProjectManagementPage() {
           </Tabs>
         </div>
       </div>
+
+      {/* Calendar Project Details Popup */}
+      {calendarSelectedProject && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CardTitle>{calendarSelectedProject.project_name}</CardTitle>
+                    <Badge className={`${PROJECT_STATUSES[calendarSelectedProject.status]?.color} text-white`}>
+                      {PROJECT_STATUSES[calendarSelectedProject.status]?.label}
+                    </Badge>
+                  </div>
+                  <CardDescription className="text-base">
+                    {calendarSelectedProject.company || calendarSelectedProject.client_name}
+                  </CardDescription>
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={() => setCalendarSelectedProject(null)}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Event Details */}
+              <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Event Details
+                </h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">Date:</span>
+                    <span className="ml-2 font-medium">{formatEventDate(calendarSelectedProject.event_date)}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Type:</span>
+                    <span className="ml-2 font-medium capitalize">{calendarSelectedProject.event_type}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-gray-500">Location:</span>
+                    <span className="ml-2 font-medium">{calendarSelectedProject.event_location || 'TBD'}</span>
+                  </div>
+                  {calendarSelectedProject.attendee_count && (
+                    <div>
+                      <span className="text-gray-500">Attendees:</span>
+                      <span className="ml-2 font-medium">{calendarSelectedProject.attendee_count}</span>
+                    </div>
+                  )}
+                  {calendarSelectedProject.requested_speaker_name && (
+                    <div>
+                      <span className="text-gray-500">Speaker:</span>
+                      <span className="ml-2 font-medium">{calendarSelectedProject.requested_speaker_name}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Client Information */}
+              <div className="bg-blue-50 p-4 rounded-lg space-y-3">
+                <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Client Information
+                </h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">Name:</span>
+                    <span className="ml-2 font-medium">{calendarSelectedProject.client_name}</span>
+                  </div>
+                  {calendarSelectedProject.company && (
+                    <div>
+                      <span className="text-gray-500">Company:</span>
+                      <span className="ml-2 font-medium">{calendarSelectedProject.company}</span>
+                    </div>
+                  )}
+                  {calendarSelectedProject.client_email && (
+                    <div className="col-span-2 flex items-center gap-1">
+                      <Mail className="h-3 w-3 text-gray-500" />
+                      <a href={`mailto:${calendarSelectedProject.client_email}`} className="text-blue-600 hover:underline">
+                        {calendarSelectedProject.client_email}
+                      </a>
+                    </div>
+                  )}
+                  {calendarSelectedProject.client_phone && (
+                    <div className="col-span-2 flex items-center gap-1">
+                      <span className="text-gray-500">Phone:</span>
+                      <a href={`tel:${calendarSelectedProject.client_phone}`} className="text-blue-600 hover:underline ml-1">
+                        {calendarSelectedProject.client_phone}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Project Information */}
+              <div className="bg-green-50 p-4 rounded-lg space-y-3">
+                <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Project Information
+                </h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {calendarSelectedProject.budget && (
+                    <div>
+                      <span className="text-gray-500">Budget:</span>
+                      <span className="ml-2 font-medium">${Number(calendarSelectedProject.budget).toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div>
+                    <span className="text-gray-500">Priority:</span>
+                    <span className={`ml-2 px-2 py-0.5 rounded text-xs font-medium capitalize ${
+                      calendarSelectedProject.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                      calendarSelectedProject.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                      calendarSelectedProject.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {calendarSelectedProject.priority}
+                    </span>
+                  </div>
+                  {calendarSelectedProject.speaker_fee && (
+                    <div>
+                      <span className="text-gray-500">Speaker Fee:</span>
+                      <span className="ml-2 font-medium">${Number(calendarSelectedProject.speaker_fee).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {calendarSelectedProject.event_classification && (
+                    <div>
+                      <span className="text-gray-500">Classification:</span>
+                      <span className="ml-2 font-medium capitalize">{calendarSelectedProject.event_classification}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Notes */}
+              {calendarSelectedProject.notes && (
+                <div className="bg-yellow-50 p-4 rounded-lg space-y-2">
+                  <h4 className="font-semibold text-sm text-gray-700">Notes</h4>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{calendarSelectedProject.notes}</p>
+                </div>
+              )}
+
+              {/* Timestamps */}
+              <div className="text-xs text-gray-500 pt-4 border-t flex justify-between">
+                <span>Created: {formatEventDate(calendarSelectedProject.created_at)}</span>
+                <span>Updated: {formatEventDate(calendarSelectedProject.updated_at)}</span>
+              </div>
+
+              {/* Action Button */}
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  onClick={() => {
+                    setCalendarSelectedProject(null)
+                    setSelectedProject(calendarSelectedProject)
+                  }}
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  Manage Tasks
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Create Project Dialog */}
       <Dialog open={showCreateProject} onOpenChange={setShowCreateProject}>
