@@ -1041,6 +1041,7 @@ export default function EnhancedProjectManagementPage() {
     const matchesSearch =
       (project.project_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (project.client_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (project.company?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (project.event_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (project.event_title?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (project.event_location?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
