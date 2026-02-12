@@ -134,6 +134,14 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           bgColor: "bg-orange-50"
         },
         {
+          title: "Contracts Hub",
+          href: "/admin/contracts-hub",
+          icon: FileSignature,
+          description: "Contract Management",
+          color: "text-emerald-600",
+          bgColor: "bg-emerald-50"
+        },
+        {
           title: "Finances",
           href: "/admin/finances",
           icon: Wallet,
@@ -304,14 +312,6 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           description: "Offer Sheets",
           color: "text-amber-600",
           bgColor: "bg-amber-50"
-        },
-        {
-          title: "Contracts Hub",
-          href: "/admin/contracts-hub",
-          icon: FileSignature,
-          description: "Contract Management",
-          color: "text-emerald-600",
-          bgColor: "bg-emerald-50"
         },
         {
           title: "Tasks & Follow-ups",

@@ -14,6 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   Search,
   Eye,
   Edit,
@@ -29,7 +36,8 @@ import {
   Copy,
   ExternalLink,
   Loader2,
-  Filter
+  Filter,
+  Trash2
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -79,6 +87,8 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [dateFilter, setDateFilter] = useState<string>("all")
+  const [deletingContract, setDeletingContract] = useState<Contract | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     loadContracts()
@@ -176,6 +186,36 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
 
   const downloadContract = (contractId: number) => {
     window.open(`/api/contracts/${contractId}/download`, '_blank')
+  }
+
+  const handleDeleteContract = async () => {
+    if (!deletingContract) return
+    setDeleting(true)
+    try {
+      const response = await fetch(`/api/contracts/${deletingContract.id}`, {
+        method: "DELETE"
+      })
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Contract deleted successfully"
+        })
+        setDeletingContract(null)
+        loadContracts()
+        onRefresh?.()
+      } else {
+        throw new Error("Failed to delete contract")
+      }
+    } catch (error) {
+      console.error("Error deleting contract:", error)
+      toast({
+        title: "Error",
+        description: "Failed to delete contract",
+        variant: "destructive"
+      })
+    } finally {
+      setDeleting(false)
+    }
   }
 
   const filteredContracts = contracts.filter(contract => {
@@ -405,6 +445,15 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
                         >
                           <Download className="w-4 h-4" />
                         </Button>
+
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => setDeletingContract(contract)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -414,6 +463,42 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
           </Table>
         </div>
       )}
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deletingContract} onOpenChange={() => setDeletingContract(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Contract</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete contract{" "}
+              <strong>{deletingContract?.contract_number}</strong>
+              {deletingContract?.client_name && ` for ${deletingContract.client_name}`}?
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button variant="outline" onClick={() => setDeletingContract(null)} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteContract}
+              disabled={deleting}
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
