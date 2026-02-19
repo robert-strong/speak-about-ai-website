@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Table,
   TableBody,
@@ -22,22 +22,24 @@ import {
   Clock,
   CheckCircle2,
   AlertTriangle,
-  DollarSign,
   FileText,
   Send,
-  Download,
   Receipt,
   Check,
-  X,
   Trash2,
-  AlertCircle,
-  Edit
+  Edit,
+  Search,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Calendar,
+  Mail
 } from "lucide-react"
 import { AdminSidebar } from "@/components/admin-sidebar"
 import { useToast } from "@/hooks/use-toast"
 import { InvoicePDFDialog } from "@/components/invoice-pdf-viewer"
 import { InvoiceEditorModal } from "@/components/invoice-editor-modal"
-import { authGet, authPost, authPut, authPatch, authDelete, authFetch } from "@/lib/auth-fetch"
+import { authGet, authPost, authPatch, authDelete } from "@/lib/auth-fetch"
 
 interface Project {
   id: number
@@ -65,7 +67,7 @@ interface Project {
   notes?: string
   created_at: string
   updated_at: string
-  
+
   // Event logistics
   venue_details?: string
   av_requirements?: string
@@ -73,13 +75,13 @@ interface Project {
   accommodation_details?: string
   expenses_budget?: number
   travel_expenses_amount?: string
-  
+
   // Timeline milestones
   contracts_due?: string
   speaker_confirmation_due?: string
   av_check_due?: string
   final_details_due?: string
-  
+
   // New fields
   event_name?: string
 }
@@ -89,12 +91,19 @@ interface Invoice {
   project_id: number
   invoice_number: string
   invoice_type?: "deposit" | "final" | "standard"
-  amount: number
+  amount: number | string
   status: "draft" | "sent" | "paid" | "overdue" | "cancelled"
   issue_date: string
   due_date: string
   payment_date?: string
   notes?: string
+}
+
+// Helper to safely parse amount as number
+const parseAmount = (amount: number | string | undefined): number => {
+  if (amount === undefined || amount === null) return 0
+  const parsed = typeof amount === 'string' ? parseFloat(amount) : amount
+  return isNaN(parsed) ? 0 : parsed
 }
 
 const INVOICE_STATUSES = {
@@ -105,6 +114,9 @@ const INVOICE_STATUSES = {
   cancelled: { label: "Cancelled", color: "bg-gray-400" }
 }
 
+type SortField = "due_date" | "amount" | "status" | "invoice_number"
+type SortOrder = "asc" | "desc"
+
 export default function InvoicingPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -114,6 +126,14 @@ export default function InvoicingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [selectedInvoiceForPDF, setSelectedInvoiceForPDF] = useState<{id: number, number: string} | null>(null)
   const [selectedInvoiceForEdit, setSelectedInvoiceForEdit] = useState<number | null>(null)
+
+  // Search and filter state
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [sortBy, setSortBy] = useState<SortField>("due_date")
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
+  const [projectSearch, setProjectSearch] = useState("")
+
   const [invoiceFormData, setInvoiceFormData] = useState({
     project_id: "",
     invoice_type: "",
@@ -136,7 +156,7 @@ export default function InvoicingPage() {
   const loadData = async () => {
     try {
       setLoading(true)
-      
+
       const [projectsResponse, invoicesResponse] = await Promise.all([
         authGet("/api/projects"),
         authGet("/api/invoices")
@@ -170,7 +190,7 @@ export default function InvoicingPage() {
     if (!dateString) return 'N/A'
     try {
       let date: Date
-      
+
       if (dateString.length === 10 && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
         const [year, month, day] = dateString.split('-').map(Number)
         date = new Date(year, month - 1, day)
@@ -179,9 +199,9 @@ export default function InvoicingPage() {
         const [year, month, day] = datePart.split('-').map(Number)
         date = new Date(year, month - 1, day)
       }
-      
+
       if (isNaN(date.getTime())) return 'N/A'
-      
+
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -193,17 +213,132 @@ export default function InvoicingPage() {
     }
   }
 
+  // Calculate due date status for visual indicators
+  const getDueDateStatus = (dueDate: string, status: string) => {
+    if (status === "paid" || status === "cancelled") return "normal"
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const due = new Date(dueDate)
+    due.setHours(0, 0, 0, 0)
+
+    const daysUntilDue = Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+    if (daysUntilDue < 0) return "overdue"
+    if (daysUntilDue <= 7) return "due-soon"
+    return "normal"
+  }
+
+  // Filter and sort invoices
+  const filteredAndSortedInvoices = useMemo(() => {
+    let filtered = invoices
+
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(inv => inv.status === statusFilter)
+    }
+
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      filtered = filtered.filter(invoice => {
+        const project = projects.find(p => p.id === invoice.project_id)
+        return (
+          invoice.invoice_number.toLowerCase().includes(searchLower) ||
+          project?.client_name?.toLowerCase().includes(searchLower) ||
+          project?.company?.toLowerCase().includes(searchLower) ||
+          project?.event_name?.toLowerCase().includes(searchLower) ||
+          project?.event_title?.toLowerCase().includes(searchLower) ||
+          project?.project_name?.toLowerCase().includes(searchLower)
+        )
+      })
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let comparison = 0
+
+      switch (sortBy) {
+        case "due_date":
+          comparison = new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+          break
+        case "amount":
+          comparison = parseAmount(a.amount) - parseAmount(b.amount)
+          break
+        case "status":
+          const statusOrder = { draft: 0, sent: 1, overdue: 2, paid: 3, cancelled: 4 }
+          comparison = statusOrder[a.status] - statusOrder[b.status]
+          break
+        case "invoice_number":
+          comparison = a.invoice_number.localeCompare(b.invoice_number)
+          break
+      }
+
+      return sortOrder === "asc" ? comparison : -comparison
+    })
+
+    return filtered
+  }, [invoices, projects, statusFilter, searchTerm, sortBy, sortOrder])
+
+  // Filter projects for dropdown with search
+  const filteredProjects = useMemo(() => {
+    const activeProjects = projects.filter(p => !["completed", "cancelled"].includes(p.status))
+
+    if (!projectSearch) return activeProjects
+
+    const searchLower = projectSearch.toLowerCase()
+    return activeProjects.filter(project =>
+      project.client_name?.toLowerCase().includes(searchLower) ||
+      project.company?.toLowerCase().includes(searchLower) ||
+      project.event_name?.toLowerCase().includes(searchLower) ||
+      project.event_title?.toLowerCase().includes(searchLower) ||
+      project.project_name?.toLowerCase().includes(searchLower)
+    )
+  }, [projects, projectSearch])
+
+  // Get selected project details for preview
+  const selectedProject = useMemo(() => {
+    if (!invoiceFormData.project_id) return null
+    return projects.find(p => p.id.toString() === invoiceFormData.project_id)
+  }, [projects, invoiceFormData.project_id])
+
+  // Count invoices by status
+  const statusCounts = useMemo(() => ({
+    all: invoices.length,
+    draft: invoices.filter(i => i.status === "draft").length,
+    sent: invoices.filter(i => i.status === "sent").length,
+    paid: invoices.filter(i => i.status === "paid").length,
+    overdue: invoices.filter(i => i.status === "overdue").length
+  }), [invoices])
+
+  const handleSort = (field: SortField) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortBy(field)
+      setSortOrder("desc")
+    }
+  }
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortBy !== field) return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />
+    return sortOrder === "asc"
+      ? <ArrowUp className="h-4 w-4 ml-1" />
+      : <ArrowDown className="h-4 w-4 ml-1" />
+  }
+
   const handleInvoiceTypeChange = (value: string, projectId: string) => {
     if (!projectId) return
-    
+
     const project = projects.find(p => p.id.toString() === projectId)
     if (!project) return
-    
+
     const speakerFee = parseFloat(project.speaker_fee || project.budget || "0")
     const travelExpenses = parseFloat(project.travel_expenses_amount || "0")
     const totalAmount = speakerFee + travelExpenses
     let amount = ""
-    
+
     switch (value) {
       case "initial":
         amount = (totalAmount * 0.5).toString()
@@ -224,7 +359,7 @@ export default function InvoicingPage() {
         amount = ""
         break
     }
-    
+
     setInvoiceFormData({
       ...invoiceFormData,
       invoice_type: value,
@@ -237,7 +372,7 @@ export default function InvoicingPage() {
       const response = await authPost("/api/invoices", {
           project_id: parseInt(invoiceFormData.project_id)
       })
-      
+
       if (response.ok) {
         toast({
           title: "Success",
@@ -252,6 +387,7 @@ export default function InvoicingPage() {
           payment_terms: "net-30",
           notes: ""
         })
+        setProjectSearch("")
       } else {
         const errorData = await response.json()
         toast({
@@ -272,8 +408,15 @@ export default function InvoicingPage() {
 
   const handleUpdateInvoiceStatus = async (invoiceId: number, newStatus: string) => {
     try {
-      const response = await authPatch(`/api/invoices/${invoiceId}`, { status: newStatus })
-      
+      const updateData: { status: string; payment_date?: string } = { status: newStatus }
+
+      // If marking as paid, set payment_date to today
+      if (newStatus === "paid") {
+        updateData.payment_date = new Date().toISOString().split('T')[0]
+      }
+
+      const response = await authPatch(`/api/invoices/${invoiceId}`, updateData)
+
       if (response.ok) {
         toast({
           title: "Success",
@@ -300,10 +443,10 @@ export default function InvoicingPage() {
 
   const handleDeleteInvoice = async (invoiceId: number) => {
     if (!confirm("Are you sure you want to delete this invoice?")) return
-    
+
     try {
       const response = await authDelete(`/api/invoices/${invoiceId}`)
-      
+
       if (response.ok) {
         toast({
           title: "Success",
@@ -380,7 +523,7 @@ export default function InvoicingPage() {
               <CardContent>
                 <div className="text-2xl font-bold">
                   ${new Intl.NumberFormat('en-US').format(
-                    invoices.reduce((sum, inv) => sum + inv.amount, 0)
+                    invoices.reduce((sum, inv) => sum + parseAmount(inv.amount), 0)
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -396,7 +539,7 @@ export default function InvoicingPage() {
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
                   ${new Intl.NumberFormat('en-US').format(
-                    invoices.filter(i => i.status === "paid").reduce((sum, inv) => sum + inv.amount, 0)
+                    invoices.filter(i => i.status === "paid").reduce((sum, inv) => sum + parseAmount(inv.amount), 0)
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -412,7 +555,7 @@ export default function InvoicingPage() {
               <CardContent>
                 <div className="text-2xl font-bold text-yellow-600">
                   ${new Intl.NumberFormat('en-US').format(
-                    invoices.filter(i => ["sent", "overdue"].includes(i.status)).reduce((sum, inv) => sum + inv.amount, 0)
+                    invoices.filter(i => ["sent", "overdue"].includes(i.status)).reduce((sum, inv) => sum + parseAmount(inv.amount), 0)
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -428,7 +571,7 @@ export default function InvoicingPage() {
               <CardContent>
                 <div className="text-2xl font-bold text-red-600">
                   ${new Intl.NumberFormat('en-US').format(
-                    invoices.filter(i => i.status === "overdue").reduce((sum, inv) => sum + inv.amount, 0)
+                    invoices.filter(i => i.status === "overdue").reduce((sum, inv) => sum + parseAmount(inv.amount), 0)
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -451,33 +594,43 @@ export default function InvoicingPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="invoice-project">Select Project</Label>
-                  <Select 
-                    value={invoiceFormData.project_id} 
-                    onValueChange={(value) => {
-                      setInvoiceFormData({...invoiceFormData, project_id: value})
-                      if (invoiceFormData.invoice_type) {
-                        handleInvoiceTypeChange(invoiceFormData.invoice_type, value)
-                      }
-                    }}
-                  >
-                    <SelectTrigger id="invoice-project">
-                      <SelectValue placeholder="Choose a project" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {projects
-                        .filter(p => !["completed", "cancelled"].includes(p.status))
-                        .map(project => (
+                  <Label htmlFor="project-search">Select Project</Label>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="project-search"
+                        placeholder="Search projects..."
+                        value={projectSearch}
+                        onChange={(e) => setProjectSearch(e.target.value)}
+                        className="pl-9"
+                      />
+                    </div>
+                    <Select
+                      value={invoiceFormData.project_id}
+                      onValueChange={(value) => {
+                        setInvoiceFormData({...invoiceFormData, project_id: value})
+                        if (invoiceFormData.invoice_type) {
+                          handleInvoiceTypeChange(invoiceFormData.invoice_type, value)
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a project" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredProjects.map(project => (
                           <SelectItem key={project.id} value={project.id.toString()}>
                             {project.event_name || project.event_title || project.project_name} - {project.client_name}
                           </SelectItem>
                         ))}
-                    </SelectContent>
-                  </Select>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="invoice-type">Invoice Type</Label>
-                  <Select 
+                  <Select
                     value={invoiceFormData.invoice_type}
                     onValueChange={(value) => handleInvoiceTypeChange(value, invoiceFormData.project_id)}
                   >
@@ -496,9 +649,9 @@ export default function InvoicingPage() {
                 </div>
                 <div>
                   <Label htmlFor="invoice-amount">Amount</Label>
-                  <Input 
-                    id="invoice-amount" 
-                    type="number" 
+                  <Input
+                    id="invoice-amount"
+                    type="number"
                     placeholder="25000"
                     value={invoiceFormData.amount}
                     onChange={(e) => setInvoiceFormData({...invoiceFormData, amount: e.target.value})}
@@ -506,11 +659,45 @@ export default function InvoicingPage() {
                   />
                 </div>
               </div>
+
+              {/* Project Preview */}
+              {selectedProject && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Project Details</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-500">Client:</span>
+                      <p className="font-medium">{selectedProject.client_name}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Company:</span>
+                      <p className="font-medium">{selectedProject.company || "N/A"}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Email:</span>
+                      <p className="font-medium">{selectedProject.client_email || "N/A"}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Event Date:</span>
+                      <p className="font-medium">{formatEventDate(selectedProject.event_date)}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Speaker Fee:</span>
+                      <p className="font-medium">${new Intl.NumberFormat('en-US').format(parseFloat(selectedProject.speaker_fee || selectedProject.budget || "0"))}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Travel Expenses:</span>
+                      <p className="font-medium">${new Intl.NumberFormat('en-US').format(parseFloat(selectedProject.travel_expenses_amount || "0"))}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div>
                   <Label htmlFor="invoice-due-date">Due Date</Label>
-                  <Input 
-                    id="invoice-due-date" 
+                  <Input
+                    id="invoice-due-date"
                     type="date"
                     value={invoiceFormData.due_date}
                     onChange={(e) => setInvoiceFormData({...invoiceFormData, due_date: e.target.value})}
@@ -518,7 +705,7 @@ export default function InvoicingPage() {
                 </div>
                 <div>
                   <Label htmlFor="invoice-terms">Payment Terms</Label>
-                  <Select 
+                  <Select
                     value={invoiceFormData.payment_terms}
                     onValueChange={(value) => setInvoiceFormData({...invoiceFormData, payment_terms: value})}
                   >
@@ -536,8 +723,8 @@ export default function InvoicingPage() {
               </div>
               <div className="mt-4">
                 <Label htmlFor="invoice-notes">Notes / Description</Label>
-                <Textarea 
-                  id="invoice-notes" 
+                <Textarea
+                  id="invoice-notes"
                   placeholder="Additional notes or description for the invoice..."
                   rows={3}
                   value={invoiceFormData.notes}
@@ -545,7 +732,7 @@ export default function InvoicingPage() {
                 />
               </div>
               <div className="flex justify-end gap-2 mt-6">
-                <Button 
+                <Button
                   onClick={handleCreateInvoice}
                   disabled={!invoiceFormData.project_id || !invoiceFormData.amount}
                 >
@@ -556,94 +743,213 @@ export default function InvoicingPage() {
             </CardContent>
           </Card>
 
-          {/* Invoices List */}
+          {/* Invoices List with Tabs */}
           <Card>
             <CardHeader>
-              <CardTitle>All Invoices</CardTitle>
-              <CardDescription>Manage and track all invoices</CardDescription>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <CardTitle>All Invoices</CardTitle>
+                  <CardDescription>Manage and track all invoices</CardDescription>
+                </div>
+                <div className="relative w-full md:w-80">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search by client, invoice #, or project..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Invoice #</TableHead>
-                    <TableHead>Project</TableHead>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Due Date</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {invoices.map(invoice => {
-                    const project = projects.find(p => p.id === invoice.project_id)
-                    const statusConfig = INVOICE_STATUSES[invoice.status]
-                    
-                    return (
-                      <TableRow key={invoice.id}>
-                        <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
-                        <TableCell>
-                          {project?.event_name || project?.event_title || project?.project_name || "N/A"}
-                        </TableCell>
-                        <TableCell>{project?.client_name || "N/A"}</TableCell>
-                        <TableCell>${new Intl.NumberFormat('en-US').format(invoice.amount)}</TableCell>
-                        <TableCell>
-                          <Badge className={`${statusConfig.color} text-white`}>
-                            {statusConfig.label}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{formatEventDate(invoice.due_date)}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="ghost"
-                              onClick={() => setSelectedInvoiceForPDF({id: invoice.id, number: invoice.invoice_number})}
-                            >
-                              <FileText className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="ghost"
-                              onClick={() => setSelectedInvoiceForEdit(invoice.id)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            {invoice.status === "draft" && (
-                              <Button 
-                                size="sm" 
-                                variant="ghost"
-                                onClick={() => handleSendInvoice(invoice.id)}
-                              >
-                                <Send className="h-4 w-4" />
-                              </Button>
-                            )}
-                            {invoice.status === "sent" && (
-                              <Button 
-                                size="sm" 
-                                variant="ghost"
-                                className="text-green-600 hover:text-green-700"
-                                onClick={() => markInvoicePaid(invoice.id)}
-                              >
-                                <Check className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <Button 
-                              size="sm" 
-                              variant="ghost"
-                              className="text-red-600 hover:text-red-700"
-                              onClick={() => handleDeleteInvoice(invoice.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+              <Tabs value={statusFilter} onValueChange={setStatusFilter} className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="all" className="gap-2">
+                    All
+                    <Badge variant="secondary" className="ml-1">{statusCounts.all}</Badge>
+                  </TabsTrigger>
+                  <TabsTrigger value="draft" className="gap-2">
+                    Draft
+                    <Badge variant="secondary" className="ml-1">{statusCounts.draft}</Badge>
+                  </TabsTrigger>
+                  <TabsTrigger value="sent" className="gap-2">
+                    Sent
+                    <Badge variant="secondary" className="ml-1">{statusCounts.sent}</Badge>
+                  </TabsTrigger>
+                  <TabsTrigger value="paid" className="gap-2">
+                    Paid
+                    <Badge variant="secondary" className="ml-1">{statusCounts.paid}</Badge>
+                  </TabsTrigger>
+                  <TabsTrigger value="overdue" className="gap-2">
+                    Overdue
+                    <Badge variant="secondary" className="ml-1 bg-red-100 text-red-700">{statusCounts.overdue}</Badge>
+                  </TabsTrigger>
+                </TabsList>
+
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead
+                        className="cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleSort("invoice_number")}
+                      >
+                        <div className="flex items-center">
+                          Invoice #
+                          <SortIcon field="invoice_number" />
+                        </div>
+                      </TableHead>
+                      <TableHead>Project</TableHead>
+                      <TableHead>Client</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead
+                        className="cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleSort("amount")}
+                      >
+                        <div className="flex items-center">
+                          Amount
+                          <SortIcon field="amount" />
+                        </div>
+                      </TableHead>
+                      <TableHead
+                        className="cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleSort("status")}
+                      >
+                        <div className="flex items-center">
+                          Status
+                          <SortIcon field="status" />
+                        </div>
+                      </TableHead>
+                      <TableHead
+                        className="cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleSort("due_date")}
+                      >
+                        <div className="flex items-center">
+                          Due Date
+                          <SortIcon field="due_date" />
+                        </div>
+                      </TableHead>
+                      <TableHead>Payment Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredAndSortedInvoices.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                          {searchTerm || statusFilter !== "all"
+                            ? "No invoices match your search criteria"
+                            : "No invoices found. Create your first invoice above."}
                         </TableCell>
                       </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+                    ) : (
+                      filteredAndSortedInvoices.map(invoice => {
+                        const project = projects.find(p => p.id === invoice.project_id)
+                        const statusConfig = INVOICE_STATUSES[invoice.status]
+                        const dueDateStatus = getDueDateStatus(invoice.due_date, invoice.status)
+
+                        return (
+                          <TableRow key={invoice.id}>
+                            <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
+                            <TableCell>
+                              {project?.event_name || project?.event_title || project?.project_name || "N/A"}
+                            </TableCell>
+                            <TableCell>{project?.client_name || "N/A"}</TableCell>
+                            <TableCell>
+                              {project?.client_email ? (
+                                <a
+                                  href={`mailto:${project.client_email}`}
+                                  className="text-blue-600 hover:underline flex items-center gap-1"
+                                >
+                                  <Mail className="h-3 w-3" />
+                                  {project.client_email}
+                                </a>
+                              ) : "N/A"}
+                            </TableCell>
+                            <TableCell>${new Intl.NumberFormat('en-US').format(parseAmount(invoice.amount))}</TableCell>
+                            <TableCell>
+                              <Badge className={`${statusConfig.color} text-white`}>
+                                {statusConfig.label}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className={`flex items-center gap-2 ${
+                                dueDateStatus === "overdue" ? "text-red-600 font-medium" :
+                                dueDateStatus === "due-soon" ? "text-yellow-600 font-medium" :
+                                ""
+                              }`}>
+                                {dueDateStatus === "overdue" && <AlertTriangle className="h-4 w-4" />}
+                                {dueDateStatus === "due-soon" && <Clock className="h-4 w-4" />}
+                                {formatEventDate(invoice.due_date)}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {invoice.payment_date ? (
+                                <div className="flex items-center gap-1 text-green-600">
+                                  <Calendar className="h-3 w-3" />
+                                  {formatEventDate(invoice.payment_date)}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  title="View PDF"
+                                  onClick={() => setSelectedInvoiceForPDF({id: invoice.id, number: invoice.invoice_number})}
+                                >
+                                  <FileText className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  title="Edit Invoice"
+                                  onClick={() => setSelectedInvoiceForEdit(invoice.id)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                {invoice.status === "draft" && (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    title="Mark as Sent"
+                                    onClick={() => handleSendInvoice(invoice.id)}
+                                  >
+                                    <Send className="h-4 w-4" />
+                                  </Button>
+                                )}
+                                {(invoice.status === "sent" || invoice.status === "overdue") && (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-green-600 hover:text-green-700"
+                                    title="Mark as Paid"
+                                    onClick={() => markInvoicePaid(invoice.id)}
+                                  >
+                                    <Check className="h-4 w-4" />
+                                  </Button>
+                                )}
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-red-600 hover:text-red-700"
+                                  title="Delete Invoice"
+                                  onClick={() => handleDeleteInvoice(invoice.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+              </Tabs>
             </CardContent>
           </Card>
         </div>

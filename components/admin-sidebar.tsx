@@ -40,7 +40,8 @@ import {
   Bot,
   Sparkles,
   Archive,
-  FileEdit
+  FileEdit,
+  Receipt
 } from "lucide-react"
 
 interface AdminSidebarProps {
@@ -148,6 +149,14 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           description: "Revenue & Commissions",
           color: "text-emerald-600",
           bgColor: "bg-emerald-50"
+        },
+        {
+          title: "Invoices",
+          href: "/admin/invoicing",
+          icon: Receipt,
+          description: "Invoice Management",
+          color: "text-green-600",
+          bgColor: "bg-green-50"
         }
       ]
     },
@@ -263,14 +272,6 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           description: "System Debug",
           color: "text-red-600",
           bgColor: "bg-red-50"
-        },
-        {
-          title: "Invoicing (BETA)",
-          href: "/admin/invoicing",
-          icon: DollarSign,
-          description: "Invoice Management",
-          color: "text-green-600",
-          bgColor: "bg-green-50"
         }
       ]
     },
