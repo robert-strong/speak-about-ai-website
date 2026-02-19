@@ -213,6 +213,20 @@ export default function InvoicingPage() {
     }
   }
 
+  // Check if an invoice is overdue (past due date and not paid/cancelled)
+  const isInvoiceOverdue = (invoice: Invoice) => {
+    if (invoice.status === "paid" || invoice.status === "cancelled") return false
+    if (invoice.status === "overdue") return true // Already marked overdue in DB
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const due = new Date(invoice.due_date)
+    due.setHours(0, 0, 0, 0)
+
+    return due.getTime() < today.getTime()
+  }
+
   // Calculate due date status for visual indicators
   const getDueDateStatus = (dueDate: string, status: string) => {
     if (status === "paid" || status === "cancelled") return "normal"
@@ -236,7 +250,15 @@ export default function InvoicingPage() {
 
     // Apply status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(inv => inv.status === statusFilter)
+      if (statusFilter === "overdue") {
+        // For overdue tab, include both DB-marked overdue AND sent invoices past due date
+        filtered = filtered.filter(inv => isInvoiceOverdue(inv))
+      } else if (statusFilter === "sent") {
+        // For sent tab, exclude invoices that are actually overdue
+        filtered = filtered.filter(inv => inv.status === "sent" && !isInvoiceOverdue(inv))
+      } else {
+        filtered = filtered.filter(inv => inv.status === statusFilter)
+      }
     }
 
     // Apply search filter
@@ -303,14 +325,19 @@ export default function InvoicingPage() {
     return projects.find(p => p.id.toString() === invoiceFormData.project_id)
   }, [projects, invoiceFormData.project_id])
 
-  // Count invoices by status
-  const statusCounts = useMemo(() => ({
-    all: invoices.length,
-    draft: invoices.filter(i => i.status === "draft").length,
-    sent: invoices.filter(i => i.status === "sent").length,
-    paid: invoices.filter(i => i.status === "paid").length,
-    overdue: invoices.filter(i => i.status === "overdue").length
-  }), [invoices])
+  // Count invoices by status (overdue includes sent invoices past due date)
+  const statusCounts = useMemo(() => {
+    const overdueCount = invoices.filter(i => isInvoiceOverdue(i)).length
+    const sentCount = invoices.filter(i => i.status === "sent" && !isInvoiceOverdue(i)).length
+
+    return {
+      all: invoices.length,
+      draft: invoices.filter(i => i.status === "draft").length,
+      sent: sentCount,
+      paid: invoices.filter(i => i.status === "paid").length,
+      overdue: overdueCount
+    }
+  }, [invoices])
 
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
@@ -555,11 +582,11 @@ export default function InvoicingPage() {
               <CardContent>
                 <div className="text-2xl font-bold text-yellow-600">
                   ${new Intl.NumberFormat('en-US').format(
-                    invoices.filter(i => ["sent", "overdue"].includes(i.status)).reduce((sum, inv) => sum + parseAmount(inv.amount), 0)
+                    invoices.filter(i => i.status === "sent" || isInvoiceOverdue(i)).reduce((sum, inv) => sum + parseAmount(inv.amount), 0)
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {invoices.filter(i => ["sent", "overdue"].includes(i.status)).length} pending
+                  {invoices.filter(i => i.status === "sent" || isInvoiceOverdue(i)).length} pending
                 </p>
               </CardContent>
             </Card>
@@ -571,11 +598,11 @@ export default function InvoicingPage() {
               <CardContent>
                 <div className="text-2xl font-bold text-red-600">
                   ${new Intl.NumberFormat('en-US').format(
-                    invoices.filter(i => i.status === "overdue").reduce((sum, inv) => sum + parseAmount(inv.amount), 0)
+                    invoices.filter(i => isInvoiceOverdue(i)).reduce((sum, inv) => sum + parseAmount(inv.amount), 0)
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {invoices.filter(i => i.status === "overdue").length} overdue
+                  {invoices.filter(i => isInvoiceOverdue(i)).length} overdue
                 </p>
               </CardContent>
             </Card>
