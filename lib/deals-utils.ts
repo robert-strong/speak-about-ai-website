@@ -103,6 +103,9 @@ export async function createDeal(formData: DealFormData, sessionId?: string): Pr
       ? formData.selectedWorkshop
       : formData.specificSpeaker
 
+    // Build notes from additional info so it shows in the CRM Notes section
+    const notes = additionalInfo ? `[Additional Information from Inquiry]\n${additionalInfo}` : null
+
     // Create the main deal record
     const dealResult = await sql`
       INSERT INTO deals (
@@ -110,7 +113,7 @@ export async function createDeal(formData: DealFormData, sessionId?: string): Pr
         event_title, event_date, event_location, event_type, attendee_count,
         budget_range, deal_value, event_budget,
         status, priority, specific_speaker, speaker_requested, additional_info,
-        wishlist_speakers, source, created_at, last_contact
+        wishlist_speakers, source, notes, created_at, last_contact
       ) VALUES (
         ${formData.clientName},
         ${formData.clientEmail},
@@ -133,6 +136,7 @@ export async function createDeal(formData: DealFormData, sessionId?: string): Pr
         ${additionalInfo || null},
         ${JSON.stringify(formData.wishlistSpeakers || [])},
         ${'website_form'},
+        ${notes},
         CURRENT_TIMESTAMP,
         CURRENT_DATE
       )

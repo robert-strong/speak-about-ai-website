@@ -182,6 +182,9 @@ export async function submitLandingPageForm(formData: FormData): Promise<{ succe
     }
     const sql = neon(databaseUrl)
 
+    // Build admin_notes from additional_info so it shows in the CRM Notes section
+    const adminNotes = formData.additionalInfo ? `[Additional Information from Inquiry]\n${formData.additionalInfo}` : null
+
     // Save to form_submissions table
     const [submission] = await sql`
       INSERT INTO form_submissions (
@@ -197,6 +200,7 @@ export async function submitLandingPageForm(formData: FormData): Promise<{ succe
         event_budget,
         message,
         additional_info,
+        admin_notes,
         form_data,
         newsletter_opt_in,
         ip_address,
@@ -216,6 +220,7 @@ export async function submitLandingPageForm(formData: FormData): Promise<{ succe
         ${formData.eventBudget || null},
         ${formData.message || null},
         ${formData.additionalInfo || null},
+        ${adminNotes},
         ${JSON.stringify(formData)},
         ${!formData.newsletterOptOut},
         ${ip},
