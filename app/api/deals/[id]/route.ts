@@ -149,6 +149,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           notes: `Deal ID: ${deal.id}\nSource: ${deal.source}\nBudget Range: ${deal.budget_range}\nOriginal notes: ${deal.notes}`,
           tags: [deal.event_type, deal.source],
 
+          // Link back to the deal
+          deal_id: deal.id,
+
           // Status tracking (initialized for new project)
           contract_signed: body.contract_signed || false,
           invoice_sent: false,
@@ -284,6 +287,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           contact_person: deal.client_name,
           notes: `Deal ID: ${deal.id}\nSource: ${deal.source}\nBudget Range: ${deal.budget_range}\nOriginal notes: ${deal.notes}`,
           tags: [deal.event_type, deal.source],
+
+          // Link back to the deal
+          deal_id: deal.id,
 
           // Status tracking (initialized for new project)
           contract_signed: body.contract_signed || false,

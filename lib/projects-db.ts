@@ -260,6 +260,7 @@ export async function createProject(projectData: Omit<Project, "id" | "created_a
         billing_contact_email,
         billing_contact_phone,
         requested_speaker_name,
+        deal_id,
         stage_completion
       ) VALUES (
         ${finalProjectData.project_name},
@@ -289,6 +290,7 @@ export async function createProject(projectData: Omit<Project, "id" | "created_a
         ${finalProjectData.billing_contact_email || finalProjectData.client_email || null},
         ${finalProjectData.billing_contact_phone || finalProjectData.client_phone || null},
         ${finalProjectData.requested_speaker_name || null},
+        ${finalProjectData.deal_id || null},
         ${JSON.stringify(initialStageCompletion)}
       )
       RETURNING *
