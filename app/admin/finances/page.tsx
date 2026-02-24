@@ -46,7 +46,11 @@ import {
   User,
   Mic,
   Building2,
-  Plane
+  Plane,
+  Settings,
+  Plus,
+  Trash2,
+  X
 } from "lucide-react"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import Link from "next/link"
@@ -80,6 +84,10 @@ interface FinancialProject {
   // Speaker payment tracking
   speaker_payment_status: "pending" | "paid"
   speaker_payment_date?: string
+
+  // Payment methods
+  client_payment_method?: string
+  speaker_payment_method?: string
 }
 
 interface FinancialSummary {
@@ -131,6 +139,12 @@ export default function FinancesPage() {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  // Payment methods state
+  const [paymentMethods, setPaymentMethods] = useState<{ id: number; name: string }[]>([])
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false)
+  const [newMethodName, setNewMethodName] = useState("")
+  const [addingMethod, setAddingMethod] = useState(false)
+
   useEffect(() => {
     const isAdminLoggedIn = localStorage.getItem("adminLoggedIn")
     if (!isAdminLoggedIn) {
@@ -138,6 +152,7 @@ export default function FinancesPage() {
       return
     }
     loadFinancialData()
+    loadPaymentMethods()
   }, [router])
 
   const loadFinancialData = async () => {
@@ -171,6 +186,69 @@ export default function FinancesPage() {
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadPaymentMethods = async () => {
+    try {
+      const token = localStorage.getItem("adminSessionToken")
+      const response = await fetch("/api/admin/payment-methods", {
+        headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setPaymentMethods(data.methods || [])
+      }
+    } catch (error) {
+      console.error("Error loading payment methods:", error)
+    }
+  }
+
+  const handleAddPaymentMethod = async () => {
+    if (!newMethodName.trim()) return
+    try {
+      setAddingMethod(true)
+      const token = localStorage.getItem("adminSessionToken")
+      const response = await fetch("/api/admin/payment-methods", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: JSON.stringify({ name: newMethodName.trim() })
+      })
+      if (response.ok) {
+        setNewMethodName("")
+        loadPaymentMethods()
+        toast({ title: "Success", description: "Payment method added" })
+      } else {
+        const data = await response.json()
+        toast({ title: "Error", description: data.error || "Failed to add", variant: "destructive" })
+      }
+    } catch {
+      toast({ title: "Error", description: "Failed to add payment method", variant: "destructive" })
+    } finally {
+      setAddingMethod(false)
+    }
+  }
+
+  const handleDeletePaymentMethod = async (id: number) => {
+    try {
+      const token = localStorage.getItem("adminSessionToken")
+      const response = await fetch("/api/admin/payment-methods", {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: JSON.stringify({ id })
+      })
+      if (response.ok) {
+        loadPaymentMethods()
+        toast({ title: "Success", description: "Payment method removed" })
+      }
+    } catch {
+      toast({ title: "Error", description: "Failed to remove", variant: "destructive" })
     }
   }
 
@@ -209,7 +287,9 @@ export default function FinancesPage() {
           speaker_payment_date: editingProject.speaker_payment_date,
           travel_buyout: travelBuyoutValue,
           invoice_number: editingProject.invoice_number,
-          purchase_order_number: editingProject.purchase_order_number
+          purchase_order_number: editingProject.purchase_order_number,
+          client_payment_method: editingProject.client_payment_method || null,
+          speaker_payment_method: editingProject.speaker_payment_method || null
         })
       })
 
@@ -311,10 +391,16 @@ export default function FinancesPage() {
               <h1 className="text-3xl font-bold text-gray-900">Financial Dashboard</h1>
               <p className="mt-2 text-gray-600">Track revenue, payments, and speaker payouts</p>
             </div>
-            <Button onClick={exportToCSV} variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setShowSettingsDialog(true)} variant="outline">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
+              <Button onClick={exportToCSV} variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+            </div>
           </div>
 
           {/* Summary Stats - Row 1 */}
@@ -733,6 +819,28 @@ export default function FinancesPage() {
                     />
                   </div>
                 </div>
+                <div>
+                  <Label htmlFor="client_payment_method">Payment Method</Label>
+                  <Select
+                    value={editingProject.client_payment_method || "none"}
+                    onValueChange={(value) => setEditingProject({
+                      ...editingProject,
+                      client_payment_method: value === "none" ? undefined : value
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select payment method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Not specified</SelectItem>
+                      {paymentMethods.map((method) => (
+                        <SelectItem key={method.id} value={method.name}>
+                          {method.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               {/* Speaker Payment */}
@@ -774,6 +882,28 @@ export default function FinancesPage() {
                       />
                     </div>
                   </div>
+                  <div>
+                    <Label htmlFor="speaker_payment_method">Payment Method</Label>
+                    <Select
+                      value={editingProject.speaker_payment_method || "none"}
+                      onValueChange={(value) => setEditingProject({
+                        ...editingProject,
+                        speaker_payment_method: value === "none" ? undefined : value
+                      })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select payment method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Not specified</SelectItem>
+                        {paymentMethods.map((method) => (
+                          <SelectItem key={method.id} value={method.name}>
+                            {method.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
             </div>
@@ -795,6 +925,67 @@ export default function FinancesPage() {
                   Save Changes
                 </>
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Payment Methods Settings Dialog */}
+      <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Payment Method Settings
+            </DialogTitle>
+            <DialogDescription>
+              Manage payment method options for client and speaker payments
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Add new method */}
+            <div className="flex gap-2">
+              <Input
+                placeholder="New payment method name..."
+                value={newMethodName}
+                onChange={(e) => setNewMethodName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddPaymentMethod()}
+              />
+              <Button
+                onClick={handleAddPaymentMethod}
+                disabled={addingMethod || !newMethodName.trim()}
+                size="sm"
+              >
+                {addingMethod ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              </Button>
+            </div>
+
+            {/* List of methods */}
+            <div className="border rounded-lg divide-y max-h-64 overflow-y-auto">
+              {paymentMethods.length === 0 ? (
+                <p className="p-4 text-sm text-gray-500 text-center">No payment methods configured</p>
+              ) : (
+                paymentMethods.map((method) => (
+                  <div key={method.id} className="flex items-center justify-between px-4 py-2">
+                    <span className="text-sm">{method.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 text-gray-400 hover:text-red-600"
+                      onClick={() => handleDeletePaymentMethod(method.id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSettingsDialog(false)}>
+              Done
             </Button>
           </DialogFooter>
         </DialogContent>

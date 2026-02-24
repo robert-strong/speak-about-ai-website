@@ -29,6 +29,8 @@ export async function GET(request: NextRequest) {
         p.invoice_number,
         p.purchase_order_number,
         p.payment_terms,
+        p.client_payment_method,
+        p.speaker_payment_method,
         p.notes,
         p.deal_id,
         p.created_at,
@@ -89,6 +91,10 @@ export async function GET(request: NextRequest) {
         // Speaker payment tracking
         speaker_payment_status: project.speaker_payment_status || 'pending',
         speaker_payment_date: project.speaker_payment_date,
+
+        // Payment methods
+        client_payment_method: project.client_payment_method || null,
+        speaker_payment_method: project.speaker_payment_method || null,
 
         notes: project.notes,
         deal_id: project.deal_id,
@@ -174,7 +180,9 @@ export async function PATCH(request: NextRequest) {
       speaker_payment_date,
       travel_buyout,
       invoice_number,
-      purchase_order_number
+      purchase_order_number,
+      client_payment_method,
+      speaker_payment_method
     } = body
 
     if (!projectId) {
@@ -200,6 +208,8 @@ export async function PATCH(request: NextRequest) {
         travel_buyout = COALESCE(${travel_buyout ?? null}, travel_buyout),
         invoice_number = COALESCE(${invoice_number ?? null}, invoice_number),
         purchase_order_number = COALESCE(${purchase_order_number ?? null}, purchase_order_number),
+        client_payment_method = ${client_payment_method ?? null},
+        speaker_payment_method = ${speaker_payment_method ?? null},
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${projectId}
       RETURNING *

@@ -50,9 +50,10 @@ export function useAdminSession(options: UseAdminSessionOptions = {}) {
     }))
 
     // Refresh session token if we haven't refreshed in the last 5 minutes
+    // Use a soft refresh that never triggers logout - only validateSession should logout
     const now = Date.now()
     if (now - refreshCooldownRef.current > 5 * 60 * 1000) {
-      refreshSession().catch(() => {
+      softRefreshSession().catch(() => {
         // Silently ignore refresh errors during activity updates
         // This prevents console noise from network blips
       })
@@ -62,7 +63,7 @@ export function useAdminSession(options: UseAdminSessionOptions = {}) {
 
   // Track consecutive refresh failures
   const refreshFailuresRef = useRef<number>(0)
-  const MAX_REFRESH_FAILURES = 3
+  const MAX_REFRESH_FAILURES = 5
 
   // Refresh session token
   const refreshSession = async () => {
@@ -99,6 +100,37 @@ export function useAdminSession(options: UseAdminSessionOptions = {}) {
     } catch (error) {
       // Network error - don't count as auth failure, just log it
       console.error('Failed to refresh session (network error):', error)
+    }
+  }
+
+  // Soft refresh: attempts to refresh the token but never triggers logout.
+  // Used by updateActivity so that normal page navigation or network latency
+  // cannot accidentally force a logout.
+  const softRefreshSession = async () => {
+    try {
+      const token = localStorage.getItem('adminSessionToken')
+      if (!token) return
+
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sessionToken) {
+          localStorage.setItem('adminSessionToken', data.sessionToken)
+        }
+        // Reset failure count on success
+        refreshFailuresRef.current = 0
+      }
+      // On failure: do nothing - no failure counting, no logout
+    } catch (error) {
+      // Network error - silently ignore during soft refresh
+      console.debug('Soft refresh failed (network error):', error)
     }
   }
 
@@ -263,8 +295,18 @@ export function useAdminSession(options: UseAdminSessionOptions = {}) {
         }
 
         // Try to refresh the session if we have a token
+        // If refresh fails, only logout when both localStorage values are gone
+        // This gives a grace period for transient failures during navigation
         if (token) {
-          await refreshSession()
+          try {
+            await refreshSession()
+          } catch {
+            const stillHasToken = localStorage.getItem('adminSessionToken')
+            const stillLoggedIn = localStorage.getItem('adminLoggedIn')
+            if (!stillHasToken && !stillLoggedIn) {
+              performLogout()
+            }
+          }
         }
       } catch {
         // Silently ignore validation errors on mount
