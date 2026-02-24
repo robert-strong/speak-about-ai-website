@@ -44,7 +44,8 @@ interface Contract {
   contract_number: string
   title: string
   status: "draft" | "sent" | "partially_signed" | "fully_executed" | "cancelled"
-  total_amount: number
+  fee_amount: number
+  total_amount?: number
   event_title: string
   event_date: string
   client_name: string
@@ -555,7 +556,7 @@ export function ContractsManagement() {
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <DollarSign className="w-4 h-4 text-gray-400" />
-                          ${(contract.total_amount || 0).toLocaleString()}
+                          ${(contract.fee_amount || contract.total_amount || 0).toLocaleString()}
                         </div>
                       </TableCell>
                       <TableCell>
