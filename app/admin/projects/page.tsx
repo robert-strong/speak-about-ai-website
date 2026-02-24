@@ -98,6 +98,8 @@ interface Project {
   payment_received?: boolean
   description?: string
   notes?: string
+  event_name?: string
+  deal_id?: number
   created_at: string
   updated_at: string
 
@@ -423,6 +425,10 @@ export default function EnhancedProjectManagementPage() {
   const [selectedInvoiceForEdit, setSelectedInvoiceForEdit] = useState<number | null>(null)
   const [calendarMonth, setCalendarMonth] = useState(new Date())
   const [calendarSelectedProject, setCalendarSelectedProject] = useState<Project | null>(null)
+  const [addingTaskFor, setAddingTaskFor] = useState<{ projectId: number; stageId: string } | null>(null)
+  const [newTaskName, setNewTaskName] = useState("")
+  const [editingNotesFor, setEditingNotesFor] = useState<number | null>(null)
+  const [editNotesValue, setEditNotesValue] = useState("")
   const [newProjectData, setNewProjectData] = useState({
     project_name: "",
     event_date: "",
@@ -1031,6 +1037,42 @@ export default function EnhancedProjectManagementPage() {
         description: "Failed to delete project",
         variant: "destructive"
       })
+    }
+  }
+
+  const handleAddCustomTask = async (projectId: number, stageId: string, taskName: string) => {
+    if (!taskName.trim()) return
+    try {
+      const response = await authPost(`/api/projects/${projectId}/tasks`, {
+        tasks: [{
+          name: taskName.trim(),
+          description: '',
+          category: 'custom',
+          priority: 'medium',
+          stage: stageId,
+        }]
+      })
+      if (response.ok) {
+        toast({ title: "Task added", description: taskName.trim() })
+        setNewTaskName("")
+        setAddingTaskFor(null)
+        refreshData()
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to add task", variant: "destructive" })
+    }
+  }
+
+  const handleSaveNotes = async (projectId: number, notes: string) => {
+    try {
+      const response = await authPut(`/api/projects/${projectId}`, { notes })
+      if (response.ok) {
+        setProjects(prev => prev.map(p => p.id === projectId ? { ...p, notes } : p))
+        setEditingNotesFor(null)
+        toast({ title: "Notes saved" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to save notes", variant: "destructive" })
     }
   }
 
@@ -1865,11 +1907,19 @@ export default function EnhancedProjectManagementPage() {
                                             <div className="text-xs text-gray-500">{formatEventDate(project.event_date)}</div>
                                           </div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-right min-w-[140px]">
                                           <div className="text-sm font-medium text-green-600">
-                                            ${new Intl.NumberFormat('en-US').format(parseFloat(project.speaker_fee || project.budget || "0"))}
+                                            ${new Intl.NumberFormat('en-US').format(parseFloat(project.budget || "0"))}
+                                            {project.speaker_fee && parseFloat(project.speaker_fee) > 0 && (
+                                              <span className="text-xs font-normal text-gray-500 ml-1">
+                                                / ${new Intl.NumberFormat('en-US').format(parseFloat(project.speaker_fee))} spkr
+                                              </span>
+                                            )}
                                           </div>
                                           <div className="text-xs text-gray-500">{project.event_location || "Location TBD"}</div>
+                                          <div className="text-xs text-gray-400">
+                                            Inquiry: {new Date(project.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                          </div>
                                         </div>
                                         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                                           <Button
@@ -2124,6 +2174,124 @@ export default function EnhancedProjectManagementPage() {
                                             </div>
                                           )
                                         })()}
+
+                                        {/* Custom Tasks for this project in this stage */}
+                                        {(() => {
+                                          const stageCustomTasks = customTasks.filter(t => t.projectId === project.id && t.stage === stage.id)
+                                          if (stageCustomTasks.length === 0 && !(addingTaskFor?.projectId === project.id && addingTaskFor?.stageId === stage.id)) return null
+                                          return (
+                                            <div className="mt-4 pt-3 border-t border-dashed border-gray-300">
+                                              <h4 className="font-medium text-gray-600 text-sm mb-2 flex items-center gap-2">
+                                                <Plus className="h-3.5 w-3.5" />
+                                                Custom Tasks
+                                              </h4>
+                                              <div className="space-y-1.5">
+                                                {stageCustomTasks.map((task) => (
+                                                  <div key={task.id} className={`flex items-center gap-3 p-2 rounded border ${task.completed ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'}`}>
+                                                    <button
+                                                      onClick={async () => {
+                                                        const newValue = !task.completed
+                                                        setCustomTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: newValue } : t))
+                                                        try {
+                                                          await authPut(`/api/projects/${project.id}/tasks`, { taskId: task.id, completed: newValue })
+                                                        } catch (e) {
+                                                          setCustomTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: !newValue } : t))
+                                                        }
+                                                      }}
+                                                      className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+                                                        task.completed ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-gray-400'
+                                                      }`}
+                                                    >
+                                                      {task.completed && <Check className="h-2.5 w-2.5" />}
+                                                    </button>
+                                                    <span className={`text-sm ${task.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>
+                                                      {task.task_name}
+                                                    </span>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          )
+                                        })()}
+
+                                        {/* Add Task Form */}
+                                        {addingTaskFor?.projectId === project.id && addingTaskFor?.stageId === stage.id ? (
+                                          <div className="mt-3 flex items-center gap-2">
+                                            <Input
+                                              placeholder="Task name..."
+                                              value={newTaskName}
+                                              onChange={(e) => setNewTaskName(e.target.value)}
+                                              onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleAddCustomTask(project.id, stage.id, newTaskName)
+                                                if (e.key === 'Escape') { setAddingTaskFor(null); setNewTaskName("") }
+                                              }}
+                                              className="h-8 text-sm"
+                                              autoFocus
+                                            />
+                                            <Button size="sm" className="h-8" onClick={() => handleAddCustomTask(project.id, stage.id, newTaskName)}>
+                                              Add
+                                            </Button>
+                                            <Button size="sm" variant="ghost" className="h-8" onClick={() => { setAddingTaskFor(null); setNewTaskName("") }}>
+                                              <X className="h-4 w-4" />
+                                            </Button>
+                                          </div>
+                                        ) : (
+                                          <div className="mt-3">
+                                            <Button
+                                              size="sm"
+                                              variant="ghost"
+                                              className="text-gray-500 h-7 text-xs"
+                                              onClick={() => { setAddingTaskFor({ projectId: project.id, stageId: stage.id }); setNewTaskName("") }}
+                                            >
+                                              <Plus className="h-3 w-3 mr-1" />
+                                              Add Task
+                                            </Button>
+                                          </div>
+                                        )}
+
+                                        {/* Notes Section */}
+                                        <div className="mt-4 pt-3 border-t border-gray-200">
+                                          <div className="flex items-center justify-between mb-2">
+                                            <h4 className="font-medium text-gray-600 text-sm flex items-center gap-2">
+                                              <FileText className="h-3.5 w-3.5" />
+                                              Notes
+                                            </h4>
+                                            {editingNotesFor !== project.id && (
+                                              <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="h-6 text-xs text-gray-500"
+                                                onClick={() => { setEditingNotesFor(project.id); setEditNotesValue(project.notes || "") }}
+                                              >
+                                                <Edit className="h-3 w-3 mr-1" />
+                                                Edit
+                                              </Button>
+                                            )}
+                                          </div>
+                                          {editingNotesFor === project.id ? (
+                                            <div className="space-y-2">
+                                              <Textarea
+                                                value={editNotesValue}
+                                                onChange={(e) => setEditNotesValue(e.target.value)}
+                                                placeholder="Add notes about this project..."
+                                                className="text-sm min-h-[80px]"
+                                                autoFocus
+                                              />
+                                              <div className="flex gap-2 justify-end">
+                                                <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingNotesFor(null)}>
+                                                  Cancel
+                                                </Button>
+                                                <Button size="sm" className="h-7 text-xs" onClick={() => handleSaveNotes(project.id, editNotesValue)}>
+                                                  Save Notes
+                                                </Button>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <div className="text-sm text-gray-600 whitespace-pre-wrap">
+                                              {project.notes || <span className="text-gray-400 italic">No notes</span>}
+                                            </div>
+                                          )}
+                                        </div>
 
                                         {/* Action buttons */}
                                         <div className="flex justify-end mt-4 pt-3 border-t border-gray-200 gap-2">
@@ -3768,10 +3936,64 @@ export default function EnhancedProjectManagementPage() {
             <DialogTitle>Manage Tasks - {selectedProject?.project_name || selectedProject?.event_name}</DialogTitle>
             <DialogDescription>
               {selectedProject?.client_name} • {selectedProject?.event_date ? new Date(selectedProject.event_date).toLocaleDateString() : 'No date set'}
+              {selectedProject?.created_at && (
+                <span className="ml-2">• Inquiry: {new Date(selectedProject.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              )}
             </DialogDescription>
           </DialogHeader>
           {selectedProject && (
             <div className="space-y-4 mt-4">
+              {/* Notes Section */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Notes
+                    </CardTitle>
+                    {editingNotesFor !== selectedProject.id && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-xs"
+                        onClick={() => { setEditingNotesFor(selectedProject.id); setEditNotesValue(selectedProject.notes || "") }}
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {editingNotesFor === selectedProject.id ? (
+                    <div className="space-y-2">
+                      <Textarea
+                        value={editNotesValue}
+                        onChange={(e) => setEditNotesValue(e.target.value)}
+                        placeholder="Add notes about this project..."
+                        className="text-sm min-h-[80px]"
+                        autoFocus
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingNotesFor(null)}>
+                          Cancel
+                        </Button>
+                        <Button size="sm" className="h-7 text-xs" onClick={() => {
+                          handleSaveNotes(selectedProject.id, editNotesValue)
+                          setSelectedProject({ ...selectedProject, notes: editNotesValue })
+                        }}>
+                          Save Notes
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-600 whitespace-pre-wrap">
+                      {selectedProject.notes || <span className="text-gray-400 italic">No notes</span>}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* Task stages */}
               {Object.entries(TASK_DEFINITIONS).map(([stage, tasks]) => {
                 const stageConfig = PROJECT_STATUSES[stage]
@@ -3779,7 +4001,8 @@ export default function EnhancedProjectManagementPage() {
                 const stageCompletion = selectedProject.stage_completion?.[stage] || {}
                 const completedCount = Object.values(stageCompletion).filter(Boolean).length
                 const totalCount = Object.keys(tasks).length
-                
+                const stageCustomTasks = customTasks.filter(t => t.projectId === selectedProject.id && t.stage === stage)
+
                 return (
                   <Card key={stage} className={isCurrentStage ? "border-blue-500 shadow-md" : ""}>
                     <CardHeader className="pb-3">
@@ -3802,13 +4025,13 @@ export default function EnhancedProjectManagementPage() {
                     <CardContent className="space-y-2">
                       {Object.entries(tasks).map(([taskKey, taskDef]) => {
                         const isCompleted = stageCompletion[taskKey] || false
-                        const daysUntilEvent = selectedProject.event_date 
+                        const daysUntilEvent = selectedProject.event_date
                           ? Math.ceil((new Date(selectedProject.event_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
                           : null
                         const urgency = calculateTaskUrgency(stage, daysUntilEvent, taskKey)
-                        
+
                         return (
-                          <div 
+                          <div
                             key={taskKey}
                             className={`p-3 rounded-lg border ${isCompleted ? 'bg-green-50 border-green-200' : 'bg-white'}`}
                           >
@@ -3825,16 +4048,16 @@ export default function EnhancedProjectManagementPage() {
                                   </span>
                                   {!isCompleted && (
                                     <>
-                                      <Badge 
+                                      <Badge
                                         className={`text-xs ${
                                           urgency === "critical" ? "bg-red-100 text-red-700" :
-                                          urgency === "high" ? "bg-orange-100 text-orange-700" : 
-                                          urgency === "medium" ? "bg-yellow-100 text-yellow-700" : 
+                                          urgency === "high" ? "bg-orange-100 text-orange-700" :
+                                          urgency === "medium" ? "bg-yellow-100 text-yellow-700" :
                                           "bg-gray-100 text-gray-700"
                                         }`}
                                       >
                                         {urgency === "critical" ? "Critical" :
-                                         urgency === "high" ? "Urgent" : 
+                                         urgency === "high" ? "Urgent" :
                                          urgency === "medium" ? "Soon" : "Normal"}
                                       </Badge>
                                       {taskDef.estimatedTime && (
@@ -3854,7 +4077,6 @@ export default function EnhancedProjectManagementPage() {
                                   variant="outline"
                                   onClick={async () => {
                                     const success = await handleUpdateStageCompletion(selectedProject.id, stage, taskKey, true)
-                                    // Only update local state if API call was successful
                                     if (success) {
                                       setSelectedProject({
                                         ...selectedProject,
@@ -3879,7 +4101,6 @@ export default function EnhancedProjectManagementPage() {
                                   variant="ghost"
                                   onClick={async () => {
                                     const success = await handleUpdateStageCompletion(selectedProject.id, stage, taskKey, false)
-                                    // Only update local state if API call was successful
                                     if (success) {
                                       setSelectedProject({
                                         ...selectedProject,
@@ -3902,6 +4123,67 @@ export default function EnhancedProjectManagementPage() {
                           </div>
                         )
                       })}
+
+                      {/* Custom Tasks for this stage */}
+                      {stageCustomTasks.length > 0 && (
+                        <div className="pt-2 border-t border-dashed border-gray-300 mt-2">
+                          <p className="text-xs text-gray-500 mb-2 font-medium">Custom Tasks</p>
+                          {stageCustomTasks.map((task) => (
+                            <div key={task.id} className={`p-3 rounded-lg border ${task.completed ? 'bg-green-50 border-green-200' : 'bg-white'}`}>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={async () => {
+                                    const newValue = !task.completed
+                                    setCustomTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: newValue } : t))
+                                    try {
+                                      await authPut(`/api/projects/${selectedProject.id}/tasks`, { taskId: task.id, completed: newValue })
+                                    } catch (e) {
+                                      setCustomTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: !newValue } : t))
+                                    }
+                                  }}
+                                  className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+                                    task.completed ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-gray-400'
+                                  }`}
+                                >
+                                  {task.completed && <Check className="h-3 w-3" />}
+                                </button>
+                                <span className={`font-medium ${task.completed ? 'line-through text-gray-500' : ''}`}>
+                                  {task.task_name}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Add Task */}
+                      {addingTaskFor?.projectId === selectedProject.id && addingTaskFor?.stageId === stage ? (
+                        <div className="flex items-center gap-2 pt-2">
+                          <Input
+                            placeholder="Task name..."
+                            value={newTaskName}
+                            onChange={(e) => setNewTaskName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleAddCustomTask(selectedProject.id, stage, newTaskName)
+                              if (e.key === 'Escape') { setAddingTaskFor(null); setNewTaskName("") }
+                            }}
+                            className="h-8 text-sm"
+                            autoFocus
+                          />
+                          <Button size="sm" className="h-8" onClick={() => handleAddCustomTask(selectedProject.id, stage, newTaskName)}>Add</Button>
+                          <Button size="sm" variant="ghost" className="h-8" onClick={() => { setAddingTaskFor(null); setNewTaskName("") }}><X className="h-4 w-4" /></Button>
+                        </div>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-gray-500 h-7 text-xs mt-1"
+                          onClick={() => { setAddingTaskFor({ projectId: selectedProject.id, stageId: stage }); setNewTaskName("") }}
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Add Task
+                        </Button>
+                      )}
                     </CardContent>
                   </Card>
                 )

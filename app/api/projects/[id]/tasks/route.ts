@@ -130,6 +130,11 @@ export async function POST(
   }
 }
 
+// PUT alias for PATCH (authPut compatibility)
+export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
+  return PATCH(request, context)
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
