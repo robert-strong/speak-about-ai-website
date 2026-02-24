@@ -569,7 +569,7 @@ export function ContractsManagement() {
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <DollarSign className="w-4 h-4 text-gray-400" />
-                          ${(contract.fee_amount || contract.total_amount || 0).toLocaleString()}
+                          ${(contract.deal_value || contract.fee_amount || 0).toLocaleString()}
                         </div>
                       </TableCell>
                       <TableCell>

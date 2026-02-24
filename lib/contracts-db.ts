@@ -225,7 +225,7 @@ export async function getAllContracts(): Promise<Contract[]> {
   try {
     console.log("Fetching all contracts from database...")
     const contracts = await sql`
-      SELECT c.*, d.client_name as deal_client_name, d.event_title as deal_event_title
+      SELECT c.*, d.client_name as deal_client_name, d.event_title as deal_event_title, d.deal_value
       FROM contracts c
       LEFT JOIN deals d ON c.deal_id = d.id
       ORDER BY c.generated_at DESC
