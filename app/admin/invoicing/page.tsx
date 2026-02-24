@@ -360,9 +360,10 @@ export default function InvoicingPage() {
     const project = projects.find(p => p.id.toString() === projectId)
     if (!project) return
 
-    const speakerFee = parseFloat(project.speaker_fee || project.budget || "0")
+    const dealValue = parseFloat(project.budget || project.speaker_fee || "0")
+    const speakerFee = parseFloat(project.speaker_fee || "0")
     const travelExpenses = parseFloat(project.travel_expenses_amount || "0")
-    const totalAmount = speakerFee + travelExpenses
+    const totalAmount = dealValue + travelExpenses
     let amount = ""
 
     switch (value) {

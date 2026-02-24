@@ -8,7 +8,8 @@ export async function POST(request?: NextRequest) {
     // Find ALL projects that don't have any invoices yet
     const projects = await sql`
       SELECT p.*,
-        d.client_email as deal_client_email
+        d.client_email as deal_client_email,
+        d.deal_value
       FROM projects p
       LEFT JOIN deals d ON p.deal_id = d.id
       WHERE NOT EXISTS (
@@ -26,7 +27,7 @@ export async function POST(request?: NextRequest) {
 
     for (const project of projects) {
       try {
-        const totalAmount = parseFloat(project.speaker_fee || project.budget || '0')
+        const totalAmount = parseFloat(project.deal_value || project.budget || project.speaker_fee || '0')
         if (totalAmount === 0) {
           skipped++
           skippedProjects.push({

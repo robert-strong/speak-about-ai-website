@@ -24,14 +24,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
-    // Fetch project details
+    // Fetch project details with deal value
     const [project] = await sql`
-      SELECT 
+      SELECT
         p.*,
         s.name as speaker_name,
-        s.email as speaker_email
+        s.email as speaker_email,
+        d.deal_value
       FROM projects p
       LEFT JOIN speakers s ON p.speaker_id = s.id
+      LEFT JOIN deals d ON p.deal_id = d.id
       WHERE p.id = ${projectId}
     `
 
@@ -39,9 +41,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    // Calculate deposit and final amounts
+    // Calculate deposit and final amounts using deal value (client-facing amount)
     const depositPercentage = parseInt(process.env.INVOICE_DEPOSIT_PERCENTAGE || '50') / 100
-    const totalAmount = parseFloat(project.speaker_fee || project.budget || '0')
+    const totalAmount = parseFloat(project.deal_value || project.budget || project.speaker_fee || '0')
     const depositAmount = totalAmount * depositPercentage
     const finalAmount = totalAmount - depositAmount
 
