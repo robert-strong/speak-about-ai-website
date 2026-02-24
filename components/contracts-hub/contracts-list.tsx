@@ -161,13 +161,13 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
         onRefresh?.()
       } else {
         const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to update contract")
+        throw new Error(errorData.error || errorData.details || "Failed to update contract")
       }
     } catch (error) {
       console.error("Error updating contract:", error)
       toast({
         title: "Error",
-        description: "Failed to update contract status",
+        description: error instanceof Error ? error.message : "Failed to update contract status",
         variant: "destructive"
       })
     }

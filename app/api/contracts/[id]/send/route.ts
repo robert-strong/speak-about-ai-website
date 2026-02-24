@@ -3,19 +3,17 @@ import { getContractById, updateContractStatus } from "@/lib/contracts-db"
 import { sendContractEmail } from "@/lib/email-service-unified"
 import { requireAdminAuth } from "@/lib/auth-middleware"
 
-interface RouteParams {
-  params: {
-    id: string
-  }
-}
-
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     // Require admin authentication
     const authError = requireAdminAuth(request)
     if (authError) return authError
 
-    const contractId = parseInt(params.id)
+    const { id } = await params
+    const contractId = parseInt(id)
     if (isNaN(contractId)) {
       return NextResponse.json({ error: "Invalid contract ID" }, { status: 400 })
     }

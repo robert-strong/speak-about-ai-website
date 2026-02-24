@@ -3,12 +3,6 @@ import { getContractById, updateContractStatus, deleteContract, generateContract
 import { requireAdminAuth } from "@/lib/auth-middleware"
 import { neon } from "@neondatabase/serverless"
 
-interface RouteParams {
-  params: {
-    id: string
-  }
-}
-
 // Build contract_data from individual columns + linked deal
 function buildContractDataFromColumns(contract: any, deal: any | null): Record<string, any> {
   const data: Record<string, any> = {}
@@ -58,9 +52,13 @@ function buildContractDataFromColumns(contract: any, deal: any | null): Record<s
   return data
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const contractId = parseInt(params.id)
+    const { id } = await params
+    const contractId = parseInt(id)
     if (isNaN(contractId)) {
       return NextResponse.json({ error: "Invalid contract ID" }, { status: 400 })
     }
@@ -74,7 +72,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     let contractData = contract.contract_data
     if (!contractData || Object.keys(contractData).length === 0 ||
         (contractData.tokens && Object.keys(contractData).length <= 3)) {
-      // contract_data is either null or only has tokens/metadata — build from columns
       let deal = null
       if (contract.deal_id) {
         try {
@@ -119,13 +116,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    // Skip auth for now to match the simple localStorage pattern
-    // const authError = requireAdminAuth(request)
-    // if (authError) return authError
-
-    const contractId = parseInt(params.id)
+    const { id } = await params
+    const contractId = parseInt(id)
     if (isNaN(contractId)) {
       return NextResponse.json({ error: "Invalid contract ID" }, { status: 400 })
     }
@@ -139,7 +136,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         title: body.title,
         type: body.type,
         category: body.category,
-        contract_data: body.values || body.contract_data,  // Use contract_data column
+        contract_data: body.values || body.contract_data,
         financial_terms: body.financial_terms,
         status: body.status,
         updated_by: body.updated_by || 'admin'
@@ -150,7 +147,6 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Failed to update contract" }, { status: 500 })
       }
 
-      // If send_for_signature flag is set, update status
       if (body.send_for_signature) {
         await updateContractStatus(contractId, 'sent_for_signature', updateData.updated_by)
       }
@@ -162,12 +158,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (body.status) {
       const validStatuses = ['draft', 'pending_review', 'sent', 'sent_for_signature', 'partially_signed', 'fully_executed', 'active', 'completed', 'cancelled']
       if (!validStatuses.includes(body.status)) {
-        return NextResponse.json({ error: "Invalid status" }, { status: 400 })
+        return NextResponse.json({ error: `Invalid status: ${body.status}` }, { status: 400 })
       }
 
       const contract = await updateContractStatus(contractId, body.status, body.updated_by)
       if (!contract) {
-        return NextResponse.json({ error: "Failed to update contract" }, { status: 500 })
+        return NextResponse.json({ error: `Failed to update contract ${contractId} to status ${body.status}` }, { status: 500 })
       }
 
       return NextResponse.json(contract)
@@ -186,14 +182,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    // Skip auth for now to match the simple localStorage pattern used elsewhere
-    // TODO: Implement proper JWT auth across all admin APIs
-    // const authError = requireAdminAuth(request)
-    // if (authError) return authError
-
-    const contractId = parseInt(params.id)
+    const { id } = await params
+    const contractId = parseInt(id)
     if (isNaN(contractId)) {
       return NextResponse.json({ error: "Invalid contract ID" }, { status: 400 })
     }
