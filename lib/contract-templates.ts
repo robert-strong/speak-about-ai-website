@@ -100,6 +100,7 @@ The Speaker agrees to provide speaking services for the following event:
         order: 3,
         content: `## 2. COMPENSATION
 
+**Total Fee (Deal Value):** {{deal_value}} USD
 **Speaking Fee:** {{speaker_fee}} USD
 **Payment Terms:** {{payment_terms}}
 
@@ -112,7 +113,7 @@ The Client agrees to reimburse the following pre-approved expenses:
 
 All expenses must be submitted with receipts within {{expense_submission_deadline}} days after the event.`,
         isEditable: true,
-        variables: ['speaker_fee', 'payment_terms', 'additional_compensation', 'expense_coverage', 'expense_submission_deadline']
+        variables: ['deal_value', 'speaker_fee', 'payment_terms', 'additional_compensation', 'expense_coverage', 'expense_submission_deadline']
       },
       {
         id: 'travel-accommodation',
@@ -385,6 +386,7 @@ Date: {{agency_signature_date}}`,
       { key: 'additional_requirements', label: 'Additional Requirements', type: 'textarea', required: false },
       
       // Compensation
+      { key: 'deal_value', label: 'Total Fee (Deal Value)', type: 'currency', required: true },
       { key: 'speaker_fee', label: 'Speaking Fee', type: 'currency', required: true },
       { 
         key: 'payment_terms', 

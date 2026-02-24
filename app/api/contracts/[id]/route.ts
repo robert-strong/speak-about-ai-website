@@ -36,13 +36,14 @@ function buildContractDataFromColumns(contract: any, deal: any | null): Record<s
   if (contract.event_type) data.event_type = contract.event_type
 
   // Financial
-  if (contract.speaker_fee || contract.fee_amount) {
-    data.speaker_fee = contract.speaker_fee || contract.fee_amount
-  }
+  if (contract.fee_amount) data.deal_value = contract.fee_amount
+  if (contract.speaker_fee) data.speaker_fee = contract.speaker_fee
+  if (!data.speaker_fee && contract.fee_amount) data.speaker_fee = contract.fee_amount
   if (contract.payment_terms) data.payment_terms = contract.payment_terms
 
   // Enrich from linked deal
   if (deal) {
+    if (deal.deal_value) data.deal_value = deal.deal_value
     if (!data.client_company && deal.company) data.client_company = deal.company
     if (deal.client_phone) data.client_phone = deal.client_phone
     if (deal.phone && !data.client_phone) data.client_phone = deal.phone

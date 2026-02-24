@@ -181,6 +181,7 @@ export function ContractEditor({ contractId, isCreating, onSave, onCancel }: Con
           event_date: deal.event_date,
           event_location: deal.event_location,
           attendee_count: deal.attendee_count,
+          deal_value: deal.deal_value,
           speaker_fee: deal.deal_value,
           agreement_date: new Date().toISOString().split('T')[0]
         }
@@ -390,7 +391,7 @@ export function ContractEditor({ contractId, isCreating, onSave, onCancel }: Con
     basic: ['agreement_date', 'client_company', 'client_address', 'client_contact_name', 'client_email', 'client_phone', 'client_signer_name', 'client_signer_title'],
     speaker: ['speaker_name', 'speaker_email', 'speaker_phone', 'speaker_address'],
     event: ['event_title', 'event_date', 'event_time', 'presentation_duration', 'event_location', 'venue_name', 'attendee_count', 'event_type', 'presentation_title', 'presentation_format', 'presentation_description', 'additional_requirements'],
-    financial: ['speaker_fee', 'payment_terms', 'additional_compensation', 'expense_coverage', 'expense_submission_deadline'],
+    financial: ['deal_value', 'speaker_fee', 'payment_terms', 'additional_compensation', 'expense_coverage', 'expense_submission_deadline'],
     travel: ['travel_arrangements', 'travel_cost_type', 'travel_buyout_amount', 'travel_buyout_includes', 'client_covers_items', 'departure_city', 'arrival_requirements', 'ground_transportation', 'hotel_arrangements', 'checkin_date', 'checkout_date', 'meal_arrangements'],
     terms: ['arrival_buffer', 'additional_activities', 'materials_deadline', 'bio_length', 'technical_requirements', 'venue_requirements', 'info_deadline', 'recording_rights', 'marketing_rights', 'distribution_rights'],
     cancellation: ['cancellation_period_1', 'cancellation_period_2', 'cancellation_fee_1', 'cancellation_fee_2', 'cancellation_fee_3'],
