@@ -165,14 +165,7 @@ export default function ProposalsPage() {
 
     const matchesTab = activeTab === "all" || proposal.status === activeTab
 
-    // Filter out proposals linked to won/lost deals
-    // Keep proposals that:
-    // 1. Don't have a deal_id (standalone proposals), OR
-    // 2. Have a deal_id but the deal is still active (not won or lost)
-    const deal = proposal.deal_id ? deals.find(d => d.id === proposal.deal_id) : null
-    const isDealActive = !proposal.deal_id || !deal || !["won", "lost"].includes(deal.status)
-
-    return matchesSearch && matchesTab && isDealActive
+    return matchesSearch && matchesTab
   })
 
   const handleDeleteProposal = async () => {
@@ -248,16 +241,10 @@ export default function ProposalsPage() {
   }
 
   const getProposalStats = () => {
-    // Filter out proposals linked to won/lost deals for stats
-    const activeProposals = proposals.filter(proposal => {
-      const deal = proposal.deal_id ? deals.find(d => d.id === proposal.deal_id) : null
-      return !proposal.deal_id || !deal || !["won", "lost"].includes(deal.status)
-    })
-
-    const total = activeProposals.length
-    const sent = activeProposals.filter(p => ["sent", "viewed", "accepted", "rejected"].includes(p.status)).length
-    const accepted = activeProposals.filter(p => p.status === "accepted").length
-    const totalValue = activeProposals
+    const total = proposals.length
+    const sent = proposals.filter(p => ["sent", "viewed", "accepted", "rejected"].includes(p.status)).length
+    const accepted = proposals.filter(p => p.status === "accepted").length
+    const totalValue = proposals
       .filter(p => p.status === "accepted")
       .reduce((sum, p) => sum + p.total_investment, 0)
     const conversionRate = sent > 0 ? (accepted / sent) * 100 : 0
