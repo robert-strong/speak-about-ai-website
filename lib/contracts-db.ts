@@ -459,79 +459,53 @@ export async function updateContract(id: number, data: any): Promise<Contract | 
     console.warn("updateContract: Database not available")
     return null
   }
-  
+
   try {
     console.log("Updating contract ID:", id)
-    
-    // Build update fields dynamically
-    const updates: string[] = []
-    const values: any = { id }
-    
-    if (data.title) {
-      updates.push('title = ${title}')
-      values.title = data.title
-    }
-    
-    if (data.type) {
-      updates.push('type = ${type}')
-      values.type = data.type
-    }
-    
-    if (data.contract_data) {
-      updates.push('contract_data = ${contract_data}::jsonb')
-      values.contract_data = JSON.stringify(data.contract_data)
-    }
-    
-    if (data.status) {
-      updates.push('status = ${status}')
-      values.status = data.status
-    }
-    
-    if (data.updated_by) {
-      updates.push('created_by = ${updated_by}')
-      values.updated_by = data.updated_by
-    }
-    
-    // Update fee_amount if speaker_fee is provided in contract_data
-    if (data.contract_data && data.contract_data.speaker_fee) {
-      updates.push('fee_amount = ${fee_amount}')
-      values.fee_amount = parseFloat(data.contract_data.speaker_fee) || 0
-      updates.push('speaker_fee = ${speaker_fee}')
-      values.speaker_fee = parseFloat(data.contract_data.speaker_fee) || 0
-    }
-    
-    // Update event details if provided
-    if (data.contract_data) {
-      if (data.contract_data.event_title) {
-        updates.push('event_title = ${event_title}')
-        values.event_title = data.contract_data.event_title
-      }
-      if (data.contract_data.event_date) {
-        updates.push('event_date = ${event_date}')
-        values.event_date = data.contract_data.event_date
-      }
-      if (data.contract_data.event_location) {
-        updates.push('event_location = ${event_location}')
-        values.event_location = data.contract_data.event_location
-      }
-    }
-    
-    // Always update the timestamp
-    updates.push('updated_at = NOW()')
-    
-    if (updates.length === 1) {
-      // Only timestamp update, no other changes
-      return await getContractById(id)
-    }
-    
-    // Execute the update
+
+    const cd = data.contract_data || {}
+
+    // Sync contract_data values back to individual columns
+    const title = data.title || cd.event_title ? `Speaking Agreement - ${cd.event_title}` : null
+    const type = data.type || null
+    const status = data.status || null
+    const contractDataJson = Object.keys(cd).length > 0 ? JSON.stringify(cd) : null
+    const feeAmount = cd.speaker_fee ? parseFloat(cd.speaker_fee) || null : null
+    const speakerFee = feeAmount
+    const eventTitle = cd.event_title || null
+    const eventDate = cd.event_date || null
+    const eventLocation = cd.event_location || null
+    const eventType = cd.event_type || null
+    const clientName = cd.client_contact_name || null
+    const clientEmail = cd.client_email || null
+    const clientCompany = cd.client_company || null
+    const speakerName = cd.speaker_name || null
+    const speakerEmail = cd.speaker_email || null
+    const paymentTerms = cd.payment_terms || null
+
     const result = await sql`
-      UPDATE contracts 
-      SET ${sql.unsafe(updates.join(', '))}
+      UPDATE contracts SET
+        title = COALESCE(${title}, title),
+        type = COALESCE(${type}, type),
+        status = COALESCE(${status}, status),
+        contract_data = COALESCE(${contractDataJson}::jsonb, contract_data),
+        fee_amount = COALESCE(${feeAmount}, fee_amount),
+        speaker_fee = COALESCE(${speakerFee}, speaker_fee),
+        event_title = COALESCE(${eventTitle}, event_title),
+        event_date = COALESCE(${eventDate}::date, event_date),
+        event_location = COALESCE(${eventLocation}, event_location),
+        event_type = COALESCE(${eventType}, event_type),
+        client_name = COALESCE(${clientName}, client_name),
+        client_email = COALESCE(${clientEmail}, client_email),
+        client_company = COALESCE(${clientCompany}, client_company),
+        speaker_name = COALESCE(${speakerName}, speaker_name),
+        speaker_email = COALESCE(${speakerEmail}, speaker_email),
+        payment_terms = COALESCE(${paymentTerms}, payment_terms),
+        updated_at = NOW()
       WHERE id = ${id}
       RETURNING *
     `
-    
+
     console.log("Successfully updated contract ID:", id)
     return result.length > 0 ? result[0] : null
   } catch (error) {

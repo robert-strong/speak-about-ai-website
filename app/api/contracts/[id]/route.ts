@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getContractById, updateContractStatus, deleteContract, generateContractHTML, updateContract } from "@/lib/contracts-db"
 import { requireAdminAuth } from "@/lib/auth-middleware"
+import { neon } from "@neondatabase/serverless"
 
 interface RouteParams {
   params: {
@@ -8,12 +9,56 @@ interface RouteParams {
   }
 }
 
+// Build contract_data from individual columns + linked deal
+function buildContractDataFromColumns(contract: any, deal: any | null): Record<string, any> {
+  const data: Record<string, any> = {}
+
+  // Basic info from contract columns
+  if (contract.client_company) data.client_company = contract.client_company
+  if (contract.client_name) data.client_contact_name = contract.client_name
+  if (contract.client_email) data.client_email = contract.client_email
+  if (contract.created_at || contract.generated_at) {
+    const d = contract.generated_at || contract.created_at
+    data.agreement_date = typeof d === 'string' ? d.split('T')[0] : new Date(d).toISOString().split('T')[0]
+  }
+
+  // Speaker info
+  if (contract.speaker_name) data.speaker_name = contract.speaker_name
+  if (contract.speaker_email) data.speaker_email = contract.speaker_email
+
+  // Event info
+  if (contract.event_title) data.event_title = contract.event_title
+  if (contract.event_date) {
+    const d = contract.event_date
+    data.event_date = typeof d === 'string' ? d.split('T')[0] : new Date(d).toISOString().split('T')[0]
+  }
+  if (contract.event_location) data.event_location = contract.event_location
+  if (contract.event_type) data.event_type = contract.event_type
+
+  // Financial
+  if (contract.speaker_fee || contract.fee_amount) {
+    data.speaker_fee = contract.speaker_fee || contract.fee_amount
+  }
+  if (contract.payment_terms) data.payment_terms = contract.payment_terms
+
+  // Enrich from linked deal
+  if (deal) {
+    if (!data.client_company && deal.company) data.client_company = deal.company
+    if (deal.client_phone) data.client_phone = deal.client_phone
+    if (deal.phone && !data.client_phone) data.client_phone = deal.phone
+    if (deal.attendee_count) data.attendee_count = deal.attendee_count
+    if (!data.speaker_name && deal.speaker_requested) data.speaker_name = deal.speaker_requested
+    if (!data.event_location && deal.event_location) data.event_location = deal.event_location
+    if (!data.event_type && deal.event_type) data.event_type = deal.event_type
+    if (deal.travel_required) data.travel_arrangements = 'required'
+    if (deal.travel_stipend) data.travel_buyout_amount = deal.travel_stipend
+  }
+
+  return data
+}
+
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    // Skip auth for now to match the simple localStorage pattern
-    // const authError = requireAdminAuth(request)
-    // if (authError) return authError
-
     const contractId = parseInt(params.id)
     if (isNaN(contractId)) {
       return NextResponse.json({ error: "Invalid contract ID" }, { status: 400 })
@@ -24,14 +69,27 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Contract not found" }, { status: 404 })
     }
 
-    console.log("Raw contract from database:", contract)
-    console.log("contract.contract_data:", contract.contract_data)
-    
-    // Add additional fields for the hub
-    // The contract_data column already exists in the database
+    // If contract_data is empty/null, build it from columns + deal
+    let contractData = contract.contract_data
+    if (!contractData || Object.keys(contractData).length === 0 ||
+        (contractData.tokens && Object.keys(contractData).length <= 3)) {
+      // contract_data is either null or only has tokens/metadata — build from columns
+      let deal = null
+      if (contract.deal_id) {
+        try {
+          const sql = neon(process.env.DATABASE_URL!)
+          const deals = await sql`SELECT * FROM deals WHERE id = ${contract.deal_id}`
+          deal = deals[0] || null
+        } catch (e) {
+          console.error("Error fetching linked deal:", e)
+        }
+      }
+      contractData = buildContractDataFromColumns(contract, deal)
+    }
+
     const enhancedContract = {
       ...contract,
-      contract_data: contract.contract_data || contract.metadata || {},
+      contract_data: contractData,
       template_id: contract.template_id || contract.template_settings?.template_id || 'standard-speaker-agreement',
       signatures: {
         client: contract.client_signature_status ? {

@@ -469,35 +469,38 @@ export default function EnhancedProjectManagementPage() {
     try {
       if (showLoading) setLoading(true)
 
-      const [projectsResponse, invoicesResponse] = await Promise.all([
+      const [projectsResponse, invoicesResponse, tasksResponse] = await Promise.all([
         authGet("/api/projects"),
-        authGet("/api/invoices")
+        authGet("/api/invoices"),
+        authGet("/api/projects/tasks-bulk")
       ])
 
       if (projectsResponse.ok) {
         const projectsData = await projectsResponse.json()
         setProjects(projectsData)
 
-        // Load custom tasks for all projects
-        const allCustomTasks = []
-        for (const project of projectsData) {
-          try {
-            const tasksRes = await authGet(`/api/projects/${project.id}/tasks`)
-            if (tasksRes.ok) {
-              const tasks = await tasksRes.json()
-              allCustomTasks.push(...tasks.map(task => ({
+        // Build a lookup map for project metadata
+        const projectMap = new Map(
+          projectsData.map((p: any) => [p.id, p])
+        )
+
+        // Process bulk tasks response
+        if (tasksResponse.ok) {
+          const allTasks = await tasksResponse.json()
+          const allCustomTasks = allTasks
+            .filter((task: any) => projectMap.has(task.project_id))
+            .map((task: any) => {
+              const project = projectMap.get(task.project_id)
+              return {
                 ...task,
-                projectId: project.id,
+                projectId: task.project_id,
                 projectName: project.project_name,
                 clientName: project.client_name,
                 eventDate: project.event_date
-              })))
-            }
-          } catch (error) {
-            console.error(`Error loading tasks for project ${project.id}:`, error)
-          }
+              }
+            })
+          setCustomTasks(allCustomTasks)
         }
-        setCustomTasks(allCustomTasks)
       } else {
         // Log the error for debugging
         console.error('Failed to load projects:', {
