@@ -123,7 +123,6 @@ export default function InvoicingPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [selectedInvoiceForPDF, setSelectedInvoiceForPDF] = useState<{id: number, number: string} | null>(null)
   const [selectedInvoiceForEdit, setSelectedInvoiceForEdit] = useState<number | null>(null)
 
@@ -149,7 +148,6 @@ export default function InvoicingPage() {
       router.push("/admin")
       return
     }
-    setIsLoggedIn(true)
     loadData()
   }, [router])
 
@@ -519,22 +517,30 @@ export default function InvoicingPage() {
     }
   }
 
-  if (!isLoggedIn || loading) {
+  if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-gray-50 flex">
+        <div className="fixed left-0 top-0 h-full z-[60]">
+          <AdminSidebar />
+        </div>
+        <div className="flex-1 ml-72 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          <span className="ml-2 text-gray-600">Loading invoices...</span>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-8">
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <div className="fixed left-0 top-0 h-full z-[60]">
+        <AdminSidebar />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 ml-72 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Invoice Management</h1>
             <p className="text-gray-600 mt-2">Create, manage, and track invoices for all projects</p>
@@ -980,7 +986,7 @@ export default function InvoicingPage() {
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
 
       {/* PDF Dialog */}
       {selectedInvoiceForPDF && (
