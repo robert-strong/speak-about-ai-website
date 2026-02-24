@@ -59,10 +59,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // 3. Update status constraint to allow qualified/proposal
+    let constraintUpdated = false
+    try {
+      await sql`ALTER TABLE projects DROP CONSTRAINT IF EXISTS projects_status_check`
+      await sql`
+        ALTER TABLE projects ADD CONSTRAINT projects_status_check
+        CHECK (status IN (
+          '2plus_months', '1to2_months', 'less_than_month', 'final_week',
+          'qualified', 'proposal', 'contracts_signed', 'invoicing',
+          'logistics_planning', 'pre_event', 'event_week', 'follow_up',
+          'completed', 'cancelled'
+        ))
+      `
+      constraintUpdated = true
+    } catch (err) {
+      results.errors.push(`Failed to update constraint: ${err}`)
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Workflow stage migration completed',
-      results
+      results: { ...results, constraintUpdated }
     })
 
   } catch (error) {
