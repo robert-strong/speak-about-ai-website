@@ -329,7 +329,7 @@ function NewProposalPageContent() {
           description: "Failed to load proposal",
           variant: "destructive"
         })
-        router.push("/admin/crm?tab=proposals")
+        router.push("/admin/proposals")
       }
     } catch (error) {
       console.error("Error loading proposal:", error)
@@ -338,7 +338,7 @@ function NewProposalPageContent() {
         description: "Failed to load proposal",
         variant: "destructive"
       })
-      router.push("/admin/crm?tab=proposals")
+      router.push("/admin/proposals")
     } finally {
       setLoadingProposal(false)
     }
@@ -925,7 +925,7 @@ function NewProposalPageContent() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                <Button variant="ghost" size="icon" onClick={() => router.push("/admin/proposals")}>
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div>
