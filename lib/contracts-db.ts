@@ -296,14 +296,11 @@ export async function updateContractStatus(
   try {
     console.log("Updating contract status:", id, "to", status)
     
-    // Set completion timestamp if fully executed
-    const completedAt = status === 'fully_executed' ? new Date().toISOString() : null
     const sentAt = status === 'sent' ? new Date().toISOString() : null
-    
+
     const [contract] = await sql`
       UPDATE contracts SET
         status = ${status},
-        completed_at = COALESCE(${completedAt}, completed_at),
         sent_at = COALESCE(${sentAt}, sent_at),
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${id}
