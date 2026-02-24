@@ -83,10 +83,10 @@ export async function PATCH(request: NextRequest) {
       UPDATE project_payments
       SET
         amount = COALESCE(${amount ?? null}, amount),
-        payment_date = ${payment_date ?? null},
-        payment_method = ${payment_method ?? null},
-        label = ${label ?? null},
-        notes = ${notes ?? null},
+        payment_date = COALESCE(${payment_date ?? null}, payment_date),
+        payment_method = COALESCE(${payment_method ?? null}, payment_method),
+        label = COALESCE(${label ?? null}, label),
+        notes = COALESCE(${notes ?? null}, notes),
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${id}
       RETURNING *

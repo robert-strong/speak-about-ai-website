@@ -300,7 +300,6 @@ export default function FinancesPage() {
           project_id: projectId,
           payment_type: paymentType,
           amount: 0,
-          label: paymentType === 'client' ? 'Payment' : 'Payment',
         })
       })
       if (response.ok) {
@@ -315,6 +314,12 @@ export default function FinancesPage() {
     }
   }
 
+  // Update local state immediately for responsive UI
+  const updatePaymentLocal = (paymentId: number, updates: Partial<PaymentRecord>) => {
+    setEditPayments(prev => prev.map(p => p.id === paymentId ? { ...p, ...updates } : p))
+  }
+
+  // Save payment to server
   const handleUpdatePayment = async (paymentId: number, updates: Partial<PaymentRecord>) => {
     try {
       const token = localStorage.getItem("adminSessionToken")
@@ -328,7 +333,7 @@ export default function FinancesPage() {
       })
       if (response.ok) {
         const data = await response.json()
-        setEditPayments(prev => prev.map(p => p.id === paymentId ? data.payment : p))
+        setEditPayments(prev => prev.map(p => p.id === paymentId ? { ...p, ...data.payment, amount: Number(data.payment.amount) || 0 } : p))
       }
     } catch {
       console.error("Failed to update payment")
@@ -394,9 +399,8 @@ export default function FinancesPage() {
       if (response.ok) {
         toast({
           title: "Success",
-          description: "Payment info updated successfully",
+          description: "Payment info saved",
         })
-        setShowEditDialog(false)
         loadFinancialData()
       } else {
         toast({
@@ -966,9 +970,10 @@ export default function FinancesPage() {
                         <div key={payment.id} className="flex items-center gap-2 p-2 border rounded-lg bg-gray-50">
                           <div className="flex-1 grid grid-cols-4 gap-2">
                             <Input
-                              placeholder="Label"
+                              placeholder="Notes"
                               className="h-8 text-sm"
-                              defaultValue={payment.label || ''}
+                              value={payment.label || ''}
+                              onChange={(e) => updatePaymentLocal(payment.id, { label: e.target.value })}
                               onBlur={(e) => handleUpdatePayment(payment.id, { label: e.target.value })}
                             />
                             <Input
@@ -977,18 +982,26 @@ export default function FinancesPage() {
                               className="h-8 text-sm"
                               step="0.01"
                               min="0"
-                              defaultValue={payment.amount > 0 ? payment.amount : ''}
+                              value={payment.amount > 0 ? payment.amount : ''}
+                              onChange={(e) => updatePaymentLocal(payment.id, { amount: e.target.value === '' ? 0 : Number(e.target.value) })}
                               onBlur={(e) => handleUpdatePayment(payment.id, { amount: Number(e.target.value) || 0 })}
                             />
                             <Input
                               type="date"
                               className="h-8 text-sm"
-                              defaultValue={payment.payment_date?.split('T')[0] || ''}
-                              onBlur={(e) => handleUpdatePayment(payment.id, { payment_date: e.target.value || undefined })}
+                              value={payment.payment_date?.split('T')[0] || ''}
+                              onChange={(e) => {
+                                updatePaymentLocal(payment.id, { payment_date: e.target.value || undefined })
+                                handleUpdatePayment(payment.id, { payment_date: e.target.value || undefined })
+                              }}
                             />
                             <Select
-                              defaultValue={payment.payment_method || "none"}
-                              onValueChange={(value) => handleUpdatePayment(payment.id, { payment_method: value === "none" ? undefined : value })}
+                              value={payment.payment_method || "none"}
+                              onValueChange={(value) => {
+                                const method = value === "none" ? undefined : value
+                                updatePaymentLocal(payment.id, { payment_method: method })
+                                handleUpdatePayment(payment.id, { payment_method: method })
+                              }}
                             >
                               <SelectTrigger className="h-8 text-sm">
                                 <SelectValue placeholder="Method" />
@@ -1103,9 +1116,10 @@ export default function FinancesPage() {
                           <div key={payment.id} className="flex items-center gap-2 p-2 border rounded-lg bg-gray-50">
                             <div className="flex-1 grid grid-cols-4 gap-2">
                               <Input
-                                placeholder="Label"
+                                placeholder="Notes"
                                 className="h-8 text-sm"
-                                defaultValue={payment.label || ''}
+                                value={payment.label || ''}
+                                onChange={(e) => updatePaymentLocal(payment.id, { label: e.target.value })}
                                 onBlur={(e) => handleUpdatePayment(payment.id, { label: e.target.value })}
                               />
                               <Input
@@ -1114,18 +1128,26 @@ export default function FinancesPage() {
                                 className="h-8 text-sm"
                                 step="0.01"
                                 min="0"
-                                defaultValue={payment.amount > 0 ? payment.amount : ''}
+                                value={payment.amount > 0 ? payment.amount : ''}
+                                onChange={(e) => updatePaymentLocal(payment.id, { amount: e.target.value === '' ? 0 : Number(e.target.value) })}
                                 onBlur={(e) => handleUpdatePayment(payment.id, { amount: Number(e.target.value) || 0 })}
                               />
                               <Input
                                 type="date"
                                 className="h-8 text-sm"
-                                defaultValue={payment.payment_date?.split('T')[0] || ''}
-                                onBlur={(e) => handleUpdatePayment(payment.id, { payment_date: e.target.value || undefined })}
+                                value={payment.payment_date?.split('T')[0] || ''}
+                                onChange={(e) => {
+                                  updatePaymentLocal(payment.id, { payment_date: e.target.value || undefined })
+                                  handleUpdatePayment(payment.id, { payment_date: e.target.value || undefined })
+                                }}
                               />
                               <Select
-                                defaultValue={payment.payment_method || "none"}
-                                onValueChange={(value) => handleUpdatePayment(payment.id, { payment_method: value === "none" ? undefined : value })}
+                                value={payment.payment_method || "none"}
+                                onValueChange={(value) => {
+                                  const method = value === "none" ? undefined : value
+                                  updatePaymentLocal(payment.id, { payment_method: method })
+                                  handleUpdatePayment(payment.id, { payment_method: method })
+                                }}
                               >
                                 <SelectTrigger className="h-8 text-sm">
                                   <SelectValue placeholder="Method" />
@@ -1207,8 +1229,8 @@ export default function FinancesPage() {
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
-              Cancel
+            <Button variant="outline" onClick={() => { setShowEditDialog(false); loadFinancialData() }}>
+              Close
             </Button>
             <Button onClick={handleSaveProject} disabled={saving}>
               {saving ? (
