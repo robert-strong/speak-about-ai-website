@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useLayoutSidebar } from "@/lib/sidebar-context"
 import {
   BarChart3,
   Users,
@@ -50,9 +51,14 @@ import {
 
 interface AdminSidebarProps {
   className?: string
+  isLayoutInstance?: boolean
 }
 
-export function AdminSidebar({ className }: AdminSidebarProps) {
+export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps) {
+  // If the layout already renders a persistent sidebar, page-level instances become no-ops
+  const layoutHasSidebar = useLayoutSidebar()
+  if (layoutHasSidebar && !isLayoutInstance) return null
+
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [expandedSections, setExpandedSections] = useState<string[]>([])
