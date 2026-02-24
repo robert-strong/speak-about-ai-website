@@ -93,12 +93,71 @@ export async function PUT(
         console.error('Slack notification failed:', slackError)
       }
 
-      // Auto-create proposal when project moves to proposal stage
+      // Sync project stage changes to linked deal and proposal
+      const dbSql = neon(process.env.DATABASE_URL!)
+      const dealId = project.deal_id
+
+      // --- Sync deal status from project stage ---
+      if (dealId) {
+        try {
+          // Map project status to deal status
+          const projectToDealStatus: Record<string, string> = {
+            qualified: 'qualified',
+            proposal: 'proposal',
+            contracts_signed: 'won',
+            logistics_planning: 'won',
+            pre_event: 'won',
+            event_week: 'won',
+            follow_up: 'won',
+            completed: 'won',
+            cancelled: 'lost',
+          }
+          const newDealStatus = projectToDealStatus[project.status]
+          if (newDealStatus) {
+            const currentDeal = await dbSql`SELECT status FROM deals WHERE id = ${dealId}`
+            if (currentDeal.length > 0 && currentDeal[0].status !== newDealStatus) {
+              // Don't downgrade a "won" deal back to earlier stages
+              const dealRank: Record<string, number> = { lead: 0, qualified: 1, proposal: 2, negotiation: 3, won: 4, lost: 5 }
+              const currentRank = dealRank[currentDeal[0].status] ?? 0
+              const newRank = dealRank[newDealStatus] ?? 0
+              if (newRank >= currentRank || newDealStatus === 'lost') {
+                await dbSql`UPDATE deals SET status = ${newDealStatus}, updated_at = CURRENT_TIMESTAMP WHERE id = ${dealId}`
+                console.log(`Synced deal #${dealId} status to "${newDealStatus}" from project #${project.id} stage "${project.status}"`)
+              }
+            }
+          }
+        } catch (dealSyncError) {
+          console.error(`Failed to sync deal status for project #${project.id}:`, dealSyncError)
+        }
+      }
+
+      // --- Sync proposal status from project stage ---
+      if (dealId) {
+        try {
+          // Map project status to proposal status
+          let newProposalStatus: string | null = null
+          if (project.status === 'proposal') newProposalStatus = 'sent'
+          else if (['contracts_signed', 'logistics_planning', 'pre_event', 'event_week', 'follow_up', 'completed'].includes(project.status)) {
+            newProposalStatus = 'accepted'
+          } else if (project.status === 'cancelled') {
+            newProposalStatus = 'rejected'
+          }
+
+          if (newProposalStatus) {
+            await dbSql`
+              UPDATE proposals SET status = ${newProposalStatus}, updated_at = CURRENT_TIMESTAMP
+              WHERE deal_id = ${dealId} AND status NOT IN ('accepted', 'rejected')
+            `
+            console.log(`Synced proposal for deal #${dealId} to status "${newProposalStatus}"`)
+          }
+        } catch (proposalSyncError) {
+          console.error(`Failed to sync proposal status for project #${project.id}:`, proposalSyncError)
+        }
+      }
+
+      // --- Auto-create proposal when project moves to proposal stage ---
       if (project.status === 'proposal') {
         try {
-          const dbSql = neon(process.env.DATABASE_URL!)
-          // Check if a proposal already exists for this project's deal or directly
-          const dealId = project.deal_id
           let hasProposal = false
           if (dealId) {
             const existing = await dbSql`SELECT id FROM proposals WHERE deal_id = ${dealId}`
@@ -127,11 +186,9 @@ export async function PUT(
         }
       }
 
-      // Auto-create contract when project moves to contracts_signed stage
+      // --- Auto-create contract when project moves to contracts_signed stage ---
       if (project.status === 'contracts_signed') {
         try {
-          const dbSql = neon(process.env.DATABASE_URL!)
-          const dealId = project.deal_id
           let hasContract = false
           if (dealId) {
             const existing = await dbSql`SELECT id FROM contracts WHERE deal_id = ${dealId}`
