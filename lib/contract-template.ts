@@ -7,7 +7,7 @@ export interface ContractData extends Deal {
   speaker_fee?: number
   payment_terms?: string
   additional_terms?: string
-  
+
   // Virtual event fields
   event_platform?: string
   event_timezone?: string
@@ -17,7 +17,7 @@ export interface ContractData extends Deal {
   recording_distribution?: string
   recording_usage_period?: string
   governing_law?: string
-  
+
   // Travel fields
   travel_required?: boolean
   flight_required?: boolean
@@ -28,6 +28,15 @@ export interface ContractData extends Deal {
   local_transportation?: string
   travel_stipend?: number
   travel_stipend_coverage?: string
+
+  // New fields for updated template
+  travel_details?: string
+  deliverables?: string
+  deposit_percent?: number
+  mid_payment_percent?: number
+  mid_payment_date?: string
+  balance_percent?: number
+  balance_due_date?: string
 }
 
 export interface ContractTemplate {
@@ -43,583 +52,293 @@ export interface ContractSection {
   required: boolean
 }
 
-export const VIRTUAL_EVENT_TEMPLATE: ContractTemplate = {
-  version: "v1.0-virtual",
-  title: "Virtual Speaker Engagement Agreement",
-  sections: [
-    {
-      id: "parties",
-      title: "Parties",
-      content: `This Virtual Speaker Engagement Agreement ("Agreement") is entered into on {{contract_date}} between:
-
-**Client:** {{client_name}} ({{client_company}})
-**Email:** {{client_email}}
-**Phone:** {{client_phone}}
-
-**Speaker:** {{speaker_name}}
-**Email:** {{speaker_email}}
-
-**Event Details:**
-- **Event Title:** {{event_title}}
-- **Event Date:** {{event_date}}
-- **Platform:** {{event_platform}}
-- **Event Type:** Virtual Presentation
-- **Expected Attendees:** {{attendee_count}}
-- **Time Zone:** {{event_timezone}}`,
-      required: true
-    },
-    {
-      id: "services",
-      title: "Services to be Provided",
-      content: `The Speaker agrees to provide the following services:
-
-1. **Virtual Presentation:** Deliver a virtual presentation/keynote via the designated platform
-2. **Duration:** {{presentation_duration}} presentation plus Q&A
-3. **Technical Requirements:** Ensure reliable internet connection and appropriate audio/video setup
-4. **Format:** Virtual presentation with screen sharing capabilities
-5. **Recording:** Agreement to allow recording for {{recording_usage}}
-
-**Virtual Platform Requirements:**
-- Test connection prior to event
-- Professional background/virtual background
-- High-quality audio and video equipment
-- Backup internet connection if possible`,
-      required: true
-    },
-    {
-      id: "compensation",
-      title: "Compensation and Payment Terms",
-      content: `**Speaker Fee:** $\{{deal_value}} USD
-
-**Payment Terms:**
-{{payment_terms}}
-
-**Virtual Event Considerations:**
-- No travel expenses required
-- Fee includes all preparation and presentation time
-- Technical setup is Speaker's responsibility
-
-**Total Contract Value:** $\{{deal_value}} USD`,
-      required: true
-    },
-    {
-      id: "technical_requirements",
-      title: "Technical Requirements and Obligations",
-      content: `**Speaker Technical Obligations:**
-1. Maintain stable internet connection (minimum 10 Mbps upload)
-2. Use professional-grade microphone and camera
-3. Ensure quiet, professional environment
-4. Test platform functionality before event
-5. Have backup plan for technical failures
-
-**Client Technical Obligations:**
-1. Provide platform access and credentials
-2. Arrange technical rehearsal if requested
-3. Provide technical support contact
-4. Manage attendee access and platform settings
-5. Handle recording and distribution (if applicable)`,
-      required: true
-    },
-    {
-      id: "virtual_cancellation",
-      title: "Cancellation and Technical Failure Policy",
-      content: `**Standard Cancellation:**
-- More than 14 days before event: Full refund minus 10% processing fee
-- 7-14 days before event: 50% of speaker fee retained
-- Less than 7 days before event: Full speaker fee retained
-
-**Technical Failure:**
-- If Speaker experiences technical failure preventing presentation: Full refund
-- If Client's platform fails: Full speaker fee paid, option to reschedule
-- Both parties must attempt reasonable troubleshooting before cancellation
-
-**Force Majeure:**
-Including but not limited to internet outages, platform failures, or other technical impediments beyond reasonable control.`,
-      required: true
-    }
-  ]
-}
-
-export const IN_PERSON_EVENT_TEMPLATE: ContractTemplate = {
-  version: "v1.0-inperson",
-  title: "In-Person Speaker Engagement Agreement",
-  sections: [
-    {
-      id: "parties",
-      title: "Parties",
-      content: `This Speaker Engagement Agreement ("Agreement") is entered into on {{contract_date}} between:
-
-**Client:** {{client_name}} ({{client_company}})
-**Address:** {{event_location}}
-**Email:** {{client_email}}
-**Phone:** {{client_phone}}
-
-**Speaker:** {{speaker_name}}
-**Email:** {{speaker_email}}
-
-**Event Details:**
-- **Event Title:** {{event_title}}
-- **Event Date:** {{event_date}}
-- **Event Location:** {{event_location}}
-- **Event Type:** {{event_type}}
-- **Expected Attendees:** {{attendee_count}}`,
-      required: true
-    },
-    {
-      id: "services",
-      title: "Services to be Provided",
-      content: `The Speaker agrees to provide the following services:
-
-1. **Speaking Engagement:** Deliver a presentation/keynote on AI-related topics as mutually agreed upon
-2. **Duration:** Standard presentation duration unless otherwise specified
-3. **Format:** {{event_type}} format as appropriate for the venue and audience
-4. **Preparation:** Reasonable preparation time and materials as needed for the engagement
-
-**Specific Requirements:**
-- Presentation tailored to audience of {{attendee_count}} attendees
-- Topic focus aligned with {{event_type}} format
-- Professional presentation materials and setup`,
-      required: true
-    },
-    {
-      id: "compensation",
-      title: "Compensation and Payment Terms",
-      content: `**Speaker Fee:** $\{{deal_value}} USD
-
-**Payment Terms:**
-{{payment_terms}}
-
-**Expenses:**
-- Travel expenses (if applicable) to be discussed separately
-- Accommodation (if required) as per mutual agreement
-- Other reasonable expenses with prior approval
-
-**Total Contract Value:** $\{{deal_value}} USD`,
-      required: true
-    },
-    {
-      id: "obligations",
-      title: "Speaker Obligations",
-      content: `The Speaker agrees to:
-
-1. **Preparation:** Adequately prepare for the presentation based on agreed topics and audience
-2. **Punctuality:** Arrive at the venue with sufficient time for setup and sound checks
-3. **Professionalism:** Maintain professional standards throughout the engagement
-4. **Materials:** Provide presentation materials in advance if requested
-5. **Availability:** Be available for reasonable Q&A session following the presentation
-6. **Confidentiality:** Maintain confidentiality of any proprietary information shared`,
-      required: true
-    },
-    {
-      id: "client_obligations",
-      title: "Client Obligations",
-      content: `The Client agrees to:
-
-1. **Venue:** Provide appropriate venue with necessary AV equipment
-2. **Payment:** Make payment according to agreed terms
-3. **Information:** Provide relevant event details and audience information
-4. **Support:** Ensure adequate technical support during the event
-5. **Promotion:** Handle event promotion and attendee management
-6. **Communication:** Maintain clear communication regarding event logistics`,
-      required: true
-    },
-    {
-      id: "cancellation",
-      title: "Cancellation Policy",
-      content: `**Cancellation by Client:**
-- More than 30 days before event: Full refund minus 10% processing fee
-- 15-30 days before event: 50% of speaker fee retained
-- Less than 15 days before event: Full speaker fee retained
-
-**Cancellation by Speaker:**
-- Speaker may cancel due to illness, emergency, or force majeure
-- Reasonable notice must be provided
-- Client entitled to full refund if alternative speaker not provided
-
-**Force Majeure:**
-Neither party shall be liable for delays or failures due to circumstances beyond their reasonable control.`,
-      required: true
-    },
-    {
-      id: "travel_arrangements",
-      title: "Travel and Accommodation",
-      content: `**Travel Arrangements:**
-{{travel_details}}
-
-**Flight Details:**
-- Flight Required: {{flight_required}}
-- Booking Responsibility: {{flight_booking_responsibility}}
-- Class of Travel: {{flight_class}}
-
-**Accommodation:**
-- Hotel Required: {{hotel_required}}
-- Hotel Arrangements: {{hotel_arrangements}}
-- Check-in/Check-out: {{hotel_dates}}
-
-**Ground Transportation:**
-- Airport Transfers: {{airport_transfers}}
-- Local Transportation: {{local_transportation}}
-
-**Travel Stipend:**
-- Amount: $\{{travel_stipend}} USD
-- Covers: {{travel_stipend_coverage}}`,
-      required: true
-    },
-    {
-      id: "intellectual_property",
-      title: "Intellectual Property",
-      content: `**Speaker's IP:** Speaker retains all rights to their presentation materials, methodologies, and intellectual property.
-
-**Usage Rights:** Client may record the presentation for internal use only, subject to prior written consent.
-
-**Attribution:** Any use of Speaker's materials must include proper attribution.
-
-**Confidentiality:** Both parties agree to maintain confidentiality of proprietary information shared during the engagement.`,
-      required: true
-    },
-    {
-      id: "liability",
-      title: "Limitation of Liability",
-      content: `Each party's liability under this Agreement shall be limited to the total amount paid under this Agreement.
-
-Neither party shall be liable for any indirect, incidental, or consequential damages.
-
-Both parties agree to maintain appropriate insurance coverage for their respective activities.
-
-**Travel Insurance:** Speaker agrees to maintain appropriate travel insurance for international engagements.`,
-      required: true
-    },
-    {
-      id: "general_terms",
-      title: "General Terms",
-      content: `**Governing Law:** This Agreement shall be governed by the laws of the jurisdiction where the event takes place.
-
-**Entire Agreement:** This Agreement constitutes the entire agreement between the parties.
-
-**Amendments:** Any modifications must be in writing and signed by both parties.
-
-**Severability:** If any provision is deemed invalid, the remainder shall remain in effect.
-
-**Assignment:** Neither party may assign this Agreement without written consent.
-
-**Additional Terms:**
-{{additional_terms}}`,
-      required: true
-    },
-    {
-      id: "signatures",
-      title: "Electronic Signatures",
-      content: `By signing below, both parties agree to the terms and conditions set forth in this Agreement.
-
-This Agreement may be executed electronically, and electronic signatures shall be deemed equivalent to original signatures.
-
-**Contract Number:** {{contract_number}}
-**Generated Date:** {{contract_date}}
-
-**CLIENT SIGNATURE:**
-_________________________________
-{{client_name}}
-{{client_company}}
-Date: ________________
-
-**SPEAKER SIGNATURE:**
-_________________________________
-{{speaker_name}}
-Date: ________________`,
-      required: true
-    }
-  ]
-}
-
-// Add remaining sections to virtual template
-VIRTUAL_EVENT_TEMPLATE.sections.push(
-  {
-    id: "intellectual_property",
-    title: "Intellectual Property and Recording",
-    content: `**Speaker's IP:** Speaker retains all rights to their presentation materials and content.
-
-**Recording Rights:** 
-- Recording permission: {{recording_permission}}
-- Distribution rights: {{recording_distribution}}
-- Usage period: {{recording_usage_period}}
-
-**Platform Content:** Any materials shared via screen share remain property of Speaker.
-
-**Attribution:** Client agrees to provide proper attribution in all uses of recorded content.`,
-    required: true
-  },
-  {
-    id: "general_terms",
-    title: "General Terms",
-    content: `**Governing Law:** This Agreement shall be governed by the laws of {{governing_law}}.
-
-**Time Zone:** All times referenced are in {{event_timezone}} unless otherwise specified.
-
-**Platform Terms:** Both parties agree to abide by the terms of service of the chosen platform.
-
-**Entire Agreement:** This constitutes the entire agreement between the parties.
-
-**Additional Terms:**
-{{additional_terms}}`,
-    required: true
-  },
-  {
-    id: "signatures",
-    title: "Electronic Signatures",
-    content: `By signing below, both parties agree to the terms and conditions set forth in this Virtual Speaker Engagement Agreement.
-
-**Contract Number:** {{contract_number}}
-**Generated Date:** {{contract_date}}
-
-**CLIENT SIGNATURE:**
-_________________________________
-{{client_name}}
-{{client_company}}
-Date: ________________
-
-**SPEAKER SIGNATURE:**
-_________________________________
-{{speaker_name}}
-Date: ________________`,
-    required: true
-  }
-)
-
-export const DEFAULT_CONTRACT_TEMPLATE = IN_PERSON_EVENT_TEMPLATE
-
-export function selectContractTemplate(eventType: string): ContractTemplate {
-  if (eventType === 'virtual' || eventType === 'webinar' || eventType === 'online') {
-    return VIRTUAL_EVENT_TEMPLATE
-  }
-  return IN_PERSON_EVENT_TEMPLATE
-}
-
 export function generateContractContent(contractData: ContractData, template?: ContractTemplate): string {
-  // Select appropriate template if not provided
-  if (!template) {
-    template = selectContractTemplate(contractData.event_type || 'in-person')
-  }
-
-  // Create template variables for substitution
-  const isVirtual = contractData.event_type === 'virtual'
-  const templateVars: Record<string, string> = {
-    contract_number: contractData.contract_number,
-    contract_date: new Date().toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    }),
-    
-    // Client information
-    client_name: contractData.client_name,
-    client_email: contractData.client_email,
-    client_phone: contractData.client_phone || 'N/A',
-    client_company: contractData.company || contractData.client_name,
-    
-    // Event information  
-    event_title: contractData.event_title,
-    event_date: new Date(contractData.event_date).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    }),
-    event_location: contractData.event_location,
-    event_type: contractData.event_type || 'Speaking Engagement',
-    attendee_count: contractData.attendee_count?.toString() || 'TBD',
-    
-    // Speaker information
-    speaker_name: contractData.speaker_name || contractData.speaker_requested || 'TBD',
-    speaker_email: contractData.speaker_email || 'TBD',
-    speaker_fee: contractData.speaker_fee?.toLocaleString('en-US') || contractData.deal_value.toLocaleString('en-US'),
-    
-    // Financial terms
-    deal_value: contractData.deal_value.toLocaleString('en-US'),
-    payment_terms: contractData.payment_terms || 'Payment due within 30 days of event completion',
-    
-    // Additional terms
-    additional_terms: contractData.additional_terms || 'No additional terms specified'
-  }
-
-  // Add virtual-specific variables
-  if (isVirtual) {
-    Object.assign(templateVars, {
-      event_platform: contractData.event_platform || 'Zoom/Teams/Platform TBD',
-      event_timezone: contractData.event_timezone || 'PST',
-      presentation_duration: contractData.presentation_duration || '60 minutes',
-      recording_usage: contractData.recording_usage || 'internal purposes only',
-      recording_permission: contractData.recording_permission || 'Granted for internal use',
-      recording_distribution: contractData.recording_distribution || 'Internal only',
-      recording_usage_period: contractData.recording_usage_period || '1 year',
-      governing_law: contractData.governing_law || 'California, USA'
-    })
-  } else {
-    // Add in-person specific variables
-    Object.assign(templateVars, {
-      travel_details: contractData.travel_required ? 'Travel arrangements required as detailed below' : 'No travel required',
-      flight_required: contractData.flight_required ? 'Yes' : 'No',
-      flight_booking_responsibility: contractData.flight_required ? 'Client to book and pay directly' : 'N/A',
-      flight_class: contractData.flight_class || 'Economy/Business as agreed',
-      hotel_required: contractData.hotel_required ? 'Yes' : 'No',
-      hotel_arrangements: contractData.hotel_required ? 'Client to book and pay directly' : 'N/A',
-      hotel_dates: contractData.hotel_dates || 'Night before and night of event',
-      airport_transfers: contractData.airport_transfers || 'Provided by Client',
-      local_transportation: contractData.local_transportation || 'Provided by Client',
-      travel_stipend: contractData.travel_stipend?.toLocaleString('en-US') || '0',
-      travel_stipend_coverage: contractData.travel_stipend_coverage || 'Meals and incidentals'
-    })
-  }
-
-  // Generate the complete contract content
-  let contractContent = `# ${template.title}\n\n`
-  
-  template.sections.forEach((section) => {
-    contractContent += `## ${section.title}\n\n`
-    
-    // Replace template variables in section content
-    let sectionContent = section.content
-    Object.entries(templateVars).forEach(([key, value]) => {
-      const regex = new RegExp(`{{${key}}}`, 'g')
-      sectionContent = sectionContent.replace(regex, value)
-    })
-    
-    contractContent += sectionContent + '\n\n'
-  })
-  
-  return contractContent
+  // Not used anymore — HTML is generated directly
+  return ''
 }
 
-export function generateContractHTML(contractData: ContractData, template?: ContractTemplate): string {
-  const markdownContent = generateContractContent(contractData, template)
-  
-  // Convert markdown to HTML (simple conversion)
-  let htmlContent = markdownContent
-    .replace(/^# (.+)$/gm, '<h1 class="contract-title">$1</h1>')
-    .replace(/^## (.+)$/gm, '<h2 class="section-title">$1</h2>')
-    .replace(/^\*\*(.+):\*\*(.+)$/gm, '<div class="contract-item"><strong>$1:</strong>$2</div>')
-    .replace(/^\*\*(.+)\*\*$/gm, '<div class="contract-header"><strong>$1</strong></div>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^(.+)$/gm, '<p>$1</p>')
-  
-  // Wrap in proper HTML structure with styling
-  return `
-<!DOCTYPE html>
+export function generateContractHTML(contractData: ContractData): string {
+  const speakerName = contractData.speaker_name || contractData.speaker_requested || 'TBD'
+  const clientName = contractData.client_name || 'TBD'
+  const clientCompany = contractData.company || contractData.client_name || ''
+  const eventTitle = contractData.event_title || 'TBD'
+  const eventDate = contractData.event_date
+    ? new Date(contractData.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : 'TBD'
+  const eventLocation = contractData.event_location || 'TBD'
+  const dealValue = contractData.deal_value
+    ? Number(contractData.deal_value).toLocaleString('en-US')
+    : '0'
+  const travelDetails = contractData.travel_details || contractData.travel_stipend
+    ? `$${(contractData.travel_stipend || 0).toLocaleString('en-US')} flight buyout`
+    : 'To be determined'
+  const deliverables = contractData.deliverables || '- Speaking engagement as agreed upon'
+  const depositPercent = contractData.deposit_percent || 20
+  const midPaymentPercent = contractData.mid_payment_percent || 30
+  const midPaymentDate = contractData.mid_payment_date || 'TBD'
+  const balancePercent = contractData.balance_percent || 50
+  const balanceDueDate = contractData.balance_due_date || eventDate
+  const eventReference = contractData.contract_number || ''
+
+  // Format deliverables as HTML list items
+  const deliverablesHtml = deliverables
+    .split('\n')
+    .filter(line => line.trim())
+    .map(line => {
+      const cleaned = line.replace(/^[-*]\s*/, '').trim()
+      return cleaned ? `<li>${cleaned}</li>` : ''
+    })
+    .filter(Boolean)
+    .join('\n          ')
+
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contract - ${contractData.contract_number}</title>
-    <style>
-        body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            background: #fff;
-        }
-        
-        .contract-title {
-            text-align: center;
-            color: #1E68C6;
-            border-bottom: 3px solid #1E68C6;
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-            font-size: 28px;
-        }
-        
-        .section-title {
-            color: #1E68C6;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 10px;
-            margin-top: 40px;
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-        
-        .contract-item {
-            margin: 10px 0;
-            padding: 5px 0;
-        }
-        
-        .contract-header {
-            font-weight: bold;
-            margin: 15px 0 10px 0;
-            color: #2c3e50;
-        }
-        
-        p {
-            margin: 12px 0;
-            text-align: justify;
-        }
-        
-        li {
-            margin: 8px 0;
-            margin-left: 20px;
-        }
-        
-        .signature-section {
-            margin-top: 60px;
-            border-top: 2px solid #1E68C6;
-            padding-top: 40px;
-        }
-        
-        .signature-block {
-            margin: 40px 0;
-            padding: 20px;
-            border: 1px solid #ddd;
-            background: #f9f9f9;
-        }
-        
-        .signature-line {
-            border-bottom: 1px solid #333;
-            width: 300px;
-            height: 50px;
-            margin: 20px 0;
-            display: inline-block;
-        }
-        
-        @media print {
-            body { margin: 0; padding: 20px; }
-            .signature-block { page-break-inside: avoid; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speaker Agreement - ${eventReference}</title>
+  <style>
+    @media print {
+      body { margin: 0; padding: 0.5in 0.75in; }
+      .no-print { display: none; }
+      .page-footer { position: fixed; bottom: 0.3in; left: 0; right: 0; text-align: center; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #333;
+      max-width: 8.5in;
+      margin: 0 auto;
+      padding: 0.75in 1in;
+      background: white;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .header-title {
+      font-size: 18pt;
+      font-weight: bold;
+      color: #000;
+      margin: 0;
+      flex: 1;
+    }
+    .header-logo {
+      width: 180px;
+      height: auto;
+      margin-left: 20px;
+    }
+    .intro {
+      margin-bottom: 8px;
+    }
+    .intro p {
+      margin: 4px 0 4px 0;
+    }
+    .party-item {
+      margin-left: 20px;
+    }
+    .party-name {
+      color: #2563eb;
+      font-weight: bold;
+    }
+    .contract-details {
+      margin: 16px 0;
+    }
+    .contract-details .label {
+      font-weight: bold;
+    }
+    .contract-details .value {
+      color: #2563eb;
+    }
+    .detail-row {
+      margin: 4px 0 4px 8px;
+    }
+    .deliverables-header {
+      font-weight: bold;
+      margin: 8px 0 4px 8px;
+    }
+    .deliverables-list {
+      margin: 4px 0 4px 24px;
+      padding-left: 0;
+    }
+    .deliverables-list li {
+      margin: 2px 0;
+      color: #2563eb;
+      font-weight: bold;
+    }
+    .section {
+      margin: 20px 0;
+    }
+    .section-title {
+      font-weight: bold;
+    }
+    .section-body {
+      text-align: justify;
+    }
+    .payment-highlight {
+      color: #2563eb;
+      font-weight: bold;
+    }
+    .uppercase-section {
+      text-transform: uppercase;
+      font-weight: bold;
+      text-align: justify;
+    }
+    .signature-section {
+      margin-top: 40px;
+    }
+    .signature-block {
+      margin: 30px 0;
+      display: flex;
+      gap: 20px;
+      align-items: baseline;
+    }
+    .sig-field {
+      display: inline-block;
+    }
+    .sig-label {
+      font-size: 9pt;
+      color: #666;
+    }
+    .sig-line {
+      border-bottom: 1px solid #333;
+      min-width: 180px;
+      display: inline-block;
+      margin: 0 4px;
+    }
+    .sig-date { min-width: 100px; }
+    .sig-signature { min-width: 200px; }
+    .sig-title-field { min-width: 140px; }
+    .sig-company { min-width: 120px; }
+    .page-footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 9pt;
+      font-weight: bold;
+      color: #333;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+  </style>
 </head>
 <body>
-    ${htmlContent}
+  <div class="header">
+    <h1 class="header-title">SPEAKER/CLIENT/AGENT AGREEMENT</h1>
+    <img src="/speak-about-ai-logo.png" alt="Speak About AI" class="header-logo" />
+  </div>
+
+  <div class="intro">
+    <p>This agreement is entered into by and between</p>
+    <p class="party-item">a) <span class="party-name">Speak About AI</span>, a division of Strong Entertainment, LLC ("Agent" for the "Speaker"),</p>
+    <p class="party-item">b) <span class="party-name">${speakerName}</span> ("Speaker"), and</p>
+    <p class="party-item">c) <span class="party-name">${clientName}</span> ("Client") for the purposes of engaging the Speaker for:</p>
+  </div>
+
+  <div class="contract-details">
+    <p style="font-weight: bold;">Contract details:</p>
+    <div class="detail-row"><span class="label">Event Reference:</span> <span class="value">${eventReference}</span></div>
+    <div class="detail-row"><span class="label">Client & Name of Event:</span> <span class="value">${clientCompany}${clientCompany && eventTitle ? ' / ' : ''}${eventTitle}</span></div>
+    <div class="detail-row"><span class="label">Date(s)/Time(s):</span> <span class="value">Event on ${eventDate}</span></div>
+    <div class="detail-row"><span class="label">Location(s):</span> <span class="value">${eventLocation}</span></div>
+    <div class="detail-row"><span class="label">The fee and any other consideration payable to the Agent:</span> <span class="value">$${dealValue} USD</span></div>
+    <div class="detail-row"><span class="label">Travel:</span> <span class="value">${typeof travelDetails === 'string' ? travelDetails : 'To be determined'}</span></div>
+    <p class="deliverables-header">For that fee, the Speaker will provide:</p>
+    <ul class="deliverables-list">
+      ${deliverablesHtml}
+    </ul>
+  </div>
+
+  <div class="section">
+    <p class="section-body"><span class="section-title">2. Taxation</span> - The Speaker agrees to act as an independent contractor under the terms of this agreement and assumes all responsibility for Social Security, State, and Federal Income Tax, etc., as governed by the laws of the federal government of the United States and the Speaker's state of residence. The Client is not responsible for any additional expenses or costs.</p>
+  </div>
+
+  <div class="section">
+    <p class="section-body"><span class="section-title">3. Deposit and Payment</span> - A <span class="payment-highlight">${depositPercent}% Deposit is due at the time of execution/signing of this agreement. An additional ${midPaymentPercent}% is due ${midPaymentDate}, and the remaining ${balancePercent}% Balance Payment is due by ${balanceDueDate}</span>. All parties enter into this agreement in good faith. However, cancellation by the client shall make the client liable for the amount of the 50% deposit. If the contract is canceled by the Speaker, the Speaker and the Agent will refund all payments made.</p>
+  </div>
+
+  <div class="section">
+    <p class="section-body"><span class="section-title">4. Permission to Photograph and Record</span> - Any use of the Speaker's name, likeness, presentation content, or Recordings (as that term is defined in this section) for commercial purposes (and the section below marked "Permissible Use" is not considered to be commercial purposes) is expressly prohibited. No Trademark license is granted.</p>
+
+    <p class="section-body"><span class="section-title">Permissible Use:</span> All parties agree that the client may use the recorded video footage (the "Recording") of the Speaker for this Event. The Client may, without further fee or payment, use the Speaker's name and likeness for up to twelve months after the talk is delivered in marketing and promotion, but that does not suggest Speaker affiliation or endorsement. For example, the Client may share short snippets (up to 5-minute clips) from or about the event and talk that reference or include the Speaker. However, those snippets may not suggest endorsement by the speaker of the Client's products or the Client itself. The Recording in its entirety may be shared internally and with Event attendees via a private link for the 12 months after the initial airing date of <span class="payment-highlight">${eventDate}</span>. The Client agrees that they will not use the Recording for the purpose of training artificial intelligence models or digital twins of the Speaker.</p>
+  </div>
+
+  <div class="page-footer">
+    Speak About AI is a division of Strong Entertainment, LLC, 651 Homer Avenue, Palo Alto, CA 94301
+  </div>
+
+  <div class="section" style="margin-top: 30px;">
+    <p class="section-body"><span class="section-title">5. Cancellation</span> - This contract is binding and may be canceled only if:</p>
+    <div style="margin-left: 20px;">
+      <p>a) there is a mutual agreement between the parties; or</p>
+      <p>b) by force majeure; or</p>
+      <p>c) If the Speaker is delayed by airline delay/cancellation, accident due to travel, or incapacitated due to illness; or</p>
+      <p>d) An immediate family member is stricken by serious injury, illness, or death.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <p class="section-title">6. Limitation of Liability</p>
+    <p class="uppercase-section">6.1 EXCLUSION OF CERTAIN DAMAGES. NOTWITHSTANDING ANYTHING TO THE CONTRARY IN THIS AGREEMENT AND TO THE FULLEST EXTENT PERMITTED UNDER APPLICABLE LAWS, IN NO EVENT WILL EITHER PARTY BE LIABLE TO THE OTHER PARTY OR TO ANY THIRD PARTY UNDER ANY TORT, CONTRACT, NEGLIGENCE, STRICT LIABILITY, OR OTHER LEGAL OR EQUITABLE THEORY FOR</p>
+    <p class="uppercase-section">(1) INDIRECT, INCIDENTAL, CONSEQUENTIAL, EXEMPLARY, REPUTATIONAL, SPECIAL OR PUNITIVE DAMAGES OF ANY KIND; (2) COSTS OF PROCUREMENT, COVER, OR SUBSTITUTE SERVICES;</p>
+    <p class="uppercase-section">(3) LOSS OF USE OR CORRUPTION OF DATA, CONTENT OR INFORMATION; OR</p>
+    <p class="uppercase-section">(4) LOSS OF BUSINESS OPPORTUNITIES, REVENUES, PROFITS, GOODWILL, OR SAVINGS, EVEN IF THE PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH LOSS OR DAMAGES OR SUCH OR LOSS DAMAGES COULD HAVE BEEN REASONABLY FORESEEN.</p>
+    <p class="uppercase-section">6.2 LIMITATION OF LIABILITY. NEITHER PARTY SHALL BE LIABLE FOR CUMULATIVE, AGGREGATE DAMAGES THAT EXCEED THE AMOUNT ACTUALLY PAID OR PAYABLE BY CLIENT TO SPEAKER OR AGENCY FOR THE APPLICABLE SERVICES.</p>
+  </div>
+
+  <div class="section">
+    <p class="section-body"><span class="section-title">7. Miscellaneous</span> - This agreement represents the entire understanding between all parties, and supersedes all prior negotiations, representations, and agreements made by or between parties. No alterations, amendments, or modifications to any of the terms and conditions of this agreement shall be valid unless made in writing and signed by each party. Any controversy, dispute, or claim shall be resolved at the request of any party to this Agreement by final and binding arbitration administered by Judicial Arbitration & Mediation Services, Inc., and judgment upon any award rendered by the arbitrator may be entered by any State or Federal Court having jurisdiction thereof. This Agreement shall be governed by California law without reference to its conflicts of law principles. Any such arbitration shall occur exclusively in the County of Santa Clara, California.</p>
+  </div>
+
+  <div class="signature-section">
+    <div class="signature-block">
+      <span class="sig-field">Date:<span class="sig-line sig-date">&nbsp;</span></span>
+      <span class="sig-field">Client Signature:<span class="sig-line sig-signature">&nbsp;</span></span>
+      <span class="sig-field">Title:<span class="sig-line sig-title-field">&nbsp;</span></span>
+      <span class="sig-field">Company:<span class="sig-line sig-company">&nbsp;</span></span>
+    </div>
+    <div class="signature-block">
+      <span class="sig-field">Date:<span class="sig-line sig-date">&nbsp;</span></span>
+      <span class="sig-field">Agent Signature:<span class="sig-line sig-signature">&nbsp;</span></span>
+      <span class="sig-field">Title:<span class="sig-line sig-title-field">&nbsp;</span></span>
+      <span class="sig-field">Company:<span class="sig-line sig-company">&nbsp;</span></span>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    Speak About AI is a division of Strong Entertainment, LLC, 651 Homer Avenue, Palo Alto, CA 94301
+  </div>
+
+  <div class="no-print" style="text-align: center; margin-top: 30px;">
+    <button onclick="window.print()" style="padding: 10px 20px; font-size: 14px; cursor: pointer; background: #2563eb; color: white; border: none; border-radius: 4px;">
+      Print Contract
+    </button>
+  </div>
 </body>
 </html>`
 }
 
 export function validateContractData(contractData: Partial<ContractData>): { isValid: boolean; errors: string[] } {
   const errors: string[] = []
-  
-  // Required fields validation
+
   if (!contractData.client_name) errors.push('Client name is required')
   if (!contractData.client_email) errors.push('Client email is required')
   if (!contractData.event_title) errors.push('Event title is required')
   if (!contractData.event_date) errors.push('Event date is required')
   if (!contractData.event_location) errors.push('Event location is required')
   if (!contractData.deal_value || contractData.deal_value <= 0) errors.push('Deal value must be greater than 0')
-  
-  // Email validation
+
   if (contractData.client_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contractData.client_email)) {
     errors.push('Valid client email is required')
   }
-  
+
   if (contractData.speaker_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contractData.speaker_email)) {
     errors.push('Valid speaker email is required')
   }
-  
-  // Date validation
-  if (contractData.event_date) {
-    const eventDate = new Date(contractData.event_date)
-    if (eventDate < new Date()) {
-      errors.push('Event date cannot be in the past')
-    }
-  }
-  
+
   return {
     isValid: errors.length === 0,
     errors

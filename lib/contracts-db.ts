@@ -419,17 +419,17 @@ export async function generateContractHTML(contractId: number): Promise<string |
       contract_number: contract.contract_number,
       client_name: contract.client_name || '',
       client_email: contract.client_email || '',
-      client_phone: '', // We'll need to get this from the deal if needed
+      client_phone: '',
       company: contract.client_company || '',
       event_title: contract.event_title || '',
       event_date: contract.event_date || new Date().toISOString(),
       event_location: contract.event_location || '',
       event_type: contract.event_type || '',
       speaker_requested: contract.speaker_name || '',
-      attendee_count: contractMetadata.attendeeCount || 0,
+      attendee_count: contractMetadata.attendee_count || 0,
       budget_range: '',
       deal_value: contract.fee_amount || 0,
-      status: 'won', // Since we're generating a contract
+      status: 'won',
       priority: 'medium',
       source: '',
       notes: '',
@@ -440,7 +440,15 @@ export async function generateContractHTML(contractId: number): Promise<string |
       speaker_email: contract.speaker_email || '',
       speaker_fee: contract.speaker_fee || contract.fee_amount || 0,
       payment_terms: contract.payment_terms || 'Payment due within 30 days of event completion',
-      travel_stipend: 0 // Default value as contracts table might not have this field
+      travel_stipend: 0,
+      // New fields from contract_data
+      travel_details: contractMetadata.travel_details || '',
+      deliverables: contractMetadata.deliverables || '',
+      deposit_percent: contractMetadata.deposit_percent || 20,
+      mid_payment_percent: contractMetadata.mid_payment_percent || 30,
+      mid_payment_date: contractMetadata.mid_payment_date || '',
+      balance_percent: contractMetadata.balance_percent || 50,
+      balance_due_date: contractMetadata.balance_due_date || ''
     }
     
     return generateHTMLFromTemplate(contractData)

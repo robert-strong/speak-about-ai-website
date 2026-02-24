@@ -34,466 +34,137 @@ export interface ContractVariable {
 export const defaultContractTemplates: ContractTemplate[] = [
   {
     id: 'standard-speaker-agreement',
-    name: 'Standard Speaking Engagement Agreement',
+    name: 'Speaker/Client/Agent Agreement',
     type: 'client_speaker',
     category: 'external',
-    description: 'Complete contract for speaking engagements between client and speaker',
+    description: 'Standard three-party agreement between Speaker, Client, and Agent',
     sections: [
       {
         id: 'header',
-        title: 'Agreement Header',
+        title: 'SPEAKER/CLIENT/AGENT AGREEMENT',
         order: 1,
-        content: `SPEAKING ENGAGEMENT AGREEMENT
+        content: `SPEAKER/CLIENT/AGENT AGREEMENT
 
-This Speaking Engagement Agreement ("Agreement") is entered into as of {{agreement_date}} ("Effective Date") between:
+This agreement is entered into by and between
+a) Speak About AI, a division of Strong Entertainment, LLC ("Agent" for the "Speaker"),
+b) {{speaker_name}} ("Speaker"), and
+c) {{client_contact_name}} ("Client") for the purposes of engaging the Speaker for:
 
-**CLIENT:**
-{{client_company}}
-{{client_address}}
-Contact: {{client_contact_name}}
-Email: {{client_email}}
-Phone: {{client_phone}}
-
-**SPEAKER:**
-{{speaker_name}}
-{{speaker_address}}
-Email: {{speaker_email}}
-Phone: {{speaker_phone}}
-
-**AGENCY (if applicable):**
-Speak About AI, LLC
-Contact: {{agency_contact}}
-Email: {{agency_email}}`,
+**Contract details:**
+**Event Reference:** {{event_reference}}
+**Client & Name of Event:** {{client_company}} / {{event_title}}
+**Date(s)/Time(s):** {{event_date}}
+**Location(s):** {{event_location}}
+**The fee and any other consideration payable to the Agent:** \${{deal_value}} USD
+**Travel:** {{travel_details}}
+**For that fee, the Speaker will provide:**
+{{deliverables}}`,
         isEditable: false,
-        variables: ['agreement_date', 'client_company', 'client_address', 'client_contact_name', 'client_email', 'client_phone', 'speaker_name', 'speaker_address', 'speaker_email', 'speaker_phone', 'agency_contact', 'agency_email']
+        variables: ['speaker_name', 'client_contact_name', 'event_reference', 'client_company', 'event_title', 'event_date', 'event_location', 'deal_value', 'travel_details', 'deliverables']
       },
       {
-        id: 'event-details',
-        title: 'Event Details',
+        id: 'taxation',
+        title: '2. Taxation',
         order: 2,
-        content: `## 1. ENGAGEMENT DETAILS
-
-The Speaker agrees to provide speaking services for the following event:
-
-**Event Name:** {{event_title}}
-**Event Date(s):** {{event_date}}
-**Event Time:** {{event_time}}
-**Duration:** {{presentation_duration}}
-**Event Location:** {{event_location}}
-**Venue:** {{venue_name}}
-**Expected Attendance:** {{attendee_count}} attendees
-**Event Type:** {{event_type}}
-
-**Presentation Details:**
-- **Topic/Title:** {{presentation_title}}
-- **Format:** {{presentation_format}}
-- **Description:** {{presentation_description}}
-
-**Additional Requirements:**
-{{additional_requirements}}`,
-        isEditable: true,
-        variables: ['event_title', 'event_date', 'event_time', 'presentation_duration', 'event_location', 'venue_name', 'attendee_count', 'event_type', 'presentation_title', 'presentation_format', 'presentation_description', 'additional_requirements']
+        content: `**2. Taxation** - The Speaker agrees to act as an independent contractor under the terms of this agreement and assumes all responsibility for Social Security, State, and Federal Income Tax, etc., as governed by the laws of the federal government of the United States and the Speaker's state of residence. The Client is not responsible for any additional expenses or costs.`,
+        isEditable: false,
+        variables: []
       },
       {
-        id: 'compensation',
-        title: 'Compensation',
+        id: 'payment',
+        title: '3. Deposit and Payment',
         order: 3,
-        content: `## 2. COMPENSATION
-
-**Total Fee (Deal Value):** {{deal_value}} USD
-**Speaking Fee:** {{speaker_fee}} USD
-**Payment Terms:** {{payment_terms}}
-
-**Additional Compensation:**
-{{additional_compensation}}
-
-**Expenses:**
-The Client agrees to reimburse the following pre-approved expenses:
-{{expense_coverage}}
-
-All expenses must be submitted with receipts within {{expense_submission_deadline}} days after the event.`,
+        content: `**3. Deposit and Payment** - A {{deposit_percent}}% Deposit is due at the time of execution/signing of this agreement. An additional {{mid_payment_percent}}% is due {{mid_payment_date}}, and the remaining {{balance_percent}}% Balance Payment is due by {{balance_due_date}}. All parties enter into this agreement in good faith. However, cancellation by the client shall make the client liable for the amount of the 50% deposit. If the contract is canceled by the Speaker, the Speaker and the Agent will refund all payments made.`,
         isEditable: true,
-        variables: ['deal_value', 'speaker_fee', 'payment_terms', 'additional_compensation', 'expense_coverage', 'expense_submission_deadline']
+        variables: ['deposit_percent', 'mid_payment_percent', 'mid_payment_date', 'balance_percent', 'balance_due_date']
       },
       {
-        id: 'travel-accommodation',
-        title: 'Travel & Accommodation',
+        id: 'recording-rights',
+        title: '4. Permission to Photograph and Record',
         order: 4,
-        content: `## 3. TRAVEL & ACCOMMODATION
+        content: `**4. Permission to Photograph and Record** - Any use of the Speaker's name, likeness, presentation content, or Recordings (as that term is defined in this section) for commercial purposes (and the section below marked "Permissible Use" is not considered to be commercial purposes) is expressly prohibited. No Trademark license is granted.
 
-{{travel_arrangements}}
-
-**Travel Cost Arrangement:** {{travel_cost_type}}
-
-**Travel Buyout:**
-- **Buyout Amount:** {{travel_buyout_amount}} USD
-- **Buyout Covers:** {{travel_buyout_includes}}
-
-**Client-Covered Items:**
-{{client_covers_items}}
-
-**Travel Details:**
-- **Departure City:** {{departure_city}}
-- **Arrival Requirements:** {{arrival_requirements}}
-- **Ground Transportation:** {{ground_transportation}}
-
-**Accommodation:**
-- **Hotel:** {{hotel_arrangements}}
-- **Check-in Date:** {{checkin_date}}
-- **Check-out Date:** {{checkout_date}}
-
-**Meals & Per Diem:**
-{{meal_arrangements}}`,
-        isEditable: true,
-        variables: ['travel_arrangements', 'travel_cost_type', 'travel_buyout_amount', 'travel_buyout_includes', 'client_covers_items', 'departure_city', 'arrival_requirements', 'ground_transportation', 'hotel_arrangements', 'checkin_date', 'checkout_date', 'meal_arrangements']
-      },
-      {
-        id: 'speaker-obligations',
-        title: 'Speaker Obligations',
-        order: 5,
-        content: `## 4. SPEAKER OBLIGATIONS
-
-The Speaker agrees to:
-
-a) Arrive at the venue at least {{arrival_buffer}} minutes before the scheduled presentation time
-b) Provide a professional presentation on the agreed topic
-c) Participate in the following additional activities (if applicable):
-   {{additional_activities}}
-d) Provide the following materials by {{materials_deadline}}:
-   - Professional biography ({{bio_length}} words)
-   - High-resolution headshot
-   - Presentation title and description
-   - Audio/visual requirements
-   {{additional_materials}}
-e) Maintain professional conduct throughout the engagement
-f) Not promote competing products or services without prior written consent`,
-        isEditable: true,
-        variables: ['arrival_buffer', 'additional_activities', 'materials_deadline', 'bio_length', 'additional_materials']
-      },
-      {
-        id: 'client-obligations',
-        title: 'Client Obligations',
-        order: 6,
-        content: `## 5. CLIENT OBLIGATIONS
-
-The Client agrees to:
-
-a) Provide the following equipment and technical support:
-   {{technical_requirements}}
-b) Ensure appropriate venue setup including:
-   - Stage/speaking area
-   - Lighting
-   - Sound system
-   - {{venue_requirements}}
-c) Provide event schedule and logistics information at least {{info_deadline}} days before the event
-d) Handle event promotion and attendee registration
-e) Provide on-site support and point of contact
-f) Process payment according to the terms specified in Section 2`,
-        isEditable: true,
-        variables: ['technical_requirements', 'venue_requirements', 'info_deadline']
-      },
-      {
-        id: 'intellectual-property',
-        title: 'Intellectual Property',
-        order: 7,
-        content: `## 6. INTELLECTUAL PROPERTY & RECORDING RIGHTS
-
-**Content Ownership:**
-The Speaker retains all rights to their presentation content, materials, and intellectual property.
-
-**Recording Rights:**
-{{recording_rights}}
-
-**Marketing Use:**
-{{marketing_rights}}
-
-**Materials Distribution:**
-{{distribution_rights}}`,
-        isEditable: true,
-        variables: ['recording_rights', 'marketing_rights', 'distribution_rights']
+**Permissible Use:** All parties agree that the client may use the recorded video footage (the "Recording") of the Speaker for this Event. The Client may, without further fee or payment, use the Speaker's name and likeness for up to twelve months after the talk is delivered in marketing and promotion, but that does not suggest Speaker affiliation or endorsement. For example, the Client may share short snippets (up to 5-minute clips) from or about the event and talk that reference or include the Speaker. However, those snippets may not suggest endorsement by the speaker of the Client's products or the Client itself. The Recording in its entirety may be shared internally and with Event attendees via a private link for the 12 months after the initial airing date of {{event_date}}. The Client agrees that they will not use the Recording for the purpose of training artificial intelligence models or digital twins of the Speaker.`,
+        isEditable: false,
+        variables: ['event_date']
       },
       {
         id: 'cancellation',
-        title: 'Cancellation Policy',
-        order: 8,
-        content: `## 7. CANCELLATION POLICY
+        title: '5. Cancellation',
+        order: 5,
+        content: `**5. Cancellation** - This contract is binding and may be canceled only if:
 
-**By Client:**
-- More than {{cancellation_period_1}} days before event: {{cancellation_fee_1}}% of speaking fee
-- {{cancellation_period_2}} to {{cancellation_period_1}} days before event: {{cancellation_fee_2}}% of speaking fee
-- Less than {{cancellation_period_2}} days before event: {{cancellation_fee_3}}% of speaking fee
-
-**By Speaker:**
-The Speaker may cancel only due to illness, emergency, or Act of God. The Speaker will make reasonable efforts to provide a qualified replacement speaker.
-
-**Force Majeure:**
-Neither party shall be liable for failure to perform due to causes beyond their reasonable control, including but not limited to acts of God, natural disasters, war, terrorism, pandemic, government restrictions, or other emergencies.`,
-        isEditable: true,
-        variables: ['cancellation_period_1', 'cancellation_period_2', 'cancellation_fee_1', 'cancellation_fee_2', 'cancellation_fee_3']
-      },
-      {
-        id: 'confidentiality',
-        title: 'Confidentiality',
-        order: 9,
-        content: `## 8. CONFIDENTIALITY
-
-Both parties agree to maintain confidentiality regarding:
-- Proprietary information shared during the engagement
-- Financial terms of this agreement (unless disclosure is required by law)
-- {{additional_confidentiality}}
-
-This confidentiality obligation survives termination of this agreement.`,
-        isEditable: true,
-        variables: ['additional_confidentiality']
-      },
-      {
-        id: 'liability-indemnification',
-        title: 'Liability & Indemnification',
-        order: 10,
-        content: `## 9. LIABILITY & INDEMNIFICATION
-
-**Limitation of Liability:**
-Neither party shall be liable for indirect, incidental, special, or consequential damages arising from this agreement.
-
-**Indemnification:**
-Each party agrees to indemnify and hold harmless the other party from claims arising from their own negligence or willful misconduct.
-
-**Insurance:**
-{{insurance_requirements}}`,
-        isEditable: true,
-        variables: ['insurance_requirements']
-      },
-      {
-        id: 'general-provisions',
-        title: 'General Provisions',
-        order: 11,
-        content: `## 10. GENERAL PROVISIONS
-
-**Governing Law:** This Agreement shall be governed by the laws of {{governing_state}}.
-
-**Entire Agreement:** This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements.
-
-**Amendments:** Any amendments to this Agreement must be in writing and signed by both parties.
-
-**Severability:** If any provision is found to be unenforceable, the remaining provisions shall continue in full force and effect.
-
-**Notice:** All notices shall be sent to the addresses listed above via email with confirmation of receipt.
-
-**Assignment:** Neither party may assign this Agreement without the prior written consent of the other party.`,
+a) there is a mutual agreement between the parties; or
+b) by force majeure; or
+c) If the Speaker is delayed by airline delay/cancellation, accident due to travel, or incapacitated due to illness; or
+d) An immediate family member is stricken by serious injury, illness, or death.`,
         isEditable: false,
-        variables: ['governing_state']
+        variables: []
+      },
+      {
+        id: 'liability',
+        title: '6. Limitation of Liability',
+        order: 6,
+        content: `**6. Limitation of Liability**
+
+**6.1 EXCLUSION OF CERTAIN DAMAGES.** NOTWITHSTANDING ANYTHING TO THE CONTRARY IN THIS AGREEMENT AND TO THE FULLEST EXTENT PERMITTED UNDER APPLICABLE LAWS, IN NO EVENT WILL EITHER PARTY BE LIABLE TO THE OTHER PARTY OR TO ANY THIRD PARTY UNDER ANY TORT, CONTRACT, NEGLIGENCE, STRICT LIABILITY, OR OTHER LEGAL OR EQUITABLE THEORY FOR (1) INDIRECT, INCIDENTAL, CONSEQUENTIAL, EXEMPLARY, REPUTATIONAL, SPECIAL OR PUNITIVE DAMAGES OF ANY KIND; (2) COSTS OF PROCUREMENT, COVER, OR SUBSTITUTE SERVICES; (3) LOSS OF USE OR CORRUPTION OF DATA, CONTENT OR INFORMATION; OR (4) LOSS OF BUSINESS OPPORTUNITIES, REVENUES, PROFITS, GOODWILL, OR SAVINGS, EVEN IF THE PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH LOSS OR DAMAGES OR SUCH OR LOSS DAMAGES COULD HAVE BEEN REASONABLY FORESEEN.
+
+**6.2 LIMITATION OF LIABILITY.** NEITHER PARTY SHALL BE LIABLE FOR CUMULATIVE, AGGREGATE DAMAGES THAT EXCEED THE AMOUNT ACTUALLY PAID OR PAYABLE BY CLIENT TO SPEAKER OR AGENCY FOR THE APPLICABLE SERVICES.`,
+        isEditable: false,
+        variables: []
+      },
+      {
+        id: 'miscellaneous',
+        title: '7. Miscellaneous',
+        order: 7,
+        content: `**7. Miscellaneous** - This agreement represents the entire understanding between all parties, and supersedes all prior negotiations, representations, and agreements made by or between parties. No alterations, amendments, or modifications to any of the terms and conditions of this agreement shall be valid unless made in writing and signed by each party. Any controversy, dispute, or claim shall be resolved at the request of any party to this Agreement by final and binding arbitration administered by Judicial Arbitration & Mediation Services, Inc., and judgment upon any award rendered by the arbitrator may be entered by any State or Federal Court having jurisdiction thereof. This Agreement shall be governed by California law without reference to its conflicts of law principles. Any such arbitration shall occur exclusively in the County of Santa Clara, California.`,
+        isEditable: false,
+        variables: []
       },
       {
         id: 'signatures',
         title: 'Signatures',
-        order: 12,
-        content: `## SIGNATURES
+        order: 8,
+        content: `Date:_________ Client Signature:__________________________ Title:_____________________ Company:______________
 
-By signing below, the parties acknowledge they have read, understood, and agree to be bound by the terms of this Agreement.
-
-**CLIENT:**
-
-_________________________________
-Signature
-
-{{client_signer_name}}
-Name
-
-{{client_signer_title}}
-Title
-
-Date: {{client_signature_date}}
-
-**SPEAKER:**
-
-_________________________________
-Signature
-
-{{speaker_name}}
-Name
-
-Date: {{speaker_signature_date}}
-
-**AGENCY (if applicable):**
-
-_________________________________
-Signature
-
-{{agency_signer_name}}
-Name
-
-{{agency_signer_title}}
-Title
-
-Date: {{agency_signature_date}}`,
+Date:_________ Agent Signature:__________________________ Title:_____________________ Company:________________`,
         isEditable: false,
-        variables: ['client_signer_name', 'client_signer_title', 'client_signature_date', 'speaker_name', 'speaker_signature_date', 'agency_signer_name', 'agency_signer_title', 'agency_signature_date']
+        variables: ['client_signer_name', 'client_signer_title', 'client_signer_company', 'agent_signer_name', 'agent_signer_title']
       }
     ],
     variables: [
-      // Basic Information
-      { key: 'agreement_date', label: 'Agreement Date', type: 'date', required: true },
-      { key: 'client_company', label: 'Client Company', type: 'text', required: true },
-      { key: 'client_address', label: 'Client Address', type: 'textarea', required: true },
-      { key: 'client_contact_name', label: 'Client Contact Name', type: 'text', required: true },
-      { key: 'client_email', label: 'Client Email', type: 'email', required: true },
-      { key: 'client_phone', label: 'Client Phone', type: 'text', required: false },
+      // Parties
       { key: 'speaker_name', label: 'Speaker Name', type: 'text', required: true },
-      { key: 'speaker_address', label: 'Speaker Address', type: 'textarea', required: false },
-      { key: 'speaker_email', label: 'Speaker Email', type: 'email', required: true },
-      { key: 'speaker_phone', label: 'Speaker Phone', type: 'text', required: false },
-      { key: 'agency_contact', label: 'Agency Contact', type: 'text', required: false, defaultValue: 'Contract Team' },
-      { key: 'agency_email', label: 'Agency Email', type: 'email', required: false, defaultValue: 'contracts@speakaboutai.com' },
-      
+      { key: 'client_contact_name', label: 'Client Contact Name', type: 'text', required: true },
+      { key: 'client_company', label: 'Client Company', type: 'text', required: true },
+      { key: 'client_email', label: 'Client Email', type: 'email', required: true },
+      { key: 'speaker_email', label: 'Speaker Email', type: 'email', required: false },
+
       // Event Details
-      { key: 'event_title', label: 'Event Title', type: 'text', required: true },
-      { key: 'event_date', label: 'Event Date', type: 'date', required: true },
-      { key: 'event_time', label: 'Event Time', type: 'text', required: true },
-      { key: 'presentation_duration', label: 'Presentation Duration', type: 'text', required: true, defaultValue: '60 minutes' },
-      { key: 'event_location', label: 'Event Location', type: 'text', required: true },
-      { key: 'venue_name', label: 'Venue Name', type: 'text', required: false },
-      { key: 'attendee_count', label: 'Expected Attendance', type: 'number', required: true },
-      { 
-        key: 'event_type', 
-        label: 'Event Type', 
-        type: 'select', 
-        required: true,
-        options: [
-          { value: 'conference', label: 'Conference' },
-          { value: 'workshop', label: 'Workshop' },
-          { value: 'keynote', label: 'Keynote' },
-          { value: 'panel', label: 'Panel Discussion' },
-          { value: 'webinar', label: 'Webinar' },
-          { value: 'corporate', label: 'Corporate Event' },
-          { value: 'other', label: 'Other' }
-        ]
-      },
-      { key: 'presentation_title', label: 'Presentation Title', type: 'text', required: true },
-      { 
-        key: 'presentation_format', 
-        label: 'Presentation Format', 
-        type: 'select', 
-        required: true,
-        options: [
-          { value: 'keynote', label: 'Keynote Presentation' },
-          { value: 'workshop', label: 'Interactive Workshop' },
-          { value: 'panel', label: 'Panel Discussion' },
-          { value: 'fireside', label: 'Fireside Chat' },
-          { value: 'training', label: 'Training Session' }
-        ]
-      },
-      { key: 'presentation_description', label: 'Presentation Description', type: 'textarea', required: true },
-      { key: 'additional_requirements', label: 'Additional Requirements', type: 'textarea', required: false },
-      
-      // Compensation
-      { key: 'deal_value', label: 'Total Fee (Deal Value)', type: 'currency', required: true },
-      { key: 'speaker_fee', label: 'Speaking Fee', type: 'currency', required: true },
-      { 
-        key: 'payment_terms', 
-        label: 'Payment Terms', 
-        type: 'select', 
-        required: true,
-        options: [
-          { value: 'net30', label: 'Net 30 days after event' },
-          { value: 'net15', label: 'Net 15 days after event' },
-          { value: '50_50', label: '50% deposit, 50% after event' },
-          { value: 'upon_receipt', label: 'Due upon receipt' },
-          { value: 'custom', label: 'Custom terms' }
-        ],
-        defaultValue: 'net30'
-      },
-      { key: 'additional_compensation', label: 'Additional Compensation', type: 'textarea', required: false },
-      { key: 'expense_coverage', label: 'Expense Coverage', type: 'textarea', required: false, defaultValue: 'Travel, accommodation, and meals as pre-approved' },
-      { key: 'expense_submission_deadline', label: 'Expense Submission Deadline (days)', type: 'number', required: true, defaultValue: 30 },
-      
-      // Travel & Accommodation
-      {
-        key: 'travel_arrangements',
-        label: 'Travel Arrangements',
-        type: 'select',
-        required: true,
-        options: [
-          { value: 'client_books', label: 'Client books and pays directly' },
-          { value: 'speaker_books', label: 'Speaker books, client reimburses' },
-          { value: 'no_travel', label: 'No travel required' },
-          { value: 'virtual', label: 'Virtual event' }
-        ]
-      },
-      {
-        key: 'travel_cost_type',
-        label: 'Travel Cost Type',
-        type: 'select',
-        required: true,
-        options: [
-          { value: 'buyout', label: 'Travel Buyout (fixed amount to speaker)' },
-          { value: 'client_covered', label: 'Client Covers All Travel' },
-          { value: 'split', label: 'Split (buyout + client covers some items)' },
-          { value: 'speaker_covered', label: 'Speaker Covers (included in fee)' },
-          { value: 'no_travel', label: 'No Travel Required' }
-        ],
-        defaultValue: 'client_covered'
-      },
-      { key: 'travel_buyout_amount', label: 'Travel Buyout Amount', type: 'currency', required: false },
-      { key: 'travel_buyout_includes', label: 'Buyout Includes', type: 'textarea', required: false, defaultValue: 'Airfare, ground transportation, hotel, and meals' },
-      { key: 'client_covers_items', label: 'Client Covers Items', type: 'textarea', required: false, defaultValue: 'The client will directly book and pay for:\n- Round-trip airfare (business class for flights over 4 hours)\n- Hotel accommodations (4-star or equivalent)\n- Ground transportation to/from airport and venue\n- Meals during the engagement' },
-      { key: 'departure_city', label: 'Departure City', type: 'text', required: false },
-      { key: 'arrival_requirements', label: 'Arrival Requirements', type: 'text', required: false, defaultValue: 'Arrive day before event' },
-      { key: 'ground_transportation', label: 'Ground Transportation', type: 'text', required: false, defaultValue: 'Provided by client' },
-      { key: 'hotel_arrangements', label: 'Hotel Arrangements', type: 'text', required: false },
-      { key: 'checkin_date', label: 'Check-in Date', type: 'date', required: false },
-      { key: 'checkout_date', label: 'Check-out Date', type: 'date', required: false },
-      { key: 'meal_arrangements', label: 'Meal Arrangements', type: 'textarea', required: false },
-      
-      // Speaker Obligations
-      { key: 'arrival_buffer', label: 'Arrival Buffer (minutes)', type: 'number', required: true, defaultValue: 60 },
-      { key: 'additional_activities', label: 'Additional Activities', type: 'textarea', required: false, defaultValue: 'Q&A session, meet and greet' },
-      { key: 'materials_deadline', label: 'Materials Deadline', type: 'date', required: true },
-      { key: 'bio_length', label: 'Bio Length (words)', type: 'number', required: true, defaultValue: 150 },
-      { key: 'additional_materials', label: 'Additional Materials', type: 'textarea', required: false },
-      
-      // Client Obligations
-      { key: 'technical_requirements', label: 'Technical Requirements', type: 'textarea', required: true, defaultValue: 'Microphone, projector, screen, clicker' },
-      { key: 'venue_requirements', label: 'Additional Venue Requirements', type: 'textarea', required: false },
-      { key: 'info_deadline', label: 'Information Deadline (days before)', type: 'number', required: true, defaultValue: 14 },
-      
-      // Intellectual Property
-      { 
-        key: 'recording_rights', 
-        label: 'Recording Rights', 
-        type: 'select',
-        required: true,
-        options: [
-          { value: 'no_recording', label: 'No recording permitted' },
-          { value: 'audio_only', label: 'Audio recording permitted' },
-          { value: 'video_internal', label: 'Video recording for internal use only' },
-          { value: 'video_full', label: 'Full video recording and distribution rights' },
-          { value: 'custom', label: 'Custom recording terms' }
-        ],
-        defaultValue: 'no_recording'
-      },
-      { key: 'marketing_rights', label: 'Marketing Rights', type: 'textarea', required: false, defaultValue: 'Client may use Speaker name and photo for event promotion' },
-      { key: 'distribution_rights', label: 'Materials Distribution', type: 'textarea', required: false, defaultValue: 'Presentation materials may be shared with attendees only' },
-      
-      // Cancellation
-      { key: 'cancellation_period_1', label: 'Cancellation Period 1 (days)', type: 'number', required: true, defaultValue: 30 },
-      { key: 'cancellation_period_2', label: 'Cancellation Period 2 (days)', type: 'number', required: true, defaultValue: 14 },
-      { key: 'cancellation_fee_1', label: 'Cancellation Fee 1 (%)', type: 'number', required: true, defaultValue: 25 },
-      { key: 'cancellation_fee_2', label: 'Cancellation Fee 2 (%)', type: 'number', required: true, defaultValue: 50 },
-      { key: 'cancellation_fee_3', label: 'Cancellation Fee 3 (%)', type: 'number', required: true, defaultValue: 100 },
-      
-      // Other
-      { key: 'additional_confidentiality', label: 'Additional Confidentiality Terms', type: 'textarea', required: false },
-      { key: 'insurance_requirements', label: 'Insurance Requirements', type: 'textarea', required: false, defaultValue: 'Each party maintains appropriate liability insurance' },
-      { key: 'governing_state', label: 'Governing State', type: 'text', required: true, defaultValue: 'California' },
-      
+      { key: 'event_reference', label: 'Event Reference #', type: 'text', required: false },
+      { key: 'event_title', label: 'Name of Event', type: 'text', required: true },
+      { key: 'event_date', label: 'Event Date(s)/Time(s)', type: 'text', required: true },
+      { key: 'event_location', label: 'Event Location(s)', type: 'text', required: true },
+
+      // Financial
+      { key: 'deal_value', label: 'Fee (Deal Value)', type: 'currency', required: true },
+      { key: 'speaker_fee', label: 'Speaker Fee', type: 'currency', required: false },
+      { key: 'travel_details', label: 'Travel Arrangements', type: 'textarea', required: false, defaultValue: '$2,500 flight buyout, 2 nights at a 4+ star hotel, meals, and event city ground transportation' },
+      { key: 'deliverables', label: 'Speaker Deliverables', type: 'textarea', required: true, defaultValue: '- A 30-minute content alignment meeting a month or so before the event.\n- A short tech-check the day before or day of your talk.\n- A 60-minute keynote/workshop in person.' },
+
+      // Payment Schedule
+      { key: 'deposit_percent', label: 'Deposit %', type: 'number', required: true, defaultValue: 20 },
+      { key: 'mid_payment_percent', label: 'Mid-Payment %', type: 'number', required: true, defaultValue: 30 },
+      { key: 'mid_payment_date', label: 'Mid-Payment Due Date', type: 'text', required: true },
+      { key: 'balance_percent', label: 'Balance %', type: 'number', required: true, defaultValue: 50 },
+      { key: 'balance_due_date', label: 'Balance Due Date', type: 'text', required: true },
+
       // Signatures
-      { key: 'client_signer_name', label: 'Client Signer Name', type: 'text', required: true },
-      { key: 'client_signer_title', label: 'Client Signer Title', type: 'text', required: true },
-      { key: 'client_signature_date', label: 'Client Signature Date', type: 'date', required: false },
-      { key: 'speaker_signature_date', label: 'Speaker Signature Date', type: 'date', required: false },
-      { key: 'agency_signer_name', label: 'Agency Signer Name', type: 'text', required: false },
-      { key: 'agency_signer_title', label: 'Agency Signer Title', type: 'text', required: false },
-      { key: 'agency_signature_date', label: 'Agency Signature Date', type: 'date', required: false }
+      { key: 'client_signer_name', label: 'Client Signer Name', type: 'text', required: false },
+      { key: 'client_signer_title', label: 'Client Signer Title', type: 'text', required: false },
+      { key: 'client_signer_company', label: 'Client Signer Company', type: 'text', required: false },
+      { key: 'agent_signer_name', label: 'Agent Signer Name', type: 'text', required: false, defaultValue: 'Robert Strong' },
+      { key: 'agent_signer_title', label: 'Agent Signer Title', type: 'text', required: false, defaultValue: 'Owner' }
     ]
   },
   {
@@ -502,47 +173,46 @@ Date: {{agency_signature_date}}`,
     type: 'workshop',
     category: 'external',
     description: 'Agreement for workshop facilitation and training sessions',
-    sections: [
-      // Workshop-specific sections would go here
-    ],
+    sections: [],
     variables: []
   }
 ]
 
 export function processTemplate(template: ContractTemplate, values: Record<string, any>): string {
   let processedContent = ''
-  
+
   template.sections
     .sort((a, b) => a.order - b.order)
     .forEach(section => {
       let sectionContent = section.content
-      
+
       // Replace all variables with their values
-      section.variables?.forEach(variable => {
+      const allVariableKeys = template.variables.map(v => v.key)
+      allVariableKeys.forEach(variable => {
         const value = values[variable] || `[${variable}]`
         const regex = new RegExp(`{{${variable}}}`, 'g')
         sectionContent = sectionContent.replace(regex, value)
       })
-      
+
       processedContent += sectionContent + '\n\n'
     })
-  
+
   return processedContent
 }
 
 export function validateTemplateValues(
-  template: ContractTemplate, 
+  template: ContractTemplate,
   values: Record<string, any>
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = []
-  
+
   template.variables.forEach(variable => {
     const value = values[variable.key]
-    
+
     if (variable.required && !value) {
       errors.push(`${variable.label} is required`)
     }
-    
+
     if (value && variable.validation) {
       if (variable.type === 'number' || variable.type === 'currency') {
         const numValue = parseFloat(value)
@@ -553,7 +223,7 @@ export function validateTemplateValues(
           errors.push(`${variable.label} must be at most ${variable.validation.max}`)
         }
       }
-      
+
       if (variable.validation.pattern) {
         const regex = new RegExp(variable.validation.pattern)
         if (!regex.test(value)) {
@@ -562,7 +232,7 @@ export function validateTemplateValues(
       }
     }
   })
-  
+
   return {
     valid: errors.length === 0,
     errors

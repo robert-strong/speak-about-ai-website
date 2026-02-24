@@ -68,7 +68,7 @@ export function ContractEditor({ contractId, isCreating, onSave, onCancel }: Con
   const [selectedTemplate, setSelectedTemplate] = useState<ContractTemplate | null>(null)
   const [deals, setDeals] = useState<Deal[]>([])
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null)
-  const [activeSection, setActiveSection] = useState("basic")
+  const [activeSection, setActiveSection] = useState("parties")
   const [validationErrors, setValidationErrors] = useState<string[]>([])
 
   useEffect(() => {
@@ -177,14 +177,12 @@ export function ContractEditor({ contractId, isCreating, onSave, onCancel }: Con
           client_company: deal.company,
           client_contact_name: deal.client_name,
           client_email: deal.client_email,
-          client_phone: deal.client_phone,
           event_title: deal.event_title,
-          event_date: deal.event_date,
+          event_date: deal.event_date ? new Date(deal.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '',
           event_location: deal.event_location,
-          attendee_count: deal.attendee_count,
           deal_value: deal.deal_value,
           speaker_fee: deal.deal_value,
-          agreement_date: new Date().toISOString().split('T')[0]
+          event_reference: `#${deal.id}`
         }
       }))
     }
@@ -387,14 +385,11 @@ export function ContractEditor({ contractId, isCreating, onSave, onCancel }: Con
   }
 
   const variablesBySection = {
-    basic: ['agreement_date', 'client_company', 'client_address', 'client_contact_name', 'client_email', 'client_phone', 'client_signer_name', 'client_signer_title'],
-    speaker: ['speaker_name', 'speaker_email', 'speaker_phone', 'speaker_address'],
-    event: ['event_title', 'event_date', 'event_time', 'presentation_duration', 'event_location', 'venue_name', 'attendee_count', 'event_type', 'presentation_title', 'presentation_format', 'presentation_description', 'additional_requirements'],
-    financial: ['deal_value', 'speaker_fee', 'payment_terms', 'additional_compensation', 'expense_coverage', 'expense_submission_deadline'],
-    travel: ['travel_arrangements', 'travel_cost_type', 'travel_buyout_amount', 'travel_buyout_includes', 'client_covers_items', 'departure_city', 'arrival_requirements', 'ground_transportation', 'hotel_arrangements', 'checkin_date', 'checkout_date', 'meal_arrangements'],
-    terms: ['arrival_buffer', 'additional_activities', 'materials_deadline', 'bio_length', 'technical_requirements', 'venue_requirements', 'info_deadline', 'recording_rights', 'marketing_rights', 'distribution_rights'],
-    cancellation: ['cancellation_period_1', 'cancellation_period_2', 'cancellation_fee_1', 'cancellation_fee_2', 'cancellation_fee_3'],
-    legal: ['additional_confidentiality', 'insurance_requirements', 'governing_state', 'agency_signer_name', 'agency_signer_title']
+    parties: ['client_contact_name', 'client_company', 'client_email', 'speaker_name', 'speaker_email'],
+    event: ['event_reference', 'event_title', 'event_date', 'event_location'],
+    financial: ['deal_value', 'speaker_fee', 'travel_details', 'deliverables'],
+    payment: ['deposit_percent', 'mid_payment_percent', 'mid_payment_date', 'balance_percent', 'balance_due_date'],
+    signatures: ['client_signer_name', 'client_signer_title', 'client_signer_company', 'agent_signer_name', 'agent_signer_title']
   }
 
   return (
@@ -512,29 +507,20 @@ export function ContractEditor({ contractId, isCreating, onSave, onCancel }: Con
           <Tabs value={activeSection} onValueChange={setActiveSection}>
             <div className="border-b">
               <TabsList className="w-full justify-start h-auto p-0 bg-transparent">
-                <TabsTrigger value="basic" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
-                  Basic Info
-                </TabsTrigger>
-                <TabsTrigger value="speaker" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
-                  Speaker
+                <TabsTrigger value="parties" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
+                  Parties
                 </TabsTrigger>
                 <TabsTrigger value="event" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
                   Event Details
                 </TabsTrigger>
                 <TabsTrigger value="financial" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
-                  Financial
+                  Financial & Deliverables
                 </TabsTrigger>
-                <TabsTrigger value="travel" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
-                  Travel
+                <TabsTrigger value="payment" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
+                  Payment Schedule
                 </TabsTrigger>
-                <TabsTrigger value="terms" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
-                  Terms
-                </TabsTrigger>
-                <TabsTrigger value="cancellation" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
-                  Cancellation
-                </TabsTrigger>
-                <TabsTrigger value="legal" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
-                  Legal
+                <TabsTrigger value="signatures" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-6 py-3">
+                  Signatures
                 </TabsTrigger>
               </TabsList>
             </div>

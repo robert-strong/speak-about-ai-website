@@ -4,10 +4,11 @@ import { processTemplate, defaultContractTemplates } from "@/lib/contract-templa
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const contractId = parseInt(params.id)
+    const { id } = await params
+    const contractId = parseInt(id)
     if (isNaN(contractId)) {
       return NextResponse.json({ error: "Invalid contract ID" }, { status: 400 })
     }
@@ -16,6 +17,31 @@ export async function GET(
     if (!contract) {
       return NextResponse.json({ error: "Contract not found" }, { status: 404 })
     }
+
+    // Parse contract_data
+    let contractValues: Record<string, any> = {}
+    if (contract.contract_data) {
+      try {
+        contractValues = typeof contract.contract_data === 'string'
+          ? JSON.parse(contract.contract_data)
+          : contract.contract_data
+      } catch (e) {
+        console.warn("Failed to parse contract_data:", e)
+      }
+    }
+
+    // Fill in values from contract columns if not in contract_data
+    if (!contractValues.speaker_name && contract.speaker_name) contractValues.speaker_name = contract.speaker_name
+    if (!contractValues.client_contact_name && contract.client_name) contractValues.client_contact_name = contract.client_name
+    if (!contractValues.client_company && contract.client_company) contractValues.client_company = contract.client_company
+    if (!contractValues.client_email && contract.client_email) contractValues.client_email = contract.client_email
+    if (!contractValues.event_title && contract.event_title) contractValues.event_title = contract.event_title
+    if (!contractValues.event_date && contract.event_date) {
+      contractValues.event_date = new Date(contract.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    }
+    if (!contractValues.event_location && contract.event_location) contractValues.event_location = contract.event_location
+    if (!contractValues.deal_value && contract.fee_amount) contractValues.deal_value = Number(contract.fee_amount).toLocaleString('en-US')
+    if (!contractValues.event_reference) contractValues.event_reference = contract.contract_number
 
     // Get the template
     const template = defaultContractTemplates.find(
@@ -27,9 +53,9 @@ export async function GET(
     }
 
     // Process the template with contract data
-    const contractContent = processTemplate(template, contract.metadata || {})
+    const contractContent = processTemplate(template, contractValues)
 
-    // Generate HTML document
+    // Generate HTML document matching the PDF style
     const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -39,118 +65,86 @@ export async function GET(
   <title>${contract.title || 'Contract'} - ${contract.contract_number}</title>
   <style>
     @media print {
-      body { margin: 0; }
+      body { margin: 0; padding: 0.5in 0.75in; }
       .no-print { display: none; }
     }
     body {
-      font-family: 'Times New Roman', Times, serif;
-      line-height: 1.6;
+      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
       color: #333;
       max-width: 8.5in;
       margin: 0 auto;
-      padding: 1in;
+      padding: 0.75in 1in;
       background: white;
     }
-    h1 {
-      font-size: 24px;
-      text-align: center;
-      margin-bottom: 30px;
-      text-transform: uppercase;
-    }
-    h2 {
-      font-size: 18px;
-      margin-top: 30px;
-      margin-bottom: 15px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
-    }
-    h3 {
-      font-size: 16px;
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-    p, li {
-      text-align: justify;
-      margin-bottom: 10px;
-    }
-    .contract-header {
-      margin-bottom: 30px;
-    }
-    .party-info {
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
       margin-bottom: 20px;
-      padding: 15px;
-      background: #f9f9f9;
-      border-left: 3px solid #333;
     }
-    .signature-section {
-      margin-top: 50px;
-      page-break-inside: avoid;
+    .header-title {
+      font-size: 18pt;
+      font-weight: bold;
+      margin: 0;
     }
-    .signature-line {
+    .header-logo {
+      width: 180px;
+      height: auto;
+    }
+    p { margin: 8px 0; text-align: justify; }
+    strong { font-weight: bold; }
+    .footer {
       margin-top: 40px;
-      border-bottom: 1px solid #333;
-      width: 300px;
-      display: inline-block;
+      text-align: center;
+      font-size: 9pt;
+      font-weight: bold;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
     }
-    .signature-block {
-      margin-bottom: 40px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    .page-break {
-      page-break-before: always;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      background: #ffc107;
-      color: white;
-      font-size: 12px;
-      border-radius: 3px;
-      margin-left: 10px;
-    }
+    ${contract.status !== 'fully_executed' ? '.draft-badge { display: inline-block; padding: 2px 8px; background: #ffc107; color: white; font-size: 10px; border-radius: 3px; margin-left: 10px; }' : ''}
   </style>
 </head>
 <body>
-  <div class="contract-header">
-    <p style="text-align: right;">
-      Contract #: <strong>${contract.contract_number}</strong><br>
-      Date: <strong>${new Date().toLocaleDateString()}</strong>
-      ${contract.status !== 'fully_executed' ? '<span class="status-badge">DRAFT</span>' : ''}
-    </p>
+  <div class="header">
+    <div>
+      <h1 class="header-title">
+        ${contract.contract_number}
+        ${contract.status !== 'fully_executed' ? '<span class="draft-badge">DRAFT</span>' : ''}
+      </h1>
+    </div>
+    <img src="/speak-about-ai-logo.png" alt="Speak About AI" class="header-logo" />
   </div>
-  
-  ${contractContent.split('\n').map(line => {
-    if (line.startsWith('## ')) {
-      return `<h2>${line.replace('## ', '')}</h2>`
-    } else if (line.startsWith('### ')) {
-      return `<h3>${line.replace('### ', '')}</h3>`
-    } else if (line.startsWith('**') && line.endsWith('**')) {
-      return `<p><strong>${line.replace(/\*\*/g, '')}</strong></p>`
-    } else if (line.includes('**')) {
-      return `<p>${line.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>`
-    } else if (line.startsWith('- ')) {
-      return `<ul><li>${line.replace('- ', '')}</li></ul>`
-    } else if (line.trim() === '') {
-      return ''
-    } else {
-      return `<p>${line}</p>`
+
+  ${contractContent.split('\n').map((line: string) => {
+    const trimmed = line.trim()
+    if (!trimmed) return ''
+    if (trimmed.startsWith('SPEAKER/CLIENT/AGENT AGREEMENT')) {
+      return `<h2 style="font-size: 16pt; margin-bottom: 16px;">${trimmed}</h2>`
     }
+    // Bold items like **Label:** value
+    if (trimmed.startsWith('**') && trimmed.includes(':**')) {
+      return `<p>${trimmed.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>`
+    }
+    if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+      return `<p><strong>${trimmed.replace(/\*\*/g, '')}</strong></p>`
+    }
+    if (trimmed.includes('**')) {
+      return `<p>${trimmed.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>`
+    }
+    if (trimmed.startsWith('- ')) {
+      return `<ul style="margin: 2px 0 2px 20px;"><li>${trimmed.replace('- ', '')}</li></ul>`
+    }
+    return `<p>${trimmed}</p>`
   }).join('\n')}
-  
-  <div class="no-print" style="text-align: center; margin-top: 50px;">
-    <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+
+  <div class="footer">
+    Speak About AI is a division of Strong Entertainment, LLC, 651 Homer Avenue, Palo Alto, CA 94301
+  </div>
+
+  <div class="no-print" style="text-align: center; margin-top: 30px;">
+    <button onclick="window.print()" style="padding: 10px 20px; font-size: 14px; cursor: pointer; background: #2563eb; color: white; border: none; border-radius: 4px;">
       Print Contract
     </button>
   </div>
@@ -158,7 +152,6 @@ export async function GET(
 </html>
     `
 
-    // Return HTML as response with PDF download headers
     return new NextResponse(html, {
       headers: {
         'Content-Type': 'text/html',

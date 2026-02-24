@@ -7,47 +7,42 @@ import { neon } from "@neondatabase/serverless"
 function buildContractDataFromColumns(contract: any, deal: any | null): Record<string, any> {
   const data: Record<string, any> = {}
 
-  // Basic info from contract columns
+  // Parties
   if (contract.client_company) data.client_company = contract.client_company
   if (contract.client_name) data.client_contact_name = contract.client_name
   if (contract.client_email) data.client_email = contract.client_email
-  if (contract.created_at || contract.generated_at) {
-    const d = contract.generated_at || contract.created_at
-    data.agreement_date = typeof d === 'string' ? d.split('T')[0] : new Date(d).toISOString().split('T')[0]
-  }
-
-  // Speaker info
   if (contract.speaker_name) data.speaker_name = contract.speaker_name
   if (contract.speaker_email) data.speaker_email = contract.speaker_email
 
   // Event info
+  data.event_reference = contract.contract_number || ''
   if (contract.event_title) data.event_title = contract.event_title
   if (contract.event_date) {
     const d = contract.event_date
     data.event_date = typeof d === 'string' ? d.split('T')[0] : new Date(d).toISOString().split('T')[0]
   }
   if (contract.event_location) data.event_location = contract.event_location
-  if (contract.event_type) data.event_type = contract.event_type
 
   // Financial
   if (contract.fee_amount) data.deal_value = contract.fee_amount
   if (contract.speaker_fee) data.speaker_fee = contract.speaker_fee
   if (!data.speaker_fee && contract.fee_amount) data.speaker_fee = contract.fee_amount
-  if (contract.payment_terms) data.payment_terms = contract.payment_terms
 
   // Enrich from linked deal
   if (deal) {
     if (deal.deal_value) data.deal_value = deal.deal_value
     if (!data.client_company && deal.company) data.client_company = deal.company
-    if (deal.client_phone) data.client_phone = deal.client_phone
-    if (deal.phone && !data.client_phone) data.client_phone = deal.phone
-    if (deal.attendee_count) data.attendee_count = deal.attendee_count
     if (!data.speaker_name && deal.speaker_requested) data.speaker_name = deal.speaker_requested
     if (!data.event_location && deal.event_location) data.event_location = deal.event_location
-    if (!data.event_type && deal.event_type) data.event_type = deal.event_type
-    if (deal.travel_required) data.travel_arrangements = 'required'
-    if (deal.travel_stipend) data.travel_buyout_amount = deal.travel_stipend
+    if (deal.travel_stipend) {
+      data.travel_details = `$${Number(deal.travel_stipend).toLocaleString('en-US')} flight buyout`
+    }
   }
+
+  // Payment defaults
+  if (!data.deposit_percent) data.deposit_percent = 20
+  if (!data.mid_payment_percent) data.mid_payment_percent = 30
+  if (!data.balance_percent) data.balance_percent = 50
 
   return data
 }
