@@ -354,7 +354,6 @@ export async function getProposalByToken(token: string): Promise<Proposal | null
     const [proposal] = await sql`
       SELECT * FROM proposals
       WHERE access_token = ${token}
-      AND status != 'draft'
     `
     
     if (!proposal) return null
