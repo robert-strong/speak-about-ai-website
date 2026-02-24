@@ -50,7 +50,10 @@ import {
   Settings,
   Plus,
   Trash2,
-  X
+  X,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import Link from "next/link"
@@ -149,6 +152,11 @@ export default function FinancesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [paymentFilter, setPaymentFilter] = useState("all")
   const [speakerPaymentFilter, setSpeakerPaymentFilter] = useState("all")
+
+  // Sort state
+  type SortField = "project_name" | "speaker_name" | "event_date" | "budget" | "speaker_fee" | "travel_buyout" | "net_commission" | "invoice_number" | "payment_status" | "speaker_payment_status"
+  const [sortField, setSortField] = useState<SortField | null>(null)
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
 
   // Edit dialog state
   const [editingProject, setEditingProject] = useState<FinancialProject | null>(null)
@@ -437,6 +445,31 @@ export default function FinancesPage() {
     a.click()
   }
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
+    }
+  }
+
+  const SortableHeader = ({ field, children, className }: { field: SortField; children: React.ReactNode; className?: string }) => (
+    <TableHead className={className}>
+      <button
+        className="flex items-center gap-1 hover:text-gray-900 transition-colors"
+        onClick={() => handleSort(field)}
+      >
+        {children}
+        {sortField === field ? (
+          sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+        ) : (
+          <ArrowUpDown className="h-3 w-3 opacity-40" />
+        )}
+      </button>
+    </TableHead>
+  )
+
   // Filter projects
   const filteredProjects = projects.filter(project => {
     const matchesSearch = searchQuery === "" ||
@@ -452,6 +485,25 @@ export default function FinancesPage() {
 
     return matchesSearch && matchesPayment && matchesSpeakerPayment
   })
+
+  // Sort filtered projects
+  const sortedProjects = sortField
+    ? [...filteredProjects].sort((a, b) => {
+        const dir = sortDirection === "asc" ? 1 : -1
+        const valA = a[sortField]
+        const valB = b[sortField]
+
+        if (valA == null && valB == null) return 0
+        if (valA == null) return 1
+        if (valB == null) return -1
+
+        if (typeof valA === "number" && typeof valB === "number") {
+          return (valA - valB) * dir
+        }
+
+        return String(valA).localeCompare(String(valB)) * dir
+      })
+    : filteredProjects
 
   if (loading) {
     return (
@@ -671,21 +723,21 @@ export default function FinancesPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Project</TableHead>
-                    <TableHead>Speaker</TableHead>
-                    <TableHead>Event Date</TableHead>
-                    <TableHead className="text-right">Deal Value</TableHead>
-                    <TableHead className="text-right">Speaker Fee</TableHead>
-                    <TableHead className="text-right">Travel</TableHead>
-                    <TableHead className="text-right">Net Commission</TableHead>
-                    <TableHead>Invoice #</TableHead>
-                    <TableHead>Client Payment</TableHead>
-                    <TableHead>Speaker Payment</TableHead>
+                    <SortableHeader field="project_name">Project</SortableHeader>
+                    <SortableHeader field="speaker_name">Speaker</SortableHeader>
+                    <SortableHeader field="event_date">Event Date</SortableHeader>
+                    <SortableHeader field="budget" className="text-right">Deal Value</SortableHeader>
+                    <SortableHeader field="speaker_fee" className="text-right">Speaker Fee</SortableHeader>
+                    <SortableHeader field="travel_buyout" className="text-right">Travel</SortableHeader>
+                    <SortableHeader field="net_commission" className="text-right">Net Commission</SortableHeader>
+                    <SortableHeader field="invoice_number">Invoice #</SortableHeader>
+                    <SortableHeader field="payment_status">Client Payment</SortableHeader>
+                    <SortableHeader field="speaker_payment_status">Speaker Payment</SortableHeader>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProjects.map((project) => (
+                  {sortedProjects.map((project) => (
                     <TableRow key={project.id}>
                       <TableCell>
                         <div>
@@ -789,7 +841,7 @@ export default function FinancesPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {filteredProjects.length === 0 && (
+                  {sortedProjects.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={11} className="text-center py-8 text-gray-500">
                         No projects match your filters
