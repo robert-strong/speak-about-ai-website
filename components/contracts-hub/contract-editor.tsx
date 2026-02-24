@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { authGet, authPost, authPut } from "@/lib/auth-fetch"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -83,7 +84,7 @@ export function ContractEditor({ contractId, isCreating, onSave, onCancel }: Con
     try {
       setLoading(true)
       console.log("Loading contract with ID:", id)
-      const response = await fetch(`/api/contracts/${id}`)
+      const response = await authGet(`/api/contracts/${id}`)
       if (response.ok) {
         const data = await response.json()
         console.log("Contract data received from API:", data)
@@ -125,7 +126,7 @@ export function ContractEditor({ contractId, isCreating, onSave, onCancel }: Con
 
   const loadDeals = async () => {
     try {
-      const response = await fetch("/api/deals?status=won")
+      const response = await authGet("/api/deals?status=won")
       if (response.ok) {
         const data = await response.json()
         setDeals(data)
@@ -239,11 +240,9 @@ export function ContractEditor({ contractId, isCreating, onSave, onCancel }: Con
       
       console.log('Saving contract with payload:', payload)
       
-      const response = await fetch(endpoint, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
+      const response = contractId
+        ? await authPut(endpoint, payload)
+        : await authPost(endpoint, payload)
 
       const responseText = await response.text()
       console.log('Response status:', response.status)

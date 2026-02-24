@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { authGet, authPost, authPut, authDelete } from "@/lib/auth-fetch"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -97,7 +98,7 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
   const loadContracts = async () => {
     try {
       setLoading(true)
-      const response = await fetch("/api/contracts")
+      const response = await authGet("/api/contracts")
       if (response.ok) {
         const data = await response.json()
         // Transform the data to match our interface
@@ -126,11 +127,7 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
 
   const handleStatusUpdate = async (contractId: number, newStatus: Contract['status']) => {
     try {
-      const response = await fetch(`/api/contracts/${contractId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus })
-      })
+      const response = await authPut(`/api/contracts/${contractId}`, { status: newStatus })
 
       if (response.ok) {
         toast({
@@ -152,10 +149,7 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
 
   const handleSendForSignature = async (contractId: number) => {
     try {
-      const response = await fetch(`/api/contracts/${contractId}/send`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" }
-      })
+      const response = await authPost(`/api/contracts/${contractId}/send`, {})
 
       if (response.ok) {
         toast({
@@ -192,9 +186,7 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
     if (!deletingContract) return
     setDeleting(true)
     try {
-      const response = await fetch(`/api/contracts/${deletingContract.id}`, {
-        method: "DELETE"
-      })
+      const response = await authDelete(`/api/contracts/${deletingContract.id}`)
       if (response.ok) {
         toast({
           title: "Success",

@@ -160,7 +160,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     // Support status-only updates
     if (body.status) {
-      const validStatuses = ['draft', 'pending_review', 'sent_for_signature', 'partially_signed', 'fully_executed', 'active', 'completed', 'cancelled']
+      const validStatuses = ['draft', 'pending_review', 'sent', 'sent_for_signature', 'partially_signed', 'fully_executed', 'active', 'completed', 'cancelled']
       if (!validStatuses.includes(body.status)) {
         return NextResponse.json({ error: "Invalid status" }, { status: 400 })
       }

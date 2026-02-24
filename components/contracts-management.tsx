@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { authGet, authPost, authPut, authDelete } from "@/lib/auth-fetch"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -101,8 +102,8 @@ export function ContractsManagement() {
       
       // Load contracts and won deals in parallel
       const [contractsResponse, dealsResponse] = await Promise.all([
-        fetch("/api/contracts"),
-        fetch("/api/deals?status=won")
+        authGet("/api/contracts"),
+        authGet("/api/deals?status=won")
       ])
 
       if (contractsResponse.ok) {
@@ -131,21 +132,15 @@ export function ContractsManagement() {
     setSubmitting(true)
 
     try {
-      const response = await fetch("/api/contracts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const response = await authPost("/api/contracts", {
+        deal_id: parseInt(formData.deal_id),
+        speaker_info: {
+          name: formData.speaker_name,
+          email: formData.speaker_email,
+          fee: parseFloat(formData.speaker_fee) || undefined
         },
-        body: JSON.stringify({
-          deal_id: parseInt(formData.deal_id),
-          speaker_info: {
-            name: formData.speaker_name,
-            email: formData.speaker_email,
-            fee: parseFloat(formData.speaker_fee) || undefined
-          },
-          additional_terms: formData.additional_terms,
-          created_by: "admin"
-        })
+        additional_terms: formData.additional_terms,
+        created_by: "admin"
       })
 
       if (response.ok) {
@@ -180,15 +175,9 @@ export function ContractsManagement() {
 
   const handleStatusUpdate = async (contractId: number, newStatus: Contract['status']) => {
     try {
-      const response = await fetch(`/api/contracts/${contractId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          status: newStatus,
-          updated_by: "admin"
-        })
+      const response = await authPut(`/api/contracts/${contractId}`, {
+        status: newStatus,
+        updated_by: "admin"
       })
 
       if (response.ok) {
@@ -213,12 +202,7 @@ export function ContractsManagement() {
 
   const handleSendContract = async (contractId: number) => {
     try {
-      const response = await fetch(`/api/contracts/${contractId}/send`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
+      const response = await authPost(`/api/contracts/${contractId}/send`, {})
 
       if (response.ok) {
         const result = await response.json()
