@@ -43,7 +43,9 @@ import {
   FileEdit,
   Receipt,
   Shield,
-  Landmark
+  Landmark,
+  UserCog,
+  MailIcon
 } from "lucide-react"
 
 interface AdminSidebarProps {
@@ -54,6 +56,9 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [expandedSections, setExpandedSections] = useState<string[]>(['sales', 'operations', 'website', 'marketing', 'tools'])
+  const [userPermissions, setUserPermissions] = useState<Record<string, boolean> | null>(null)
+  const [userName, setUserName] = useState<string | null>(null)
+  const [userRoleName, setUserRoleName] = useState<string | null>(null)
   const pathname = usePathname()
   const router = useRouter()
 
@@ -61,6 +66,32 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
   useEffect(() => {
     setMobileOpen(false)
   }, [pathname])
+
+  // Load user permissions from localStorage
+  useEffect(() => {
+    try {
+      const userStr = localStorage.getItem("adminUser")
+      if (userStr) {
+        const user = JSON.parse(userStr)
+        if (user.permissions) {
+          setUserPermissions(user.permissions)
+        }
+        if (user.name) {
+          setUserName(user.name)
+        }
+        if (user.role_name) {
+          setUserRoleName(user.role_name)
+        }
+      }
+    } catch {}
+  }, [])
+
+  // Permission check helper: null permissions = env admin = show everything
+  const hasPermission = (key?: string): boolean => {
+    if (!userPermissions) return true
+    if (!key) return true
+    return userPermissions[key] === true
+  }
 
   const handleLogout = async () => {
     try {
@@ -79,8 +110,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
   }
 
   const toggleSection = (sectionName: string) => {
-    setExpandedSections(prev => 
-      prev.includes(sectionName) 
+    setExpandedSections(prev =>
+      prev.includes(sectionName)
         ? prev.filter(s => s !== sectionName)
         : [...prev, sectionName]
     )
@@ -94,7 +125,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
       description: "Operations Hub",
       color: "text-slate-600",
       bgColor: "bg-slate-50",
-      standalone: true
+      standalone: true,
+      permissionKey: "master_panel"
     },
     {
       title: "Sales",
@@ -109,7 +141,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: BarChart3,
           description: "Active Deals",
           color: "text-blue-600",
-          bgColor: "bg-blue-50"
+          bgColor: "bg-blue-50",
+          permissionKey: "crm"
         },
         {
           title: "Contacts",
@@ -117,7 +150,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Users,
           description: "All Contacts",
           color: "text-blue-600",
-          bgColor: "bg-blue-50"
+          bgColor: "bg-blue-50",
+          permissionKey: "contacts"
         }
       ]
     },
@@ -134,7 +168,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: CheckSquare,
           description: "Live Projects",
           color: "text-orange-600",
-          bgColor: "bg-orange-50"
+          bgColor: "bg-orange-50",
+          permissionKey: "projects"
         },
         {
           title: "Proposals",
@@ -142,7 +177,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: FileText,
           description: "Client Proposals",
           color: "text-blue-600",
-          bgColor: "bg-blue-50"
+          bgColor: "bg-blue-50",
+          permissionKey: "proposals"
         },
         {
           title: "Contracts Hub",
@@ -150,7 +186,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: FileSignature,
           description: "Contract Management",
           color: "text-emerald-600",
-          bgColor: "bg-emerald-50"
+          bgColor: "bg-emerald-50",
+          permissionKey: "contracts"
         },
         {
           title: "Invoices",
@@ -158,7 +195,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Receipt,
           description: "Invoice Management",
           color: "text-green-600",
-          bgColor: "bg-green-50"
+          bgColor: "bg-green-50",
+          permissionKey: "invoices"
         },
         {
           title: "Finances",
@@ -166,7 +204,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Wallet,
           description: "Revenue & Commissions",
           color: "text-emerald-600",
-          bgColor: "bg-emerald-50"
+          bgColor: "bg-emerald-50",
+          permissionKey: "finances"
         }
       ]
     },
@@ -183,7 +222,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: FileEdit,
           description: "Edit Page Content",
           color: "text-cyan-600",
-          bgColor: "bg-cyan-50"
+          bgColor: "bg-cyan-50",
+          permissionKey: "page_editor"
         },
         {
           title: "Case Studies",
@@ -191,7 +231,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Building2,
           description: "Testimonials & Success Stories",
           color: "text-amber-600",
-          bgColor: "bg-amber-50"
+          bgColor: "bg-amber-50",
+          permissionKey: "case_studies"
         },
         {
           title: "Speaker Management",
@@ -199,7 +240,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Users,
           description: "Profiles & Content",
           color: "text-green-600",
-          bgColor: "bg-green-50"
+          bgColor: "bg-green-50",
+          permissionKey: "speakers"
         },
         {
           title: "Analytics",
@@ -207,7 +249,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: TrendingUp,
           description: "Website Insights",
           color: "text-purple-600",
-          bgColor: "bg-purple-50"
+          bgColor: "bg-purple-50",
+          permissionKey: "analytics"
         },
         {
           title: "Workshops",
@@ -215,7 +258,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Presentation,
           description: "Workshop Management",
           color: "text-amber-600",
-          bgColor: "bg-amber-50"
+          bgColor: "bg-amber-50",
+          permissionKey: "workshops"
         }
       ]
     },
@@ -232,7 +276,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Mail,
           description: "Subscriber Management",
           color: "text-pink-600",
-          bgColor: "bg-pink-50"
+          bgColor: "bg-pink-50",
+          permissionKey: "newsletter"
         },
         {
           title: "Blog",
@@ -240,7 +285,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: FileText,
           description: "Content & Outrank",
           color: "text-purple-600",
-          bgColor: "bg-purple-50"
+          bgColor: "bg-purple-50",
+          permissionKey: "blog"
         },
         {
           title: "Vendor Directory",
@@ -248,7 +294,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Building2,
           description: "Vendor Management",
           color: "text-blue-600",
-          bgColor: "bg-blue-50"
+          bgColor: "bg-blue-50",
+          permissionKey: "vendor_directory"
         },
         {
           title: "Landing Resources",
@@ -256,7 +303,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Send,
           description: "Email Resources",
           color: "text-cyan-600",
-          bgColor: "bg-cyan-50"
+          bgColor: "bg-cyan-50",
+          permissionKey: "landing_resources"
         },
         {
           title: "WhatsApp Group",
@@ -264,11 +312,12 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: MessageSquare,
           description: "Event Pro Community",
           color: "text-green-600",
-          bgColor: "bg-green-50"
+          bgColor: "bg-green-50",
+          permissionKey: "whatsapp"
         }
       ]
     },
-        {
+    {
       title: "System",
       icon: Settings,
       sectionKey: "system",
@@ -276,12 +325,31 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
       bgColor: "bg-gray-50",
       items: [
         {
+          title: "Team",
+          href: "/admin/settings/team",
+          icon: UserCog,
+          description: "Members & Access",
+          color: "text-blue-600",
+          bgColor: "bg-blue-50",
+          permissionKey: "settings"
+        },
+        {
           title: "Roles & Permissions",
           href: "/admin/settings/roles",
           icon: Shield,
           description: "Team Access Control",
           color: "text-blue-600",
-          bgColor: "bg-blue-50"
+          bgColor: "bg-blue-50",
+          permissionKey: "settings"
+        },
+        {
+          title: "Email / SMTP",
+          href: "/admin/settings/smtp",
+          icon: MailIcon,
+          description: "Email Configuration",
+          color: "text-violet-600",
+          bgColor: "bg-violet-50",
+          permissionKey: "settings"
         },
         {
           title: "Banking",
@@ -289,7 +357,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Landmark,
           description: "Invoice Banking Config",
           color: "text-emerald-600",
-          bgColor: "bg-emerald-50"
+          bgColor: "bg-emerald-50",
+          permissionKey: "settings"
         },
         {
           title: "Database",
@@ -297,7 +366,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Database,
           description: "System Debug",
           color: "text-red-600",
-          bgColor: "bg-red-50"
+          bgColor: "bg-red-50",
+          permissionKey: "system"
         }
       ]
     },
@@ -307,6 +377,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
       sectionKey: "sunsetted",
       color: "text-slate-500",
       bgColor: "bg-slate-100",
+      permissionKey: "system",
       items: [
         {
           title: "Client Portal",
@@ -314,7 +385,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Users,
           description: "Client Access",
           color: "text-cyan-600",
-          bgColor: "bg-cyan-50"
+          bgColor: "bg-cyan-50",
+          permissionKey: "system"
         },
         {
           title: "Leads",
@@ -322,7 +394,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Users,
           description: "SQL Leads",
           color: "text-purple-600",
-          bgColor: "bg-purple-50"
+          bgColor: "bg-purple-50",
+          permissionKey: "system"
         },
         {
           title: "Firm Offers",
@@ -330,7 +403,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: FileSignature,
           description: "Offer Sheets",
           color: "text-amber-600",
-          bgColor: "bg-amber-50"
+          bgColor: "bg-amber-50",
+          permissionKey: "system"
         },
         {
           title: "Tasks & Follow-ups",
@@ -338,7 +412,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: CheckSquare,
           description: "Action Items",
           color: "text-green-600",
-          bgColor: "bg-green-50"
+          bgColor: "bg-green-50",
+          permissionKey: "system"
         },
         {
           title: "Activity Log",
@@ -346,7 +421,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Activity,
           description: "Speaker Updates",
           color: "text-indigo-600",
-          bgColor: "bg-indigo-50"
+          bgColor: "bg-indigo-50",
+          permissionKey: "system"
         },
         {
           title: "SEO Dashboard",
@@ -354,7 +430,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: TrendingUp,
           description: "Semrush Analytics",
           color: "text-pink-600",
-          bgColor: "bg-pink-50"
+          bgColor: "bg-pink-50",
+          permissionKey: "system"
         },
         {
           title: "Content Studio",
@@ -362,7 +439,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: PenTool,
           description: "AI Blog Writer",
           color: "text-violet-600",
-          bgColor: "bg-violet-50"
+          bgColor: "bg-violet-50",
+          permissionKey: "system"
         },
         {
           title: "Speaker Chat",
@@ -370,7 +448,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: Bot,
           description: "AI Speaker Assistant",
           color: "text-emerald-600",
-          bgColor: "bg-emerald-50"
+          bgColor: "bg-emerald-50",
+          permissionKey: "system"
         }
       ]
     }
@@ -418,7 +497,11 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-white tracking-tight">Speak About AI</h2>
-                  <p className="text-sm text-slate-400 font-medium">Admin Dashboard</p>
+                  {userRoleName ? (
+                    <p className="text-xs text-slate-400 font-medium">{userName || 'Admin'} &middot; {userRoleName}</p>
+                  ) : (
+                    <p className="text-sm text-slate-400 font-medium">Admin Dashboard</p>
+                  )}
                 </div>
               </div>
             )}
@@ -450,6 +533,9 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
         {navigationSections.map((section) => {
           // Standalone items (like Master Panel)
           if (section.standalone) {
+            // Check permission for standalone items
+            if (!hasPermission(section.permissionKey)) return null
+
             const isActive = pathname === section.href
             return (
               <Link key={section.href} href={section.href}>
@@ -457,25 +543,25 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
                   className={cn(
                     "group relative overflow-hidden rounded-xl transition-all duration-200 ease-in-out",
                     collapsed ? "p-3" : "p-4",
-                    isActive 
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg transform scale-105" 
+                    isActive
+                      ? "bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg transform scale-105"
                       : "hover:bg-slate-700/50 hover:transform hover:scale-102"
                   )}
                 >
                   {isActive && (
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl" />
                   )}
-                  
+
                   <div className="relative flex items-center">
                     <div className={cn(
                       "flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200",
-                      isActive 
-                        ? "bg-white/20 text-white shadow-md" 
+                      isActive
+                        ? "bg-white/20 text-white shadow-md"
                         : `${section.bgColor} ${section.color} group-hover:scale-110`
                     )}>
                       <section.icon className="h-5 w-5" />
                     </div>
-                    
+
                     {!collapsed && (
                       <div className="ml-4 flex-1 min-w-0">
                         <div className={cn(
@@ -492,22 +578,30 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
                         </div>
                       </div>
                     )}
-                    
+
                     {isActive && !collapsed && (
                       <div className="w-2 h-2 bg-white rounded-full shadow-lg animate-pulse" />
                     )}
                   </div>
-                  
+
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 ease-in-out" />
                 </div>
               </Link>
             )
           }
 
-          // Sections with items
+          // Sections with items - filter items by permission
+          const visibleItems = section.items?.filter(item => hasPermission(item.permissionKey)) || []
+
+          // Also check section-level permission (e.g. sunsetted section)
+          if ('permissionKey' in section && !hasPermission((section as any).permissionKey)) return null
+
+          // Hide section if no visible items
+          if (visibleItems.length === 0) return null
+
           const isExpanded = expandedSections.includes(section.sectionKey!)
-          const hasActiveChild = section.items?.some(item => pathname === item.href)
-          
+          const hasActiveChild = visibleItems.some(item => pathname === item.href)
+
           return (
             <div key={section.sectionKey}>
               {/* Section Header */}
@@ -528,7 +622,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
                   )}>
                     <section.icon className="h-4 w-4" />
                   </div>
-                  
+
                   {!collapsed && (
                     <>
                       <div className="ml-3 flex-1 min-w-0">
@@ -546,33 +640,37 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
               </div>
 
               {/* Section Items */}
-              {!collapsed && isExpanded && section.items && (
+              {!collapsed && isExpanded && visibleItems.length > 0 && (
                 <div className="ml-4 space-y-1 mt-1">
-                  {section.items.map((item) => {
-                    const isActive = pathname === item.href || 
+                  {visibleItems.map((item) => {
+                    const isActive = pathname === item.href ||
                       (item.href === "/admin/contracts-hub" && pathname.startsWith("/admin/contracts-hub")) ||
-                      (item.href === "/admin/invoicing" && pathname.startsWith("/admin/invoicing"))
-                    
+                      (item.href === "/admin/invoicing" && pathname.startsWith("/admin/invoicing")) ||
+                      (item.href === "/admin/settings/team" && pathname.startsWith("/admin/settings/team")) ||
+                      (item.href === "/admin/settings/roles" && pathname.startsWith("/admin/settings/roles")) ||
+                      (item.href === "/admin/settings/smtp" && pathname.startsWith("/admin/settings/smtp")) ||
+                      (item.href === "/admin/settings/banking" && pathname.startsWith("/admin/settings/banking"))
+
                     return (
                       <Link key={item.href} href={item.href}>
                         <div
                           className={cn(
                             "group relative overflow-hidden rounded-lg transition-all duration-200 ease-in-out p-3",
-                            isActive 
-                              ? "bg-gradient-to-r from-blue-600 to-purple-600 shadow-md" 
+                            isActive
+                              ? "bg-gradient-to-r from-blue-600 to-purple-600 shadow-md"
                               : "hover:bg-slate-700/40"
                           )}
                         >
                           <div className="relative flex items-center">
                             <div className={cn(
                               "flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200",
-                              isActive 
-                                ? "bg-white/20 text-white" 
+                              isActive
+                                ? "bg-white/20 text-white"
                                 : `${item.bgColor} ${item.color} group-hover:scale-110`
                             )}>
                               <item.icon className="h-4 w-4" />
                             </div>
-                            
+
                             <div className="ml-3 flex-1 min-w-0">
                               <div className={cn(
                                 "text-xs font-semibold transition-colors duration-200",
@@ -589,7 +687,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
                                 </div>
                               )}
                             </div>
-                            
+
                             {isActive && (
                               <div className="w-1.5 h-1.5 bg-white rounded-full shadow-lg animate-pulse" />
                             )}
