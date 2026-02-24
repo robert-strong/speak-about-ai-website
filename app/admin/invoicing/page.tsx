@@ -33,7 +33,8 @@ import {
   ArrowUp,
   ArrowDown,
   Calendar,
-  Mail
+  Mail,
+  Undo2
 } from "lucide-react"
 import { AdminSidebar } from "@/components/admin-sidebar"
 import { useToast } from "@/hooks/use-toast"
@@ -955,14 +956,36 @@ export default function InvoicingPage() {
                                   </Button>
                                 )}
                                 {(invoice.status === "sent" || invoice.status === "overdue") && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="text-green-600 hover:text-green-700"
+                                      title="Mark as Paid"
+                                      onClick={() => markInvoicePaid(invoice.id)}
+                                    >
+                                      <Check className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="text-orange-500 hover:text-orange-600"
+                                      title="Revert to Draft"
+                                      onClick={() => handleUpdateInvoiceStatus(invoice.id, "draft")}
+                                    >
+                                      <Undo2 className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                                {invoice.status === "paid" && (
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="text-green-600 hover:text-green-700"
-                                    title="Mark as Paid"
-                                    onClick={() => markInvoicePaid(invoice.id)}
+                                    className="text-orange-500 hover:text-orange-600"
+                                    title="Revert to Sent"
+                                    onClick={() => handleUpdateInvoiceStatus(invoice.id, "sent")}
                                   >
-                                    <Check className="h-4 w-4" />
+                                    <Undo2 className="h-4 w-4" />
                                   </Button>
                                 )}
                                 <Button
