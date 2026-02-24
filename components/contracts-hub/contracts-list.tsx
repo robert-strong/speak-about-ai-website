@@ -67,6 +67,7 @@ interface Contract {
 const STATUS_CONFIG = {
   draft: { label: "Draft", color: "bg-gray-500", icon: FileText },
   pending_review: { label: "Pending Review", color: "bg-yellow-500", icon: Clock },
+  sent: { label: "Sent", color: "bg-blue-500", icon: Send },
   sent_for_signature: { label: "Sent for Signature", color: "bg-blue-500", icon: Send },
   partially_signed: { label: "Partially Signed", color: "bg-orange-500", icon: Clock },
   fully_executed: { label: "Fully Executed", color: "bg-green-500", icon: CheckCircle },
@@ -149,21 +150,24 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
 
   const handleSendForSignature = async (contractId: number) => {
     try {
-      const response = await authPost(`/api/contracts/${contractId}/send`, {})
+      const response = await authPut(`/api/contracts/${contractId}`, { status: "sent" })
 
       if (response.ok) {
         toast({
           title: "Success",
-          description: "Contract sent for signature"
+          description: "Contract marked as sent"
         })
         loadContracts()
         onRefresh?.()
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to update contract")
       }
     } catch (error) {
-      console.error("Error sending contract:", error)
+      console.error("Error updating contract:", error)
       toast({
         title: "Error",
-        description: "Failed to send contract",
+        description: "Failed to update contract status",
         variant: "destructive"
       })
     }
@@ -268,6 +272,7 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="pending_review">Pending Review</SelectItem>
+              <SelectItem value="sent">Sent</SelectItem>
               <SelectItem value="sent_for_signature">Sent for Signature</SelectItem>
               <SelectItem value="partially_signed">Partially Signed</SelectItem>
               <SelectItem value="fully_executed">Fully Executed</SelectItem>
@@ -420,7 +425,7 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
                           </Button>
                         )}
                         
-                        {['sent_for_signature', 'partially_signed'].includes(contract.status) && (
+                        {['sent', 'sent_for_signature', 'partially_signed'].includes(contract.status) && (
                           <Button
                             size="sm"
                             variant="ghost"

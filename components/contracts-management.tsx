@@ -202,24 +202,26 @@ export function ContractsManagement() {
 
   const handleSendContract = async (contractId: number) => {
     try {
-      const response = await authPost(`/api/contracts/${contractId}/send`, {})
+      const response = await authPut(`/api/contracts/${contractId}`, {
+        status: "sent",
+        updated_by: "admin"
+      })
 
       if (response.ok) {
-        const result = await response.json()
         toast({
           title: "Success",
-          description: "Contract sent to all parties for signing!"
+          description: "Contract marked as sent"
         })
         loadData()
       } else {
         const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to send contract")
+        throw new Error(errorData.error || "Failed to update contract")
       }
     } catch (error) {
-      console.error("Error sending contract:", error)
+      console.error("Error updating contract:", error)
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to send contract",
+        description: error instanceof Error ? error.message : "Failed to update contract",
         variant: "destructive"
       })
     }
