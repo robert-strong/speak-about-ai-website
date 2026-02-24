@@ -246,7 +246,7 @@ export default function ProposalsPage() {
     const accepted = proposals.filter(p => p.status === "accepted").length
     const totalValue = proposals
       .filter(p => p.status === "accepted")
-      .reduce((sum, p) => sum + p.total_investment, 0)
+      .reduce((sum, p) => sum + (Number(p.total_investment) || 0), 0)
     const conversionRate = sent > 0 ? (accepted / sent) * 100 : 0
 
     return { total, sent, accepted, totalValue, conversionRate }
