@@ -592,6 +592,10 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ error: "Invalid deal ID" }, { status: 400 })
     }
 
+    // Unlink any projects that reference this deal so they aren't orphaned
+    const dbSql = neon(process.env.DATABASE_URL!)
+    await dbSql`UPDATE projects SET deal_id = NULL WHERE deal_id = ${id}`
+
     const success = await deleteDeal(id)
 
     if (!success) {
