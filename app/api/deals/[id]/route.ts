@@ -138,7 +138,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           }
         }
 
-        // Qualified → Proposal: Advance existing project
+        // Qualified → Proposal: Advance existing project and auto-create proposal
         if (deal.status === "proposal" && (originalDeal.status === "qualified" || originalDeal.status === "lead")) {
           const existing = await dbSql`SELECT id, stage_completion FROM projects WHERE deal_id = ${deal.id}`
           if (existing.length > 0) {
@@ -154,6 +154,31 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             }
             await dbSql`UPDATE projects SET status = 'proposal', stage_completion = ${JSON.stringify(stageCompletion)}, updated_at = CURRENT_TIMESTAMP WHERE deal_id = ${deal.id}`
             console.log(`Advanced project to proposal stage for deal #${deal.id}`)
+
+            // Auto-create draft proposal for this deal
+            try {
+              const existingProposal = await dbSql`SELECT id FROM proposals WHERE deal_id = ${deal.id}`
+              if (existingProposal.length === 0) {
+                const proposalCount = await dbSql`SELECT COUNT(*) as count FROM proposals`
+                const count = Number(proposalCount[0].count) + 1
+                const year = new Date().getFullYear()
+                const proposalNumber = `PROP-${year}-${String(count).padStart(4, '0')}`
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+                let accessToken = ''
+                for (let i = 0; i < 40; i++) accessToken += chars.charAt(Math.floor(Math.random() * chars.length))
+                const validUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                const dealValue = Number(deal.deal_value) || 0
+                const speakerName = deal.speaker_requested || null
+                const speakers = speakerName ? JSON.stringify([{ name: speakerName, bio: '', topics: [], fee: dealValue, fee_status: 'estimated' }]) : '[]'
+                await dbSql`
+                  INSERT INTO proposals (deal_id, proposal_number, title, status, version, client_name, client_email, client_company, executive_summary, speakers, event_title, event_date, event_location, event_type, attendee_count, services, deliverables, total_investment, payment_terms, payment_schedule, testimonials, case_studies, valid_until, access_token)
+                  VALUES (${deal.id}, ${proposalNumber}, ${`Speaking Engagement Proposal for ${deal.company || deal.client_name}`}, 'draft', 1, ${deal.client_name}, ${deal.client_email}, ${deal.company || null}, ${`We are pleased to present this proposal for ${deal.event_title}. Our speaker will deliver an engaging and impactful presentation tailored to your audience.`}, ${speakers}::jsonb, ${deal.event_title}, ${deal.event_date || null}, ${deal.event_location || null}, ${deal.event_type || null}, ${deal.attendee_count || null}, '[]'::jsonb, '[]'::jsonb, ${dealValue}, ${'50% due upon contract signing, 50% due before event date'}, '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, ${validUntil}, ${accessToken})
+                `
+                console.log(`Auto-created draft proposal ${proposalNumber} for deal #${deal.id}`)
+              }
+            } catch (proposalError) {
+              console.error(`Failed to auto-create proposal for deal #${deal.id}:`, proposalError)
+            }
           } else {
             // No existing project — create at proposal stage
             const projectData = {
@@ -241,6 +266,27 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             WHERE id = ${existing[0].id}`
 
             console.log(`Updated existing project #${existing[0].id} with financial data and advanced to contracts_signed`)
+
+            // Auto-create draft contract for this deal
+            try {
+              const existingContract = await dbSql`SELECT id FROM contracts WHERE deal_id = ${deal.id}`
+              if (existingContract.length === 0) {
+                const contractDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+                const contractRandom = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
+                const contractNumber = `CTR-${contractDate}-${contractRandom}`
+                const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+                const speakerName = body.speaker_name || deal.speaker_requested || null
+
+                await dbSql`
+                  INSERT INTO contracts (deal_id, contract_number, title, type, status, fee_amount, payment_terms, event_title, event_date, event_location, event_type, client_name, client_email, client_company, speaker_name, speaker_fee, expires_at, created_by)
+                  VALUES (${deal.id}, ${contractNumber}, ${`Speaker Engagement Agreement - ${deal.event_title}`}, 'client_speaker', 'draft', ${dealValue}, ${'Payment due within 30 days of event completion'}, ${deal.event_title}, ${deal.event_date || null}, ${deal.event_location || null}, ${deal.event_type || null}, ${deal.client_name}, ${deal.client_email}, ${deal.company || null}, ${speakerName}, ${speakerFee}, ${expiresAt}, ${'system-auto'})
+                `
+                console.log(`Auto-created draft contract ${contractNumber} for deal #${deal.id}`)
+              }
+            } catch (contractError) {
+              console.error(`Failed to auto-create contract for deal #${deal.id}:`, contractError)
+            }
+
             return NextResponse.json({
               ...deal,
               projectCreated: false,
@@ -303,6 +349,24 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             const project = await createProject(projectData)
             if (project) {
               console.log(`Created project "${project.project_name}" at contracts_signed from won deal #${deal.id}`)
+
+              // Auto-create draft contract for fallback path too
+              try {
+                const contractDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+                const contractRandom = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
+                const contractNumber = `CTR-${contractDate}-${contractRandom}`
+                const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+                const speakerName = body.speaker_name || deal.speaker_requested || null
+
+                await dbSql`
+                  INSERT INTO contracts (deal_id, contract_number, title, type, status, fee_amount, payment_terms, event_title, event_date, event_location, event_type, client_name, client_email, client_company, speaker_name, speaker_fee, expires_at, created_by)
+                  VALUES (${deal.id}, ${contractNumber}, ${`Speaker Engagement Agreement - ${deal.event_title}`}, 'client_speaker', 'draft', ${dealValue}, ${'Payment due within 30 days of event completion'}, ${deal.event_title}, ${deal.event_date || null}, ${deal.event_location || null}, ${deal.event_type || null}, ${deal.client_name}, ${deal.client_email}, ${deal.company || null}, ${speakerName}, ${speakerFee}, ${expiresAt}, ${'system-auto'})
+                `
+                console.log(`Auto-created draft contract ${contractNumber} for deal #${deal.id}`)
+              } catch (contractError) {
+                console.error(`Failed to auto-create contract for deal #${deal.id}:`, contractError)
+              }
+
               return NextResponse.json({
                 ...deal,
                 projectCreated: true,
@@ -426,6 +490,31 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
               proposal_agreed: false
             }
             await dbSql`UPDATE projects SET status = 'proposal', stage_completion = ${JSON.stringify(stageCompletion)}, updated_at = CURRENT_TIMESTAMP WHERE deal_id = ${deal.id}`
+
+            // Auto-create draft proposal for this deal
+            try {
+              const existingProposal = await dbSql`SELECT id FROM proposals WHERE deal_id = ${deal.id}`
+              if (existingProposal.length === 0) {
+                const proposalCount = await dbSql`SELECT COUNT(*) as count FROM proposals`
+                const count = Number(proposalCount[0].count) + 1
+                const year = new Date().getFullYear()
+                const proposalNumber = `PROP-${year}-${String(count).padStart(4, '0')}`
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+                let accessToken = ''
+                for (let i = 0; i < 40; i++) accessToken += chars.charAt(Math.floor(Math.random() * chars.length))
+                const validUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                const dealValue = Number(deal.deal_value) || 0
+                const speakerName = deal.speaker_requested || null
+                const speakers = speakerName ? JSON.stringify([{ name: speakerName, bio: '', topics: [], fee: dealValue, fee_status: 'estimated' }]) : '[]'
+                await dbSql`
+                  INSERT INTO proposals (deal_id, proposal_number, title, status, version, client_name, client_email, client_company, executive_summary, speakers, event_title, event_date, event_location, event_type, attendee_count, services, deliverables, total_investment, payment_terms, payment_schedule, testimonials, case_studies, valid_until, access_token)
+                  VALUES (${deal.id}, ${proposalNumber}, ${`Speaking Engagement Proposal for ${deal.company || deal.client_name}`}, 'draft', 1, ${deal.client_name}, ${deal.client_email}, ${deal.company || null}, ${`We are pleased to present this proposal for ${deal.event_title}. Our speaker will deliver an engaging and impactful presentation tailored to your audience.`}, ${speakers}::jsonb, ${deal.event_title}, ${deal.event_date || null}, ${deal.event_location || null}, ${deal.event_type || null}, ${deal.attendee_count || null}, '[]'::jsonb, '[]'::jsonb, ${dealValue}, ${'50% due upon contract signing, 50% due before event date'}, '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, ${validUntil}, ${accessToken})
+                `
+                console.log(`Auto-created draft proposal ${proposalNumber} for deal #${deal.id}`)
+              }
+            } catch (proposalError) {
+              console.error(`Failed to auto-create proposal for deal #${deal.id}:`, proposalError)
+            }
           } else {
             const projectData = {
               project_name: deal.event_title,
@@ -496,6 +585,26 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
               updated_at = CURRENT_TIMESTAMP
             WHERE id = ${existing[0].id}`
 
+            // Auto-create draft contract for this deal
+            try {
+              const existingContract = await dbSql`SELECT id FROM contracts WHERE deal_id = ${deal.id}`
+              if (existingContract.length === 0) {
+                const contractDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+                const contractRandom = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
+                const contractNumber = `CTR-${contractDate}-${contractRandom}`
+                const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+                const speakerName = body.speaker_name || deal.speaker_requested || null
+
+                await dbSql`
+                  INSERT INTO contracts (deal_id, contract_number, title, type, status, fee_amount, payment_terms, event_title, event_date, event_location, event_type, client_name, client_email, client_company, speaker_name, speaker_fee, expires_at, created_by)
+                  VALUES (${deal.id}, ${contractNumber}, ${`Speaker Engagement Agreement - ${deal.event_title}`}, 'client_speaker', 'draft', ${dealValue}, ${'Payment due within 30 days of event completion'}, ${deal.event_title}, ${deal.event_date || null}, ${deal.event_location || null}, ${deal.event_type || null}, ${deal.client_name}, ${deal.client_email}, ${deal.company || null}, ${speakerName}, ${speakerFee}, ${expiresAt}, ${'system-auto'})
+                `
+                console.log(`Auto-created draft contract ${contractNumber} for deal #${deal.id}`)
+              }
+            } catch (contractError) {
+              console.error(`Failed to auto-create contract for deal #${deal.id}:`, contractError)
+            }
+
             return NextResponse.json({
               ...deal,
               projectUpdated: true,
@@ -549,6 +658,23 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
             const project = await createProject(projectData)
             if (project) {
+              // Auto-create draft contract for fallback path too
+              try {
+                const contractDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+                const contractRandom = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
+                const contractNumber = `CTR-${contractDate}-${contractRandom}`
+                const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+                const speakerName = body.speaker_name || deal.speaker_requested || null
+
+                await dbSql`
+                  INSERT INTO contracts (deal_id, contract_number, title, type, status, fee_amount, payment_terms, event_title, event_date, event_location, event_type, client_name, client_email, client_company, speaker_name, speaker_fee, expires_at, created_by)
+                  VALUES (${deal.id}, ${contractNumber}, ${`Speaker Engagement Agreement - ${deal.event_title}`}, 'client_speaker', 'draft', ${dealValue}, ${'Payment due within 30 days of event completion'}, ${deal.event_title}, ${deal.event_date || null}, ${deal.event_location || null}, ${deal.event_type || null}, ${deal.client_name}, ${deal.client_email}, ${deal.company || null}, ${speakerName}, ${speakerFee}, ${expiresAt}, ${'system-auto'})
+                `
+                console.log(`Auto-created draft contract ${contractNumber} for deal #${deal.id}`)
+              } catch (contractError) {
+                console.error(`Failed to auto-create contract for deal #${deal.id}:`, contractError)
+              }
+
               return NextResponse.json({
                 ...deal,
                 projectCreated: true,

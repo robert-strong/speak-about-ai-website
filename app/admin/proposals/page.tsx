@@ -117,6 +117,26 @@ export default function ProposalsPage() {
     }
   }
 
+  const getDealStage = (dealId: number | undefined) => {
+    if (!dealId) return null
+    const deal = deals.find(d => d.id === dealId)
+    return deal?.status || null
+  }
+
+  const getStageBadge = (stage: string | null) => {
+    if (!stage) return null
+    const stageLabels: Record<string, { label: string; color: string }> = {
+      lead: { label: 'Lead', color: 'bg-gray-100 text-gray-800' },
+      qualified: { label: 'Qualified', color: 'bg-blue-100 text-blue-800' },
+      proposal: { label: 'Proposal', color: 'bg-purple-100 text-purple-800' },
+      negotiation: { label: 'Negotiation', color: 'bg-amber-100 text-amber-800' },
+      won: { label: 'Won', color: 'bg-green-100 text-green-800' },
+      lost: { label: 'Lost', color: 'bg-red-100 text-red-800' },
+    }
+    const info = stageLabels[stage] || { label: stage, color: 'bg-gray-100 text-gray-800' }
+    return <Badge className={`${info.color} text-xs`}>{info.label}</Badge>
+  }
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "draft":
@@ -384,8 +404,8 @@ export default function ProposalsPage() {
                       <TableHead>Event</TableHead>
                       <TableHead>Value</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Deal Stage</TableHead>
                       <TableHead>Views</TableHead>
-                      <TableHead>Created</TableHead>
                       <TableHead>Valid Until</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -418,13 +438,13 @@ export default function ProposalsPage() {
                         </TableCell>
                         <TableCell>{formatCurrency(proposal.total_investment)}</TableCell>
                         <TableCell>{getStatusBadge(proposal.status)}</TableCell>
+                        <TableCell>{getStageBadge(getDealStage(proposal.deal_id))}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <Eye className="h-3 w-3" />
                             {proposal.views}
                           </div>
                         </TableCell>
-                        <TableCell>{formatDate(proposal.created_at)}</TableCell>
                         <TableCell>
                           {proposal.valid_until ? (
                             <span className={new Date(proposal.valid_until) < new Date() ? "text-red-600" : ""}>
@@ -435,62 +455,68 @@ export default function ProposalsPage() {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => router.push(`/admin/proposals/${proposal.id}`)}>
-                                <Eye className="h-4 w-4 mr-2" />
-                                View
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => router.push(`/admin/proposals/${proposal.id}/edit`)}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => copyProposalLink(proposal)}>
-                                <LinkIcon className="h-4 w-4 mr-2" />
-                                Copy Link
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => window.open(`/proposal/${proposal.access_token}`, '_blank')}
-                              >
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Preview
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => window.open(`/api/proposals/${proposal.id}/pdf`, '_blank')}
-                              >
-                                <Download className="h-4 w-4 mr-2" />
-                                Download PDF
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              {proposal.status === "draft" && (
-                                <DropdownMenuItem onClick={() => handleSendProposal(proposal)}>
-                                  <Send className="h-4 w-4 mr-2" />
-                                  Send to Client
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Preview proposal"
+                              onClick={() => window.open(`/proposal/${proposal.access_token}`, '_blank')}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => router.push(`/admin/proposals/${proposal.id}`)}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View / Edit
                                 </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem onClick={() => router.push(`/admin/proposals/${proposal.id}/duplicate`)}>
-                                <Copy className="h-4 w-4 mr-2" />
-                                Duplicate
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="text-red-600"
-                                onClick={() => {
-                                  setProposalToDelete(proposal)
-                                  setShowDeleteDialog(true)
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                                <DropdownMenuItem onClick={() => copyProposalLink(proposal)}>
+                                  <LinkIcon className="h-4 w-4 mr-2" />
+                                  Copy Link
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => window.open(`/proposal/${proposal.access_token}`, '_blank')}
+                                >
+                                  <ExternalLink className="h-4 w-4 mr-2" />
+                                  Preview
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => window.open(`/api/proposals/${proposal.id}/pdf`, '_blank')}
+                                >
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download PDF
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                {proposal.status === "draft" && (
+                                  <DropdownMenuItem onClick={() => handleSendProposal(proposal)}>
+                                    <Send className="h-4 w-4 mr-2" />
+                                    Send to Client
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem onClick={() => copyProposalLink(proposal)}>
+                                  <Copy className="h-4 w-4 mr-2" />
+                                  Copy Link
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  className="text-red-600"
+                                  onClick={() => {
+                                    setProposalToDelete(proposal)
+                                    setShowDeleteDialog(true)
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -509,7 +535,10 @@ export default function ProposalsPage() {
                           <p className="font-semibold text-sm">{proposal.proposal_number}</p>
                           <p className="text-xs text-gray-600 mt-0.5">{proposal.title}</p>
                         </div>
-                        {getStatusBadge(proposal.status)}
+                        <div className="flex items-center gap-1">
+                          {getStageBadge(getDealStage(proposal.deal_id))}
+                          {getStatusBadge(proposal.status)}
+                        </div>
                       </div>
 
                       {/* Client Info */}
@@ -546,6 +575,15 @@ export default function ProposalsPage() {
                             {proposal.views}
                           </div>
                           <span>{formatDate(proposal.created_at)}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => window.open(`/proposal/${proposal.access_token}`, '_blank')}
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Preview
+                          </Button>
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -557,11 +595,7 @@ export default function ProposalsPage() {
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => router.push(`/admin/proposals/${proposal.id}`)}>
                               <Eye className="h-4 w-4 mr-2" />
-                              View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.push(`/admin/proposals/${proposal.id}/edit`)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
+                              View / Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => copyProposalLink(proposal)}>
                               <LinkIcon className="h-4 w-4 mr-2" />
@@ -586,10 +620,6 @@ export default function ProposalsPage() {
                                 Send to Client
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem onClick={() => router.push(`/admin/proposals/${proposal.id}/duplicate`)}>
-                              <Copy className="h-4 w-4 mr-2" />
-                              Duplicate
-                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               className="text-red-600"

@@ -135,18 +135,18 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           bgColor: "bg-orange-50"
         },
         {
+          title: "Proposals",
+          href: "/admin/proposals",
+          icon: FileText,
+          description: "Client Proposals",
+          color: "text-blue-600",
+          bgColor: "bg-blue-50"
+        },
+        {
           title: "Contracts Hub",
           href: "/admin/contracts-hub",
           icon: FileSignature,
           description: "Contract Management",
-          color: "text-emerald-600",
-          bgColor: "bg-emerald-50"
-        },
-        {
-          title: "Finances",
-          href: "/admin/finances",
-          icon: Wallet,
-          description: "Revenue & Commissions",
           color: "text-emerald-600",
           bgColor: "bg-emerald-50"
         },
@@ -157,6 +157,14 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           description: "Invoice Management",
           color: "text-green-600",
           bgColor: "bg-green-50"
+        },
+        {
+          title: "Finances",
+          href: "/admin/finances",
+          icon: Wallet,
+          description: "Revenue & Commissions",
+          color: "text-emerald-600",
+          bgColor: "bg-emerald-50"
         }
       ]
     },
@@ -297,14 +305,6 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           description: "SQL Leads",
           color: "text-purple-600",
           bgColor: "bg-purple-50"
-        },
-        {
-          title: "Proposals",
-          href: "/admin/proposals",
-          icon: FileText,
-          description: "Client Proposals",
-          color: "text-indigo-600",
-          bgColor: "bg-indigo-50"
         },
         {
           title: "Firm Offers",
