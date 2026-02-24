@@ -41,7 +41,9 @@ import {
   Sparkles,
   Archive,
   FileEdit,
-  Receipt
+  Receipt,
+  Shield,
+  Landmark
 } from "lucide-react"
 
 interface AdminSidebarProps {
@@ -273,6 +275,22 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
       color: "text-gray-600",
       bgColor: "bg-gray-50",
       items: [
+        {
+          title: "Roles & Permissions",
+          href: "/admin/settings/roles",
+          icon: Shield,
+          description: "Team Access Control",
+          color: "text-blue-600",
+          bgColor: "bg-blue-50"
+        },
+        {
+          title: "Banking",
+          href: "/admin/settings/banking",
+          icon: Landmark,
+          description: "Invoice Banking Config",
+          color: "text-emerald-600",
+          bgColor: "bg-emerald-50"
+        },
         {
           title: "Database",
           href: "/debug-neon",
