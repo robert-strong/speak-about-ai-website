@@ -162,6 +162,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 })
     }
 
+    // Clear parent_invoice_id references from child invoices first
+    await sql`UPDATE invoices SET parent_invoice_id = NULL WHERE parent_invoice_id = ${invoiceId}`
+
     // Delete the invoice
     await sql`DELETE FROM invoices WHERE id = ${invoiceId}`
 
