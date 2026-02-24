@@ -19,22 +19,17 @@ export async function GET() {
     
     const sql = neon(process.env.DATABASE_URL)
     
-    // Get contract statistics
+    // Get contract statistics using fee_amount column and deal_value from linked deals
     const stats = await sql`
-      SELECT 
+      SELECT
         COUNT(*) as total,
-        COUNT(CASE WHEN status = 'draft' THEN 1 END) as draft,
-        COUNT(CASE WHEN status = 'sent' OR status = 'sent_for_signature' THEN 1 END) as sent,
-        COUNT(CASE WHEN status = 'partially_signed' THEN 1 END) as partially_signed,
-        COUNT(CASE WHEN status = 'fully_executed' THEN 1 END) as fully_executed,
-        COALESCE(SUM(
-          CASE 
-            WHEN financial_terms IS NOT NULL AND financial_terms->>'fee' IS NOT NULL
-            THEN (financial_terms->>'fee')::numeric 
-            ELSE 0 
-          END
-        ), 0) as total_value
-      FROM contracts
+        COUNT(CASE WHEN c.status = 'draft' THEN 1 END) as draft,
+        COUNT(CASE WHEN c.status IN ('sent', 'sent_for_signature') THEN 1 END) as sent,
+        COUNT(CASE WHEN c.status = 'partially_signed' THEN 1 END) as partially_signed,
+        COUNT(CASE WHEN c.status = 'fully_executed' THEN 1 END) as fully_executed,
+        COALESCE(SUM(COALESCE(d.deal_value, c.fee_amount, 0)), 0) as total_value
+      FROM contracts c
+      LEFT JOIN deals d ON c.deal_id = d.id
     `
     
     const result = stats[0] || {
