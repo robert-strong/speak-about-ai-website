@@ -1,110 +1,131 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 
-const sql = neon(process.env.DATABASE_URL!)
-
-export async function POST() {
+export async function POST(request?: NextRequest) {
   try {
-    // Step 1: Find projects that need invoices
-    const projectsWithoutInvoices = await sql`
-      SELECT p.id, p.project_name, p.client_name, p.client_email, p.company, p.budget
+    const sql = neon(process.env.DATABASE_URL!)
+
+    // Find ALL projects that don't have any invoices yet
+    const projects = await sql`
+      SELECT p.*,
+        d.client_email as deal_client_email
       FROM projects p
-      LEFT JOIN invoices i ON i.project_id = p.id
-      WHERE p.status IN (
-        'contracts_signed',
-        'logistics_planning',
-        'pre_event',
-        'event_week',
-        'follow_up',
-        'completed'
+      LEFT JOIN deals d ON p.deal_id = d.id
+      WHERE NOT EXISTS (
+        SELECT 1 FROM invoices i WHERE i.project_id = p.id
       )
-      AND i.id IS NULL
-      AND p.budget > 0
       AND p.client_name IS NOT NULL
-      AND p.client_email IS NOT NULL
-      ORDER BY p.created_at ASC
+      ORDER BY p.created_at DESC
     `
 
-    // Step 2: Get current invoice count for numbering
-    const invoiceCountResult = await sql`SELECT COUNT(*) as count FROM invoices`
-    let currentCount = Number(invoiceCountResult[0].count)
+    let created = 0
+    let skipped = 0
+    let errors = 0
+    const createdInvoices: any[] = []
+    const skippedProjects: any[] = []
 
-    // Step 3: Create invoices for each project
-    const createdInvoices: { projectId: number; projectName: string; clientName: string; invoiceNumber: string; amount: number }[] = []
-    const errors: { projectId: number; projectName: string; error: string }[] = []
-
-    const today = new Date().toISOString().split('T')[0]
-    const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-
-    for (const project of projectsWithoutInvoices) {
+    for (const project of projects) {
       try {
-        currentCount++
-        const invoiceNumber = `INV-${String(Date.now()).slice(-6)}-${String(currentCount).padStart(3, '0')}`
+        const totalAmount = parseFloat(project.speaker_fee || project.budget || '0')
+        if (totalAmount === 0) {
+          skipped++
+          skippedProjects.push({
+            id: project.id,
+            name: project.project_name,
+            reason: 'No speaker fee or budget'
+          })
+          continue
+        }
+
+        const clientEmail = project.client_email || project.deal_client_email || project.billing_contact_email || `${project.client_name.toLowerCase().replace(/\s+/g, '.')}@pending.info`
+
+        const depositPercentage = 0.5
+        const depositAmount = totalAmount * depositPercentage
+        const finalAmount = totalAmount - depositAmount
+
+        const depDate = new Date()
+        const depYear = depDate.getFullYear()
+        const depMonth = String(depDate.getMonth() + 1).padStart(2, '0')
+        const depositInvoiceNumber = `INV-DEP-${depYear}${depMonth}-${project.id}`
+
+        const [depositInvoice] = await sql`
+          INSERT INTO invoices (
+            project_id, invoice_number, invoice_type, amount, status,
+            issue_date, due_date, description,
+            client_name, client_email, client_company
+          ) VALUES (
+            ${project.id},
+            ${depositInvoiceNumber},
+            'deposit',
+            ${depositAmount},
+            'draft',
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP + INTERVAL '30 days',
+            ${'Initial deposit (50% of total fee) for keynote presentation'},
+            ${project.client_name},
+            ${clientEmail},
+            ${project.company}
+          )
+          RETURNING *
+        `
+
+        const finalInvoiceNumber = `INV-FIN-${depYear}${depMonth}-${project.id}`
+        const eventDate = project.event_date || new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString()
 
         await sql`
           INSERT INTO invoices (
-            project_id,
-            invoice_number,
-            client_name,
-            client_email,
-            company,
-            amount,
-            status,
-            issue_date,
-            due_date,
-            notes
+            project_id, invoice_number, invoice_type, amount, status,
+            issue_date, due_date, description,
+            client_name, client_email, client_company,
+            parent_invoice_id
           ) VALUES (
             ${project.id},
-            ${invoiceNumber},
-            ${project.client_name},
-            ${project.client_email},
-            ${project.company || null},
-            ${project.budget},
+            ${finalInvoiceNumber},
+            'final',
+            ${finalAmount},
             'draft',
-            ${today},
-            ${dueDate},
-            ${'Auto-generated invoice for ' + project.project_name}
+            CURRENT_TIMESTAMP,
+            ${eventDate},
+            ${'Final payment (50% of total fee) due on event date'},
+            ${project.client_name},
+            ${clientEmail},
+            ${project.company},
+            ${depositInvoice.id}
           )
         `
 
+        created++
         createdInvoices.push({
           projectId: project.id,
           projectName: project.project_name,
           clientName: project.client_name,
-          invoiceNumber,
-          amount: Number(project.budget)
+          status: project.status,
+          totalAmount,
+          deposit: depositAmount,
+          final: finalAmount
         })
       } catch (err) {
-        errors.push({
-          projectId: project.id,
-          projectName: project.project_name,
-          error: err instanceof Error ? err.message : 'Unknown error'
-        })
+        console.error(`Error creating invoices for project ${project.id} (${project.project_name}):`, err)
+        errors++
       }
     }
 
-    // Step 4: Return results
     return NextResponse.json({
       success: true,
-      message: `Created ${createdInvoices.length} invoices for projects missing them.`,
-      summary: {
-        projectsWithoutInvoices: projectsWithoutInvoices.length,
-        invoicesCreated: createdInvoices.length,
-        errors: errors.length
-      },
+      message: `Created invoice pairs for ${created} of ${projects.length} projects missing them.`,
+      summary: { projectsChecked: projects.length, invoicePairsCreated: created, skipped, errors },
       createdInvoices,
-      errors: errors.length > 0 ? errors : undefined
+      skippedProjects
     })
   } catch (error) {
     console.error('Backfill invoices error:', error)
     return NextResponse.json({
-      error: 'Backfill failed',
+      error: 'Failed to backfill invoices',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }
 
-// GET for easy browser/testing access
 export async function GET() {
   return POST()
 }
