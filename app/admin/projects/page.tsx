@@ -89,7 +89,7 @@ interface Project {
   event_type: string
   event_classification?: "virtual" | "local" | "travel"
   attendee_count?: number
-  status: "2plus_months" | "1to2_months" | "less_than_month" | "final_week" | "contracts_signed" | "invoicing" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled"
+  status: "2plus_months" | "1to2_months" | "less_than_month" | "final_week" | "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled"
   priority: "low" | "medium" | "high" | "urgent"
   budget: string
   speaker_fee?: string
@@ -123,13 +123,30 @@ interface Project {
   
   // Stage completion tracking
   stage_completion?: {
-    invoicing?: {
+    qualified?: {
+      prioritized_reach_outs?: boolean
+      correspondence_follow_ups?: boolean
+    }
+    proposal?: {
+      proposal_discussed?: boolean
+      proposal_created?: boolean
+      proposal_finished?: boolean
+      proposal_sent?: boolean
+      proposal_agreed?: boolean
+    }
+    contracts_signed?: {
+      prepare_client_contract?: boolean
+      send_contract_to_client?: boolean
+      client_contract_signed?: boolean
+      prepare_speaker_agreement?: boolean
+      obtain_speaker_signature?: boolean
+      file_all_signed_contracts?: boolean
+    }
+    invoicing_track?: {
+      send_internal_contract?: boolean
       initial_invoice_sent?: boolean
       final_invoice_sent?: boolean
       kickoff_meeting_planned?: boolean
-      client_contacts_documented?: boolean
-      project_folder_created?: boolean
-      internal_team_briefed?: boolean
       event_details_confirmed?: boolean
     }
     logistics_planning?: {
@@ -197,15 +214,20 @@ const PROJECT_STATUSES: Record<string, { label: string; color: string; descripti
     description: "Event is within the final week"
   },
   // Workflow statuses
+  qualified: {
+    label: "Qualified",
+    color: "bg-sky-500",
+    description: "Lead qualified — outreach and follow-ups"
+  },
+  proposal: {
+    label: "Proposal",
+    color: "bg-violet-500",
+    description: "Discuss requirements, draft and send proposal"
+  },
   contracts_signed: {
     label: "Contracting",
     color: "bg-emerald-500",
     description: "Send and sign contracts with client and speaker"
-  },
-  invoicing: {
-    label: "Invoicing",
-    color: "bg-blue-500",
-    description: "Send invoices (deposit & final)"
   },
   logistics_planning: {
     label: "Logistics",
@@ -232,6 +254,11 @@ const PROJECT_STATUSES: Record<string, { label: string; color: string; descripti
     color: "bg-green-500",
     description: "Event successfully completed"
   },
+  invoicing_track: {
+    label: "Invoicing Track",
+    color: "bg-blue-500",
+    description: "Cross-stage invoicing tasks (not a workflow stage)"
+  },
   cancelled: {
     label: "Cancelled",
     color: "bg-red-500",
@@ -251,8 +278,35 @@ const INVOICE_STATUSES = {
 // Descriptions reflect actual tasks defined in lib/task-definitions.ts
 const WORKFLOW_STAGES = [
   {
-    id: "contracts_signed",
+    id: "qualified",
     step: 1,
+    label: "Qualified",
+    color: "bg-sky-500",
+    borderColor: "border-sky-500",
+    description: "Targeted outreach and follow-up communication",
+    tasks: [
+      "Conduct targeted outreach",
+      "Follow up & maintain communication"
+    ]
+  },
+  {
+    id: "proposal",
+    step: 2,
+    label: "Proposal",
+    color: "bg-violet-500",
+    borderColor: "border-violet-500",
+    description: "Discuss requirements, draft, finalize and send proposal",
+    tasks: [
+      "Discuss requirements with client",
+      "Draft the proposal document",
+      "Complete and review proposal",
+      "Send proposal to client",
+      "Client agrees to proposal terms"
+    ]
+  },
+  {
+    id: "contracts_signed",
+    step: 3,
     label: "Contracting",
     color: "bg-emerald-500",
     borderColor: "border-emerald-500",
@@ -267,23 +321,8 @@ const WORKFLOW_STAGES = [
     ]
   },
   {
-    id: "invoicing",
-    step: 2,
-    label: "Invoicing",
-    color: "bg-blue-500",
-    borderColor: "border-blue-500",
-    description: "Deposit invoice (50%), kickoff meeting, confirm event specs",
-    tasks: [
-      "Send internal contract to speaker",
-      "Send 50% deposit invoice (Net 30)",
-      "Send final balance invoice",
-      "Schedule client kickoff meeting",
-      "Confirm all event specifications"
-    ]
-  },
-  {
     id: "logistics_planning",
-    step: 3,
+    step: 4,
     label: "Logistics Planning",
     color: "bg-purple-500",
     borderColor: "border-purple-500",
@@ -309,7 +348,7 @@ const WORKFLOW_STAGES = [
   },
   {
     id: "pre_event",
-    step: 4,
+    step: 5,
     label: "Pre-Event",
     color: "bg-yellow-500",
     borderColor: "border-yellow-500",
@@ -323,7 +362,7 @@ const WORKFLOW_STAGES = [
   },
   {
     id: "event_week",
-    step: 5,
+    step: 6,
     label: "Event Week",
     color: "bg-orange-500",
     borderColor: "border-orange-500",
@@ -336,7 +375,7 @@ const WORKFLOW_STAGES = [
   },
   {
     id: "follow_up",
-    step: 6,
+    step: 7,
     label: "Follow-up",
     color: "bg-indigo-500",
     borderColor: "border-indigo-500",
@@ -350,7 +389,7 @@ const WORKFLOW_STAGES = [
   },
   {
     id: "completed",
-    step: 7,
+    step: 8,
     label: "Completed",
     color: "bg-green-500",
     borderColor: "border-green-500",
@@ -2027,6 +2066,60 @@ export default function EnhancedProjectManagementPage() {
                                           </div>
                                         )}
 
+                                        {/* Invoicing Track (cross-stage, shown from contracts_signed onward) */}
+                                        {["contracts_signed", "logistics_planning", "pre_event", "event_week", "follow_up", "completed"].includes(stage.id) && (() => {
+                                          const invoicingTasks = TASK_DEFINITIONS["invoicing_track"] || {}
+                                          const invoicingCompletion = project.stage_completion?.invoicing_track || {}
+                                          const invoicingEntries = Object.entries(invoicingTasks)
+                                          const invoicingCompleted = invoicingEntries.filter(([key]) => invoicingCompletion[key as keyof typeof invoicingCompletion]).length
+                                          if (invoicingEntries.length === 0) return null
+                                          return (
+                                            <div className="mt-4 pt-3 border-t border-dashed border-blue-300">
+                                              <div className="flex items-center justify-between mb-2">
+                                                <h4 className="font-medium text-blue-700 flex items-center gap-2 text-sm">
+                                                  <Receipt className="h-4 w-4" />
+                                                  Invoicing Track
+                                                  <span className="text-xs font-normal text-blue-500">(cross-stage)</span>
+                                                </h4>
+                                                <span className="text-xs text-blue-500">{invoicingCompleted}/{invoicingEntries.length}</span>
+                                              </div>
+                                              <div className="space-y-1.5">
+                                                {invoicingEntries.map(([taskKey, taskDef]) => {
+                                                  const isCompleted = invoicingCompletion[taskKey as keyof typeof invoicingCompletion] || false
+                                                  return (
+                                                    <div key={taskKey} className={`flex items-center gap-3 p-2 rounded border ${isCompleted ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}`}>
+                                                      <button
+                                                        onClick={async () => {
+                                                          const newValue = !isCompleted
+                                                          setProjects(prev => prev.map(p => {
+                                                            if (p.id !== project.id) return p
+                                                            return {
+                                                              ...p,
+                                                              stage_completion: {
+                                                                ...p.stage_completion,
+                                                                invoicing_track: { ...invoicingCompletion, [taskKey]: newValue }
+                                                              }
+                                                            }
+                                                          }))
+                                                          await handleUpdateStageCompletion(project.id, "invoicing_track", taskKey, newValue)
+                                                        }}
+                                                        className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+                                                          isCompleted ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 hover:border-gray-400'
+                                                        }`}
+                                                      >
+                                                        {isCompleted && <Check className="h-2.5 w-2.5" />}
+                                                      </button>
+                                                      <span className={`text-sm ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-700'}`}>
+                                                        {taskDef.name}
+                                                      </span>
+                                                    </div>
+                                                  )
+                                                })}
+                                              </div>
+                                            </div>
+                                          )
+                                        })()}
+
                                         {/* Action buttons */}
                                         <div className="flex justify-end mt-4 pt-3 border-t border-gray-200 gap-2">
                                           <Button
@@ -3327,7 +3420,7 @@ export default function EnhancedProjectManagementPage() {
                           const tasksWithStages = tasks.map(task => {
                             let stage = 'logistics_planning' // default stage
                             if (task.category === 'overview' || task.category === 'contacts') {
-                              stage = 'invoicing'
+                              stage = 'contracts_signed'
                             } else if (task.category === 'travel' || task.category === 'venue') {
                               stage = 'logistics_planning'
                             } else if (task.category === 'event_details' || task.category === 'audience') {

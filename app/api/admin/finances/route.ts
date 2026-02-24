@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
         s.name as speaker_name
       FROM projects p
       LEFT JOIN speakers s ON s.id = p.speaker_id
-      WHERE p.status != 'cancelled'
+      WHERE p.status NOT IN ('cancelled', 'qualified', 'proposal')
       ORDER BY p.event_date DESC NULLS LAST
     `
 

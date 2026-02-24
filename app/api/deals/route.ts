@@ -109,21 +109,66 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if Slack fails
     }
 
-    // If deal is created with status "won", automatically create a project
-    if (deal.status === "won") {
+    // If deal is created at qualified or later, create a project at the appropriate stage
+    if (deal.status === "qualified" || deal.status === "proposal") {
       try {
         const projectData = {
-          // Basic project fields
           project_name: deal.event_title,
           client_name: deal.client_name,
           client_email: deal.client_email,
           client_phone: deal.client_phone,
           company: deal.company,
-          project_type: deal.event_type === "Workshop" ? "Workshop" : 
+          project_type: deal.event_type === "Workshop" ? "Workshop" :
+                       deal.event_type === "Keynote" ? "Speaking" :
+                       deal.event_type === "Consulting" ? "Consulting" : "Other",
+          description: `Event: ${deal.event_title}\nLocation: ${deal.event_location || 'TBD'}`,
+          status: deal.status as "qualified" | "proposal",
+          priority: deal.priority,
+          start_date: new Date().toISOString().split('T')[0],
+          deadline: deal.event_date,
+          budget: 0,
+          spent: 0,
+          completion_percentage: 0,
+          event_name: deal.event_title,
+          event_date: deal.event_date,
+          event_location: deal.event_location,
+          event_type: deal.event_type,
+          requested_speaker_name: deal.speaker_requested,
+          attendee_count: deal.attendee_count,
+          contact_person: deal.client_name,
+          notes: `Deal ID: ${deal.id}\nSource: ${deal.source}\nBudget Range: ${deal.budget_range}`,
+          tags: [deal.event_type, deal.source].filter(Boolean),
+          deal_id: deal.id,
+          event_classification: deal.event_type?.toLowerCase().includes('virtual') || deal.event_type?.toLowerCase().includes('webinar') ? 'virtual' as const :
+                              deal.event_location?.toLowerCase().includes('remote') ? 'virtual' as const : 'local' as const
+        }
+        const project = await createProject(projectData)
+        if (project) {
+          return NextResponse.json({
+            ...deal,
+            projectCreated: true,
+            projectId: project.id,
+            message: `Deal created and project "${project.project_name}" created at ${deal.status} stage`
+          }, { status: 201 })
+        }
+      } catch (error) {
+        console.error("Error creating project from deal:", error)
+      }
+    }
+
+    // If deal is created with status "won", create project at contracts_signed with financial data
+    if (deal.status === "won") {
+      try {
+        const projectData = {
+          project_name: deal.event_title,
+          client_name: deal.client_name,
+          client_email: deal.client_email,
+          client_phone: deal.client_phone,
+          company: deal.company,
+          project_type: deal.event_type === "Workshop" ? "Workshop" :
                        deal.event_type === "Keynote" ? "Speaking" :
                        deal.event_type === "Consulting" ? "Consulting" : "Other",
           description: `Event: ${deal.event_title}\nLocation: ${deal.event_location}\nAttendees: ${deal.attendee_count}\n\n${deal.notes}`,
-          // Set status to contracting for new projects (deals just won need contracts first)
           status: "contracts_signed" as const,
           priority: deal.priority,
           start_date: new Date().toISOString().split('T')[0],
@@ -131,67 +176,48 @@ export async function POST(request: NextRequest) {
           budget: deal.deal_value,
           spent: 0,
           completion_percentage: 0,
-          
-          // Event Overview - Billing Contact (from deal client info)
           billing_contact_name: deal.client_name,
           billing_contact_email: deal.client_email,
           billing_contact_phone: deal.client_phone,
-          
-          // Event Overview - Logistics Contact (same as billing for now)
           logistics_contact_name: deal.client_name,
           logistics_contact_email: deal.client_email,
           logistics_contact_phone: deal.client_phone,
-          
-          // Event Overview - Additional Fields
           end_client_name: deal.company,
           event_name: deal.event_title,
           event_date: deal.event_date,
           event_location: deal.event_location,
           event_type: deal.event_type,
-          
-          // Speaker Program Details
           requested_speaker_name: deal.speaker_requested,
           program_topic: `${deal.event_title} - ${deal.event_type}`,
           program_type: deal.event_type,
           audience_size: deal.attendee_count,
           audience_demographics: "To be determined during planning",
-          
-          // Financial Details
           speaker_fee: deal.deal_value,
-          
-          // Basic event fields (existing)
           attendee_count: deal.attendee_count,
           contact_person: deal.client_name,
           notes: `Deal ID: ${deal.id}\nSource: ${deal.source}\nBudget Range: ${deal.budget_range}\nOriginal notes: ${deal.notes}`,
           tags: [deal.event_type, deal.source],
-          
-          // Status tracking (initialized for new project)
+          deal_id: deal.id,
           contract_signed: false,
           invoice_sent: false,
           payment_received: false,
           presentation_ready: false,
           materials_sent: false,
-          
-          // Event classification based on type
-          event_classification: deal.event_type?.toLowerCase().includes('virtual') || deal.event_type?.toLowerCase().includes('webinar') ? 'virtual' :
-                              deal.event_location?.toLowerCase().includes('remote') ? 'virtual' : 'local'
+          event_classification: deal.event_type?.toLowerCase().includes('virtual') || deal.event_type?.toLowerCase().includes('webinar') ? 'virtual' as const :
+                              deal.event_location?.toLowerCase().includes('remote') ? 'virtual' as const : 'local' as const
         }
-        
+
         const project = await createProject(projectData)
         if (project) {
-          console.log(`Successfully created project "${project.project_name}" from won deal #${deal.id}`)
-          // Return the deal with additional info about the project creation
           return NextResponse.json({
             ...deal,
             projectCreated: true,
             projectId: project.id,
-            message: `Deal created successfully and project "${project.project_name}" was automatically created`
+            message: `Deal created and project "${project.project_name}" was automatically created`
           }, { status: 201 })
         }
       } catch (error) {
         console.error("Error creating project from won deal:", error)
-        // Don't fail the deal creation if project creation fails
-        // The user can still manually create the project later
       }
     }
 

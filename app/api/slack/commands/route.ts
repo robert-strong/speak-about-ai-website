@@ -237,9 +237,9 @@ export async function POST(request: NextRequest) {
           })
 
           const stageEmoji: Record<string, string> = {
-            'planning': '📋',
+            'qualified': '🎯',
+            'proposal': '📋',
             'contracts_signed': '📝',
-            'invoicing': '💳',
             'logistics_planning': '🗺️',
             'pre_event': '🎯',
             'event_week': '🎤',

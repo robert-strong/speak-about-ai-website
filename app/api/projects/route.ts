@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     const projectData = {
       ...body,
       project_type: body.event_type || body.project_type || "speaking_engagement",
-      status: body.status || "invoicing",
+      status: body.status || "qualified",
       priority: body.priority || "medium",
       start_date: body.start_date || body.event_date || new Date().toISOString(),
       budget: parseFloat(body.budget) || parseFloat(body.speaker_fee) || 0,

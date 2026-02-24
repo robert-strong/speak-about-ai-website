@@ -22,10 +22,11 @@ export async function POST(request: NextRequest) {
       ADD CONSTRAINT projects_status_check 
       CHECK (status IN (
         -- Legacy statuses (for backward compatibility)
-        '2plus_months', '1to2_months', 'less_than_month', 'final_week', 
-        'planning', 'contracts_signed',
-        -- New workflow statuses
-        'invoicing', 'logistics_planning', 'pre_event', 'event_week', 'follow_up',
+        '2plus_months', '1to2_months', 'less_than_month', 'final_week',
+        'planning', 'invoicing',
+        -- Workflow statuses
+        'qualified', 'proposal', 'contracts_signed',
+        'logistics_planning', 'pre_event', 'event_week', 'follow_up',
         -- Final statuses
         'completed', 'cancelled'
       ))

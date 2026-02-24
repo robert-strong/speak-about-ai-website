@@ -22,7 +22,7 @@ export interface Project {
   company?: string
   project_type: string
   description?: string
-  status: "contracts_signed" | "invoicing" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled" | "2plus_months" | "1to2_months" | "less_than_month" | "final_week"
+  status: "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled" | "2plus_months" | "1to2_months" | "less_than_month" | "final_week"
   priority: "low" | "medium" | "high" | "urgent"
   start_date: string
   end_date?: string
@@ -213,20 +213,57 @@ export async function createProject(projectData: Omit<Project, "id" | "created_a
   try {
     const sql = getSQL()
 
-    // Use the status provided or default to contracts_signed (first workflow stage)
+    // Use the status provided or default to qualified (first workflow stage)
     const finalProjectData = {
       ...projectData,
-      status: projectData.status || "contracts_signed"
+      status: projectData.status || "qualified"
     }
-    // Initialize stage_completion with contracting tasks marked as due (false = not completed)
-    const initialStageCompletion = {
-      contracts_signed: {
+    // Initialize stage_completion based on the starting status
+    const initialStageCompletion: Record<string, Record<string, boolean>> = {}
+
+    if (finalProjectData.status === "qualified") {
+      initialStageCompletion.qualified = {
+        prioritized_reach_outs: false,
+        correspondence_follow_ups: false
+      }
+    } else if (finalProjectData.status === "proposal") {
+      initialStageCompletion.qualified = {
+        prioritized_reach_outs: true,
+        correspondence_follow_ups: true
+      }
+      initialStageCompletion.proposal = {
+        proposal_discussed: false,
+        proposal_created: false,
+        proposal_finished: false,
+        proposal_sent: false,
+        proposal_agreed: false
+      }
+    } else if (finalProjectData.status === "contracts_signed") {
+      initialStageCompletion.qualified = {
+        prioritized_reach_outs: true,
+        correspondence_follow_ups: true
+      }
+      initialStageCompletion.proposal = {
+        proposal_discussed: true,
+        proposal_created: true,
+        proposal_finished: true,
+        proposal_sent: true,
+        proposal_agreed: true
+      }
+      initialStageCompletion.contracts_signed = {
         prepare_client_contract: false,
         send_contract_to_client: false,
         client_contract_signed: false,
         prepare_speaker_agreement: false,
         obtain_speaker_signature: false,
         file_all_signed_contracts: false
+      }
+      initialStageCompletion.invoicing_track = {
+        send_internal_contract: false,
+        initial_invoice_sent: false,
+        final_invoice_sent: false,
+        kickoff_meeting_planned: false,
+        event_details_confirmed: false
       }
     }
     

@@ -45,7 +45,7 @@ interface Project {
   company?: string
   project_type: string
   description?: string
-  status: "2plus_months" | "1to2_months" | "less_than_month" | "final_week" | "contracts_signed" | "invoicing" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled"
+  status: "2plus_months" | "1to2_months" | "less_than_month" | "final_week" | "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled"
   priority: "low" | "medium" | "high" | "urgent"
   start_date: string
   deadline?: string
@@ -184,25 +184,30 @@ const WORKFLOW_STAGES = {
   "less_than_month": "< 1 Month",
   "final_week": "Final Week",
   // Workflow statuses
-  "contracts_signed": "1. Contracting",
-  "invoicing": "2. Invoicing",
-  "logistics_planning": "3. Logistics",
-  "pre_event": "4. Pre-Event",
-  "event_week": "5. Event Week",
-  "follow_up": "6. Follow-up",
-  "completed": "7. Completed",
+  "qualified": "1. Qualified",
+  "proposal": "2. Proposal",
+  "contracts_signed": "3. Contracting",
+  "logistics_planning": "4. Logistics",
+  "pre_event": "5. Pre-Event",
+  "event_week": "6. Event Week",
+  "follow_up": "7. Follow-up",
+  "completed": "8. Completed",
   "cancelled": "Cancelled"
 }
 
 // Stage descriptions for reference
 const STAGE_DETAILS = {
+  qualified: {
+    label: "Qualified",
+    description: "Targeted outreach and follow-up communication"
+  },
+  proposal: {
+    label: "Proposal",
+    description: "Discuss requirements, draft, finalize and send proposal"
+  },
   contracts_signed: {
     label: "Contracting",
     description: "Client contract first (prepare → send → signed), then speaker agreement"
-  },
-  invoicing: {
-    label: "Invoicing",
-    description: "Deposit invoice (50%), kickoff meeting, confirm event specs"
   },
   logistics_planning: {
     label: "Logistics Planning",

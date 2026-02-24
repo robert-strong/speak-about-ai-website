@@ -93,11 +93,14 @@ export async function PATCH(
 // Helper function to check if all required tasks in a stage are complete
 async function checkStageCompletion(projectId: number, stage: string, stageData: any): Promise<boolean> {
   const requiredTasks = {
-    invoicing: ["initial_invoice_sent", "final_invoice_sent", "kickoff_meeting_planned", "project_setup_complete"],
+    qualified: ["prioritized_reach_outs", "correspondence_follow_ups"],
+    proposal: ["proposal_discussed", "proposal_created", "proposal_finished", "proposal_sent", "proposal_agreed"],
+    contracts_signed: ["prepare_client_contract", "send_contract_to_client", "client_contract_signed", "prepare_speaker_agreement", "obtain_speaker_signature", "file_signed_contracts"],
     logistics_planning: ["details_confirmed", "av_requirements_gathered", "press_pack_sent", "calendar_confirmed", "client_contact_obtained", "speaker_materials_ready"],
     pre_event: ["logistics_confirmed", "speaker_prepared", "client_materials_sent", "ready_for_execution"],
     event_week: ["final_preparations_complete", "event_executed", "support_provided"],
     follow_up: ["follow_up_sent", "client_feedback_requested", "speaker_feedback_requested", "lessons_documented"]
+    // invoicing_track deliberately omitted — never blocks progression
   }
 
   const required = requiredTasks[stage as keyof typeof requiredTasks]
@@ -109,7 +112,7 @@ async function checkStageCompletion(projectId: number, stage: string, stageData:
 
 // Helper function to get the next stage in the workflow
 function getNextStage(currentStage: string): string | null {
-  const stageOrder = ["invoicing", "logistics_planning", "pre_event", "event_week", "follow_up", "completed"]
+  const stageOrder = ["qualified", "proposal", "contracts_signed", "logistics_planning", "pre_event", "event_week", "follow_up", "completed"]
   const currentIndex = stageOrder.indexOf(currentStage)
   
   if (currentIndex === -1 || currentIndex === stageOrder.length - 1) {

@@ -72,7 +72,7 @@ export async function POST() {
         if (deal.payment_status === 'paid') {
           status = 'completed'
         } else if (deal.invoice_number || deal.payment_status === 'partial') {
-          status = 'invoicing'
+          status = 'logistics_planning'
         }
 
         const stageCompletion = JSON.stringify({

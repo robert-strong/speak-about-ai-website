@@ -56,7 +56,7 @@ interface Project {
   event_location: string
   event_type: string
   attendee_count?: number
-  status: "invoicing" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled"
+  status: "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled"
   priority: "low" | "medium" | "high" | "urgent"
   budget: string
   speaker_fee?: string

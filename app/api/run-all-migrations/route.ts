@@ -140,8 +140,9 @@ export async function POST(request: NextRequest) {
         ALTER TABLE projects ADD CONSTRAINT projects_status_check
         CHECK (status IN (
           '2plus_months', '1to2_months', 'less_than_month', 'final_week',
-          'contracts_signed', 'invoicing', 'logistics_planning', 'pre_event',
-          'event_week', 'follow_up', 'completed', 'cancelled'
+          'qualified', 'proposal', 'contracts_signed', 'invoicing',
+          'logistics_planning', 'pre_event', 'event_week', 'follow_up',
+          'completed', 'cancelled'
         ))
       `
       results.push({ migration: "009_projects_status_constraint", status: "success" })

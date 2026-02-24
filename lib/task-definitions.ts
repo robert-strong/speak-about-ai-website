@@ -21,83 +21,134 @@ export interface StageTaskDefinitions {
 }
 
 export const TASK_DEFINITIONS: StageTaskDefinitions = {
-  planning: {
-    initial_discovery_call: {
-      key: 'initial_discovery_call',
-      name: 'Initial Discovery Call',
-      description: 'Schedule and conduct initial discovery call to understand event requirements',
+  qualified: {
+    prioritized_reach_outs: {
+      key: 'prioritized_reach_outs',
+      name: 'Conduct Targeted Outreach',
+      description: 'Conduct prioritized outreach to qualified leads — calls, emails, or introductions',
+      requirements: [
+        'Lead qualified and contact info available',
+        'Event interest confirmed',
+        'Outreach messaging prepared'
+      ],
+      deliverables: [
+        'Initial outreach completed',
+        'Response received or follow-up scheduled',
+        'Interest level documented'
+      ],
+      priority: 'critical',
+      estimatedTime: '30 min',
+      owner: 'sales'
+    },
+    correspondence_follow_ups: {
+      key: 'correspondence_follow_ups',
+      name: 'Follow Up & Maintain Communication',
+      description: 'Follow up on outreach, maintain communication cadence with prospect',
+      requirements: [
+        'Initial outreach completed',
+        'Follow-up timeline defined'
+      ],
+      deliverables: [
+        'Follow-up emails/calls completed',
+        'Client engagement confirmed',
+        'Ready to move to proposal stage'
+      ],
+      priority: 'high',
+      estimatedTime: '30 min',
+      owner: 'sales'
+    }
+  },
+
+  proposal: {
+    proposal_discussed: {
+      key: 'proposal_discussed',
+      name: 'Discuss Requirements with Client',
+      description: 'Discovery call or meeting to understand event requirements in detail',
       requirements: [
         'Client contact information',
         'Preliminary event details',
-        'Call scheduled'
+        'Call/meeting scheduled'
       ],
       deliverables: [
         'Event requirements documented',
         'Client expectations clarified',
         'Budget range confirmed',
-        'Follow-up actions identified'
+        'Speaker preferences noted'
       ],
       priority: 'critical',
       estimatedTime: '1 hour',
       owner: 'sales'
     },
-    speaker_selection: {
-      key: 'speaker_selection',
-      name: 'Speaker Selection & Matching',
-      description: 'Identify and recommend suitable speaker(s) based on client requirements',
+    proposal_created: {
+      key: 'proposal_created',
+      name: 'Draft the Proposal Document',
+      description: 'Create formal proposal with speaker options, pricing, and event details',
       requirements: [
-        'Event topic confirmed',
-        'Audience demographics known',
-        'Budget parameters established',
-        'Event format defined'
-      ],
-      deliverables: [
-        'Speaker recommendations sent',
+        'Event requirements documented',
         'Speaker availability confirmed',
-        'Client decision received',
-        'Speaker selected'
-      ],
-      priority: 'high',
-      estimatedTime: '2 hours',
-      owner: 'sales'
-    },
-    proposal_sent: {
-      key: 'proposal_sent',
-      name: 'Send Proposal to Client',
-      description: 'Prepare and send formal proposal with speaker details and pricing',
-      requirements: [
-        'Speaker selected',
-        'Pricing confirmed',
-        'Event details documented',
-        'Proposal template prepared'
+        'Pricing structure prepared'
       ],
       deliverables: [
-        'Proposal document created',
-        'Proposal sent to client',
-        'Follow-up scheduled',
-        'Client feedback received'
+        'Proposal document drafted',
+        'Speaker recommendations included',
+        'Pricing and terms outlined'
       ],
       priority: 'high',
       estimatedTime: '1.5 hours',
       owner: 'sales'
     },
-    negotiate_terms: {
-      key: 'negotiate_terms',
-      name: 'Negotiate Terms & Conditions',
-      description: 'Handle any negotiations on pricing, terms, or scope',
+    proposal_finished: {
+      key: 'proposal_finished',
+      name: 'Complete and Review Proposal',
+      description: 'Finalize proposal with all details and internal review',
       requirements: [
-        'Initial proposal reviewed by client',
-        'Client feedback received',
-        'Negotiation parameters defined'
+        'Draft proposal completed',
+        'Internal review done',
+        'Pricing approved'
       ],
       deliverables: [
-        'Terms agreed upon',
-        'Final pricing confirmed',
-        'Special conditions documented',
-        'Ready for contract'
+        'Final proposal document ready',
+        'All details verified',
+        'Approved for sending'
       ],
-      priority: 'medium',
-      estimatedTime: '1 hour',
+      priority: 'high',
+      estimatedTime: '30 min',
+      owner: 'sales'
+    },
+    proposal_sent: {
+      key: 'proposal_sent',
+      name: 'Send Proposal to Client',
+      description: 'Send finalized proposal to client for review',
+      requirements: [
+        'Proposal finalized and approved',
+        'Client contact confirmed',
+        'Follow-up schedule planned'
+      ],
+      deliverables: [
+        'Proposal sent to client',
+        'Follow-up scheduled',
+        'Client acknowledgement received'
+      ],
+      priority: 'high',
+      estimatedTime: '15 min',
+      owner: 'sales'
+    },
+    proposal_agreed: {
+      key: 'proposal_agreed',
+      name: 'Client Agrees to Proposal Terms',
+      description: 'Client has reviewed and verbally/written agreed to proposal terms',
+      requirements: [
+        'Proposal reviewed by client',
+        'Any negotiations completed',
+        'Terms agreed upon'
+      ],
+      deliverables: [
+        'Client agreement confirmed',
+        'Final pricing locked in',
+        'Ready for contract stage'
+      ],
+      priority: 'critical',
+      estimatedTime: '30 min',
       owner: 'sales'
     }
   },
@@ -214,7 +265,7 @@ export const TASK_DEFINITIONS: StageTaskDefinitions = {
     }
   },
 
-  invoicing: {
+  invoicing_track: {
     send_internal_contract: {
       key: 'send_internal_contract',
       name: 'Send Internal Contract to Speaker',
@@ -793,15 +844,19 @@ export function calculateTaskUrgency(
   
   // Stage-specific urgency rules
   const urgencyRules: Record<string, { thresholds: { critical: number; high: number; medium: number }; criticalTasks: string[] }> = {
-    planning: {
+    qualified: {
       thresholds: { critical: 60, high: 90, medium: 120 },
-      criticalTasks: ['initial_discovery_call', 'speaker_selection']
+      criticalTasks: ['prioritized_reach_outs']
+    },
+    proposal: {
+      thresholds: { critical: 60, high: 90, medium: 120 },
+      criticalTasks: ['proposal_discussed', 'proposal_sent', 'proposal_agreed']
     },
     contracts_signed: {
       thresholds: { critical: 45, high: 60, medium: 90 },
       criticalTasks: ['prepare_client_contract', 'send_client_contract', 'obtain_speaker_signature']
     },
-    invoicing: {
+    invoicing_track: {
       thresholds: { critical: 45, high: 60, medium: 90 },
       criticalTasks: ['send_internal_contract', 'initial_invoice_sent', 'event_details_confirmed']
     },

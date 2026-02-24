@@ -488,11 +488,13 @@ export function buildProjectStatusUpdateMessage(project: {
   updated_by?: string
 }): SlackMessage {
   const statusEmoji: Record<string, string> = {
-    'planning': '📋',
-    'invoicing': '💳',
-    'contract': '📝',
-    'preparation': '🎯',
-    'ready': '✅',
+    'qualified': '🎯',
+    'proposal': '📋',
+    'contracts_signed': '📝',
+    'logistics_planning': '🗂️',
+    'pre_event': '🎯',
+    'event_week': '🎤',
+    'follow_up': '📧',
     'completed': '🎉',
     'cancelled': '🚫',
     'on_hold': '⏸️'
@@ -587,11 +589,13 @@ export function buildProjectsSummaryMessage(summary: {
   total_revenue: number
 }): SlackMessage {
   const statusEmoji: Record<string, string> = {
-    'planning': '📋',
-    'invoicing': '💳',
-    'contract': '📝',
-    'preparation': '🎯',
-    'ready': '✅',
+    'qualified': '🎯',
+    'proposal': '📋',
+    'contracts_signed': '📝',
+    'logistics_planning': '🗂️',
+    'pre_event': '🎯',
+    'event_week': '🎤',
+    'follow_up': '📧',
     'completed': '🎉',
     'cancelled': '🚫',
     'on_hold': '⏸️'
