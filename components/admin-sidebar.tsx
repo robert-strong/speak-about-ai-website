@@ -55,7 +55,8 @@ interface AdminSidebarProps {
 export function AdminSidebar({ className }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [expandedSections, setExpandedSections] = useState<string[]>(['sales', 'operations', 'website', 'marketing', 'tools'])
+  const [expandedSections, setExpandedSections] = useState<string[]>([])
+  const [sectionsLoaded, setSectionsLoaded] = useState(false)
   const [userPermissions, setUserPermissions] = useState<Record<string, boolean> | null>(null)
   const [userName, setUserName] = useState<string | null>(null)
   const [userRoleName, setUserRoleName] = useState<string | null>(null)
@@ -67,21 +68,26 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
     setMobileOpen(false)
   }, [pathname])
 
-  // Load user permissions from localStorage
+  // Load accordion state + user permissions from localStorage on mount
   useEffect(() => {
     try {
+      // Restore accordion state
+      const saved = localStorage.getItem("sidebarExpandedSections")
+      if (saved) {
+        setExpandedSections(JSON.parse(saved))
+      } else {
+        // First visit defaults
+        setExpandedSections(['sales', 'operations', 'website', 'marketing'])
+      }
+      setSectionsLoaded(true)
+
+      // Restore user permissions
       const userStr = localStorage.getItem("adminUser")
       if (userStr) {
         const user = JSON.parse(userStr)
-        if (user.permissions) {
-          setUserPermissions(user.permissions)
-        }
-        if (user.name) {
-          setUserName(user.name)
-        }
-        if (user.role_name) {
-          setUserRoleName(user.role_name)
-        }
+        if (user.permissions) setUserPermissions(user.permissions)
+        if (user.name) setUserName(user.name)
+        if (user.role_name) setUserRoleName(user.role_name)
       }
     } catch {}
   }, [])
@@ -91,6 +97,15 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
     if (!userPermissions) return true
     if (!key) return true
     return userPermissions[key] === true
+  }
+
+  // Check if a pathname matches an item's href (exact or sub-route with trailing slash)
+  const isItemActive = (href: string): boolean => {
+    if (pathname === href) return true
+    // Match sub-routes like /admin/contracts-hub/123 for href /admin/contracts-hub
+    // Exclude /admin/manage to prevent false positives on other /admin/* routes
+    if (href !== "/admin/manage" && pathname.startsWith(href + "/")) return true
+    return false
   }
 
   const handleLogout = async () => {
@@ -105,16 +120,20 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
       localStorage.removeItem("adminLoggedIn")
       localStorage.removeItem("adminSessionToken")
       localStorage.removeItem("adminUser")
+      localStorage.removeItem("sidebarExpandedSections")
       router.push("/admin")
     }
   }
 
   const toggleSection = (sectionName: string) => {
-    setExpandedSections(prev =>
-      prev.includes(sectionName)
+    setExpandedSections(prev => {
+      const next = prev.includes(sectionName)
         ? prev.filter(s => s !== sectionName)
         : [...prev, sectionName]
-    )
+      // Persist to localStorage
+      localStorage.setItem("sidebarExpandedSections", JSON.stringify(next))
+      return next
+    })
   }
 
   const navigationSections = [
@@ -536,7 +555,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
             // Check permission for standalone items
             if (!hasPermission(section.permissionKey)) return null
 
-            const isActive = pathname === section.href
+            const isActive = isItemActive(section.href!)
             return (
               <Link key={section.href} href={section.href}>
                 <div
@@ -600,7 +619,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           if (visibleItems.length === 0) return null
 
           const isExpanded = expandedSections.includes(section.sectionKey!)
-          const hasActiveChild = visibleItems.some(item => pathname === item.href)
+          const hasActiveChild = visibleItems.some(item => isItemActive(item.href))
 
           return (
             <div key={section.sectionKey}>
@@ -643,13 +662,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
               {!collapsed && isExpanded && visibleItems.length > 0 && (
                 <div className="ml-4 space-y-1 mt-1">
                   {visibleItems.map((item) => {
-                    const isActive = pathname === item.href ||
-                      (item.href === "/admin/contracts-hub" && pathname.startsWith("/admin/contracts-hub")) ||
-                      (item.href === "/admin/invoicing" && pathname.startsWith("/admin/invoicing")) ||
-                      (item.href === "/admin/settings/team" && pathname.startsWith("/admin/settings/team")) ||
-                      (item.href === "/admin/settings/roles" && pathname.startsWith("/admin/settings/roles")) ||
-                      (item.href === "/admin/settings/smtp" && pathname.startsWith("/admin/settings/smtp")) ||
-                      (item.href === "/admin/settings/banking" && pathname.startsWith("/admin/settings/banking"))
+                    const isActive = isItemActive(item.href)
 
                     return (
                       <Link key={item.href} href={item.href}>
