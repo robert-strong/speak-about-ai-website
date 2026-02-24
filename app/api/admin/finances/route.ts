@@ -34,12 +34,42 @@ export async function GET(request: NextRequest) {
         p.notes,
         p.deal_id,
         p.created_at,
-        s.name as speaker_name
+        s.name as speaker_name,
+        (SELECT string_agg(i.invoice_number, ', ' ORDER BY i.created_at)
+         FROM invoices i WHERE i.project_id = p.id) as linked_invoice_numbers
       FROM projects p
       LEFT JOIN speakers s ON s.id = p.speaker_id
       WHERE p.status NOT IN ('cancelled', 'qualified', 'proposal')
       ORDER BY p.event_date DESC NULLS LAST
     `
+
+    // Fetch all project payments in one query
+    let allPayments: any[] = []
+    try {
+      allPayments = await sql`
+        SELECT * FROM project_payments ORDER BY project_id, payment_type, created_at
+      `
+    } catch {
+      // Table may not exist yet - that's fine
+      console.log('project_payments table not available yet')
+    }
+
+    // Build a map of payments by project ID
+    const paymentsByProject: Record<number, any[]> = {}
+    for (const payment of allPayments) {
+      const pid = Number(payment.project_id)
+      if (!paymentsByProject[pid]) paymentsByProject[pid] = []
+      paymentsByProject[pid].push({
+        id: Number(payment.id),
+        payment_type: payment.payment_type,
+        amount: Number(payment.amount) || 0,
+        payment_date: payment.payment_date,
+        payment_method: payment.payment_method,
+        label: payment.label,
+        notes: payment.notes,
+        created_at: payment.created_at
+      })
+    }
 
     // Transform and calculate financial metrics for each project
     const transformedProjects = projects.map(project => {
@@ -48,6 +78,7 @@ export async function GET(request: NextRequest) {
       const travelBuyout = Number(project.travel_buyout) || 0
       const commissionPercentage = Number(project.commission_percentage) || 20
       const storedCommission = Number(project.commission_amount) || 0
+      const projectId = Number(project.id)
 
       // Travel buyout is paid by client ON TOP of the deal value, then passed through to speaker
       // Total to collect from client = deal value + travel buyout
@@ -60,8 +91,18 @@ export async function GET(request: NextRequest) {
       // This ensures existing projects without stored commission still work correctly
       const netCommission = storedCommission > 0 ? storedCommission : (budget - speakerFee)
 
+      // Use linked invoice numbers from invoices table, fallback to project's own invoice_number field
+      const invoiceNumber = project.linked_invoice_numbers || project.invoice_number || null
+
+      // Get individual payments for this project
+      const projectPayments = paymentsByProject[projectId] || []
+      const clientPayments = projectPayments.filter(p => p.payment_type === 'client')
+      const speakerPayments = projectPayments.filter(p => p.payment_type === 'speaker')
+      const clientPaidTotal = clientPayments.reduce((sum: number, p: any) => sum + p.amount, 0)
+      const speakerPaidTotal = speakerPayments.reduce((sum: number, p: any) => sum + p.amount, 0)
+
       return {
-        id: Number(project.id),
+        id: projectId,
         project_name: project.project_name,
         client_name: project.client_name,
         client_email: project.client_email,
@@ -84,7 +125,7 @@ export async function GET(request: NextRequest) {
         // Client payment tracking
         payment_status: project.payment_status || 'pending',
         payment_date: project.payment_date,
-        invoice_number: project.invoice_number,
+        invoice_number: invoiceNumber,
         purchase_order_number: project.purchase_order_number,
         payment_terms: project.payment_terms,
 
@@ -96,6 +137,11 @@ export async function GET(request: NextRequest) {
         client_payment_method: project.client_payment_method || null,
         speaker_payment_method: project.speaker_payment_method || null,
 
+        // Individual payments
+        payments: projectPayments,
+        client_paid_total: clientPaidTotal,
+        speaker_paid_total: speakerPaidTotal,
+
         notes: project.notes,
         deal_id: project.deal_id,
         created_at: project.created_at
@@ -103,32 +149,45 @@ export async function GET(request: NextRequest) {
     })
 
     // Calculate aggregate summaries
+    // Use actual payment totals when available, fall back to status-based for backwards compat
+    const totalClientPaid = transformedProjects.reduce((sum, p) => sum + p.client_paid_total, 0)
+    const totalSpeakerPaid = transformedProjects.reduce((sum, p) => sum + p.speaker_paid_total, 0)
+    const hasPaymentRecords = allPayments.length > 0
+
     const summary = {
       // Total to collect from clients (deal values + travel buyouts)
       total_to_collect: transformedProjects.reduce((sum, p) => sum + p.total_to_collect, 0),
 
-      // Amount collected (where client has paid)
-      amount_collected: transformedProjects
-        .filter(p => p.payment_status === 'paid')
-        .reduce((sum, p) => sum + p.total_to_collect, 0),
+      // Amount collected - use actual payment records if available
+      amount_collected: hasPaymentRecords
+        ? totalClientPaid
+        : transformedProjects
+            .filter(p => p.payment_status === 'paid')
+            .reduce((sum, p) => sum + p.total_to_collect, 0),
 
       // Amount pending collection
-      amount_pending: transformedProjects
-        .filter(p => p.payment_status !== 'paid')
-        .reduce((sum, p) => sum + p.total_to_collect, 0),
+      amount_pending: hasPaymentRecords
+        ? transformedProjects.reduce((sum, p) => sum + p.total_to_collect, 0) - totalClientPaid
+        : transformedProjects
+            .filter(p => p.payment_status !== 'paid')
+            .reduce((sum, p) => sum + p.total_to_collect, 0),
 
       // Total speaker payouts (speaker fees + travel buyouts)
       total_speaker_payouts: transformedProjects.reduce((sum, p) => sum + p.speaker_payout, 0),
 
       // Speaker payouts completed
-      speaker_payouts_paid: transformedProjects
-        .filter(p => p.speaker_payment_status === 'paid')
-        .reduce((sum, p) => sum + p.speaker_payout, 0),
+      speaker_payouts_paid: hasPaymentRecords
+        ? totalSpeakerPaid
+        : transformedProjects
+            .filter(p => p.speaker_payment_status === 'paid')
+            .reduce((sum, p) => sum + p.speaker_payout, 0),
 
       // Speaker payouts pending
-      speaker_payouts_pending: transformedProjects
-        .filter(p => p.speaker_payment_status !== 'paid')
-        .reduce((sum, p) => sum + p.speaker_payout, 0),
+      speaker_payouts_pending: hasPaymentRecords
+        ? transformedProjects.reduce((sum, p) => sum + p.speaker_payout, 0) - totalSpeakerPaid
+        : transformedProjects
+            .filter(p => p.speaker_payment_status !== 'paid')
+            .reduce((sum, p) => sum + p.speaker_payout, 0),
 
       // Total travel buyouts (for reference)
       total_travel_buyouts: transformedProjects.reduce((sum, p) => sum + p.travel_buyout, 0),

@@ -459,9 +459,9 @@ export default function EnhancedProjectManagementPage() {
     loadData()
   }, [router])
 
-  const loadData = async () => {
+  const loadData = async (showLoading = true) => {
     try {
-      setLoading(true)
+      if (showLoading) setLoading(true)
 
       const [projectsResponse, invoicesResponse] = await Promise.all([
         authGet("/api/projects"),
@@ -471,7 +471,7 @@ export default function EnhancedProjectManagementPage() {
       if (projectsResponse.ok) {
         const projectsData = await projectsResponse.json()
         setProjects(projectsData)
-        
+
         // Load custom tasks for all projects
         const allCustomTasks = []
         for (const project of projectsData) {
@@ -498,11 +498,11 @@ export default function EnhancedProjectManagementPage() {
           status: projectsResponse.status,
           statusText: projectsResponse.statusText
         })
-        
+
         try {
           const errorData = await projectsResponse.json()
           console.error('Error details:', errorData)
-          
+
           toast({
             title: "Error Loading Projects",
             description: errorData.error || "Failed to load projects from database",
@@ -516,7 +516,7 @@ export default function EnhancedProjectManagementPage() {
             variant: "destructive"
           })
         }
-        
+
         setProjects([])
       }
 
@@ -530,15 +530,20 @@ export default function EnhancedProjectManagementPage() {
       }
     } catch (error) {
       console.error("Error loading project data:", error)
-      toast({
-        title: "Error",
-        description: "Failed to load project data",
-        variant: "destructive"
-      })
+      if (showLoading) {
+        toast({
+          title: "Error",
+          description: "Failed to load project data",
+          variant: "destructive"
+        })
+      }
     } finally {
-      setLoading(false)
+      if (showLoading) setLoading(false)
     }
   }
+
+  // Silent background refresh - syncs data without showing loading overlay
+  const refreshData = () => loadData(false)
 
   const formatEventDate = (dateString: string | null | undefined): string => {
     if (!dateString) return 'N/A'
@@ -669,7 +674,7 @@ export default function EnhancedProjectManagementPage() {
               title: "Stage Complete! 🎉",
               description: `All tasks done. Moved to ${nextStage.label}.`
             })
-            loadData()
+            refreshData()
             return true
           }
         } catch (error) {
@@ -701,7 +706,7 @@ export default function EnhancedProjectManagementPage() {
           title: "Success",
           description: `Task ${completed ? "completed" : "unmarked"}`
         })
-        loadData()
+        refreshData()
         return true // Return true for success
       } else {
         const errorData = await response.json()
@@ -1896,7 +1901,7 @@ export default function EnhancedProjectManagementPage() {
                                                       const response = await authPut(`/api/projects/${project.id}`, { status: targetStage.id })
                                                       if (response.ok) {
                                                         toast({ title: "Success", description: `Moved to ${targetStage.label}` })
-                                                        loadData()
+                                                        refreshData()
                                                       }
                                                     } catch (error) {
                                                       toast({ title: "Error", description: "Failed to update stage", variant: "destructive" })
@@ -2141,7 +2146,7 @@ export default function EnhancedProjectManagementPage() {
                                                     if (response.ok) {
                                                       toast({ title: "Success", description: `Moved to ${nextStage.label}` })
                                                       setExpandedProjectId(null)
-                                                      loadData()
+                                                      refreshData()
                                                     }
                                                   } catch (error) {
                                                     toast({ title: "Error", description: "Failed to advance stage", variant: "destructive" })
@@ -2344,7 +2349,7 @@ export default function EnhancedProjectManagementPage() {
                                       title: "Success",
                                       description: "Project stage updated"
                                     })
-                                    loadData()
+                                    refreshData()
                                   } else {
                                     toast({
                                       title: "Error",
@@ -3068,7 +3073,7 @@ export default function EnhancedProjectManagementPage() {
                                             title: "Task Completed",
                                             description: task.taskName
                                           })
-                                          loadData() // Refresh to update task list
+                                          refreshData() // Refresh to update task list
                                         }
                                       } catch (error) {
                                         console.error('Error completing custom task:', error)
