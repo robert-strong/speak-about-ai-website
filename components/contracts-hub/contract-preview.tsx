@@ -224,9 +224,9 @@ export function ContractPreview({ contractId }: ContractPreviewProps) {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">{contract.title}</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{contract.title || `Contract ${contract.contract_number}`}</h2>
           <div className="flex items-center gap-4 mt-2">
-            <span className="text-gray-600">Contract #{contract.contract_number}</span>
+            <span className="text-gray-600">Contract #{contract.contract_number || 'N/A'}</span>
             <Badge className={`${statusConfig.color} text-white`}>
               <StatusIcon className="w-3 h-3 mr-1" />
               {statusConfig.label}
@@ -286,8 +286,8 @@ export function ContractPreview({ contractId }: ContractPreviewProps) {
                 <User className="w-4 h-4" />
                 <span className="text-sm">Client</span>
               </div>
-              <p className="font-medium">{contract.client_name}</p>
-              <p className="text-sm text-gray-500">{contract.client_email}</p>
+              <p className="font-medium">{contract.client_name || 'N/A'}</p>
+              <p className="text-sm text-gray-500">{contract.client_email || 'N/A'}</p>
             </div>
             
             <div>
@@ -307,12 +307,12 @@ export function ContractPreview({ contractId }: ContractPreviewProps) {
                 <span className="text-sm">Event Date</span>
               </div>
               <p className="font-medium">
-                {new Date(contract.event_date).toLocaleDateString('en-US', {
+                {contract.event_date ? new Date(contract.event_date).toLocaleDateString('en-US', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
-                })}
+                }) : 'TBD'}
               </p>
             </div>
             
@@ -321,7 +321,7 @@ export function ContractPreview({ contractId }: ContractPreviewProps) {
                 <DollarSign className="w-4 h-4" />
                 <span className="text-sm">Contract Value</span>
               </div>
-              <p className="font-medium">${contract.total_amount.toLocaleString()}</p>
+              <p className="font-medium">${(contract.total_amount || 0).toLocaleString()}</p>
             </div>
           </div>
         </CardContent>

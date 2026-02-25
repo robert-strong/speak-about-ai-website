@@ -84,6 +84,10 @@ export async function GET(
       ...contract,
       contract_data: contractData,
       template_id: contract.template_id || contract.template_settings?.template_id || 'standard-speaker-agreement',
+      // Ensure total_amount is set for the preview component
+      total_amount: contract.total_amount || contract.fee_amount || contract.speaker_fee || contractData?.deal_value || 0,
+      // Ensure title is set
+      title: contract.title || `Contract ${contract.contract_number}`,
       signatures: {
         client: contract.client_signature_status ? {
           signed: contract.client_signature_status === 'signed',
