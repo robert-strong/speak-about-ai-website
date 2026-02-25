@@ -42,35 +42,36 @@ export function createToken(payload: Omit<JWTPayload, 'iat' | 'exp'>, expiresInH
 
 /**
  * Verify and decode a token
+ * @param allowExpiredSeconds - If set, allow tokens that expired within this many seconds (for refresh)
  */
-export function verifyToken(token: string): JWTPayload | null {
+export function verifyToken(token: string, allowExpiredSeconds: number = 0): JWTPayload | null {
   try {
     const parts = token.split('.')
     if (parts.length !== 3) return null
-    
+
     const [header, payload, signature] = parts
-    
+
     // Verify signature using constant-time comparison to prevent timing attacks
     const expectedSignature = createHash('sha256')
       .update(`${header}.${payload}.${getJWTSecret()}`)
       .digest('base64url')
-    
+
     // Convert to buffers for constant-time comparison
     const signatureBuffer = Buffer.from(signature, 'base64url')
     const expectedBuffer = Buffer.from(expectedSignature, 'base64url')
-    
+
     // Ensure buffers are same length to prevent timing attacks
     if (signatureBuffer.length !== expectedBuffer.length) return null
-    
+
     if (!timingSafeEqual(signatureBuffer, expectedBuffer)) return null
-    
+
     // Decode payload
     const decodedPayload = JSON.parse(Buffer.from(payload, 'base64url').toString()) as JWTPayload
-    
-    // Check expiration
+
+    // Check expiration (with optional grace period for refresh)
     const now = Math.floor(Date.now() / 1000)
-    if (decodedPayload.exp < now) return null
-    
+    if (decodedPayload.exp < now - allowExpiredSeconds) return null
+
     return decodedPayload
   } catch (error) {
     return null

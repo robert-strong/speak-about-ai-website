@@ -1,18 +1,48 @@
 /**
  * Authenticated fetch utility for admin API calls
  * Automatically includes JWT token from localStorage in Authorization header
+ * Automatically refreshes expired tokens and retries on 401
  */
 
 interface AuthFetchOptions extends RequestInit {
   headers?: HeadersInit
+  _isRetry?: boolean // internal flag to prevent infinite retry loops
+}
+
+async function tryRefreshToken(): Promise<string | null> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminSessionToken') : null
+    if (!token) return null
+
+    const response = await fetch('/api/auth/refresh', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      if (data.sessionToken) {
+        localStorage.setItem('adminSessionToken', data.sessionToken)
+        return data.sessionToken
+      }
+    }
+    return null
+  } catch {
+    return null
+  }
 }
 
 export async function authFetch(url: string, options: AuthFetchOptions = {}): Promise<Response> {
+  const { _isRetry, ...fetchOptions } = options
+
   // Get token from localStorage
   const token = typeof window !== 'undefined' ? localStorage.getItem('adminSessionToken') : null
 
   // Merge headers with authorization
-  const headers = new Headers(options.headers)
+  const headers = new Headers(fetchOptions.headers)
 
   if (token) {
     headers.set('Authorization', `Bearer ${token}`)
@@ -23,10 +53,21 @@ export async function authFetch(url: string, options: AuthFetchOptions = {}): Pr
   }
 
   // Make the request with merged headers
-  return fetch(url, {
-    ...options,
+  const response = await fetch(url, {
+    ...fetchOptions,
     headers,
   })
+
+  // If we get a 401 and this isn't already a retry, try refreshing the token
+  if (response.status === 401 && !_isRetry) {
+    const newToken = await tryRefreshToken()
+    if (newToken) {
+      // Retry the original request with the new token
+      return authFetch(url, { ...options, _isRetry: true })
+    }
+  }
+
+  return response
 }
 
 /**

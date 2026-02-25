@@ -20,8 +20,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify the current token
-    const payload = verifyToken(token)
+    // Verify the current token with a 7-day grace period for expired tokens
+    // This allows users to refresh their session even if the token expired recently
+    // (e.g., after sleeping overnight or being away for a day)
+    const SEVEN_DAYS_IN_SECONDS = 7 * 24 * 60 * 60
+    const payload = verifyToken(token, SEVEN_DAYS_IN_SECONDS)
     if (!payload || payload.role !== 'admin') {
       return NextResponse.json(
         { error: 'Invalid or expired session', code: 'INVALID_TOKEN' },
