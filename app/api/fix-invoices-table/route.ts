@@ -81,6 +81,52 @@ export async function POST(request: NextRequest) {
       missingColumns.push('payment_date')
     }
 
+    // Add invoice_type column for deposit/final/standard invoices
+    if (!columnNames.includes('invoice_type')) {
+      await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS invoice_type VARCHAR(20) DEFAULT 'standard'`
+      missingColumns.push('invoice_type')
+    }
+
+    // Add description column
+    if (!columnNames.includes('description')) {
+      await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS description TEXT`
+      missingColumns.push('description')
+    }
+
+    // Add client info columns
+    if (!columnNames.includes('client_name')) {
+      await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS client_name VARCHAR(255)`
+      missingColumns.push('client_name')
+    }
+
+    if (!columnNames.includes('client_email')) {
+      await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS client_email VARCHAR(255)`
+      missingColumns.push('client_email')
+    }
+
+    if (!columnNames.includes('client_company')) {
+      await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS client_company VARCHAR(255)`
+      missingColumns.push('client_company')
+    }
+
+    // Add parent_invoice_id for linking deposit to final invoices
+    if (!columnNames.includes('parent_invoice_id')) {
+      await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS parent_invoice_id INTEGER REFERENCES invoices(id)`
+      missingColumns.push('parent_invoice_id')
+    }
+
+    // Backfill client info from projects for existing invoices
+    await sql`
+      UPDATE invoices i
+      SET
+        client_name = COALESCE(i.client_name, p.client_name),
+        client_email = COALESCE(i.client_email, p.client_email),
+        client_company = COALESCE(i.client_company, p.company)
+      FROM projects p
+      WHERE i.project_id = p.id
+        AND (i.client_name IS NULL OR i.client_email IS NULL)
+    `
+
     console.log(`Fixed invoices table. Added columns: ${missingColumns.join(', ')}`)
 
     return NextResponse.json({ 

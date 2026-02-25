@@ -40,31 +40,41 @@ export async function POST(request: NextRequest) {
     if (authError) return authError
 
     const body = await request.json()
-    
-    // Validate required fields
-    if (!body.amount) {
-      return NextResponse.json(
-        { error: "amount is required" },
-        { status: 400 }
-      )
-    }
 
-    // If project_id is provided, fetch project details
+    // If project_id is provided, fetch project details and use as defaults
     let clientName = body.client_name
     let clientEmail = body.client_email
     let company = body.company
-    
+    let amount = body.amount
+    let description = body.description
+
     if (body.project_id) {
       const [project] = await sql`
-        SELECT client_name, client_email, company 
-        FROM projects 
+        SELECT client_name, client_email, company, speaker_fee, budget, event_name, event_title, project_name
+        FROM projects
         WHERE id = ${body.project_id}
       `
       if (project) {
         clientName = clientName || project.client_name
         clientEmail = clientEmail || project.client_email
         company = company || project.company
+        // Auto-populate amount from project speaker_fee or budget if not provided
+        if (!amount) {
+          amount = parseFloat(project.speaker_fee || project.budget || '0')
+        }
+        // Auto-generate description from project
+        if (!description) {
+          description = `Speaker engagement for ${project.event_name || project.event_title || project.project_name}`
+        }
       }
+    }
+
+    // Validate required fields
+    if (!amount || amount <= 0) {
+      return NextResponse.json(
+        { error: "amount is required" },
+        { status: 400 }
+      )
     }
 
     // Validate that we have client info
@@ -83,24 +93,28 @@ export async function POST(request: NextRequest) {
       INSERT INTO invoices (
         project_id,
         invoice_number,
+        invoice_type,
         client_name,
         client_email,
-        company,
+        client_company,
         amount,
         status,
         issue_date,
         due_date,
+        description,
         notes
       ) VALUES (
         ${body.project_id || null},
         ${invoiceNumber},
+        ${body.invoice_type || 'standard'},
         ${clientName},
         ${clientEmail},
         ${company || null},
-        ${body.amount},
+        ${amount},
         ${body.status || 'draft'},
         ${new Date().toISOString().split('T')[0]},
         ${body.due_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]},
+        ${description || ''},
         ${body.notes || ''}
       )
       RETURNING *

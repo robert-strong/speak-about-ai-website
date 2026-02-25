@@ -397,7 +397,11 @@ export default function InvoicingPage() {
   const handleCreateInvoice = async () => {
     try {
       const response = await authPost("/api/invoices", {
-          project_id: parseInt(invoiceFormData.project_id)
+          project_id: parseInt(invoiceFormData.project_id),
+          amount: parseFloat(invoiceFormData.amount),
+          due_date: invoiceFormData.due_date,
+          notes: invoiceFormData.notes,
+          invoice_type: invoiceFormData.invoice_type
       })
 
       if (response.ok) {

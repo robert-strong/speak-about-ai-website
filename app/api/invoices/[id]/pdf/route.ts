@@ -9,20 +9,27 @@ function generateInvoiceHTML(invoice: any): string {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(amount)
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    if (!dateString) return 'N/A'
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric'
     })
   }
-  
+
   // Use absolute URL for logo from the actual website
   const logoUrl = 'https://www.speakabout.ai/speak-about-ai-logo.png'
+
+  // Build line item description
+  const lineItemDescription = `${invoice.speaker_name || invoice.requested_speaker_name || 'Speaker'} ${invoice.program_type || 'Talk'} for ${invoice.event_name || invoice.project_title || 'Event'}`
 
   return `
     <!DOCTYPE html>
@@ -38,8 +45,9 @@ function generateInvoiceHTML(invoice: any): string {
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
           color: #333;
-          line-height: 1.6;
+          line-height: 1.5;
           padding: 40px;
+          font-size: 14px;
         }
         .invoice-container {
           max-width: 800px;
@@ -48,287 +56,271 @@ function generateInvoiceHTML(invoice: any): string {
         .header {
           display: flex;
           justify-content: space-between;
-          align-items: start;
-          margin-bottom: 40px;
-          padding-bottom: 20px;
-          border-bottom: 2px solid #e5e7eb;
+          align-items: flex-start;
+          margin-bottom: 30px;
         }
-        .company-info h1 {
-          color: #1e40af;
-          font-size: 32px;
-          margin-bottom: 8px;
+        .logo-section img {
+          height: 60px;
         }
-        .company-info p {
-          color: #6b7280;
-          font-size: 14px;
-        }
-        .invoice-badge {
-          background: #dbeafe;
-          color: #1e40af;
-          padding: 8px 16px;
-          border-radius: 8px;
-          font-weight: bold;
-          font-size: 24px;
-        }
-        .invoice-details {
+        .invoice-title-section {
           text-align: right;
         }
-        .invoice-details h2 {
-          font-size: 20px;
-          color: #111827;
+        .invoice-title {
+          font-size: 36px;
+          font-weight: bold;
+          color: #333;
+          margin-bottom: 4px;
+        }
+        .invoice-number-header {
+          font-size: 16px;
+          color: #666;
+        }
+        .company-line {
+          margin: 20px 0;
+          font-size: 13px;
+          color: #333;
+        }
+        .info-grid {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 30px;
+        }
+        .pay-to-section, .billed-to-section {
+          font-size: 13px;
+          line-height: 1.6;
+        }
+        .pay-to-section {
+          max-width: 280px;
+        }
+        .section-label {
+          font-weight: normal;
+          color: #333;
           margin-bottom: 8px;
         }
-        .invoice-details p {
-          color: #6b7280;
-          font-size: 14px;
-          margin: 4px 0;
-        }
-        .status-badge {
-          display: inline-block;
-          padding: 4px 12px;
-          border-radius: 12px;
-          font-size: 12px;
+        .section-content strong {
           font-weight: 600;
+        }
+        .dates-section {
+          text-align: right;
+        }
+        .date-row {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 6px;
+          min-width: 200px;
+        }
+        .date-label {
+          color: #666;
+        }
+        .date-value {
+          font-weight: 500;
+          text-align: right;
+        }
+        .balance-due-row {
+          background: #f5f5f5;
+          padding: 8px 12px;
           margin-top: 8px;
+          display: flex;
+          justify-content: space-between;
         }
-        .status-draft { background: #f3f4f6; color: #6b7280; }
-        .status-sent { background: #dbeafe; color: #1e40af; }
-        .status-paid { background: #d1fae5; color: #065f46; }
-        .status-overdue { background: #fee2e2; color: #991b1b; }
-        .billing-info {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 40px;
-          margin: 40px 0;
+        .balance-due-label {
+          font-weight: 600;
         }
-        .billing-section h3 {
-          font-size: 14px;
-          color: #6b7280;
-          margin-bottom: 8px;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-        .billing-section p {
-          color: #111827;
-          margin: 4px 0;
+        .balance-due-value {
+          font-weight: 700;
+          font-size: 16px;
         }
         .invoice-table {
           width: 100%;
-          margin: 40px 0;
-        }
-        .invoice-table table {
-          width: 100%;
+          margin: 30px 0;
           border-collapse: collapse;
         }
         .invoice-table th {
-          background: #f9fafb;
+          background: #4a5568;
+          color: white;
           padding: 12px;
           text-align: left;
-          font-size: 12px;
-          color: #6b7280;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          border-bottom: 2px solid #e5e7eb;
+          font-size: 13px;
+          font-weight: 500;
+        }
+        .invoice-table th:nth-child(2),
+        .invoice-table th:nth-child(3),
+        .invoice-table th:nth-child(4) {
+          text-align: center;
+          width: 100px;
+        }
+        .invoice-table th:last-child {
+          text-align: right;
         }
         .invoice-table td {
           padding: 16px 12px;
-          border-bottom: 1px solid #f3f4f6;
+          border-bottom: 1px solid #e5e7eb;
+          vertical-align: top;
         }
-        .invoice-table .amount {
+        .invoice-table td:nth-child(2),
+        .invoice-table td:nth-child(3) {
+          text-align: center;
+        }
+        .invoice-table td:last-child {
           text-align: right;
-          font-weight: 600;
+          font-weight: 500;
         }
-        .invoice-summary {
-          margin-top: 40px;
+        .totals-section {
           display: flex;
           justify-content: flex-end;
+          margin: 20px 0;
         }
-        .summary-box {
-          width: 300px;
+        .totals-box {
+          width: 250px;
         }
-        .summary-row {
+        .totals-row {
           display: flex;
           justify-content: space-between;
           padding: 8px 0;
+          border-bottom: 1px solid #e5e7eb;
         }
-        .summary-row.total {
-          border-top: 2px solid #e5e7eb;
-          margin-top: 8px;
-          padding-top: 16px;
-          font-size: 20px;
-          font-weight: bold;
-          color: #1e40af;
+        .totals-row:last-child {
+          font-weight: 600;
+          font-size: 16px;
+          border-bottom: none;
         }
-        .notes-section {
-          margin-top: 40px;
-          padding: 20px;
-          background: #f9fafb;
-          border-radius: 8px;
+        .notes-section, .terms-section {
+          margin-top: 30px;
         }
-        .notes-section h3 {
-          font-size: 14px;
-          color: #6b7280;
+        .notes-section h4, .terms-section h4 {
+          font-size: 13px;
+          font-weight: 500;
+          color: #333;
           margin-bottom: 8px;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
         }
-        .notes-section p {
-          color: #4b5563;
-        }
-        .footer {
-          margin-top: 60px;
-          padding-top: 20px;
-          border-top: 1px solid #e5e7eb;
-          text-align: center;
-          color: #9ca3af;
-          font-size: 12px;
+        .notes-section p, .terms-section p {
+          font-size: 13px;
+          color: #555;
+          line-height: 1.6;
         }
         @media print {
-          body { padding: 0; }
+          body { padding: 20px; }
           .invoice-container { max-width: 100%; }
         }
       </style>
     </head>
     <body>
       <div class="invoice-container">
+        <!-- Header with Logo and Invoice Title -->
         <div class="header">
-          <div class="company-info">
-            <img src="${logoUrl}" alt="Speak About AI" style="height: 50px; margin-bottom: 12px;" />
-            <p>AI Keynote Speaker Bureau</p>
-            <p>human@speakabout.ai</p>
+          <div class="logo-section">
+            <img src="${logoUrl}" alt="Speak About AI" />
           </div>
-          <div class="invoice-details">
-            <div class="invoice-badge">INVOICE</div>
-            <h2>${invoice.invoice_number}</h2>
-            <p>Issue Date: ${formatDate(invoice.issue_date)}</p>
-            <p>Due Date: ${formatDate(invoice.due_date)}</p>
-            ${invoice.payment_date ? `<p>Paid: ${formatDate(invoice.payment_date)}</p>` : ''}
-            <div class="status-badge status-${invoice.status}">
-              ${invoice.status.toUpperCase()}
+          <div class="invoice-title-section">
+            <div class="invoice-title">INVOICE</div>
+            <div class="invoice-number-header"># ${invoice.invoice_number.replace('INV-', '')}</div>
+          </div>
+        </div>
+
+        <!-- Company Line -->
+        <div class="company-line">
+          <strong>Speak About AI</strong> (A Division of Strong Entertainment, LLC)
+        </div>
+
+        <!-- Info Grid: Pay To, Billed To, and Dates -->
+        <div class="info-grid">
+          <div class="pay-to-section">
+            <div class="section-label">Pay To:</div>
+            <div class="section-content">
+              ${invoice.banking_info?.account_name ? `<strong>Name:</strong> Robert Strong<br>` : ''}
+              <strong>Business:</strong> Strong Entertainment, LLC<br>
+              <strong>Address:</strong> 651 Homer Ave, Palo Alto, CA 94301<br>
+              ${invoice.banking_info?.account_number ? `<strong>Account Number:</strong> ${invoice.banking_info.account_number}<br>` : ''}
+              ${invoice.banking_info?.routing_number ? `<strong>Routing Number:</strong> ${invoice.banking_info.routing_number}<br>` : ''}
+              <strong>Email:</strong> human@speakabout.ai<br>
+              <strong>Phone:</strong> (1) 415-665-2442<br>
+              <strong>EIN:</strong> 84-4432163
+            </div>
+          </div>
+
+          <div class="billed-to-section">
+            <div class="section-label">Billed To:</div>
+            <div class="section-content">
+              <strong>Name:</strong> ${invoice.client_name || 'N/A'}<br>
+              <strong>Business:</strong> ${invoice.company || invoice.client_company || 'N/A'}
+            </div>
+          </div>
+
+          <div class="dates-section">
+            <div class="date-row">
+              <span class="date-label">Date:</span>
+              <span class="date-value">${formatDate(invoice.issue_date)}</span>
+            </div>
+            <div class="date-row">
+              <span class="date-label">Due Date:</span>
+              <span class="date-value">${formatDate(invoice.due_date)}</span>
+            </div>
+            <div class="date-row">
+              <span class="date-label">PO Number:</span>
+              <span class="date-value">#${invoice.invoice_number.replace('INV-', '')}</span>
+            </div>
+            <div class="balance-due-row">
+              <span class="balance-due-label">Balance Due:</span>
+              <span class="balance-due-value">${formatCurrency(parseFloat(invoice.amount))}</span>
             </div>
           </div>
         </div>
 
-        <div class="billing-info">
-          <div class="billing-section">
-            <h3>Bill To</h3>
-            <p><strong>${invoice.client_name}</strong></p>
-            ${invoice.company ? `<p>${invoice.company}</p>` : ''}
-            <p>${invoice.client_email}</p>
-          </div>
-          <div class="billing-section">
-            <h3>Project Details</h3>
-            ${invoice.project_title ? `<p><strong>${invoice.project_title}</strong></p>` : ''}
-            ${invoice.event_date ? `<p>Event Date: ${formatDate(invoice.event_date)}</p>` : ''}
-            ${invoice.event_location ? `<p>Location: ${invoice.event_location}</p>` : ''}
-          </div>
-        </div>
+        <!-- Line Items Table -->
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Fee</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${lineItemDescription}</td>
+              <td>1</td>
+              <td>${formatCurrency(parseFloat(invoice.amount))}</td>
+              <td>${formatCurrency(parseFloat(invoice.amount))}</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="invoice-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th style="text-align: right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <strong>${invoice.speaker_name || invoice.requested_speaker_name || 'Professional Speaker'} - Keynote Presentation</strong><br>
-                  <div style="margin-top: 8px; line-height: 1.6;">
-                    <strong>Event:</strong> ${invoice.event_name || invoice.project_title}<br>
-                    <strong>Topic:</strong> ${invoice.program_topic || 'AI and Innovation'}<br>
-                    <strong>Format:</strong> ${invoice.program_type || 'Keynote Presentation'}<br>
-                    <strong>Duration:</strong> ${invoice.program_length || 60} minutes${invoice.qa_length ? ` (includes ${invoice.qa_length} min Q&A)` : ''}<br>
-                    <strong>Audience:</strong> ${invoice.audience_size || 'TBD'} attendees<br>
-                    <br>
-                    <strong>Deliverables:</strong><br>
-                    ${invoice.deliverables ? 
-                      invoice.deliverables
-                        .split('\n')
-                        .filter(item => item.trim())
-                        .map(item => {
-                          // Clean up the item - remove existing bullet points and trim
-                          const cleanItem = item.replace(/^[•\-\*]\s*/, '').trim()
-                          return cleanItem ? `• ${cleanItem}<br>` : ''
-                        })
-                        .join('') :
-                      `• Pre-event consultation and content customization<br>
-                       • ${invoice.program_length || 60}-minute ${invoice.program_type || 'keynote presentation'}<br>
-                       ${invoice.qa_length ? `• ${invoice.qa_length}-minute Q&A session<br>` : ''}
-                       ${invoice.tech_rehearsal_date ? '• Technical rehearsal and sound check<br>' : ''}
-                       ${invoice.recording_allowed ? '• Permission for event recording<br>' : ''}
-                       • Professional presentation delivery<br>
-                       • Post-event follow-up (as requested)<br>`
-                    }
-                  </div>
-                </td>
-                <td class="amount" style="vertical-align: top; padding-top: 24px;">${formatCurrency(parseFloat(invoice.amount))}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="invoice-summary">
-          <div class="summary-box">
-            <div class="summary-row">
-              <span>Subtotal</span>
+        <!-- Totals -->
+        <div class="totals-section">
+          <div class="totals-box">
+            <div class="totals-row">
+              <span>Subtotal:</span>
               <span>${formatCurrency(parseFloat(invoice.amount))}</span>
             </div>
-            <div class="summary-row total">
-              <span>Total Due</span>
+            <div class="totals-row">
+              <span>Tax (0%):</span>
+              <span>$0.00</span>
+            </div>
+            <div class="totals-row">
+              <span>Total:</span>
               <span>${formatCurrency(parseFloat(invoice.amount))}</span>
             </div>
           </div>
         </div>
 
-        ${invoice.notes ? `
+        <!-- Notes -->
+        ${(invoice.notes || invoice.description || invoice.deliverables) ? `
         <div class="notes-section">
-          <h3>Notes</h3>
-          <p>${invoice.notes}</p>
+          <h4>Notes:</h4>
+          <p>${invoice.notes || invoice.description || `Payment for ${invoice.program_length || 60}-minute ${invoice.program_type || 'talk'} by ${invoice.speaker_name || 'speaker'} on the topic of ${invoice.program_topic || 'AI'}${invoice.event_date ? ` for event on ${formatDate(invoice.event_date)}` : ''}.`}</p>
         </div>
-        ` : ''}
+        ` : `
+        <div class="notes-section">
+          <h4>Notes:</h4>
+          <p>Payment for ${invoice.program_length || 60}-minute ${invoice.program_type || 'talk'} by ${invoice.speaker_name || invoice.requested_speaker_name || 'speaker'} on the topic of ${invoice.program_topic || 'AI'}${invoice.event_date ? ` for event on ${formatDate(invoice.event_date)}` : ''}.</p>
+        </div>
+        `}
 
-        <div class="footer" style="margin-top: 40px;">
-          ${(invoice.banking_info && (invoice.banking_info.account_name || invoice.banking_info.bank_name || invoice.banking_info.account_number)) ? `
-          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <h3 style="font-size: 14px; color: #6b7280; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Payment Information</h3>
-            <div style="color: #111827; line-height: 1.8;">
-              ${invoice.banking_info.account_name ? `
-              <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb;">
-                <strong style="color: #4b5563;">Beneficiary Information</strong><br>
-                <strong>Entity Name:</strong> ${invoice.banking_info.account_name}<br>
-                ${invoice.banking_info.entity_address ? `<strong>Entity Address:</strong> ${invoice.banking_info.entity_address}<br>` : ''}
-              </div>` : ''}
-              
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #4b5563;">Banking Details</strong><br>
-                ${invoice.banking_info.bank_name ? `<strong>Bank Name:</strong> ${invoice.banking_info.bank_name}<br>` : ''}
-                ${invoice.banking_info.bank_address ? `<strong>Bank Address:</strong> ${invoice.banking_info.bank_address}<br>` : ''}
-                ${invoice.banking_info.account_number ? `<strong>Account Number:</strong> ${invoice.banking_info.account_number}<br>` : ''}
-                ${invoice.banking_info.routing_number ? `<strong>Routing Number (ABA):</strong> ${invoice.banking_info.routing_number}<br>` : ''}
-                ${invoice.banking_info.swift_code ? `<strong>SWIFT/BIC Code:</strong> ${invoice.banking_info.swift_code}<br>` : ''}
-                ${invoice.banking_info.currency_type ? `<strong>Currency:</strong> ${invoice.banking_info.currency_type}<br>` : ''}
-              </div>
-              
-              ${invoice.banking_info.wire_instructions || invoice.banking_info.ach_instructions ? `
-              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
-                <strong style="color: #4b5563;">Transfer Instructions</strong><br>
-                ${invoice.banking_info.wire_instructions ? `<strong>Wire:</strong> ${invoice.banking_info.wire_instructions}<br>` : ''}
-                ${invoice.banking_info.ach_instructions ? `<strong>ACH:</strong> ${invoice.banking_info.ach_instructions}` : ''}
-              </div>` : ''}
-            </div>
-          </div>
-          ` : `
-          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <h3 style="font-size: 14px; color: #6b7280; margin-bottom: 12px;">Payment Information</h3>
-            <p style="color: #6b7280;">Banking details not configured. Please contact us for payment information.</p>
-          </div>
-          `}
-          <p>Thank you for your business!</p>
-          <p>Payment terms: ${invoice.payment_terms || (invoice.invoice_type === 'deposit' ? 'Net 30 days from issue date' : 'Due on event date')}</p>
-          <p>Please reference invoice number ${invoice.invoice_number} with your payment</p>
+        <!-- Terms -->
+        <div class="terms-section">
+          <h4>Terms:</h4>
+          <p>Please pay using ACH by ${formatDate(invoice.due_date)}.</p>
         </div>
       </div>
     </body>

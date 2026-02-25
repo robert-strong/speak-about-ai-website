@@ -357,16 +357,19 @@ export async function addContractSignature(
     const signatures = await sql`
       SELECT signer_type FROM contract_signatures WHERE contract_id = ${contractId}
     `
-    
+
     const hasClientSignature = signatures.some((s: any) => s.signer_type === 'client')
     const hasSpeakerSignature = signatures.some((s: any) => s.signer_type === 'speaker')
-    
+
     if (hasClientSignature && hasSpeakerSignature) {
       await updateContractStatus(contractId, 'fully_executed')
+
+      // Auto-create invoices when contract is fully executed
+      await createInvoicesFromContract(contractId)
     } else {
       await updateContractStatus(contractId, 'partially_signed')
     }
-    
+
     console.log("Successfully added contract signature")
     return signature as ContractSignature
   } catch (error) {
@@ -628,13 +631,16 @@ export async function signContract(data: {
     
     if (isFullyExecuted) {
       await sql`
-        UPDATE contracts 
-        SET 
+        UPDATE contracts
+        SET
           status = 'fully_executed',
           completed_at = NOW(),
           updated_at = NOW()
         WHERE id = ${data.contractId}
       `
+
+      // Auto-create invoices when contract is fully executed
+      await createInvoicesFromContract(data.contractId)
     } else {
       const newStatus = data.signerType === "client" ? "client_signed" : "speaker_signed"
       await sql`
@@ -656,6 +662,160 @@ export async function signContract(data: {
   }
 }
 
+
+// Auto-create invoices when contract is fully executed
+export async function createInvoicesFromContract(contractId: number): Promise<boolean> {
+  initializeDatabase()
+  if (!databaseAvailable || !sql) {
+    console.warn("createInvoicesFromContract: Database not available")
+    return false
+  }
+
+  try {
+    console.log("Creating invoices for contract:", contractId)
+
+    // Get contract details
+    const [contract] = await sql`
+      SELECT c.*, d.id as deal_id
+      FROM contracts c
+      LEFT JOIN deals d ON c.deal_id = d.id
+      WHERE c.id = ${contractId}
+    `
+
+    if (!contract) {
+      console.error("Contract not found:", contractId)
+      return false
+    }
+
+    // Find the associated project via deal_id
+    let project = null
+    if (contract.deal_id) {
+      const projects = await sql`
+        SELECT * FROM projects WHERE deal_id = ${contract.deal_id} LIMIT 1
+      `
+      project = projects[0]
+    }
+
+    // If no project found by deal_id, try to find by matching event details
+    if (!project && contract.event_title) {
+      const projects = await sql`
+        SELECT * FROM projects
+        WHERE (event_title = ${contract.event_title} OR event_name = ${contract.event_title})
+        AND client_email = ${contract.client_email}
+        LIMIT 1
+      `
+      project = projects[0]
+    }
+
+    // Check if invoices already exist for this project
+    if (project) {
+      const existingInvoices = await sql`
+        SELECT COUNT(*) as count FROM invoices WHERE project_id = ${project.id}
+      `
+      if (parseInt(existingInvoices[0].count) > 0) {
+        console.log("Invoices already exist for project:", project.id)
+        return true
+      }
+    }
+
+    // Calculate amounts
+    const totalAmount = parseFloat(contract.fee_amount || contract.speaker_fee || '0')
+    if (totalAmount <= 0) {
+      console.log("No amount found for contract, skipping invoice creation")
+      return false
+    }
+
+    const depositPercentage = 0.5
+    const depositAmount = totalAmount * depositPercentage
+    const finalAmount = totalAmount - depositAmount
+
+    // Generate invoice numbers
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const depositInvoiceNumber = `INV-DEP-${year}${month}${day}-${contractId}`
+    const finalInvoiceNumber = `INV-FIN-${year}${month}${day}-${contractId}`
+
+    // Create deposit invoice (due in 7 days)
+    const depositDueDate = new Date()
+    depositDueDate.setDate(depositDueDate.getDate() + 7)
+
+    await sql`
+      INSERT INTO invoices (
+        project_id,
+        invoice_number,
+        invoice_type,
+        amount,
+        status,
+        issue_date,
+        due_date,
+        description,
+        client_name,
+        client_email,
+        client_company
+      ) VALUES (
+        ${project?.id || null},
+        ${depositInvoiceNumber},
+        'deposit',
+        ${depositAmount},
+        'draft',
+        CURRENT_TIMESTAMP,
+        ${depositDueDate.toISOString()},
+        ${'Initial deposit (50% of total fee) for speaker engagement'},
+        ${contract.client_name},
+        ${contract.client_email},
+        ${contract.client_company}
+      )
+    `
+
+    // Create final payment invoice (due on event date or 30 days)
+    const eventDate = contract.event_date ? new Date(contract.event_date) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+
+    await sql`
+      INSERT INTO invoices (
+        project_id,
+        invoice_number,
+        invoice_type,
+        amount,
+        status,
+        issue_date,
+        due_date,
+        description,
+        client_name,
+        client_email,
+        client_company
+      ) VALUES (
+        ${project?.id || null},
+        ${finalInvoiceNumber},
+        'final',
+        ${finalAmount},
+        'draft',
+        CURRENT_TIMESTAMP,
+        ${eventDate.toISOString()},
+        ${'Final payment (50% of total fee) due on event date'},
+        ${contract.client_name},
+        ${contract.client_email},
+        ${contract.client_company}
+      )
+    `
+
+    // Update project status to invoicing if it exists
+    if (project) {
+      await sql`
+        UPDATE projects
+        SET status = 'invoicing', contract_signed = true, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ${project.id}
+      `
+    }
+
+    console.log("Successfully created invoices for contract:", contractId)
+    return true
+  } catch (error) {
+    console.error("Error creating invoices from contract:", error)
+    return false
+  }
+}
 
 // Test connection function
 export async function testContractsConnection(): Promise<boolean> {
