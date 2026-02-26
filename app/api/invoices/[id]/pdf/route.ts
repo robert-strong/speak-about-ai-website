@@ -234,7 +234,7 @@ function generateInvoiceHTML(invoice: any): string {
 
         <!-- Company Line -->
         <div class="company-line">
-          <strong>Speak About AI</strong> (A Division of Strong Entertainment, LLC)
+          <strong>Speak About AI</strong>${invoice.banking_info?.entity_name ? ` (A Division of ${invoice.banking_info.entity_name})` : ''}
         </div>
 
         <!-- Info Grid: Pay To, Billed To, and Dates -->
@@ -242,14 +242,15 @@ function generateInvoiceHTML(invoice: any): string {
           <div class="pay-to-section">
             <div class="section-label">Pay To:</div>
             <div class="section-content">
-              ${invoice.banking_info?.account_name ? `<strong>Name:</strong> Robert Strong<br>` : ''}
-              <strong>Business:</strong> Strong Entertainment, LLC<br>
-              <strong>Address:</strong> 651 Homer Ave, Palo Alto, CA 94301<br>
+              ${invoice.banking_info?.account_name ? `<strong>Name:</strong> ${invoice.banking_info.account_name}<br>` : ''}
+              ${invoice.banking_info?.entity_name ? `<strong>Business:</strong> ${invoice.banking_info.entity_name}<br>` : ''}
+              ${invoice.banking_info?.entity_address ? `<strong>Address:</strong> ${invoice.banking_info.entity_address}<br>` : ''}
               ${invoice.banking_info?.account_number ? `<strong>Account Number:</strong> ${invoice.banking_info.account_number}<br>` : ''}
               ${invoice.banking_info?.routing_number ? `<strong>Routing Number:</strong> ${invoice.banking_info.routing_number}<br>` : ''}
-              <strong>Email:</strong> human@speakabout.ai<br>
-              <strong>Phone:</strong> (1) 415-665-2442<br>
-              <strong>EIN:</strong> 84-4432163
+              ${invoice.banking_info?.wire_routing_number ? `<strong>Wire Routing:</strong> ${invoice.banking_info.wire_routing_number}<br>` : ''}
+              ${invoice.banking_info?.entity_email ? `<strong>Email:</strong> ${invoice.banking_info.entity_email}<br>` : ''}
+              ${invoice.banking_info?.entity_phone ? `<strong>Phone:</strong> ${invoice.banking_info.entity_phone}<br>` : ''}
+              ${invoice.banking_info?.entity_ein ? `<strong>EIN:</strong> ${invoice.banking_info.entity_ein}` : ''}
             </div>
           </div>
 
@@ -425,46 +426,39 @@ export async function GET(
     
     // Always try to set banking info from environment variables
     bankingInfo = {
-      bank_name: process.env.BANK_NAME || '',
-      account_name: process.env.ENTITY_NAME || '',
+      // Entity/Company info
+      entity_name: process.env.ENTITY_NAME || '',
+      account_name: process.env.ACCOUNT_NAME || process.env.ENTITY_NAME || '',
       entity_address: process.env.ENTITY_ADDRESS || '',
-      account_number: process.env.ACCOUNT_NUMBER || '',  // Show full account number
-      routing_number: process.env.ROUTING_NUMBER || '',  // Show full routing number
-      swift_code: process.env.SWIFT_CODE || '',
+      entity_email: process.env.ENTITY_EMAIL || '',
+      entity_phone: process.env.ENTITY_PHONE || '',
+      entity_ein: process.env.ENTITY_EIN || '',
+      // Bank account info
+      bank_name: process.env.BANK_NAME || '',
       bank_address: process.env.BANK_ADDRESS || '',
+      account_number: process.env.ACCOUNT_NUMBER || '',
+      routing_number: process.env.ROUTING_NUMBER || '',
+      wire_routing_number: process.env.WIRE_ROUTING_NUMBER || '',
+      swift_code: process.env.SWIFT_CODE || '',
       currency_type: process.env.CURRENCY_TYPE || 'USD',
-      wire_instructions: process.env.BANK_WIRE_INSTRUCTIONS || (process.env.SWIFT_CODE ? `Please use SWIFT code ${process.env.SWIFT_CODE} for international transfers` : ''),
-      ach_instructions: process.env.BANK_ACH_INSTRUCTIONS || 'For ACH transfers, use the routing and account numbers provided above'
+      wire_instructions: process.env.BANK_WIRE_INSTRUCTIONS || '',
+      ach_instructions: process.env.BANK_ACH_INSTRUCTIONS || ''
     }
     
     
     // Only try database if we don't have valid banking info yet
-    const needsDatabase = !(bankingInfo.account_name || bankingInfo.bank_name || bankingInfo.account_number)
+    const needsDatabase = !(bankingInfo.entity_name || bankingInfo.bank_name || bankingInfo.account_number)
     if (needsDatabase) {
       // No env vars found, checking database
-      // Fallback to database (using safe view with masked sensitive data)
       try {
         const bankingConfigs = await sql`
-          SELECT config_key, value FROM banking_info_safe
-          WHERE config_key IN (
-            'bank_name', 'account_name', 'account_number', 'routing_number',
-            'swift_code', 'bank_address', 'wire_instructions', 'ach_instructions',
-            'entity_name', 'entity_address'
-          )
+          SELECT config_key, config_value FROM banking_config
         `
-        
-        
+
         if (bankingConfigs.length > 0) {
-          const dbBankingInfo = {}
-          bankingConfigs.forEach(config => {
-            // Map entity_name to account_name for consistency
-            if (config.config_key === 'entity_name') {
-              dbBankingInfo['account_name'] = config.value
-            } else if (config.config_key === 'account_name' && !dbBankingInfo['account_name']) {
-              dbBankingInfo['account_name'] = config.value
-            } else {
-              dbBankingInfo[config.config_key] = config.value
-            }
+          const dbBankingInfo: any = {}
+          bankingConfigs.forEach((config: any) => {
+            dbBankingInfo[config.config_key] = config.config_value
           })
           // Use database values if env vars are not set
           bankingInfo = dbBankingInfo

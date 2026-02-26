@@ -26,12 +26,21 @@ import {
 } from "lucide-react"
 
 interface BankingConfig {
+  // Entity/Company Info
+  entity_name: string
+  entity_address: string
+  entity_email: string
+  entity_phone: string
+  entity_ein: string
+  // Bank Account Info
   bank_name: string
   account_name: string
   account_number: string
   routing_number: string
+  wire_routing_number: string
   swift_code: string
   bank_address: string
+  // Instructions
   wire_instructions: string
   ach_instructions: string
   payment_terms_deposit: string
@@ -52,12 +61,21 @@ export default function BankingSettingsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showSensitive, setShowSensitive] = useState(false)
   const [config, setConfig] = useState<BankingConfig>({
+    // Entity/Company Info
+    entity_name: '',
+    entity_address: '',
+    entity_email: '',
+    entity_phone: '',
+    entity_ein: '',
+    // Bank Account Info
     bank_name: '',
     account_name: '',
     account_number: '',
     routing_number: '',
+    wire_routing_number: '',
     swift_code: '',
     bank_address: '',
+    // Instructions
     wire_instructions: '',
     ach_instructions: '',
     payment_terms_deposit: 'Net 30 days from issue date',
@@ -171,16 +189,86 @@ export default function BankingSettingsPage() {
             </AlertDescription>
           </Alert>
 
+          {/* Company/Entity Information */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5" />
+                Company Information
+              </CardTitle>
+              <CardDescription>Your business details shown in the "Pay To" section of invoices</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="entity_name">Business/Entity Name</Label>
+                  <Input
+                    id="entity_name"
+                    value={config.entity_name}
+                    onChange={(e) => handleFieldChange('entity_name', e.target.value)}
+                    placeholder="Strong Entertainment, LLC"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="account_name">Account Holder Name</Label>
+                  <Input
+                    id="account_name"
+                    value={config.account_name}
+                    onChange={(e) => handleFieldChange('account_name', e.target.value)}
+                    placeholder="Robert Strong"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="entity_address">Business Address</Label>
+                  <Input
+                    id="entity_address"
+                    value={config.entity_address}
+                    onChange={(e) => handleFieldChange('entity_address', e.target.value)}
+                    placeholder="651 Homer Ave, Palo Alto, CA 94301"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="entity_email">Business Email</Label>
+                  <Input
+                    id="entity_email"
+                    type="email"
+                    value={config.entity_email}
+                    onChange={(e) => handleFieldChange('entity_email', e.target.value)}
+                    placeholder="human@speakabout.ai"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="entity_phone">Business Phone</Label>
+                  <Input
+                    id="entity_phone"
+                    value={config.entity_phone}
+                    onChange={(e) => handleFieldChange('entity_phone', e.target.value)}
+                    placeholder="(1) 415-665-2442"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="entity_ein">EIN/Tax ID</Label>
+                  <Input
+                    id="entity_ein"
+                    value={config.entity_ein}
+                    onChange={(e) => handleFieldChange('entity_ein', e.target.value)}
+                    placeholder="84-4432163"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Banking Information */}
           <Card className="mb-6">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5" />
+                    <CreditCard className="h-5 w-5" />
                     Bank Account Details
                   </CardTitle>
-                  <CardDescription>Information displayed on invoices</CardDescription>
+                  <CardDescription>Banking information for payments</CardDescription>
                 </div>
                 <Button
                   variant="outline"
@@ -213,12 +301,12 @@ export default function BankingSettingsPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="account_name">Account Name</Label>
+                  <Label htmlFor="bank_address">Bank Address</Label>
                   <Input
-                    id="account_name"
-                    value={config.account_name}
-                    onChange={(e) => handleFieldChange('account_name', e.target.value)}
-                    placeholder="Your Business Name LLC"
+                    id="bank_address"
+                    value={config.bank_address}
+                    onChange={(e) => handleFieldChange('bank_address', e.target.value)}
+                    placeholder="123 Bank St, New York, NY 10001"
                   />
                 </div>
                 <div>
@@ -233,13 +321,10 @@ export default function BankingSettingsPage() {
                     onChange={(e) => handleFieldChange('account_number', e.target.value)}
                     placeholder={maskedValues.account_number || "****1234"}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Will be displayed as: {config.account_number ? `****${config.account_number.slice(-4)}` : maskedValues.account_number}
-                  </p>
                 </div>
                 <div>
                   <Label htmlFor="routing_number" className="flex items-center gap-2">
-                    Routing Number
+                    ACH Routing Number
                     <Lock className="h-3 w-3 text-gray-500" />
                   </Label>
                   <Input
@@ -249,9 +334,19 @@ export default function BankingSettingsPage() {
                     onChange={(e) => handleFieldChange('routing_number', e.target.value)}
                     placeholder={maskedValues.routing_number || "****6789"}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Will be displayed as: {config.routing_number ? `****${config.routing_number.slice(-4)}` : maskedValues.routing_number}
-                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="wire_routing_number" className="flex items-center gap-2">
+                    Wire Routing Number
+                    <Lock className="h-3 w-3 text-gray-500" />
+                  </Label>
+                  <Input
+                    id="wire_routing_number"
+                    type={showSensitive ? "text" : "password"}
+                    value={config.wire_routing_number}
+                    onChange={(e) => handleFieldChange('wire_routing_number', e.target.value)}
+                    placeholder="For domestic wire transfers"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="swift_code">SWIFT/BIC Code</Label>
@@ -259,16 +354,7 @@ export default function BankingSettingsPage() {
                     id="swift_code"
                     value={config.swift_code}
                     onChange={(e) => handleFieldChange('swift_code', e.target.value)}
-                    placeholder="CHASUS33"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="bank_address">Bank Address</Label>
-                  <Input
-                    id="bank_address"
-                    value={config.bank_address}
-                    onChange={(e) => handleFieldChange('bank_address', e.target.value)}
-                    placeholder="123 Bank St, New York, NY 10001"
+                    placeholder="For international wires"
                   />
                 </div>
               </div>

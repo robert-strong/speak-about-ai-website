@@ -231,6 +231,15 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           color: "text-emerald-600",
           bgColor: "bg-emerald-50",
           permissionKey: "finances"
+        },
+        {
+          title: "Banking",
+          href: "/admin/settings/banking",
+          icon: Landmark,
+          description: "Invoice Banking Config",
+          color: "text-teal-600",
+          bgColor: "bg-teal-50",
+          permissionKey: "settings"
         }
       ]
     },
@@ -374,15 +383,6 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           description: "Email Configuration",
           color: "text-violet-600",
           bgColor: "bg-violet-50",
-          permissionKey: "settings"
-        },
-        {
-          title: "Banking",
-          href: "/admin/settings/banking",
-          icon: Landmark,
-          description: "Invoice Banking Config",
-          color: "text-emerald-600",
-          bgColor: "bg-emerald-50",
           permissionKey: "settings"
         },
         {

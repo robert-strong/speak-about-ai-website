@@ -138,7 +138,8 @@ export async function PUT(request: NextRequest) {
 
     // Update each config item
     for (const [key, value] of Object.entries(config)) {
-      const isSensitive = ['account_number', 'routing_number'].includes(key)
+      if (key === 'source') continue // Skip the source field
+      const isSensitive = ['account_number', 'routing_number', 'wire_routing_number'].includes(key)
       
       // Get old value for audit
       const [oldConfig] = await sql`
