@@ -59,10 +59,10 @@ export async function POST(request: NextRequest) {
       RETURNING id, token_id, expires_at
     `
 
-    // Generate the magic link URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000'
+    // Generate the magic link URL - always use speakabout.ai for production
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? 'https://www.speakabout.ai'
+      : (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000')
     const magicLink = `${baseUrl}/secure/bank-info/${tokenId}`
 
     // Log the action

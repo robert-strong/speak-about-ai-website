@@ -294,7 +294,7 @@ export async function getEmailNotifications(dealId: number): Promise<EmailNotifi
 
   try {
     const result = await sql`
-      SELECT * FROM email_notifications 
+      SELECT * FROM email_notifications
       WHERE deal_id = ${dealId}
       ORDER BY sent_at DESC
     `
@@ -312,5 +312,113 @@ export async function getEmailNotifications(dealId: number): Promise<EmailNotifi
   } catch (error) {
     console.error('Failed to get email notifications:', error)
     return []
+  }
+}
+
+/**
+ * Send email using configured SMTP settings from database
+ * This is the preferred method for sending emails
+ */
+export interface SendEmailOptions {
+  to: string
+  subject: string
+  html: string
+  from?: string
+  fromName?: string
+}
+
+export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
+  const { to, subject, html, from, fromName } = options
+
+  try {
+    // First try to get SMTP config from database
+    if (sql) {
+      const rows = await sql`SELECT * FROM smtp_config LIMIT 1`
+
+      if (rows.length > 0 && rows[0].username && rows[0].password) {
+        const config = rows[0]
+        const nodemailer = require('nodemailer')
+
+        const transporter = nodemailer.createTransport({
+          host: config.host || 'smtp.gmail.com',
+          port: config.port || 587,
+          secure: config.port === 465,
+          auth: {
+            user: config.username,
+            pass: config.password,
+          },
+        })
+
+        const fromAddress = from || config.from_email || config.username
+        const senderName = fromName || config.from_name || 'Speak About AI'
+
+        await transporter.sendMail({
+          from: `"${senderName}" <${fromAddress}>`,
+          to: to,
+          subject: subject,
+          html: html,
+        })
+
+        console.log(`✅ Email sent via SMTP to ${to}`)
+        return true
+      }
+    }
+
+    // Fallback to Resend if configured
+    if (process.env.RESEND_API_KEY) {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: from || 'notifications@speakabout.ai',
+          to: [to],
+          subject: subject,
+          html: html,
+        }),
+      })
+
+      if (response.ok) {
+        console.log(`✅ Email sent via Resend to ${to}`)
+        return true
+      }
+      const error = await response.text()
+      console.error('Resend API error:', error)
+      return false
+    }
+
+    // Fallback to Gmail env vars if configured
+    if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+      const nodemailer = require('nodemailer')
+
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_APP_PASSWORD,
+        },
+      })
+
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: to,
+        subject: subject,
+        html: html,
+      })
+
+      console.log(`✅ Email sent via Gmail to ${to}`)
+      return true
+    }
+
+    // No email service configured
+    console.warn('⚠️ No email service configured. Email not sent.')
+    console.log(`Would have sent to: ${to}, Subject: ${subject}`)
+    return false
+
+  } catch (error) {
+    console.error('Email sending error:', error)
+    return false
   }
 }
