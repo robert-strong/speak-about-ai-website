@@ -18,7 +18,7 @@ export async function PATCH(
 
     const invoiceId = parseInt(params.id)
     const body = await request.json()
-    const { description, notes, overrides } = body
+    const { description, notes, overrides, po_number } = body
 
     // Prepare notes with overrides
     let finalNotes = notes || ""
@@ -46,10 +46,11 @@ export async function PATCH(
 
     // Update invoice
     const [updatedInvoice] = await sql`
-      UPDATE invoices 
-      SET 
+      UPDATE invoices
+      SET
         description = ${description || null},
         notes = ${finalNotes},
+        po_number = ${po_number || null},
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${invoiceId}
       RETURNING *

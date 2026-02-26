@@ -20,7 +20,7 @@ export async function GET(
 
     // Fetch invoice with project details
     const [invoice] = await sql`
-      SELECT 
+      SELECT
         i.*,
         p.event_name,
         p.event_date,
@@ -35,7 +35,8 @@ export async function GET(
         p.client_email,
         p.company,
         p.deliverables as project_deliverables,
-        p.notes as project_notes
+        p.notes as project_notes,
+        p.purchase_order_number
       FROM invoices i
       LEFT JOIN projects p ON i.project_id = p.id
       WHERE i.id = ${invoiceId}
@@ -78,7 +79,8 @@ export async function GET(
       program_length: overrides.program_length || invoice.program_length,
       qa_length: overrides.qa_length || invoice.qa_length,
       audience_size: overrides.audience_size || invoice.audience_size,
-      deliverables: overrides.deliverables || invoice.project_deliverables
+      deliverables: overrides.deliverables || invoice.project_deliverables,
+      po_number: overrides.po_number || invoice.po_number || invoice.purchase_order_number
     }
 
     return NextResponse.json(fullInvoice)

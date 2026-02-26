@@ -1,8 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { neon } from "@neondatabase/serverless"
 import { requireAdminAuth } from "@/lib/auth-middleware"
+import * as fs from 'fs'
+import * as path from 'path'
 
 const sql = neon(process.env.DATABASE_URL!)
+
+// Embed logo as base64 for reliable PDF rendering
+function getLogoBase64(): string {
+  try {
+    const logoPath = path.join(process.cwd(), 'public', 'speak-about-ai-logo.png')
+    const logoBuffer = fs.readFileSync(logoPath)
+    return `data:image/png;base64,${logoBuffer.toString('base64')}`
+  } catch (error) {
+    console.error('Error loading logo:', error)
+    // Fallback to URL
+    return 'https://www.speakabout.ai/speak-about-ai-logo.png'
+  }
+}
 
 function generateInvoiceHTML(invoice: any): string {
 
@@ -25,8 +40,8 @@ function generateInvoiceHTML(invoice: any): string {
     })
   }
 
-  // Use absolute URL for logo from the actual website
-  const logoUrl = 'https://www.speakabout.ai/speak-about-ai-logo.png'
+  // Use base64 embedded logo for reliable PDF rendering
+  const logoUrl = getLogoBase64()
 
   // Build line item description
   const lineItemDescription = `${invoice.speaker_name || invoice.requested_speaker_name || 'Speaker'} ${invoice.program_type || 'Talk'} for ${invoice.event_name || invoice.project_title || 'Event'}`
@@ -255,10 +270,12 @@ function generateInvoiceHTML(invoice: any): string {
               <span class="date-label">Due Date:</span>
               <span class="date-value">${formatDate(invoice.due_date)}</span>
             </div>
+            ${invoice.po_number ? `
             <div class="date-row">
               <span class="date-label">PO Number:</span>
-              <span class="date-value">#${invoice.invoice_number.replace('INV-', '')}</span>
+              <span class="date-value">${invoice.po_number}</span>
             </div>
+            ` : ''}
             <div class="balance-due-row">
               <span class="balance-due-label">Balance Due:</span>
               <span class="balance-due-value">${formatCurrency(parseFloat(invoice.amount))}</span>
@@ -346,7 +363,7 @@ export async function GET(
 
     // Fetch invoice with project and speaker details
     const [invoice] = await sql`
-      SELECT 
+      SELECT
         i.*,
         p.project_name as project_title,
         p.event_date,
@@ -365,6 +382,7 @@ export async function GET(
         p.tech_rehearsal_date,
         p.deliverables,
         p.description as project_description,
+        p.purchase_order_number,
         s.name as speaker_name,
         s.title as speaker_title
       FROM invoices i
@@ -473,6 +491,7 @@ export async function GET(
       qa_length: overrides.qa_length || invoice.qa_length,
       audience_size: overrides.audience_size || invoice.audience_size,
       deliverables: overrides.deliverables || invoice.deliverables,
+      po_number: overrides.po_number || invoice.po_number || invoice.purchase_order_number,
       banking_info: bankingInfo,
       payment_terms: paymentTerms
     }

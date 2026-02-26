@@ -39,7 +39,8 @@ interface InvoiceData {
   company?: string
   description?: string
   notes?: string
-  
+  po_number?: string
+
   // Project details
   project_id?: number
   event_name?: string
@@ -142,6 +143,7 @@ export function InvoiceEditorModal({
       const response = await authPatch(`/api/invoices/${invoiceId}/update-details`, {
           description: editedData.description,
           notes: editedData.notes,
+          po_number: editedData.po_number,
           // Save overrides as JSON in notes or separate field
           overrides: {
             event_name: editedData.event_name,
@@ -151,7 +153,8 @@ export function InvoiceEditorModal({
             program_length: editedData.program_length,
             qa_length: editedData.qa_length,
             audience_size: editedData.audience_size,
-            deliverables: editedData.deliverables
+            deliverables: editedData.deliverables,
+            po_number: editedData.po_number
           }
         })
 
@@ -283,6 +286,15 @@ export function InvoiceEditorModal({
                   id="company"
                   value={editedData.company || ''}
                   onChange={(e) => handleFieldChange('company', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="po_number">PO Number</Label>
+                <Input
+                  id="po_number"
+                  value={editedData.po_number || ''}
+                  onChange={(e) => handleFieldChange('po_number', e.target.value)}
+                  placeholder="Enter client PO number"
                 />
               </div>
             </div>
