@@ -263,15 +263,28 @@ export async function getContractByToken(token: string): Promise<Contract | null
     console.warn("getContractByToken: Database not available")
     return null
   }
-  
+
   try {
-    console.log("Fetching contract by token")
-    const [contract] = await sql`
-      SELECT * FROM contracts 
-      WHERE access_token = ${token} 
-         OR client_signing_token = ${token} 
+    console.log("Fetching contract by token:", token)
+
+    // First try to find by secure token
+    let [contract] = await sql`
+      SELECT * FROM contracts
+      WHERE access_token = ${token}
+         OR client_signing_token = ${token}
          OR speaker_signing_token = ${token}
     `
+
+    // Backwards compatibility: if token is numeric, try looking up by ID
+    if (!contract && /^\d+$/.test(token)) {
+      const contractId = parseInt(token, 10)
+      console.log("Token is numeric, trying ID lookup:", contractId)
+      const [contractById] = await sql`
+        SELECT * FROM contracts WHERE id = ${contractId}
+      `
+      contract = contractById
+    }
+
     return contract as Contract || null
   } catch (error) {
     console.error("Error fetching contract by token:", error)
