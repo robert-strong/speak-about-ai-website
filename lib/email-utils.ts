@@ -36,7 +36,7 @@ export async function sendNewDealNotification(deal: Deal, formData: DealFormData
   
   for (const recipient of recipients) {
     try {
-      const sent = await sendEmail(recipient, subject, emailBody)
+      const sent = await sendEmail({ to: recipient, subject, html: emailBody })
       await logEmailNotification(deal.id, recipient, 'new_deal', subject, sent ? 'sent' : 'failed')
       if (!sent) allSent = false
     } catch (error) {
@@ -189,75 +189,6 @@ function generateNewDealEmailBody(deal: Deal, formData: DealFormData): string {
 </body>
 </html>
   `.trim()
-}
-
-/**
- * Send email using your own email service
- */
-async function sendEmail(to: string, subject: string, htmlBody: string): Promise<boolean> {
-  try {
-    // Option 1: Use a simple email service like Resend (easiest)
-    if (process.env.RESEND_API_KEY) {
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: 'notifications@speakaboutai.com', // Use your domain
-          to: [to],
-          subject: subject,
-          html: htmlBody,
-        }),
-      })
-      
-      if (response.ok) {
-        console.log(`✅ Email sent successfully to ${to}`)
-        return true
-      } else {
-        const error = await response.text()
-        console.error('Resend API error:', error)
-        return false
-      }
-    }
-    
-    // Option 2: Use Gmail SMTP (if you want to use your Gmail)
-    if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-      const nodemailer = require('nodemailer')
-      
-      const transporter = nodemailer.createTransporter({
-        service: 'gmail',
-        auth: {
-          user: process.env.GMAIL_USER,
-          pass: process.env.GMAIL_APP_PASSWORD, // Gmail App Password, not regular password
-        },
-      })
-      
-      await transporter.sendMail({
-        from: process.env.GMAIL_USER,
-        to: to,
-        subject: subject,
-        html: htmlBody,
-      })
-      
-      console.log(`✅ Email sent via Gmail to ${to}`)
-      return true
-    }
-    
-    // Fallback: Log to console
-    console.log('=== EMAIL NOTIFICATION (No email service configured) ===')
-    console.log(`To: ${to}`)
-    console.log(`Subject: ${subject}`)
-    console.log('Add RESEND_API_KEY or GMAIL_USER/GMAIL_APP_PASSWORD to .env to send real emails')
-    console.log('=== END EMAIL ===')
-    
-    return true
-    
-  } catch (error) {
-    console.error('Email sending error:', error)
-    return false
-  }
 }
 
 /**
