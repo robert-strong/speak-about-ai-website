@@ -88,6 +88,9 @@ export async function GET(
       total_amount: contract.total_amount || contract.fee_amount || contract.speaker_fee || contractData?.deal_value || 0,
       // Ensure title is set
       title: contract.title || `Contract ${contract.contract_number}`,
+      // Include signing tokens for generating signing links
+      client_signing_token: contract.client_signing_token,
+      speaker_signing_token: contract.speaker_signing_token,
       signatures: {
         client: contract.client_signature_status ? {
           signed: contract.client_signature_status === 'signed',

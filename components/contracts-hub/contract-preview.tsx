@@ -51,6 +51,8 @@ interface ContractData {
   created_at: string
   sent_at?: string
   executed_at?: string
+  client_signing_token?: string
+  speaker_signing_token?: string
   signatures?: {
     client?: {
       signed: boolean
@@ -151,12 +153,23 @@ export function ContractPreview({ contractId }: ContractPreviewProps) {
 
   const copySigningLink = async (type: 'client' | 'speaker') => {
     if (!contract) return
-    
-    const link = `${window.location.origin}/contracts/sign/${contract.id}/${type}`
+
+    // Use the signing token for the link, not the contract ID
+    const token = type === 'client' ? contract.client_signing_token : contract.speaker_signing_token
+    if (!token) {
+      toast({
+        title: "Error",
+        description: `No signing token available for ${type}. The contract may need to be regenerated.`,
+        variant: "destructive"
+      })
+      return
+    }
+
+    const link = `${window.location.origin}/contracts/sign/${token}`
     await navigator.clipboard.writeText(link)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-    
+
     toast({
       title: "Success",
       description: `${type === 'client' ? 'Client' : 'Speaker'} signing link copied to clipboard`

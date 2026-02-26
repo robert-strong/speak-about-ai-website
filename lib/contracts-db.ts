@@ -177,26 +177,23 @@ export async function createContractFromDeal(
         fee_amount, payment_terms, event_title, event_date, event_location,
         event_type, client_name, client_email, client_company,
         speaker_name, speaker_email, speaker_fee, expires_at,
-        created_by, sent_at, contract_data
+        created_by, sent_at, contract_data,
+        access_token, client_signing_token, speaker_signing_token
       ) VALUES (
-        ${deal.id}, ${contractData.contract_number}, 
+        ${deal.id}, ${contractData.contract_number},
         ${`Speaker Engagement Agreement - ${deal.event_title}`},
         'client_speaker', 'draft', ${contractContent},
         ${contractData.deal_value}, ${contractData.payment_terms},
         ${deal.event_title}, ${deal.event_date}, ${deal.event_location},
         ${deal.event_type},
         ${deal.client_name}, ${deal.client_email}, ${deal.company},
-        ${contractData.speaker_name}, ${contractData.speaker_email}, 
+        ${contractData.speaker_name}, ${contractData.speaker_email},
         ${contractData.speaker_fee}, ${expiresAt.toISOString()},
         ${createdBy}, NOW(), ${JSON.stringify({
           clientSigner: clientSigner,
-          attendeeCount: deal.attendee_count,
-          tokens: {
-            access: accessToken,
-            clientSigning: clientSigningToken,
-            speakerSigning: speakerSigningToken
-          }
-        })}::jsonb
+          attendeeCount: deal.attendee_count
+        })}::jsonb,
+        ${accessToken}, ${clientSigningToken}, ${speakerSigningToken}
       )
       RETURNING *
     `
