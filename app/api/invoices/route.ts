@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     if (projectId) {
       const [project] = await sql`
-        SELECT client_name, client_email, company, speaker_fee, budget, event_name, event_title, project_name
+        SELECT client_name, client_email, company, speaker_fee, budget, event_name, project_name
         FROM projects
         WHERE id = ${projectId}
       `
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
         }
         // Auto-generate description from project
         if (!description) {
-          description = `Speaker engagement for ${project.event_name || project.event_title || project.project_name}`
+          description = `Speaker engagement for ${project.event_name || project.project_name}`
         }
       }
     }
