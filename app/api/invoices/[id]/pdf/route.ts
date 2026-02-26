@@ -245,9 +245,6 @@ function generateInvoiceHTML(invoice: any): string {
               ${invoice.banking_info?.account_name ? `<strong>Name:</strong> ${invoice.banking_info.account_name}<br>` : ''}
               ${invoice.banking_info?.entity_name ? `<strong>Business:</strong> ${invoice.banking_info.entity_name}<br>` : ''}
               ${invoice.banking_info?.entity_address ? `<strong>Address:</strong> ${invoice.banking_info.entity_address}<br>` : ''}
-              ${invoice.banking_info?.account_number ? `<strong>Account Number:</strong> ${invoice.banking_info.account_number}<br>` : ''}
-              ${invoice.banking_info?.routing_number ? `<strong>Routing Number:</strong> ${invoice.banking_info.routing_number}<br>` : ''}
-              ${invoice.banking_info?.wire_routing_number ? `<strong>Wire Routing:</strong> ${invoice.banking_info.wire_routing_number}<br>` : ''}
               ${invoice.banking_info?.entity_email ? `<strong>Email:</strong> ${invoice.banking_info.entity_email}<br>` : ''}
               ${invoice.banking_info?.entity_phone ? `<strong>Phone:</strong> ${invoice.banking_info.entity_phone}<br>` : ''}
               ${invoice.banking_info?.entity_ein ? `<strong>EIN:</strong> ${invoice.banking_info.entity_ein}` : ''}
