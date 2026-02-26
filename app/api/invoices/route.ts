@@ -41,6 +41,9 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
 
+    // Validate project_id if provided - must be a valid number
+    const projectId = body.project_id && !isNaN(Number(body.project_id)) ? Number(body.project_id) : null
+
     // If project_id is provided, fetch project details and use as defaults
     let clientName = body.client_name
     let clientEmail = body.client_email
@@ -48,11 +51,11 @@ export async function POST(request: NextRequest) {
     let amount = body.amount
     let description = body.description
 
-    if (body.project_id) {
+    if (projectId) {
       const [project] = await sql`
         SELECT client_name, client_email, company, speaker_fee, budget, event_name, event_title, project_name
         FROM projects
-        WHERE id = ${body.project_id}
+        WHERE id = ${projectId}
       `
       if (project) {
         clientName = clientName || project.client_name
@@ -69,10 +72,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Validate required fields
-    if (!amount || amount <= 0) {
+    // Validate required fields - ensure amount is a valid positive number
+    const numericAmount = Number(amount)
+    if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
       return NextResponse.json(
-        { error: "amount is required" },
+        { error: "A valid positive amount is required" },
         { status: 400 }
       )
     }
@@ -104,13 +108,13 @@ export async function POST(request: NextRequest) {
         description,
         notes
       ) VALUES (
-        ${body.project_id || null},
+        ${projectId},
         ${invoiceNumber},
         ${body.invoice_type || 'standard'},
         ${clientName},
         ${clientEmail},
         ${company || null},
-        ${amount},
+        ${numericAmount},
         ${body.status || 'draft'},
         ${new Date().toISOString().split('T')[0]},
         ${body.due_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]},
@@ -123,10 +127,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result[0])
   } catch (error) {
     console.error("Create invoice error:", error)
+    const errorMessage = error instanceof Error ? error.message : "Unknown error"
     return NextResponse.json(
-      { 
-        error: "Failed to create invoice",
-        details: error instanceof Error ? error.message : "Unknown error"
+      {
+        error: `Failed to create invoice: ${errorMessage}`
       },
       { status: 500 }
     )

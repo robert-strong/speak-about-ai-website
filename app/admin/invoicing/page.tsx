@@ -395,13 +395,45 @@ export default function InvoicingPage() {
   }
 
   const handleCreateInvoice = async () => {
+    // Frontend validation
+    const projectIdNum = parseInt(invoiceFormData.project_id)
+    const amountNum = parseFloat(invoiceFormData.amount)
+
+    if (isNaN(projectIdNum) || projectIdNum <= 0) {
+      toast({
+        title: "Error",
+        description: "Please select a valid project",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (isNaN(amountNum) || amountNum <= 0) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid positive amount",
+        variant: "destructive"
+      })
+      return
+    }
+
+    // Check if selected project has client email
+    if (selectedProject && !selectedProject.client_email) {
+      toast({
+        title: "Error",
+        description: "The selected project is missing client email. Please update the project first.",
+        variant: "destructive"
+      })
+      return
+    }
+
     try {
       const response = await authPost("/api/invoices", {
-          project_id: parseInt(invoiceFormData.project_id),
-          amount: parseFloat(invoiceFormData.amount),
+          project_id: projectIdNum,
+          amount: amountNum,
           due_date: invoiceFormData.due_date,
           notes: invoiceFormData.notes,
-          invoice_type: invoiceFormData.invoice_type
+          invoice_type: invoiceFormData.invoice_type || 'standard'
       })
 
       if (response.ok) {
