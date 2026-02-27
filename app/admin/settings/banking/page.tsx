@@ -277,7 +277,7 @@ export default function BankingSettingsPage() {
       const response = await authPost('/api/admin/secure-bank-info/generate-link', {
         clientEmail,
         clientName,
-        expiresInHours: 1,
+        expiresInHours: 168,
         maxViews: 1
       })
 
@@ -399,7 +399,7 @@ export default function BankingSettingsPage() {
                 <AlertTitle className="text-blue-900">Zero-Knowledge Encryption</AlertTitle>
                 <AlertDescription className="text-blue-800">
                   Your bank info is encrypted with AES-256 before storage. Clients must verify via email OTP
-                  and can only view once. Links expire after 1 hour.
+                  and can only view once. Links expire after 7 days.
                 </AlertDescription>
               </Alert>
 
@@ -552,7 +552,7 @@ export default function BankingSettingsPage() {
                       )}
                     </Button>
                     <p className="text-sm text-gray-500">
-                      Link expires in 1 hour • One-time view only
+                      Link expires in 7 days • One-time view only
                     </p>
                   </div>
 

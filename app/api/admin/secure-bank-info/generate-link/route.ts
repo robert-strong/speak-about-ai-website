@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     if (authError) return authError
 
     const body = await request.json()
-    const { clientEmail, clientName, expiresInHours = 1, maxViews = 1 } = body
+    const { clientEmail, clientName, expiresInHours = 168, maxViews = 1 } = body
 
     // Validate email
     if (!clientEmail || !clientEmail.includes('@')) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     // Generate secure token
     const tokenId = generateSecureToken()
 
-    // Calculate expiration (default 1 hour)
+    // Calculate expiration (default 7 days)
     const expiresAt = new Date(Date.now() + expiresInHours * 60 * 60 * 1000)
 
     // Create the link record
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
             <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <p style="margin: 0 0 15px 0;"><strong>Important:</strong></p>
               <ul style="margin: 0; padding-left: 20px;">
-                <li>This link expires in ${expiresInHours} hour${expiresInHours > 1 ? 's' : ''}</li>
+                <li>This link expires in ${expiresInHours >= 24 ? Math.floor(expiresInHours / 24) + ' day' + (Math.floor(expiresInHours / 24) > 1 ? 's' : '') : expiresInHours + ' hour' + (expiresInHours > 1 ? 's' : '')}</li>
                 <li>Can only be viewed ${maxViews} time${maxViews > 1 ? 's' : ''}</li>
                 <li>You will need to verify with a one-time code sent to this email</li>
               </ul>
