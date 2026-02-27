@@ -153,11 +153,11 @@ Date:_________ Agent Signature:__________________________ Title:________________
       { key: 'deliverables', label: 'Speaker Deliverables', type: 'textarea', required: true, defaultValue: '- A 30-minute content alignment meeting a month or so before the event.\n- A short tech-check the day before or day of your talk.\n- A 60-minute keynote/workshop in person.' },
 
       // Payment Schedule
-      { key: 'deposit_percent', label: 'Deposit %', type: 'number', required: true, defaultValue: 20 },
-      { key: 'mid_payment_percent', label: 'Mid-Payment %', type: 'number', required: true, defaultValue: 30 },
-      { key: 'mid_payment_date', label: 'Mid-Payment Due Date', type: 'text', required: true },
+      { key: 'deposit_percent', label: 'Deposit %', type: 'number', required: true, defaultValue: 50 },
+      { key: 'mid_payment_percent', label: 'Mid-Payment %', type: 'number', required: false, defaultValue: 0 },
+      { key: 'mid_payment_date', label: 'Mid-Payment Due Date', type: 'date', required: false },
       { key: 'balance_percent', label: 'Balance %', type: 'number', required: true, defaultValue: 50 },
-      { key: 'balance_due_date', label: 'Balance Due Date', type: 'text', required: true },
+      { key: 'balance_due_date', label: 'Balance Due Date', type: 'date', required: true },
 
       // Signatures
       { key: 'client_signer_name', label: 'Client Signer Name', type: 'text', required: false },
