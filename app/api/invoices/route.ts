@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
 
     // Validate project_id if provided - must be a valid number
     const projectId = body.project_id && !isNaN(Number(body.project_id)) ? Number(body.project_id) : null
+    const contractId = body.contract_id && !isNaN(Number(body.contract_id)) ? Number(body.contract_id) : null
 
     // If project_id is provided, fetch project details and use as defaults
     let clientName = body.client_name
@@ -50,10 +51,11 @@ export async function POST(request: NextRequest) {
     let company = body.company
     let amount = body.amount
     let description = body.description
+    let dealId: number | null = null
 
     if (projectId) {
       const [project] = await sql`
-        SELECT client_name, client_email, company, speaker_fee, budget, event_name, project_name
+        SELECT client_name, client_email, company, speaker_fee, budget, event_name, project_name, deal_id
         FROM projects
         WHERE id = ${projectId}
       `
@@ -61,6 +63,7 @@ export async function POST(request: NextRequest) {
         clientName = clientName || project.client_name
         clientEmail = clientEmail || project.client_email
         company = company || project.company
+        dealId = project.deal_id || null
         // Auto-populate amount from project speaker_fee or budget if not provided
         if (!amount) {
           amount = parseFloat(project.speaker_fee || project.budget || '0')
@@ -96,6 +99,8 @@ export async function POST(request: NextRequest) {
     const result = await sql`
       INSERT INTO invoices (
         project_id,
+        contract_id,
+        deal_id,
         invoice_number,
         invoice_type,
         client_name,
@@ -109,6 +114,8 @@ export async function POST(request: NextRequest) {
         notes
       ) VALUES (
         ${projectId},
+        ${contractId},
+        ${dealId},
         ${invoiceNumber},
         ${body.invoice_type || 'standard'},
         ${clientName},

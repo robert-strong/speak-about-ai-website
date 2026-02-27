@@ -87,9 +87,21 @@ interface Project {
   event_name?: string
 }
 
+interface Contract {
+  id: number
+  contract_number: string
+  title: string
+  project_id?: number
+  deal_id?: number
+  client_name?: string
+  fee_amount?: number
+  status: string
+}
+
 interface Invoice {
   id: number
   project_id: number
+  contract_id?: number
   invoice_number: string
   invoice_type?: "deposit" | "final" | "standard"
   amount: number | string
@@ -122,6 +134,7 @@ export default function InvoicingPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [projects, setProjects] = useState<Project[]>([])
+  const [contracts, setContracts] = useState<Contract[]>([])
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedInvoiceForPDF, setSelectedInvoiceForPDF] = useState<{id: number, number: string} | null>(null)
@@ -136,6 +149,7 @@ export default function InvoicingPage() {
 
   const [invoiceFormData, setInvoiceFormData] = useState({
     project_id: "",
+    contract_id: "",
     invoice_type: "",
     amount: "",
     due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -156,14 +170,20 @@ export default function InvoicingPage() {
     try {
       setLoading(true)
 
-      const [projectsResponse, invoicesResponse] = await Promise.all([
+      const [projectsResponse, contractsResponse, invoicesResponse] = await Promise.all([
         authGet("/api/projects"),
+        authGet("/api/contracts"),
         authGet("/api/invoices")
       ])
 
       if (projectsResponse.ok) {
         const projectsData = await projectsResponse.json()
         setProjects(projectsData)
+      }
+
+      if (contractsResponse.ok) {
+        const contractsData = await contractsResponse.json()
+        setContracts(Array.isArray(contractsData) ? contractsData : contractsData.contracts || [])
       }
 
       if (invoicesResponse.ok) {
@@ -318,6 +338,13 @@ export default function InvoicingPage() {
     )
   }, [projects, projectSearch])
 
+  // Get contracts for selected project
+  const projectContracts = useMemo(() => {
+    if (!invoiceFormData.project_id) return contracts
+    const pid = parseInt(invoiceFormData.project_id)
+    return contracts.filter(c => c.project_id === pid)
+  }, [contracts, invoiceFormData.project_id])
+
   // Get selected project details for preview
   const selectedProject = useMemo(() => {
     if (!invoiceFormData.project_id) return null
@@ -428,8 +455,10 @@ export default function InvoicingPage() {
     }
 
     try {
+      const contractIdNum = invoiceFormData.contract_id ? parseInt(invoiceFormData.contract_id) : null
       const response = await authPost("/api/invoices", {
           project_id: projectIdNum,
+          contract_id: contractIdNum,
           amount: amountNum,
           due_date: invoiceFormData.due_date,
           notes: invoiceFormData.notes,
@@ -444,6 +473,7 @@ export default function InvoicingPage() {
         loadData()
         setInvoiceFormData({
           project_id: "",
+          contract_id: "",
           invoice_type: "",
           amount: "",
           due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -709,7 +739,11 @@ export default function InvoicingPage() {
                     <Select
                       value={invoiceFormData.project_id}
                       onValueChange={(value) => {
-                        setInvoiceFormData({...invoiceFormData, project_id: value})
+                        // Auto-select contract if project has exactly one
+                        const pid = parseInt(value)
+                        const matching = contracts.filter(c => c.project_id === pid)
+                        const autoContractId = matching.length === 1 ? matching[0].id.toString() : ""
+                        setInvoiceFormData({...invoiceFormData, project_id: value, contract_id: autoContractId})
                         if (invoiceFormData.invoice_type) {
                           handleInvoiceTypeChange(invoiceFormData.invoice_type, value)
                         }
@@ -727,6 +761,33 @@ export default function InvoicingPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="contract-select">Link to Contract</Label>
+                  <Select
+                    value={invoiceFormData.contract_id}
+                    onValueChange={(value) => {
+                      setInvoiceFormData({...invoiceFormData, contract_id: value})
+                      // Auto-select the project if not already set
+                      if (!invoiceFormData.project_id) {
+                        const contract = contracts.find(c => c.id.toString() === value)
+                        if (contract?.project_id) {
+                          setInvoiceFormData(prev => ({...prev, contract_id: value, project_id: contract.project_id!.toString()}))
+                        }
+                      }
+                    }}
+                  >
+                    <SelectTrigger id="contract-select">
+                      <SelectValue placeholder="Select contract (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(invoiceFormData.project_id ? projectContracts : contracts).map(contract => (
+                        <SelectItem key={contract.id} value={contract.id.toString()}>
+                          {contract.contract_number} - {contract.client_name || contract.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label htmlFor="invoice-type">Invoice Type</Label>
