@@ -58,27 +58,17 @@ export async function PATCH(
       WHERE id = ${projectId}
     `
 
-    // Check if we should auto-advance the project status
-    const shouldAdvanceStage = await checkStageCompletion(projectId, stage, stageCompletion[stage])
-    
-    if (shouldAdvanceStage) {
-      const nextStage = getNextStage(stage)
-      if (nextStage) {
-        await sql`
-          UPDATE projects 
-          SET 
-            status = ${nextStage},
-            updated_at = CURRENT_TIMESTAMP
-          WHERE id = ${projectId}
-        `
-      }
-    }
+    // Check if all tasks in this stage are now complete
+    // NOTE: Auto-advance is handled client-side via PUT /api/projects/[id]
+    // which triggers proposal auto-creation, deal sync, and Slack notifications.
+    // We only report whether advancement is needed here.
+    const allComplete = await checkStageCompletion(projectId, stage, stageCompletion[stage])
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: `Task ${completed ? "completed" : "unmarked"}`,
       stage_completion: stageCompletion,
-      advanced_to: shouldAdvanceStage ? getNextStage(stage) : null
+      all_tasks_complete: allComplete
     })
 
   } catch (error) {
@@ -110,17 +100,6 @@ async function checkStageCompletion(projectId: number, stage: string, stageData:
   return required.every(taskKey => stageData[taskKey] === true)
 }
 
-// Helper function to get the next stage in the workflow
-function getNextStage(currentStage: string): string | null {
-  const stageOrder = ["qualified", "proposal", "contracts_signed", "logistics_planning", "pre_event", "event_week", "follow_up", "completed"]
-  const currentIndex = stageOrder.indexOf(currentStage)
-  
-  if (currentIndex === -1 || currentIndex === stageOrder.length - 1) {
-    return null
-  }
-  
-  return stageOrder[currentIndex + 1]
-}
 
 export async function GET(
   request: NextRequest,

@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
     const deal = deals[0]
 
     // Generate unique proposal number
-    const countResult = await sql`SELECT COUNT(*) as count FROM proposals`
-    const count = Number(countResult[0].count) + 1
+    const countResult = await sql`SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM proposals`
+    const count = Number(countResult[0].next_id)
     const year = new Date().getFullYear()
     const proposalNumber = `PROP-${year}-${String(count).padStart(4, '0')}`
 

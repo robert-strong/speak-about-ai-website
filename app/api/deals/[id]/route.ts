@@ -159,8 +159,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             try {
               const existingProposal = await dbSql`SELECT id FROM proposals WHERE deal_id = ${deal.id}`
               if (existingProposal.length === 0) {
-                const proposalCount = await dbSql`SELECT COUNT(*) as count FROM proposals`
-                const count = Number(proposalCount[0].count) + 1
+                const proposalCount = await dbSql`SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM proposals`
+                const count = Number(proposalCount[0].next_id)
                 const year = new Date().getFullYear()
                 const proposalNumber = `PROP-${year}-${String(count).padStart(4, '0')}`
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -495,8 +495,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             try {
               const existingProposal = await dbSql`SELECT id FROM proposals WHERE deal_id = ${deal.id}`
               if (existingProposal.length === 0) {
-                const proposalCount = await dbSql`SELECT COUNT(*) as count FROM proposals`
-                const count = Number(proposalCount[0].count) + 1
+                const proposalCount = await dbSql`SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM proposals`
+                const count = Number(proposalCount[0].next_id)
                 const year = new Date().getFullYear()
                 const proposalNumber = `PROP-${year}-${String(count).padStart(4, '0')}`
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
