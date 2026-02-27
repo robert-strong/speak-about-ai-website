@@ -287,10 +287,10 @@ export async function POST(request: NextRequest) {
       // --- Create Invoice Pair ---
       if (needsInvoices && project.client_name) {
         try {
-          // Total to Collect = Deal Value + Travel Buyout
-          const dealValue = Number(project.budget) || Number(project.deal_value) || 0
+          // Total amount = speaker_fee + travel_buyout (user requirement)
+          const speakerFeeVal = Number(project.speaker_fee) || 0
           const travelBuyout = Number(project.travel_buyout) || 0
-          const effectiveTotal = dealValue + travelBuyout
+          const effectiveTotal = speakerFeeVal + travelBuyout
 
           if (effectiveTotal === 0) {
             details.push({
@@ -361,7 +361,7 @@ export async function POST(request: NextRequest) {
           details.push({
             action: 'create_invoice_pair', projectId: project.id,
             depositNumber: depositInvoiceNumber, finalNumber: finalInvoiceNumber,
-            total: effectiveTotal, deposit: depositAmount, final: finalAmount
+            total: effectiveTotal, deposit: effectiveTotal, final: effectiveTotal
           })
         } catch (err) {
           console.error(`Error creating invoices for project ${project.id}:`, err)
