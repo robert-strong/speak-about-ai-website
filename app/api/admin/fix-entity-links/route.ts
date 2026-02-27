@@ -165,3 +165,12 @@ export async function POST(request: NextRequest) {
     }, { status: 500 })
   }
 }
+
+// GET defaults to dry_run so you can preview in a browser
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url)
+  if (!url.searchParams.has('dry_run')) {
+    url.searchParams.set('dry_run', 'true')
+  }
+  return POST(new NextRequest(url, { method: 'POST' }))
+}
