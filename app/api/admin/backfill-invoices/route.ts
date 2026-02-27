@@ -9,7 +9,8 @@ export async function POST(request?: NextRequest) {
     const projects = await sql`
       SELECT p.*,
         d.client_email as deal_client_email,
-        d.deal_value
+        d.deal_value,
+        (SELECT c.id FROM contracts c WHERE c.project_id = p.id LIMIT 1) as contract_id
       FROM projects p
       LEFT JOIN deals d ON p.deal_id = d.id
       WHERE NOT EXISTS (
@@ -27,10 +28,10 @@ export async function POST(request?: NextRequest) {
 
     for (const project of projects) {
       try {
-        // Total to Collect = Deal Value (budget) + Travel Buyout
-        const dealValue = parseFloat(project.budget || project.deal_value || '0')
+        // Total amount = speaker_fee + travel_buyout
+        const speakerFee = parseFloat(project.speaker_fee || '0')
         const travelBuyout = parseFloat(project.travel_buyout || '0')
-        const totalAmount = dealValue + travelBuyout
+        const totalAmount = speakerFee + travelBuyout
         if (totalAmount === 0) {
           skipped++
           skippedProjects.push({
@@ -51,11 +52,13 @@ export async function POST(request?: NextRequest) {
 
         const [depositInvoice] = await sql`
           INSERT INTO invoices (
-            project_id, invoice_number, invoice_type, amount, status,
+            project_id, deal_id, contract_id, invoice_number, invoice_type, amount, status,
             issue_date, due_date, description,
             client_name, client_email, client_company
           ) VALUES (
             ${project.id},
+            ${project.deal_id || null},
+            ${project.contract_id || null},
             ${depositInvoiceNumber},
             'deposit',
             ${totalAmount},
@@ -75,12 +78,14 @@ export async function POST(request?: NextRequest) {
 
         await sql`
           INSERT INTO invoices (
-            project_id, invoice_number, invoice_type, amount, status,
+            project_id, deal_id, contract_id, invoice_number, invoice_type, amount, status,
             issue_date, due_date, description,
             client_name, client_email, client_company,
             parent_invoice_id
           ) VALUES (
             ${project.id},
+            ${project.deal_id || null},
+            ${project.contract_id || null},
             ${finalInvoiceNumber},
             'final',
             ${totalAmount},

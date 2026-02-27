@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
       fkReconciliation: {
         dealsLinkedToProjects: 0,
         contractsLinkedToProjects: 0,
-        invoicesLinkedToDeals: 0
+        invoicesLinkedToDeals: 0,
+        invoicesLinkedToContracts: 0
       },
       entitiesCreated: {
         proposals: 0,
@@ -110,6 +111,25 @@ export async function POST(request: NextRequest) {
       }
     } catch (err) {
       console.error('Error linking invoices to deals:', err)
+      summary.errors++
+    }
+
+    // Step 1.4 — Set contract_id on orphaned invoices
+    try {
+      const invoiceContractResult = await sql`
+        UPDATE invoices i SET contract_id = c.id, updated_at = NOW()
+        FROM contracts c
+        WHERE i.project_id = c.project_id
+        AND c.project_id IS NOT NULL
+        AND i.contract_id IS NULL
+        RETURNING i.id as invoice_id, c.id as contract_id
+      `
+      summary.fkReconciliation.invoicesLinkedToContracts = invoiceContractResult.length
+      for (const row of invoiceContractResult) {
+        details.push({ action: 'link_invoice_to_contract', invoiceId: row.invoice_id, contractId: row.contract_id })
+      }
+    } catch (err) {
+      console.error('Error linking invoices to contracts:', err)
       summary.errors++
     }
 
@@ -228,6 +248,7 @@ export async function POST(request: NextRequest) {
       }
 
       // --- Create Contract ---
+      let contractId: number | null = null
       if (needsContract && project.client_name) {
         try {
           const contractDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
@@ -242,7 +263,7 @@ export async function POST(request: NextRequest) {
           const speakerFee = Number(project.speaker_fee) || dealValue
           const eventTitle = project.event_name || project.deal_event_title || project.project_name
 
-          await sql`
+          const [newContract] = await sql`
             INSERT INTO contracts (
               deal_id, project_id, contract_number, title, type, status,
               fee_amount, payment_terms,
@@ -271,7 +292,9 @@ export async function POST(request: NextRequest) {
               ${expiresAt},
               ${'system-connect-entities'}
             )
+            RETURNING id
           `
+          contractId = newContract.id
 
           summary.entitiesCreated.contracts++
           details.push({
@@ -300,6 +323,14 @@ export async function POST(request: NextRequest) {
             continue
           }
 
+          // Look up existing contract if we didn't just create one
+          if (!contractId && project.has_contract) {
+            const existing = await sql`
+              SELECT id FROM contracts WHERE project_id = ${project.id} LIMIT 1
+            `
+            if (existing.length > 0) contractId = existing[0].id
+          }
+
           const clientEmail = project.client_email || project.deal_client_email ||
             `${project.client_name.toLowerCase().replace(/\s+/g, '.')}@pending.info`
 
@@ -314,12 +345,13 @@ export async function POST(request: NextRequest) {
           // Each invoice shows the full Total to Collect amount
           const [depositInvoice] = await sql`
             INSERT INTO invoices (
-              project_id, deal_id, invoice_number, invoice_type, amount, status,
+              project_id, deal_id, contract_id, invoice_number, invoice_type, amount, status,
               issue_date, due_date, description,
               client_name, client_email, client_company
             ) VALUES (
               ${project.id},
               ${project.deal_id || null},
+              ${contractId || null},
               ${depositInvoiceNumber},
               'deposit',
               ${effectiveTotal},
@@ -336,13 +368,14 @@ export async function POST(request: NextRequest) {
 
           await sql`
             INSERT INTO invoices (
-              project_id, deal_id, invoice_number, invoice_type, amount, status,
+              project_id, deal_id, contract_id, invoice_number, invoice_type, amount, status,
               issue_date, due_date, description,
               client_name, client_email, client_company,
               parent_invoice_id
             ) VALUES (
               ${project.id},
               ${project.deal_id || null},
+              ${contractId || null},
               ${finalInvoiceNumber},
               'final',
               ${effectiveTotal},
