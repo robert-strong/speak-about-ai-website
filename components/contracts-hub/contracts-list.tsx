@@ -109,7 +109,7 @@ export function ContractsList({ onSelectContract, onRefresh }: ContractsListProp
                                contract.status === 'partially_signed' ? 1 : 0,
           signatures_total: contract.speaker_name ? 2 : 1,
           client_company: contract.client_company || contract.client_name,
-          total_amount: contract.deal_value || contract.fee_amount || 0,
+          total_amount: contract.fee_amount || contract.deal_value || 0,
           created_date: contract.created_at || contract.generated_at
         }))
         setContracts(transformedData)

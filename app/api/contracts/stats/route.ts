@@ -27,7 +27,7 @@ export async function GET() {
         COUNT(CASE WHEN c.status IN ('sent', 'sent_for_signature') THEN 1 END) as sent,
         COUNT(CASE WHEN c.status = 'partially_signed' THEN 1 END) as partially_signed,
         COUNT(CASE WHEN c.status = 'fully_executed' THEN 1 END) as fully_executed,
-        COALESCE(SUM(COALESCE(d.deal_value, c.fee_amount, 0)), 0) as total_value
+        COALESCE(SUM(COALESCE(c.fee_amount, d.deal_value, 0)), 0) as total_value
       FROM contracts c
       LEFT JOIN deals d ON c.deal_id = d.id
     `
