@@ -18,6 +18,9 @@ export async function GET(request: NextRequest) {
     }
 
     let threads
+    let searchedDealId: any = null
+    let searchedClientEmail: string | null = null
+
     if (projectId) {
       // Look up the project's deal_id and client_email
       const projects = await sql`
@@ -29,6 +32,8 @@ export async function GET(request: NextRequest) {
       const project = projects[0]
       const projectDealId = project.deal_id
       const clientEmail = project.client_email
+      searchedDealId = projectDealId || null
+      searchedClientEmail = clientEmail || null
 
       if (!projectDealId && !clientEmail) {
         // No deal or email to match on
@@ -119,7 +124,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       threads,
-      count: threads.length
+      count: threads.length,
+      ...(projectId ? { searchedDealId, searchedClientEmail } : {})
     })
   } catch (error) {
     console.error('Error fetching email threads:', error)

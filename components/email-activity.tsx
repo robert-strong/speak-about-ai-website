@@ -34,6 +34,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [syncMessage, setSyncMessage] = useState("")
+  const [searchInfo, setSearchInfo] = useState<{ dealId?: number; clientEmail?: string }>({})
   const [expandedEmails, setExpandedEmails] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -55,6 +56,9 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
 
       if (data.success) {
         setThreads(data.threads || [])
+        if (data.searchedDealId !== undefined || data.searchedClientEmail !== undefined) {
+          setSearchInfo({ dealId: data.searchedDealId, clientEmail: data.searchedClientEmail })
+        }
       }
     } catch (error) {
       console.error('Error loading email threads:', error)
@@ -134,7 +138,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
     <Button
       variant="outline"
       size="sm"
-      onClick={handleSync}
+      onClick={() => handleSync()}
       disabled={syncing}
       className="ml-auto"
     >
@@ -178,7 +182,19 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
           {syncMessage && (
             <p className="text-sm text-blue-600 mb-2">{syncMessage}</p>
           )}
-          <p className="text-sm text-gray-500 mb-3">No email activity yet. Click "Sync Emails" to pull new emails, or "Full Sync" to pull the last 90 days.</p>
+          <p className="text-sm text-gray-500 mb-2">No email activity yet. Click "Sync Emails" to pull new emails, or "Full Sync" to pull the last 90 days.</p>
+          {(searchInfo.clientEmail || searchInfo.dealId) && (
+            <p className="text-xs text-gray-400 mb-3">
+              Searching for: {searchInfo.clientEmail && <span className="font-mono">{searchInfo.clientEmail}</span>}
+              {searchInfo.clientEmail && searchInfo.dealId && ' / '}
+              {searchInfo.dealId && <span>Deal #{searchInfo.dealId}</span>}
+            </p>
+          )}
+          {!searchInfo.clientEmail && !searchInfo.dealId && projectId && (
+            <p className="text-xs text-amber-600 mb-3">
+              This project has no client email or linked deal — add a client email in Basic Info to match emails.
+            </p>
+          )}
           <Button
             variant="outline"
             size="sm"
