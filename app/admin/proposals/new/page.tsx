@@ -382,8 +382,8 @@ function NewProposalPageContent() {
       
       // Set initial speaker fee if speaker is requested
       if (deal.speaker_requested && services.length > 0) {
-        setServices(prev => prev.map((s, i) => 
-          i === 0 ? { ...s, price: deal.deal_value } : s
+        setServices(prev => prev.map((s, i) =>
+          i === 0 ? { ...s, price: Number(deal.deal_value) || 0 } : s
         ))
       }
       
@@ -424,7 +424,7 @@ function NewProposalPageContent() {
               title: requestedSpeaker.title || "",
               bio: requestedSpeaker.bio || requestedSpeaker.shortBio || "",
               topics: requestedSpeaker.topics || requestedSpeaker.primary_topics || [],
-              fee: speakerNames.length > 1 ? Math.round((deal.deal_value || 0) / speakerNames.length) : (deal.deal_value || 0),
+              fee: speakerNames.length > 1 ? Math.round((Number(deal.deal_value) || 0) / speakerNames.length) : (Number(deal.deal_value) || 0),
               availability_confirmed: false,
               fee_status: "estimated" as "confirmed" | "estimated",
               video_url: videoUrl,
@@ -438,7 +438,7 @@ function NewProposalPageContent() {
               title: "",
               bio: "",
               topics: [],
-              fee: speakerNames.length > 1 ? Math.round((deal.deal_value || 0) / speakerNames.length) : (deal.deal_value || 0),
+              fee: speakerNames.length > 1 ? Math.round((Number(deal.deal_value) || 0) / speakerNames.length) : (Number(deal.deal_value) || 0),
               availability_confirmed: false,
               fee_status: "estimated" as "confirmed" | "estimated",
               video_url: ""
@@ -543,7 +543,7 @@ function NewProposalPageContent() {
   }
 
   const calculateTotal = () => {
-    return services.reduce((sum, service) => sum + (service.included ? service.price : 0), 0)
+    return services.reduce((sum, service) => sum + (service.included ? (Number(service.price) || 0) : 0), 0)
   }
 
   // Research client/company
@@ -856,17 +856,30 @@ function NewProposalPageContent() {
 
       if (response.ok) {
         const proposal = await response.json()
-        
+
         // Update the associated deal with the selected speakers if deal_id exists
         if (formData.deal_id && proposalSpeakers.length > 0) {
           await updateDealWithSpeakers(formData.deal_id, proposalSpeakers, status)
         }
-        
-        toast({
-          title: "Success",
-          description: isEditMode ? "Proposal updated successfully" : "Proposal published successfully"
-        })
-        router.push(`/admin/proposals/${proposal.id}`)
+
+        if (status === "sent") {
+          // Navigate to proposal detail when publishing
+          toast({
+            title: "Success",
+            description: "Proposal published successfully"
+          })
+          router.push(`/admin/proposals/${proposal.id}`)
+        } else {
+          // Stay on page for draft saves
+          toast({
+            title: "Draft Saved",
+            description: "Proposal draft saved successfully"
+          })
+          // If this was a new proposal, switch to edit mode with the new ID
+          if (!isEditMode) {
+            router.replace(`/admin/proposals/new?edit=${proposal.id}`)
+          }
+        }
       } else {
         let errorMessage = `Failed to ${isEditMode ? 'update' : 'create'} proposal`
         let responseBody = null
