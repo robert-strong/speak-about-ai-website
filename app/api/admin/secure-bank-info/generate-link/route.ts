@@ -181,6 +181,79 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// PATCH - Reactivate a link with new expiration
+export async function PATCH(request: NextRequest) {
+  try {
+    const authError = requireAdminAuth(request)
+    if (authError) return authError
+
+    const body = await request.json()
+    const { linkId, expiresInHours = 168 } = body
+
+    if (!linkId) {
+      return NextResponse.json(
+        { error: "Link ID is required" },
+        { status: 400 }
+      )
+    }
+
+    const expiresAt = new Date(Date.now() + expiresInHours * 60 * 60 * 1000)
+
+    const result = await sql`
+      UPDATE bank_info_links
+      SET is_active = true,
+          expires_at = ${expiresAt.toISOString()},
+          view_count = 0,
+          viewed_at = NULL
+      WHERE id = ${linkId}
+      RETURNING id, token_id, client_email, client_name, expires_at
+    `
+
+    if (result.length === 0) {
+      return NextResponse.json(
+        { error: "Link not found" },
+        { status: 404 }
+      )
+    }
+
+    // Log the action
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'Unknown'
+    await sql`
+      INSERT INTO bank_info_audit_log (link_id, action, client_email, ip_address, user_agent, details)
+      VALUES (
+        ${linkId},
+        'link_reactivated',
+        ${result[0].client_email},
+        ${ip},
+        ${request.headers.get('user-agent') || 'Unknown'},
+        ${JSON.stringify({ expiresAt: expiresAt.toISOString(), expiresInHours })}
+      )
+    `
+
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? 'https://www.speakabout.ai'
+      : (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000')
+
+    return NextResponse.json({
+      success: true,
+      link: {
+        id: result[0].id,
+        tokenId: result[0].token_id,
+        magicLink: `${baseUrl}/secure/bank-info/${result[0].token_id}`,
+        expiresAt: result[0].expires_at,
+        clientEmail: result[0].client_email,
+        clientName: result[0].client_name
+      }
+    })
+  } catch (error) {
+    console.error("Error reactivating link:", error)
+    return NextResponse.json(
+      { error: "Failed to reactivate link" },
+      { status: 500 }
+    )
+  }
+}
+
 // DELETE - Revoke a link
 export async function DELETE(request: NextRequest) {
   try {

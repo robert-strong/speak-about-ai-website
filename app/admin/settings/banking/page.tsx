@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AdminSidebar } from "@/components/admin-sidebar"
 import { useToast } from "@/hooks/use-toast"
-import { authGet, authPost, authPut, authDelete } from "@/lib/auth-fetch"
+import { authGet, authPost, authPut, authPatch, authDelete } from "@/lib/auth-fetch"
 import {
   Shield,
   Save,
@@ -135,9 +135,12 @@ export default function BankingSettingsPage() {
   // Link generation state
   const [clientEmail, setClientEmail] = useState('')
   const [clientName, setClientName] = useState('')
+  const [expiresAmount, setExpiresAmount] = useState(7)
+  const [expiresUnit, setExpiresUnit] = useState<'hours' | 'days'>('days')
   const [generatingLink, setGeneratingLink] = useState(false)
   const [generatedLink, setGeneratedLink] = useState<string | null>(null)
   const [copiedLink, setCopiedLink] = useState(false)
+  const [reactivatingLinkId, setReactivatingLinkId] = useState<number | null>(null)
 
   // Links and audit state
   const [links, setLinks] = useState<SecureLink[]>([])
@@ -274,10 +277,11 @@ export default function BankingSettingsPage() {
 
     try {
       setGeneratingLink(true)
+      const expiresInHours = expiresUnit === 'days' ? expiresAmount * 24 : expiresAmount
       const response = await authPost('/api/admin/secure-bank-info/generate-link', {
         clientEmail,
         clientName,
-        expiresInHours: 168,
+        expiresInHours,
         maxViews: 1
       })
 
@@ -310,6 +314,29 @@ export default function BankingSettingsPage() {
       }
     } catch (error) {
       toast({ title: "Error", description: "Failed to revoke link", variant: "destructive" })
+    }
+  }
+
+  const handleReactivateLink = async (linkId: number) => {
+    try {
+      setReactivatingLinkId(linkId)
+      const expiresInHours = expiresUnit === 'days' ? expiresAmount * 24 : expiresAmount
+      const response = await authPatch('/api/admin/secure-bank-info/generate-link', {
+        linkId,
+        expiresInHours
+      })
+      if (response.ok) {
+        toast({ title: "Success", description: "Link reactivated" })
+        loadLinks()
+        loadAuditLog()
+      } else {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to reactivate')
+      }
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message || "Failed to reactivate link", variant: "destructive" })
+    } finally {
+      setReactivatingLinkId(null)
     }
   }
 
@@ -347,7 +374,8 @@ export default function BankingSettingsPage() {
       'link_accessed': 'Link Accessed',
       'otp_sent': 'OTP Sent',
       'bank_info_viewed': 'Bank Info Viewed',
-      'link_revoked': 'Link Revoked'
+      'link_revoked': 'Link Revoked',
+      'link_reactivated': 'Link Reactivated'
     }
     return labels[action] || action
   }
@@ -399,7 +427,7 @@ export default function BankingSettingsPage() {
                 <AlertTitle className="text-blue-900">Zero-Knowledge Encryption</AlertTitle>
                 <AlertDescription className="text-blue-800">
                   Your bank info is encrypted with AES-256 before storage. Clients must verify via email OTP
-                  and can only view once. Links expire after 7 days.
+                  and can only view once. Link expiration is customizable.
                 </AlertDescription>
               </Alert>
 
@@ -540,6 +568,27 @@ export default function BankingSettingsPage() {
                     </div>
                   </div>
 
+                  <div className="flex items-center gap-3">
+                    <Label className="text-sm text-gray-600 whitespace-nowrap">Expires in</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={expiresAmount}
+                      onChange={(e) => setExpiresAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-20"
+                      disabled={!secureBankExists}
+                    />
+                    <select
+                      value={expiresUnit}
+                      onChange={(e) => setExpiresUnit(e.target.value as 'hours' | 'days')}
+                      className="border rounded-md px-3 py-2 text-sm bg-white"
+                      disabled={!secureBankExists}
+                    >
+                      <option value="hours">Hours</option>
+                      <option value="days">Days</option>
+                    </select>
+                  </div>
+
                   <div className="flex items-center gap-4">
                     <Button
                       onClick={handleGenerateLink}
@@ -552,7 +601,7 @@ export default function BankingSettingsPage() {
                       )}
                     </Button>
                     <p className="text-sm text-gray-500">
-                      Link expires in 7 days • One-time view only
+                      One-time view only
                     </p>
                   </div>
 
@@ -627,15 +676,33 @@ export default function BankingSettingsPage() {
                             <TableCell className="text-sm">{formatDate(link.expires_at)}</TableCell>
                             <TableCell>{link.view_count} / {link.max_views}</TableCell>
                             <TableCell>
-                              {link.status === 'active' && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleRevokeLink(link.id)}
-                                >
-                                  <Trash2 className="h-4 w-4 text-red-500" />
-                                </Button>
-                              )}
+                              <div className="flex gap-1">
+                                {link.status === 'active' && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    title="Revoke link"
+                                    onClick={() => handleRevokeLink(link.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                  </Button>
+                                )}
+                                {(link.status === 'expired' || link.status === 'revoked' || link.status === 'viewed') && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    title="Reactivate link"
+                                    onClick={() => handleReactivateLink(link.id)}
+                                    disabled={reactivatingLinkId === link.id}
+                                  >
+                                    {reactivatingLinkId === link.id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <><RefreshCw className="h-3 w-3 mr-1" /> Reactivate</>
+                                    )}
+                                  </Button>
+                                )}
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
