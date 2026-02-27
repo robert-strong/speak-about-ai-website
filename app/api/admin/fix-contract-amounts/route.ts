@@ -15,14 +15,14 @@ export async function POST(request: NextRequest) {
     const url = new URL(request.url)
     const dryRun = url.searchParams.get('dry_run') === 'true'
 
-    // Find all contracts linked to projects
+    // Find all contracts and match to projects via project_id OR deal_id
     const contracts = await sql`
-      SELECT c.id, c.contract_number, c.fee_amount,
-             p.id as project_id, p.project_name, p.budget, p.travel_buyout,
+      SELECT c.id, c.contract_number, c.fee_amount, c.deal_id, c.project_id,
+             p.id as matched_project_id, p.project_name, p.budget, p.travel_buyout,
              d.deal_value
       FROM contracts c
-      JOIN projects p ON c.project_id = p.id
-      LEFT JOIN deals d ON p.deal_id = d.id
+      LEFT JOIN projects p ON c.project_id = p.id OR (c.deal_id = p.deal_id AND c.deal_id IS NOT NULL)
+      LEFT JOIN deals d ON COALESCE(p.deal_id, c.deal_id) = d.id
     `
 
     let updated = 0
@@ -30,6 +30,17 @@ export async function POST(request: NextRequest) {
     const details: any[] = []
 
     for (const contract of contracts) {
+      // Skip contracts with no matching project
+      if (!contract.matched_project_id) {
+        skipped++
+        details.push({
+          action: 'skip', contractId: contract.id,
+          contractNumber: contract.contract_number,
+          reason: 'No linked project found'
+        })
+        continue
+      }
+
       const dealValue = Number(contract.budget) || Number(contract.deal_value) || 0
       const travelBuyout = Number(contract.travel_buyout) || 0
       const totalToCollect = dealValue + travelBuyout
@@ -62,7 +73,7 @@ export async function POST(request: NextRequest) {
         action: 'update_amount',
         contractId: contract.id,
         contractNumber: contract.contract_number,
-        projectId: contract.project_id,
+        projectId: contract.matched_project_id,
         projectName: contract.project_name,
         oldAmount: currentAmount,
         newAmount: totalToCollect,
