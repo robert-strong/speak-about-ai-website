@@ -987,8 +987,13 @@ export default function InvoicingPage() {
                               <input
                                 type="date"
                                 className="text-sm border rounded px-2 py-1 w-[130px] bg-white"
-                                value={invoice.payment_date ? invoice.payment_date.split('T')[0] : ''}
-                                onChange={(e) => handleUpdatePaymentDate(invoice.id, e.target.value)}
+                                defaultValue={invoice.payment_date ? invoice.payment_date.split('T')[0] : ''}
+                                onBlur={(e) => {
+                                  const original = invoice.payment_date ? invoice.payment_date.split('T')[0] : ''
+                                  if (e.target.value !== original) {
+                                    handleUpdatePaymentDate(invoice.id, e.target.value)
+                                  }
+                                }}
                               />
                             </TableCell>
                             <TableCell>
