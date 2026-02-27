@@ -1537,11 +1537,11 @@ export default function ProjectEditPage() {
                         id="speaker_fee"
                         type="number"
                         step="0.01"
-                        value={formData.speaker_fee ?? ""}
+                        value={formData.speaker_fee ?? ((formData.budget || 0) - (formData.commission_amount || ((formData.budget || 0) * (formData.commission_percentage || 20) / 100))) || ""}
                         onChange={(e) => updateField("speaker_fee", parseFloat(e.target.value) || 0)}
                         placeholder="Speaker fee amount"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Auto-calculated from Deal − Commission, or enter manually</p>
+                      <p className="text-xs text-gray-500 mt-1">Deal Value − Commission, or enter manually</p>
                     </div>
                   </div>
                 </div>
@@ -1646,8 +1646,8 @@ export default function ProjectEditPage() {
                     </div>
                     <div>
                       <span className="text-gray-500">Speaker Payout</span>
-                      <p className="font-semibold text-lg text-orange-600">${((formData.speaker_fee || 0) + (formData.travel_buyout || 0)).toLocaleString()}</p>
-                      <span className="text-xs text-gray-400">Fee + Travel</span>
+                      <p className="font-semibold text-lg text-orange-600">${((formData.speaker_fee || 0) + (formData.travel_expenses_amount || 0)).toLocaleString()}</p>
+                      <span className="text-xs text-gray-400">Fee + Travel Expenses</span>
                     </div>
                     <div>
                       <span className="text-gray-500">Net Commission</span>
