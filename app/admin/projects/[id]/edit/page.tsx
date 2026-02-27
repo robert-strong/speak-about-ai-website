@@ -1536,11 +1536,12 @@ export default function ProjectEditPage() {
                       <Input
                         id="speaker_fee"
                         type="number"
-                        value={Number(formData.speaker_fee || ((formData.budget || 0) - ((formData.budget || 0) * (formData.commission_percentage || 20) / 100))).toFixed(2)}
-                        readOnly
-                        className="bg-gray-100"
+                        step="0.01"
+                        value={formData.speaker_fee ?? ""}
+                        onChange={(e) => updateField("speaker_fee", parseFloat(e.target.value) || 0)}
+                        placeholder="Speaker fee amount"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Deal − Commission</p>
+                      <p className="text-xs text-gray-500 mt-1">Auto-calculated from Deal − Commission, or enter manually</p>
                     </div>
                   </div>
                 </div>
