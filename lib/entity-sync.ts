@@ -91,14 +91,19 @@ async function resolveDealId(
 }
 
 /**
- * Find all entities linked to a given deal_id.
- * Returns a map of EntityType → id[].
+ * Find entities to sync to, scoped by the source entity.
+ *
+ * KEY RULE: Never propagate project → project. Each project is an
+ * independent engagement. Sync only flows:
+ *   project → deal, contracts/invoices for THIS project
+ *   deal → its project(s), proposals/contracts/invoices on the deal
+ *   proposal/contract/invoice → deal, the owning project
  */
 async function findLinkedEntities(
   sql: ReturnType<typeof neon>,
   dealId: number,
-  excludeEntity: EntityType,
-  excludeId: number,
+  sourceEntity: EntityType,
+  sourceId: number,
 ): Promise<Record<EntityType, number[]>> {
   const result: Record<EntityType, number[]> = {
     deal: [],
@@ -108,50 +113,63 @@ async function findLinkedEntities(
     invoice: [],
   }
 
-  // Include the deal itself (unless it's the source)
-  if (excludeEntity !== "deal") {
+  // Always include the deal (unless it IS the source)
+  if (sourceEntity !== "deal") {
     result.deal = [dealId]
   }
 
-  // Projects
-  const projects = await sql`SELECT id FROM projects WHERE deal_id = ${dealId}`
-  for (const r of projects) {
-    if (!(excludeEntity === "project" && r.id === excludeId)) {
-      result.project.push(r.id)
+  if (sourceEntity === "project") {
+    // ── Source is a project ──────────────────────────────────────────
+    // NEVER sync to other projects. Only sync to the deal and to
+    // contracts/invoices/proposals that belong to THIS project.
+    const proposals = await sql`SELECT id FROM proposals WHERE deal_id = ${dealId}`
+    for (const r of proposals) result.proposal.push(r.id)
+
+    const contracts = await sql`SELECT id FROM contracts WHERE project_id = ${sourceId}`
+    for (const r of contracts) result.contract.push(r.id)
+
+    const invoices = await sql`SELECT id FROM invoices WHERE project_id = ${sourceId}`
+    for (const r of invoices) result.invoice.push(r.id)
+
+  } else if (sourceEntity === "deal") {
+    // ── Source is a deal ─────────────────────────────────────────────
+    // Sync to the deal's project(s), proposals, contracts, invoices.
+    const projects = await sql`SELECT id FROM projects WHERE deal_id = ${dealId}`
+    for (const r of projects) result.project.push(r.id)
+
+    const proposals = await sql`SELECT id FROM proposals WHERE deal_id = ${dealId}`
+    for (const r of proposals) result.proposal.push(r.id)
+
+    const contracts = await sql`SELECT id FROM contracts WHERE deal_id = ${dealId}`
+    for (const r of contracts) result.contract.push(r.id)
+
+    const invoices = await sql`SELECT id FROM invoices WHERE deal_id = ${dealId}`
+    for (const r of invoices) result.invoice.push(r.id)
+
+  } else {
+    // ── Source is proposal/contract/invoice ───────────────────────────
+    // Sync to the deal and the owning project only (not sibling entities).
+    // Resolve the project_id for contract/invoice sources.
+    let projectId: number | null = null
+
+    if (sourceEntity === "contract") {
+      const rows = await sql`SELECT project_id FROM contracts WHERE id = ${sourceId}`
+      projectId = rows[0]?.project_id ? Number(rows[0].project_id) : null
+    } else if (sourceEntity === "invoice") {
+      const rows = await sql`SELECT project_id FROM invoices WHERE id = ${sourceId}`
+      projectId = rows[0]?.project_id ? Number(rows[0].project_id) : null
     }
-  }
 
-  // Proposals
-  const proposals = await sql`SELECT id FROM proposals WHERE deal_id = ${dealId}`
-  for (const r of proposals) {
-    if (!(excludeEntity === "proposal" && r.id === excludeId)) {
-      result.proposal.push(r.id)
+    if (projectId) {
+      result.project.push(projectId)
     }
-  }
 
-  // Contracts
-  const contracts = await sql`SELECT id FROM contracts WHERE deal_id = ${dealId}`
-  for (const r of contracts) {
-    if (!(excludeEntity === "contract" && r.id === excludeId)) {
-      result.contract.push(r.id)
-    }
-  }
-
-  // Invoices — linked via deal_id OR via project_id
-  const projectIds = projects.map((p: any) => p.id)
-  const invoiceIds = new Set<number>()
-
-  const invoicesByDeal = await sql`SELECT id FROM invoices WHERE deal_id = ${dealId}`
-  for (const r of invoicesByDeal) invoiceIds.add(r.id)
-
-  for (const pid of projectIds) {
-    const invoicesByProject = await sql`SELECT id FROM invoices WHERE project_id = ${pid}`
-    for (const r of invoicesByProject) invoiceIds.add(r.id)
-  }
-
-  for (const iid of invoiceIds) {
-    if (!(excludeEntity === "invoice" && iid === excludeId)) {
-      result.invoice.push(iid)
+    // Include proposals on the deal (excluding the source if it's a proposal)
+    const proposals = await sql`SELECT id FROM proposals WHERE deal_id = ${dealId}`
+    for (const r of proposals) {
+      if (!(sourceEntity === "proposal" && r.id === sourceId)) {
+        result.proposal.push(r.id)
+      }
     }
   }
 

@@ -49,13 +49,15 @@ export async function POST(request: NextRequest) {
 
     for (const project of orphanedProjects) {
       try {
+        // Require BOTH client_name AND company to match (strict).
+        // Generic event names like "AI Keynote Speaking Engagement" caused
+        // false matches when only OR conditions were used.
         const matchedDeals = await sql`
           SELECT id FROM deals
           WHERE client_name ILIKE ${project.client_name}
-          AND (
-            company ILIKE ${project.company || ''}
-            OR event_title ILIKE ${project.event_name || ''}
-            OR event_date = ${project.event_date || null}
+          AND company ILIKE ${project.company || '___NOMATCH___'}
+          AND NOT EXISTS (
+            SELECT 1 FROM projects p2 WHERE p2.deal_id = deals.id
           )
           LIMIT 1
         `
