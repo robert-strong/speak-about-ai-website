@@ -320,9 +320,7 @@ export default function ProjectEditPage() {
 
       if (response.ok) {
         setSuccess("Project updated successfully!")
-        setTimeout(() => {
-          router.push("/admin/projects")
-        }, 1500)
+        setTimeout(() => setSuccess(""), 3000)
       } else if (response.status === 401) {
         setError("Not authenticated. Please log in.")
       } else {
@@ -423,14 +421,19 @@ export default function ProjectEditPage() {
               })()}
             </div>
 
-            <Button onClick={handleSave} disabled={isSaving}>
-              {isSaving ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="mr-2 h-4 w-4" />
-              )}
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                {isSaving ? "Saving..." : "Save Changes"}
+              </Button>
+              <Button variant="outline" onClick={() => router.push("/admin/projects")}>
+                Close
+              </Button>
+            </div>
           </div>
         </div>
 
