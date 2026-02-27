@@ -1912,7 +1912,7 @@ export default function EnhancedProjectManagementPage() {
                                         </div>
                                         <div className="text-right min-w-[140px]">
                                           <div className="text-sm font-medium text-green-600">
-                                            ${new Intl.NumberFormat('en-US').format(parseFloat(project.budget || "0"))}
+                                            ${new Intl.NumberFormat('en-US').format(parseFloat(project.budget || "0") + parseFloat(String(project.travel_buyout || "0")))}
                                             {project.speaker_fee && parseFloat(project.speaker_fee) > 0 && (
                                               <span className="text-xs font-normal text-gray-500 ml-1">
                                                 / ${new Intl.NumberFormat('en-US').format(parseFloat(project.speaker_fee))} spkr
