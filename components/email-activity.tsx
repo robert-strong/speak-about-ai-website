@@ -74,7 +74,15 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
       })
       const data = await response.json()
       if (data.success) {
-        setSyncMessage(data.message)
+        // Build detailed message with per-account info
+        const details = (data.results || []).map((r: any) => {
+          if (r.success) {
+            const res = r.data?.results
+            return `${r.userEmail}: ${res?.stored || 0} stored, ${res?.totalMessages || 0} fetched`
+          }
+          return `${r.userEmail}: failed - ${r.error}`
+        }).join(' | ')
+        setSyncMessage(`${data.message}${details ? ` (${details})` : ''}`)
         await loadEmailThreads()
       } else {
         setSyncMessage(data.error || 'Sync failed')
@@ -83,7 +91,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
       setSyncMessage('Failed to sync emails')
     } finally {
       setSyncing(false)
-      setTimeout(() => setSyncMessage(""), 5000)
+      setTimeout(() => setSyncMessage(""), 10000)
     }
   }
 
