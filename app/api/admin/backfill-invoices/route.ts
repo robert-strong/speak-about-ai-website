@@ -102,8 +102,8 @@ export async function POST(request?: NextRequest) {
           clientName: project.client_name,
           status: project.status,
           totalAmount,
-          deposit: depositAmount,
-          final: finalAmount
+          deposit: totalAmount,
+          final: totalAmount
         })
       } catch (err) {
         console.error(`Error creating invoices for project ${project.id} (${project.project_name}):`, err)

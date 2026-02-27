@@ -8,7 +8,9 @@ import { neon } from '@neondatabase/serverless'
  * (Deal Value + Travel Buyout). Matches contracts to projects via:
  *   1. project_id FK
  *   2. shared deal_id
- *   3. client_name + event_title fuzzy match (fallback)
+ *   3. client_name + event_title exact match
+ *   4. client_name alone (only if exactly one project matches)
+ *   5. speaker_name → requested_speaker_name (only if exactly one project matches)
  *
  * Also sets project_id on the contract when a match is found.
  * GET defaults to dry_run for browser preview.
@@ -22,7 +24,7 @@ export async function POST(request: NextRequest) {
     // Get all contracts
     const contracts = await sql`
       SELECT c.id, c.contract_number, c.fee_amount, c.deal_id, c.project_id,
-             c.client_name, c.event_title
+             c.client_name, c.event_title, c.speaker_name
       FROM contracts c
       ORDER BY c.id
     `
@@ -30,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Get all projects with financial data
     const projects = await sql`
       SELECT p.id, p.project_name, p.client_name, p.company, p.event_name,
-             p.budget, p.travel_buyout, p.deal_id,
+             p.budget, p.travel_buyout, p.deal_id, p.requested_speaker_name,
              d.deal_value
       FROM projects p
       LEFT JOIN deals d ON p.deal_id = d.id
@@ -59,14 +61,14 @@ export async function POST(request: NextRequest) {
         matchedProject = projects.find((p: any) => p.deal_id === contract.deal_id)
       }
 
-      // Method 3: client_name + event_title match
+      // Method 3: client_name + event_title exact match
       if (!matchedProject && contract.client_name && contract.event_title) {
         matchedProject = projects.find((p: any) =>
           p.client_name && p.event_name &&
           p.client_name.toLowerCase() === contract.client_name.toLowerCase() &&
           p.event_name.toLowerCase() === contract.event_title.toLowerCase()
         )
-        // Try just client_name if event didn't match
+        // Try client_name + company in event_title
         if (!matchedProject) {
           matchedProject = projects.find((p: any) =>
             p.client_name &&
@@ -74,6 +76,28 @@ export async function POST(request: NextRequest) {
             p.company &&
             contract.event_title.toLowerCase().includes(p.company.toLowerCase())
           )
+        }
+      }
+
+      // Method 4: client_name alone — only if exactly one project has that client
+      if (!matchedProject && contract.client_name) {
+        const clientMatches = projects.filter((p: any) =>
+          p.client_name &&
+          p.client_name.toLowerCase() === contract.client_name.toLowerCase()
+        )
+        if (clientMatches.length === 1) {
+          matchedProject = clientMatches[0]
+        }
+      }
+
+      // Method 5: speaker_name → requested_speaker_name — only if exactly one project matches
+      if (!matchedProject && contract.speaker_name) {
+        const speakerMatches = projects.filter((p: any) =>
+          p.requested_speaker_name &&
+          p.requested_speaker_name.toLowerCase() === contract.speaker_name.toLowerCase()
+        )
+        if (speakerMatches.length === 1) {
+          matchedProject = speakerMatches[0]
         }
       }
 
