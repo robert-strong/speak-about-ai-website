@@ -5,6 +5,14 @@ const sql = neon(process.env.DATABASE_URL!)
 
 export async function POST(request: NextRequest) {
   try {
+    let fullSync = false
+    try {
+      const body = await request.json()
+      fullSync = body.fullSync === true
+    } catch {
+      // No body or invalid JSON is fine, default to incremental sync
+    }
+
     // Get all authenticated Gmail users
     const users = await sql`SELECT user_email FROM gmail_auth_tokens`
 
@@ -26,7 +34,7 @@ export async function POST(request: NextRequest) {
         const response = await fetch(`${baseUrl}/api/gmail/sync`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userEmail: user.user_email })
+          body: JSON.stringify({ userEmail: user.user_email, fullSync })
         })
 
         const data = await response.json()
@@ -44,13 +52,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const totalSynced = results
+    const totalStored = results
+      .filter(r => r.success)
+      .reduce((sum, r) => sum + (r.data?.results?.stored || 0), 0)
+    const totalMessages = results
       .filter(r => r.success)
       .reduce((sum, r) => sum + (r.data?.results?.totalMessages || 0), 0)
 
     return NextResponse.json({
       success: true,
-      message: `Synced ${totalSynced} emails from ${results.length} account(s)`,
+      message: `Synced ${totalStored} of ${totalMessages} emails from ${results.length} account(s)`,
       results
     })
   } catch (error) {

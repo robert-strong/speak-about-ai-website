@@ -63,11 +63,15 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
     }
   }
 
-  const handleSync = async () => {
+  const handleSync = async (fullSync = false) => {
     setSyncing(true)
     setSyncMessage("")
     try {
-      const response = await fetch('/api/gmail/sync-all', { method: 'POST' })
+      const response = await fetch('/api/gmail/sync-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullSync })
+      })
       const data = await response.json()
       if (data.success) {
         setSyncMessage(data.message)
@@ -166,7 +170,20 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
           {syncMessage && (
             <p className="text-sm text-blue-600 mb-2">{syncMessage}</p>
           )}
-          <p className="text-sm text-gray-500">No email activity yet. Click "Sync Emails" to pull emails from Gmail.</p>
+          <p className="text-sm text-gray-500 mb-3">No email activity yet. Click "Sync Emails" to pull new emails, or "Full Sync" to pull the last 90 days.</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleSync(true)}
+            disabled={syncing}
+          >
+            {syncing ? (
+              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-1" />
+            )}
+            {syncing ? "Syncing..." : "Full Sync (90 days)"}
+          </Button>
         </CardContent>
       </Card>
     )

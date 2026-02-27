@@ -6,7 +6,7 @@ const sql = neon(process.env.DATABASE_URL!)
 
 export async function POST(request: NextRequest) {
   try {
-    const { userEmail } = await request.json()
+    const { userEmail, fullSync } = await request.json()
 
     if (!userEmail) {
       return NextResponse.json({ error: 'userEmail is required' }, { status: 400 })
@@ -22,13 +22,18 @@ export async function POST(request: NextRequest) {
 
     await gmailClient.setCredentials(tokens.access_token, tokens.refresh_token)
 
-    // Get last sync time
-    const lastSync = await sql`
-      SELECT MAX(received_at) as last_sync FROM email_threads
-    `
-    const lastSyncDate = lastSync[0]?.last_sync
-      ? new Date(lastSync[0].last_sync)
-      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Default: last 30 days
+    // Get last sync time (skip if fullSync requested)
+    let lastSyncDate: Date
+    if (fullSync) {
+      lastSyncDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) // Last 90 days for full sync
+    } else {
+      const lastSync = await sql`
+        SELECT MAX(received_at) as last_sync FROM email_threads
+      `
+      lastSyncDate = lastSync[0]?.last_sync
+        ? new Date(lastSync[0].last_sync)
+        : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Default: last 30 days
+    }
 
     // Build query for emails after last sync
     const afterTimestamp = Math.floor(lastSyncDate.getTime() / 1000)
@@ -39,6 +44,7 @@ export async function POST(request: NextRequest) {
 
     const results = {
       totalMessages: messages.length,
+      stored: 0,
       matched: { leads: 0, deals: 0 },
       unmatched: 0,
       errors: [] as string[]
@@ -109,50 +115,51 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Store email thread (only if matched to lead or deal)
-        if (leadId || dealId) {
-          await sql`
-            INSERT INTO email_threads (
-              gmail_message_id,
-              gmail_thread_id,
-              lead_id,
-              deal_id,
-              subject,
-              from_email,
-              to_email,
-              cc_emails,
-              body_snippet,
-              body_full,
-              direction,
-              is_read,
-              received_at,
-              labels,
-              created_at,
-              updated_at
-            ) VALUES (
-              ${message.id},
-              ${message.threadId},
-              ${leadId},
-              ${dealId},
-              ${subject},
-              ${fromEmails[0] || ''},
-              ${toEmails[0] || ''},
-              ${ccEmails},
-              ${bodySnippet},
-              ${bodyFull},
-              ${direction},
-              ${!message.labelIds.includes('UNREAD')},
-              ${receivedAt},
-              ${message.labelIds},
-              NOW(),
-              NOW()
-            )
-            ON CONFLICT (gmail_message_id) DO UPDATE SET
-              is_read = EXCLUDED.is_read,
-              labels = EXCLUDED.labels,
-              updated_at = NOW()
-          `
-        }
+        // Store all email threads (matched and unmatched)
+        await sql`
+          INSERT INTO email_threads (
+            gmail_message_id,
+            gmail_thread_id,
+            lead_id,
+            deal_id,
+            subject,
+            from_email,
+            to_email,
+            cc_emails,
+            body_snippet,
+            body_full,
+            direction,
+            is_read,
+            received_at,
+            labels,
+            created_at,
+            updated_at
+          ) VALUES (
+            ${message.id},
+            ${message.threadId},
+            ${leadId},
+            ${dealId},
+            ${subject},
+            ${fromEmails[0] || ''},
+            ${toEmails[0] || ''},
+            ${ccEmails},
+            ${bodySnippet},
+            ${bodyFull},
+            ${direction},
+            ${!message.labelIds.includes('UNREAD')},
+            ${receivedAt},
+            ${message.labelIds},
+            NOW(),
+            NOW()
+          )
+          ON CONFLICT (gmail_message_id) DO UPDATE SET
+            lead_id = COALESCE(EXCLUDED.lead_id, email_threads.lead_id),
+            deal_id = COALESCE(EXCLUDED.deal_id, email_threads.deal_id),
+            is_read = EXCLUDED.is_read,
+            labels = EXCLUDED.labels,
+            updated_at = NOW()
+        `
+        results.stored++
       } catch (error) {
         console.error('Error processing message:', error)
         results.errors.push(message.id)
@@ -161,7 +168,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Synced ${results.totalMessages} emails`,
+      message: `Synced ${results.stored} emails (${results.matched.leads} leads, ${results.matched.deals} deals, ${results.unmatched} unmatched)`,
       results
     })
   } catch (error) {
