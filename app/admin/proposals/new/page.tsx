@@ -299,6 +299,9 @@ function NewProposalPageContent() {
         // Populate services
         if (proposal.services && proposal.services.length > 0) {
           setServices(proposal.services)
+        } else if (Number(proposal.total_investment) > 0) {
+          // If services are empty but total_investment exists, initialize the default service with that price
+          setServices([{ name: "Keynote Presentation", description: "60-minute keynote address", price: Number(proposal.total_investment), included: true }])
         }
         
         // Populate deliverables

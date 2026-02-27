@@ -52,6 +52,13 @@ export async function POST(request: NextRequest) {
       fee_status: 'estimated'
     }]) : '[]'
 
+    const services = JSON.stringify([{
+      name: 'Keynote Presentation',
+      description: '60-minute keynote address',
+      price: dealValue,
+      included: true
+    }])
+
     const validUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
     const result = await sql`
@@ -81,7 +88,7 @@ export async function POST(request: NextRequest) {
         ${deal.event_location || null},
         ${deal.event_type || null},
         ${deal.attendee_count || null},
-        '[]'::jsonb,
+        ${services}::jsonb,
         '[]'::jsonb,
         ${dealValue},
         ${'50% due upon contract signing, 50% due before event date'},
