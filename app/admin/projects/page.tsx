@@ -3821,8 +3821,17 @@ export default function EnhancedProjectManagementPage() {
                 <span>Updated: {formatEventDate(calendarSelectedProject.updated_at)}</span>
               </div>
 
-              {/* Action Button */}
+              {/* Action Buttons */}
               <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    window.location.href = `/admin/projects/${calendarSelectedProject.id}/edit`
+                  }}
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit Project
+                </Button>
                 <Button
                   onClick={() => {
                     setCalendarSelectedProject(null)
