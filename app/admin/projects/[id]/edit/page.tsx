@@ -30,14 +30,17 @@ import {
   Trash2,
   CheckCircle,
   Sparkles,
-  Timer
+  Timer,
+  Mail
 } from "lucide-react"
 import Link from "next/link"
 import { generateDeliverablesFromProject, formatDeliverablesForStorage } from "@/lib/generate-deliverables"
 import { authFetch } from "@/lib/auth-fetch"
+import { EmailActivity } from "@/components/email-activity"
 
 interface Project {
   id: number
+  deal_id?: number
   project_name: string
   client_name: string
   client_email?: string
@@ -453,13 +456,17 @@ export default function ProjectEditPage() {
 
         {/* Main Form */}
         <Tabs defaultValue="basic" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="event">Event Details</TabsTrigger>
             <TabsTrigger value="speaker">Speaker Program</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
             <TabsTrigger value="logistics">Logistics</TabsTrigger>
             <TabsTrigger value="financial">Financial</TabsTrigger>
+            <TabsTrigger value="emails">
+              <Mail className="h-4 w-4 mr-1" />
+              Emails
+            </TabsTrigger>
           </TabsList>
 
           {/* Basic Information */}
@@ -1880,6 +1887,11 @@ export default function ProjectEditPage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Emails */}
+          <TabsContent value="emails">
+            <EmailActivity projectId={project.id} dealId={project.deal_id} />
           </TabsContent>
         </Tabs>
 

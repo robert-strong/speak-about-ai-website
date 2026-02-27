@@ -26,23 +26,25 @@ interface EmailThread {
 interface EmailActivityProps {
   leadId?: number
   dealId?: number
+  projectId?: number
 }
 
-export function EmailActivity({ leadId, dealId }: EmailActivityProps) {
+export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps) {
   const [threads, setThreads] = useState<EmailThread[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedEmails, setExpandedEmails] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     loadEmailThreads()
-  }, [leadId, dealId])
+  }, [leadId, dealId, projectId])
 
   const loadEmailThreads = async () => {
-    if (!leadId && !dealId) return
+    if (!leadId && !dealId && !projectId) return
 
     setLoading(true)
     try {
       const params = new URLSearchParams()
+      if (projectId) params.set('project_id', projectId.toString())
       if (leadId) params.set('lead_id', leadId.toString())
       if (dealId) params.set('deal_id', dealId.toString())
 
