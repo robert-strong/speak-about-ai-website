@@ -1623,7 +1623,7 @@ export default function ProjectEditPage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                     <div>
                       <span className="text-gray-500">Deal Value</span>
-                      <p className="font-semibold text-lg">${(formData.budget || 0).toLocaleString()}</p>
+                      <p className="font-semibold text-lg">${Number(formData.budget || 0).toLocaleString()}</p>
                     </div>
                     <div>
                       <span className="text-gray-500">Commission Rate</span>
@@ -1631,28 +1631,28 @@ export default function ProjectEditPage() {
                     </div>
                     <div>
                       <span className="text-gray-500">Speaker Fee</span>
-                      <p className="font-semibold text-lg">${(formData.speaker_fee || 0).toLocaleString()}</p>
+                      <p className="font-semibold text-lg">${Number(formData.speaker_fee || 0).toLocaleString()}</p>
                     </div>
                     <div>
                       <span className="text-gray-500">Travel Buyout</span>
-                      <p className="font-semibold text-lg">${(formData.travel_buyout || 0).toLocaleString()}</p>
+                      <p className="font-semibold text-lg">${Number(formData.travel_buyout || 0).toLocaleString()}</p>
                     </div>
                   </div>
                   <div className="border-t pt-4 grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                     <div>
                       <span className="text-gray-500">Total to Collect</span>
-                      <p className="font-semibold text-lg text-blue-600">${((formData.budget || 0) + (formData.travel_buyout || 0)).toLocaleString()}</p>
+                      <p className="font-semibold text-lg text-blue-600">${(Number(formData.budget || 0) + Number(formData.travel_buyout || 0)).toLocaleString()}</p>
                       <span className="text-xs text-gray-400">Deal + Travel</span>
                     </div>
                     <div>
                       <span className="text-gray-500">Speaker Payout</span>
-                      <p className="font-semibold text-lg text-orange-600">${((formData.speaker_fee || 0) + (formData.travel_expenses_amount || 0)).toLocaleString()}</p>
+                      <p className="font-semibold text-lg text-orange-600">${(Number(formData.speaker_fee || 0) + Number(formData.travel_expenses_amount || 0)).toLocaleString()}</p>
                       <span className="text-xs text-gray-400">Fee + Travel Expenses</span>
                     </div>
                     <div>
                       <span className="text-gray-500">Net Commission</span>
-                      <p className={`font-semibold text-lg ${(formData.commission_amount || ((formData.budget || 0) - (formData.speaker_fee || 0))) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        ${(formData.commission_amount || ((formData.budget || 0) - (formData.speaker_fee || 0))).toLocaleString()}
+                      <p className={`font-semibold text-lg ${Number(formData.commission_amount || (Number(formData.budget || 0) - Number(formData.speaker_fee || 0))) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        ${Number(formData.commission_amount || (Number(formData.budget || 0) - Number(formData.speaker_fee || 0))).toLocaleString()}
                       </p>
                       <span className="text-xs text-gray-400">{formData.commission_percentage ?? 20}% of deal</span>
                     </div>
