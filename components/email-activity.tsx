@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Mail, Send, Inbox, ChevronDown, ChevronUp, ExternalLink } from "lucide-react"
+import { Mail, Send, Inbox, ChevronDown, ChevronUp, ExternalLink, RefreshCw, Loader2 } from "lucide-react"
 
 interface EmailThread {
   id: number
@@ -32,6 +32,8 @@ interface EmailActivityProps {
 export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps) {
   const [threads, setThreads] = useState<EmailThread[]>([])
   const [loading, setLoading] = useState(true)
+  const [syncing, setSyncing] = useState(false)
+  const [syncMessage, setSyncMessage] = useState("")
   const [expandedEmails, setExpandedEmails] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -58,6 +60,26 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
       console.error('Error loading email threads:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSync = async () => {
+    setSyncing(true)
+    setSyncMessage("")
+    try {
+      const response = await fetch('/api/gmail/sync-all', { method: 'POST' })
+      const data = await response.json()
+      if (data.success) {
+        setSyncMessage(data.message)
+        await loadEmailThreads()
+      } else {
+        setSyncMessage(data.error || 'Sync failed')
+      }
+    } catch (error) {
+      setSyncMessage('Failed to sync emails')
+    } finally {
+      setSyncing(false)
+      setTimeout(() => setSyncMessage(""), 5000)
     }
   }
 
@@ -96,6 +118,23 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
     )
   }
 
+  const syncButton = (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleSync}
+      disabled={syncing}
+      className="ml-auto"
+    >
+      {syncing ? (
+        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+      ) : (
+        <RefreshCw className="w-4 h-4 mr-1" />
+      )}
+      {syncing ? "Syncing..." : "Sync Emails"}
+    </Button>
+  )
+
   if (loading) {
     return (
       <Card>
@@ -103,6 +142,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
           <CardTitle className="flex items-center gap-2">
             <Mail className="w-5 h-5" />
             Email Activity
+            {syncButton}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -119,10 +159,14 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
           <CardTitle className="flex items-center gap-2">
             <Mail className="w-5 h-5" />
             Email Activity
+            {syncButton}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500">No email activity yet</p>
+          {syncMessage && (
+            <p className="text-sm text-blue-600 mb-2">{syncMessage}</p>
+          )}
+          <p className="text-sm text-gray-500">No email activity yet. Click "Sync Emails" to pull emails from Gmail.</p>
         </CardContent>
       </Card>
     )
@@ -135,9 +179,13 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
           <Mail className="w-5 h-5" />
           Email Activity
           <Badge variant="secondary">{threads.length}</Badge>
+          {syncButton}
         </CardTitle>
       </CardHeader>
       <CardContent>
+        {syncMessage && (
+          <p className="text-sm text-blue-600 mb-3">{syncMessage}</p>
+        )}
         <div className="space-y-3">
           {threads.map((thread) => {
             const isExpanded = expandedEmails.has(thread.id)
