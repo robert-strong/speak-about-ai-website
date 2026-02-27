@@ -28,9 +28,12 @@ const FIELD_MAP: Record<string, Record<EntityType, string | null>> = {
   event_location: { deal: "event_location",    project: "event_location",         proposal: "event_location", contract: "event_location", invoice: null           },
   event_type:     { deal: "event_type",        project: "event_type",             proposal: "event_type",     contract: "event_type",     invoice: null           },
   attendee_count: { deal: "attendee_count",    project: "audience_size",          proposal: "attendee_count", contract: null,             invoice: null           },
-  fee_amount:     { deal: "deal_value",        project: "speaker_fee",            proposal: "total_investment", contract: "fee_amount",   invoice: null           },
   speaker_name:   { deal: "speaker_requested", project: "requested_speaker_name", proposal: null,             contract: "speaker_name",   invoice: null           },
 }
+
+// Fields that trigger Total to Collect recalculation on contracts/invoices
+// Total to Collect = budget (deal value) + travel_buyout
+const TOTAL_TO_COLLECT_TRIGGERS = ["budget", "travel_buyout"]
 
 // Reverse index: given an entity type + column name, return the logical field.
 const REVERSE_MAP: Record<EntityType, Record<string, string>> = {
@@ -191,6 +194,7 @@ export function extractSyncableFields(
   const reverseMap = REVERSE_MAP[entityType] || {}
   const changed: Record<string, any> = {}
 
+  // Check standard field-map columns
   for (const [col] of Object.entries(reverseMap)) {
     if (body[col] !== undefined) {
       // If we have the original, only include if actually changed
@@ -203,6 +207,18 @@ export function extractSyncableFields(
         if (String(oldNorm ?? "") === String(newNorm ?? "")) continue
       }
       changed[col] = body[col]
+    }
+  }
+
+  // For projects: also detect budget/travel_buyout changes (Total to Collect)
+  if (entityType === "project") {
+    for (const col of TOTAL_TO_COLLECT_TRIGGERS) {
+      if (body[col] !== undefined) {
+        if (originalEntity) {
+          if (String(originalEntity[col] ?? "") === String(body[col] ?? "")) continue
+        }
+        changed[col] = body[col]
+      }
     }
   }
 
@@ -301,6 +317,44 @@ export async function propagateChanges(ctx: PropagateContext): Promise<void> {
           console.log(`[entity-sync] Updated ${targetEntity} #${targetId}`)
         } catch (updateErr) {
           console.error(`[entity-sync] Failed to update ${targetEntity} #${targetId}:`, updateErr)
+        }
+      }
+    }
+
+    // ── Custom: Total to Collect sync (project → contracts + invoices) ───
+    // When budget or travel_buyout changes on a project, recompute
+    // Total to Collect and push it to linked contract fee_amount and invoice amount.
+    if (ctx.sourceEntity === "project") {
+      const hasTrigger = TOTAL_TO_COLLECT_TRIGGERS.some(col => ctx.changedFields[col] !== undefined)
+      if (hasTrigger) {
+        // Fetch the full project to compute Total to Collect
+        const projectRows = await sql`SELECT budget, travel_buyout FROM projects WHERE id = ${ctx.sourceId}`
+        const proj = projectRows[0]
+        if (proj) {
+          const totalToCollect = (Number(proj.budget) || 0) + (Number(proj.travel_buyout) || 0)
+          console.log(`[entity-sync] Total to Collect for project #${ctx.sourceId}: ${totalToCollect}`)
+
+          // Update linked contracts
+          const contractIds = linked.contract || []
+          for (const cid of contractIds) {
+            try {
+              await sql`UPDATE contracts SET fee_amount = ${totalToCollect}, updated_at = CURRENT_TIMESTAMP WHERE id = ${cid}`
+              console.log(`[entity-sync] Updated contract #${cid} fee_amount to ${totalToCollect}`)
+            } catch (e) {
+              console.error(`[entity-sync] Failed to update contract #${cid} fee_amount:`, e)
+            }
+          }
+
+          // Update linked invoices
+          const invoiceIds = linked.invoice || []
+          for (const iid of invoiceIds) {
+            try {
+              await sql`UPDATE invoices SET amount = ${totalToCollect}, updated_at = CURRENT_TIMESTAMP WHERE id = ${iid}`
+              console.log(`[entity-sync] Updated invoice #${iid} amount to ${totalToCollect}`)
+            } catch (e) {
+              console.error(`[entity-sync] Failed to update invoice #${iid} amount:`, e)
+            }
+          }
         }
       }
     }
