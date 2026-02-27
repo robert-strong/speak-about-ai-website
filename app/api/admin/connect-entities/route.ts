@@ -284,13 +284,10 @@ export async function POST(request: NextRequest) {
       // --- Create Invoice Pair ---
       if (needsInvoices && project.client_name) {
         try {
-          const speakerFee = Number(project.speaker_fee) || 0
+          // Total to Collect = Deal Value + Travel Buyout
+          const dealValue = Number(project.budget) || Number(project.deal_value) || 0
           const travelBuyout = Number(project.travel_buyout) || 0
-          const totalAmount = speakerFee + travelBuyout
-
-          // Fall back to budget/deal_value if speaker_fee + travel_buyout is 0
-          const effectiveTotal = totalAmount > 0 ? totalAmount
-            : (Number(project.budget) || Number(project.deal_value) || 0)
+          const effectiveTotal = dealValue + travelBuyout
 
           if (effectiveTotal === 0) {
             details.push({

@@ -27,7 +27,10 @@ export async function POST(request?: NextRequest) {
 
     for (const project of projects) {
       try {
-        const totalAmount = parseFloat(project.deal_value || project.budget || project.speaker_fee || '0')
+        // Total to Collect = Deal Value (budget) + Travel Buyout
+        const dealValue = parseFloat(project.budget || project.deal_value || '0')
+        const travelBuyout = parseFloat(project.travel_buyout || '0')
+        const totalAmount = dealValue + travelBuyout
         if (totalAmount === 0) {
           skipped++
           skippedProjects.push({
