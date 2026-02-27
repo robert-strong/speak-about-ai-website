@@ -5,7 +5,7 @@ import { neon } from '@neondatabase/serverless'
  * POST /api/admin/fix-invoice-amounts
  *
  * Updates existing invoice amounts to match their project's Total to Collect
- * (Deal Value + Travel Buyout). Deposit = 50%, Final = 50%.
+ * (Deal Value + Travel Buyout). Each invoice shows the full total.
  *
  * GET defaults to dry_run for browser preview.
  */
@@ -42,9 +42,6 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      const depositAmount = totalToCollect * 0.5
-      const finalAmount = totalToCollect - depositAmount
-
       // Get current invoices for this project
       const invoices = await sql`
         SELECT id, invoice_type, amount, invoice_number
@@ -56,16 +53,8 @@ export async function POST(request: NextRequest) {
 
       for (const inv of invoices) {
         const currentAmount = Number(inv.amount)
-        let targetAmount: number
-
-        if (inv.invoice_type === 'deposit') {
-          targetAmount = depositAmount
-        } else if (inv.invoice_type === 'final') {
-          targetAmount = finalAmount
-        } else {
-          // Standard invoice — set to full total
-          targetAmount = totalToCollect
-        }
+        // Every invoice reflects the full Total to Collect
+        const targetAmount = totalToCollect
 
         if (Math.abs(currentAmount - targetAmount) < 0.01) continue // already correct
 

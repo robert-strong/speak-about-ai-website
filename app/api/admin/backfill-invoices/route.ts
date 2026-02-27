@@ -43,10 +43,7 @@ export async function POST(request?: NextRequest) {
 
         const clientEmail = project.client_email || project.deal_client_email || project.billing_contact_email || `${project.client_name.toLowerCase().replace(/\s+/g, '.')}@pending.info`
 
-        const depositPercentage = 0.5
-        const depositAmount = totalAmount * depositPercentage
-        const finalAmount = totalAmount - depositAmount
-
+        // Each invoice shows the full Total to Collect amount
         const depDate = new Date()
         const depYear = depDate.getFullYear()
         const depMonth = String(depDate.getMonth() + 1).padStart(2, '0')
@@ -61,11 +58,11 @@ export async function POST(request?: NextRequest) {
             ${project.id},
             ${depositInvoiceNumber},
             'deposit',
-            ${depositAmount},
+            ${totalAmount},
             'draft',
             CURRENT_TIMESTAMP,
             CURRENT_TIMESTAMP + INTERVAL '30 days',
-            ${'Initial deposit (50% of total fee) for keynote presentation'},
+            ${'Deposit invoice for keynote presentation'},
             ${project.client_name},
             ${clientEmail},
             ${project.company}
@@ -86,11 +83,11 @@ export async function POST(request?: NextRequest) {
             ${project.id},
             ${finalInvoiceNumber},
             'final',
-            ${finalAmount},
+            ${totalAmount},
             'draft',
             CURRENT_TIMESTAMP,
             ${eventDate},
-            ${'Final payment (50% of total fee) due on event date'},
+            ${'Final invoice due on event date'},
             ${project.client_name},
             ${clientEmail},
             ${project.company},

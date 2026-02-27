@@ -303,9 +303,6 @@ export async function POST(request: NextRequest) {
           const clientEmail = project.client_email || project.deal_client_email ||
             `${project.client_name.toLowerCase().replace(/\s+/g, '.')}@pending.info`
 
-          const depositAmount = effectiveTotal * 0.5
-          const finalAmount = effectiveTotal - depositAmount
-
           const now = new Date()
           const yearMonth = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`
           const depositInvoiceNumber = `INV-DEP-${yearMonth}-${project.id}`
@@ -314,6 +311,7 @@ export async function POST(request: NextRequest) {
           const eventDate = project.event_date ||
             new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString()
 
+          // Each invoice shows the full Total to Collect amount
           const [depositInvoice] = await sql`
             INSERT INTO invoices (
               project_id, deal_id, invoice_number, invoice_type, amount, status,
@@ -324,11 +322,11 @@ export async function POST(request: NextRequest) {
               ${project.deal_id || null},
               ${depositInvoiceNumber},
               'deposit',
-              ${depositAmount},
+              ${effectiveTotal},
               'draft',
               CURRENT_TIMESTAMP,
               CURRENT_TIMESTAMP + INTERVAL '30 days',
-              ${'Initial deposit (50% of total fee) for keynote presentation'},
+              ${'Deposit invoice for keynote presentation'},
               ${project.client_name},
               ${clientEmail},
               ${project.company || null}
@@ -347,11 +345,11 @@ export async function POST(request: NextRequest) {
               ${project.deal_id || null},
               ${finalInvoiceNumber},
               'final',
-              ${finalAmount},
+              ${effectiveTotal},
               'draft',
               CURRENT_TIMESTAMP,
               ${eventDate},
-              ${'Final payment (50% of total fee) due on event date'},
+              ${'Final invoice due on event date'},
               ${project.client_name},
               ${clientEmail},
               ${project.company || null},
