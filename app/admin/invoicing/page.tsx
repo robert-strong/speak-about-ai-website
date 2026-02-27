@@ -504,6 +504,35 @@ export default function InvoicingPage() {
     }
   }
 
+  const handleUpdatePaymentDate = async (invoiceId: number, paymentDate: string) => {
+    try {
+      const response = await authPatch(`/api/invoices/${invoiceId}`, {
+        payment_date: paymentDate || null
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Payment date updated"
+        })
+        loadData()
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update payment date",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      console.error("Error updating payment date:", error)
+      toast({
+        title: "Error",
+        description: "Failed to update payment date",
+        variant: "destructive"
+      })
+    }
+  }
+
   const handleDeleteInvoice = async (invoiceId: number) => {
     if (!confirm("Are you sure you want to delete this invoice?")) return
 
@@ -955,14 +984,12 @@ export default function InvoicingPage() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              {invoice.payment_date ? (
-                                <div className="flex items-center gap-1 text-green-600">
-                                  <Calendar className="h-3 w-3" />
-                                  {formatEventDate(invoice.payment_date)}
-                                </div>
-                              ) : (
-                                <span className="text-gray-400">-</span>
-                              )}
+                              <input
+                                type="date"
+                                className="text-sm border rounded px-2 py-1 w-[130px] bg-white"
+                                value={invoice.payment_date ? invoice.payment_date.split('T')[0] : ''}
+                                onChange={(e) => handleUpdatePaymentDate(invoice.id, e.target.value)}
+                              />
                             </TableCell>
                             <TableCell>
                               <div className="flex gap-1">
