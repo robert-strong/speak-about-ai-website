@@ -639,6 +639,46 @@ The Speak About AI Team
 }
 
 /**
+ * Send contract portal notification after signing
+ */
+export async function sendContractPortalNotification(data: {
+  clientName: string
+  clientEmail: string
+  eventTitle: string
+  contractNumber: string
+}): Promise<boolean> {
+  const portalUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://speakabout.ai'}/client-portal/contracts`
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2>Your Signed Contract is Ready</h2>
+          <p>Dear ${data.clientName},</p>
+          <p>Your contract for <strong>${data.eventTitle}</strong> (${data.contractNumber}) has been fully executed by all parties.</p>
+          <p>You can download your signed contract from your Client Portal:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${portalUrl}" style="display: inline-block; padding: 12px 30px; background: #10b981; color: white; text-decoration: none; border-radius: 5px;">
+              View in Client Portal
+            </a>
+          </div>
+          <p>If you have any questions, please don't hesitate to reach out.</p>
+          <p>Best regards,<br>The Speak About AI Team</p>
+        </div>
+      </body>
+    </html>
+  `
+
+  return sendEmail({
+    to: data.clientEmail,
+    subject: `Signed Contract Ready - ${data.eventTitle}`,
+    html,
+    text: `Dear ${data.clientName},\n\nYour contract for ${data.eventTitle} (${data.contractNumber}) has been fully executed.\n\nView in Client Portal: ${portalUrl}\n\nBest regards,\nThe Speak About AI Team`
+  })
+}
+
+/**
  * Export functions from email-service-new.ts for backward compatibility
  */
 export { sendNewInquiryEmail, generateAdminEmailHtml, generateAdminEmailText, generateClientConfirmationHtml, generateClientConfirmationText } from './email-service-new'

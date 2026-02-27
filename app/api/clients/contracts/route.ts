@@ -1,28 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
-import jwt from 'jsonwebtoken'
+import { verifyClientToken } from '@/lib/client-auth-utils'
 
 const sql = neon(process.env.DATABASE_URL!)
-
-// Helper to verify client token
-function verifyClientToken(request: NextRequest): { clientId: number; email: string } | null {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-
-  const token = authHeader.replace('Bearer ', '')
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any
-    if (decoded.type !== 'client' || !decoded.clientId) {
-      return null
-    }
-    return { clientId: decoded.clientId, email: decoded.email }
-  } catch (error) {
-    return null
-  }
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -59,7 +39,8 @@ export async function GET(request: NextRequest) {
         c.speaker_name,
         c.created_at,
         c.sent_at,
-        c.signed_at
+        c.signed_at,
+        CASE WHEN c.status IN ('sent', 'partially_signed') THEN c.client_signing_token ELSE NULL END as client_signing_token
       FROM contracts c
       WHERE c.client_id = ${auth.clientId}
          OR LOWER(c.client_email) = ${clientEmail.toLowerCase()}

@@ -1,7 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getContractByToken, addContractSignature, getContractSignatures } from "@/lib/contracts-db"
-import { sendContractCompletedEmail } from "@/lib/email-service-unified"
+import { sendContractCompletedEmail, sendContractPortalNotification } from "@/lib/email-service-unified"
 import { neon } from "@neondatabase/serverless"
+import {
+  validateInitialsComplete,
+  generateSignedContractHTML,
+  computeDocumentHash,
+  logSigningAudit,
+} from "@/lib/contract-signing-utils"
 
 export async function GET(
   request: NextRequest,
@@ -141,6 +147,23 @@ export async function POST(
                      request.headers.get("x-real-ip") || "unknown"
     const userAgent = request.headers.get("user-agent") || "unknown"
 
+    // Validate initials are complete before accepting signature
+    const sql = neon(process.env.DATABASE_URL!)
+    const initialsRows = await sql`
+      SELECT section_id, signer_type FROM contract_initials
+      WHERE contract_id = ${contract.id} AND signer_type = ${signerType}
+    `
+    const initialsValidation = validateInitialsComplete(initialsRows as any[], signerType)
+    if (!initialsValidation.complete) {
+      return NextResponse.json(
+        { error: `Missing initials for sections: ${initialsValidation.missing.join(", ")}` },
+        { status: 400 }
+      )
+    }
+
+    // Log signature attempt
+    await logSigningAudit(contract.id, "signature_submitted", signerType, body.signer_email, clientIP, userAgent)
+
     const signature = await addContractSignature(
       contract.id,
       signerType,
@@ -156,6 +179,9 @@ export async function POST(
       return NextResponse.json({ error: "Failed to record signature" }, { status: 500 })
     }
 
+    // Log signature recorded
+    await logSigningAudit(contract.id, "signature_recorded", signerType, body.signer_email, clientIP, userAgent)
+
     // Check if contract is now fully executed and send emails
     const allSignatures = await getContractSignatures(contract.id)
     const hasClient = allSignatures.some(s => s.signer_type === "client")
@@ -163,6 +189,69 @@ export async function POST(
     const isFullyExecuted = hasClient && hasSpeaker
 
     if (isFullyExecuted) {
+      // Generate signed contract HTML and store it
+      try {
+        // Parse contract_data
+        let contractData: Record<string, any> = {}
+        if (contract.contract_data) {
+          contractData = typeof contract.contract_data === "string"
+            ? JSON.parse(contract.contract_data)
+            : contract.contract_data
+        }
+
+        const allInitials = await sql`
+          SELECT section_id, signer_type, initial_data
+          FROM contract_initials WHERE contract_id = ${contract.id}
+        `
+
+        const signedHTML = generateSignedContractHTML(
+          {
+            contractNumber: contract.contract_number || "",
+            eventTitle: contractData.event_title || contract.event_title || "",
+            eventDate: contractData.event_date || (contract.event_date ? new Date(contract.event_date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""),
+            eventLocation: contractData.event_location || contract.event_location || "",
+            speakerName: contractData.speaker_name || contract.speaker_name || "",
+            clientName: contractData.client_contact_name || contract.client_name || "",
+            clientCompany: contractData.client_company || contract.client_company || "",
+            dealValue: Number(contractData.deal_value || contract.fee_amount || 0),
+            travelDetails: contractData.travel_details || "To be determined",
+            deliverables: contractData.deliverables || "- Speaking engagement as agreed upon",
+            depositPercent: contractData.deposit_percent || 20,
+            midPaymentPercent: contractData.mid_payment_percent || 30,
+            midPaymentDate: contractData.mid_payment_date || "TBD",
+            balancePercent: contractData.balance_percent || 50,
+            balanceDueDate: contractData.balance_due_date || "",
+            eventReference: contractData.event_reference || contract.contract_number || "",
+          },
+          allSignatures.map(s => ({
+            signer_type: s.signer_type,
+            signer_name: s.signer_name,
+            signer_title: s.signer_title || "",
+            signature_data: s.signature_data || "",
+            signed_at: s.signed_at,
+          })),
+          allInitials.map((i: any) => ({
+            section_id: i.section_id,
+            signer_type: i.signer_type,
+            initial_data: i.initial_data,
+          }))
+        )
+
+        const docHash = computeDocumentHash(signedHTML)
+
+        await sql`
+          INSERT INTO signed_contract_pdfs (contract_id, signed_html, document_hash, file_size)
+          VALUES (${contract.id}, ${signedHTML}, ${docHash}, ${signedHTML.length})
+          ON CONFLICT (contract_id)
+          DO UPDATE SET signed_html = EXCLUDED.signed_html, document_hash = EXCLUDED.document_hash,
+                        file_size = EXCLUDED.file_size, generated_at = CURRENT_TIMESTAMP
+        `
+
+        await logSigningAudit(contract.id, "signed_pdf_generated", null, null, null, null, { document_hash: docHash })
+      } catch (pdfError) {
+        console.error("Failed to generate signed PDF:", pdfError)
+      }
+
       // Send fully executed notification to all parties
       try {
         await sendContractCompletedEmail({
@@ -176,10 +265,18 @@ export async function POST(
           speakerFee: contract.fee_amount,
           contractNumber: contract.contract_number
         })
+        // Also send portal notification with download link
+        await sendContractPortalNotification({
+          clientName: contract.client_name || "",
+          clientEmail: contract.client_email || "",
+          eventTitle: contract.event_title || "",
+          contractNumber: contract.contract_number || "",
+        })
       } catch (emailError) {
         console.error("Failed to send completion emails:", emailError)
-        // Don't fail the signing just because email failed
       }
+
+      await logSigningAudit(contract.id, "contract_fully_executed", null, null, null, null)
     }
 
     return NextResponse.json({

@@ -55,6 +55,8 @@ export async function middleware(request: NextRequest) {
     '/apply',
     '/privacy',
     '/terms',
+    '/client-portal',
+    '/contracts',
   ]
 
   // Check if this is a root-level path (no nested paths)
