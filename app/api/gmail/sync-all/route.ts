@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
+import { syncGmailForUser } from '@/lib/sync-gmail'
 
 const sql = neon(process.env.DATABASE_URL!)
 
@@ -23,25 +24,15 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-
     const results = []
 
     for (const user of users) {
       try {
-        const response = await fetch(`${baseUrl}/api/gmail/sync`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userEmail: user.user_email, fullSync })
-        })
-
-        const data = await response.json()
+        const syncResults = await syncGmailForUser(user.user_email, fullSync)
         results.push({
           userEmail: user.user_email,
-          success: response.ok,
-          data
+          success: true,
+          data: { results: syncResults }
         })
       } catch (error) {
         results.push({
