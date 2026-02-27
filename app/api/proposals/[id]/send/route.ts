@@ -1,14 +1,15 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { getProposalById, updateProposalStatus } from "@/lib/proposals-db"
 import { getProposalSentEmailTemplate } from "@/lib/email-templates/proposal-sent"
 import { sendProposalEmail } from "@/lib/email-service-unified"
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const proposalId = parseInt(params.id)
+    const { id } = await params
+    const proposalId = parseInt(id)
     
     // Get proposal details
     const proposal = await getProposalById(proposalId)

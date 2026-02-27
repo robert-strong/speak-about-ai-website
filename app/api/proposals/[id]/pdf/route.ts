@@ -1,14 +1,15 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { getProposalById } from "@/lib/proposals-db"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { jsPDF } from "jspdf"
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const proposalId = parseInt(params.id)
+    const { id } = await params
+    const proposalId = parseInt(id)
     const proposal = await getProposalById(proposalId)
     
     if (!proposal) {

@@ -1907,6 +1907,15 @@ function NewProposalPageContent() {
             <div className="space-y-6">
               <div>
                 <h3 className="font-medium mb-3">Services</h3>
+                <div className="flex gap-3 items-start mb-2">
+                  <div className="flex-1 grid grid-cols-3 gap-3">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Service Name</span>
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Description</span>
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Price ($)</span>
+                  </div>
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide w-[44px] text-center">Incl.</span>
+                  <div className="w-10" />
+                </div>
                 <div className="space-y-3">
                   {services.map((service, index) => (
                     <div key={index} className="flex gap-3 items-start">
@@ -1924,8 +1933,8 @@ function NewProposalPageContent() {
                         <Input
                           type="number"
                           placeholder="Price"
-                          value={service.price}
-                          onChange={(e) => updateService(index, { ...service, price: parseFloat(e.target.value) || 0 })}
+                          value={service.price || ""}
+                          onChange={(e) => updateService(index, { ...service, price: e.target.value === "" ? 0 : parseFloat(e.target.value) })}
                         />
                       </div>
                       <Switch
@@ -1946,6 +1955,14 @@ function NewProposalPageContent() {
 
               <div>
                 <h3 className="font-medium mb-3">Deliverables</h3>
+                <div className="flex gap-3 items-start mb-2">
+                  <div className="flex-1 grid grid-cols-3 gap-3">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Deliverable Name</span>
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Description</span>
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Timeline</span>
+                  </div>
+                  <div className="w-10" />
+                </div>
                 <div className="space-y-3">
                   {deliverables.map((deliverable, index) => (
                     <div key={index} className="flex gap-3 items-start">
@@ -2005,23 +2022,29 @@ function NewProposalPageContent() {
 
               <div>
                 <h3 className="font-medium mb-3">Payment Schedule</h3>
+                <div className="grid grid-cols-4 gap-3 mb-2">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Amount ($)</span>
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Percentage (%)</span>
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Due Date</span>
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Description</span>
+                </div>
                 <div className="space-y-3">
                   {paymentSchedule.map((milestone, index) => (
                     <div key={index} className="grid grid-cols-4 gap-3">
                       <Input
                         type="number"
                         placeholder="Amount"
-                        value={milestone.amount}
-                        onChange={(e) => setPaymentSchedule(prev => 
-                          prev.map((m, i) => i === index ? { ...m, amount: parseFloat(e.target.value) || 0 } : m)
+                        value={milestone.amount || ""}
+                        onChange={(e) => setPaymentSchedule(prev =>
+                          prev.map((m, i) => i === index ? { ...m, amount: e.target.value === "" ? 0 : parseFloat(e.target.value) } : m)
                         )}
                       />
                       <Input
                         type="number"
                         placeholder="Percentage"
-                        value={milestone.percentage}
-                        onChange={(e) => setPaymentSchedule(prev => 
-                          prev.map((m, i) => i === index ? { ...m, percentage: parseFloat(e.target.value) || 0 } : m)
+                        value={milestone.percentage || ""}
+                        onChange={(e) => setPaymentSchedule(prev =>
+                          prev.map((m, i) => i === index ? { ...m, percentage: e.target.value === "" ? 0 : parseFloat(e.target.value) } : m)
                         )}
                       />
                       <Input
