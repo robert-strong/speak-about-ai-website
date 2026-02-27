@@ -436,7 +436,8 @@ export async function updateProposal(id: number, proposalData: Partial<Proposal>
       RETURNING *
     `
 
-    const [proposal] = await sql(query, values)
+    const result = await sql.query(query, values)
+    const proposal = result[0]
     
     return {
       ...proposal,
