@@ -36,6 +36,9 @@ export async function PUT(
     const proposalId = parseInt(id)
     const data = await request.json()
 
+    // Fetch original for change detection
+    const originalProposal = await getProposalById(proposalId)
+
     const proposal = await updateProposal(proposalId, data)
 
     if (!proposal) {
@@ -43,6 +46,17 @@ export async function PUT(
         { error: "Failed to update proposal" },
         { status: 500 }
       )
+    }
+
+    // Propagate syncable field changes to linked entities
+    try {
+      const { propagateChanges, extractSyncableFields } = await import("@/lib/entity-sync")
+      const changedFields = extractSyncableFields('proposal', data, originalProposal)
+      if (Object.keys(changedFields).length > 0) {
+        await propagateChanges({ sourceEntity: 'proposal', sourceId: proposalId, changedFields })
+      }
+    } catch (syncError) {
+      console.error("Entity sync failed (non-blocking):", syncError)
     }
 
     return NextResponse.json(proposal)

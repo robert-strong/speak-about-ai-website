@@ -103,6 +103,17 @@ export async function PATCH(
       RETURNING *
     `
 
+    // Propagate syncable field changes to linked entities
+    try {
+      const { propagateChanges, extractSyncableFields } = await import("@/lib/entity-sync")
+      const changedFields = extractSyncableFields('invoice', body, invoice)
+      if (Object.keys(changedFields).length > 0) {
+        await propagateChanges({ sourceEntity: 'invoice', sourceId: invoiceId, changedFields })
+      }
+    } catch (syncError) {
+      console.error("Entity sync failed (non-blocking):", syncError)
+    }
+
     // If invoice is marked as paid and has a project_id, update the project status
     if (status === "paid" && updatedInvoice.project_id) {
       console.log(`Invoice ${invoiceId} marked as paid. Updating project ${updatedInvoice.project_id} to completed status.`)

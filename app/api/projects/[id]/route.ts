@@ -65,6 +65,17 @@ export async function PUT(
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
+    // Propagate syncable field changes to linked entities
+    try {
+      const { propagateChanges, extractSyncableFields } = await import("@/lib/entity-sync")
+      const changedFields = extractSyncableFields('project', body, originalProject)
+      if (Object.keys(changedFields).length > 0) {
+        await propagateChanges({ sourceEntity: 'project', sourceId: id, changedFields })
+      }
+    } catch (syncError) {
+      console.error("Entity sync failed (non-blocking):", syncError)
+    }
+
     // Send Slack notification for status changes
     if (originalProject && originalProject.status !== project.status) {
       try {

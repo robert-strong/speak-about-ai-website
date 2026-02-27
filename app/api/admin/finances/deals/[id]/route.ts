@@ -59,43 +59,22 @@ export async function PUT(
     
     const updatedDeal = result[0]
     
-    // Sync budget to related project(s)
+    // Propagate syncable field changes to all linked entities
     try {
-      const projectUpdateResult = await sql`
-        UPDATE projects 
-        SET 
-          budget = ${deal_value},
-          speaker_fee = ${deal_value},
-          commission_percentage = ${commission_percentage},
-          commission_amount = ${calculatedCommission},
-          payment_status = ${payment_status},
-          payment_date = ${payment_date},
-          financial_notes = ${notes},
-          contract_link = ${contract_link},
-          invoice_link_1 = ${invoice_link_1},
-          invoice_link_2 = ${invoice_link_2},
-          updated_at = NOW()
-        WHERE company = ${updatedDeal.company}
-          AND client_name = ${updatedDeal.client_name}
-          AND (event_date = ${updatedDeal.event_date} 
-               OR project_name = ${updatedDeal.event_title})
-        RETURNING id, project_name
-      `
-      
-      console.log(`Updated ${projectUpdateResult.length} related project(s) for deal ${dealId}`)
-      
-      return NextResponse.json({ 
+      const { propagateChanges } = await import("@/lib/entity-sync")
+      const changedFields: Record<string, any> = { deal_value }
+      await propagateChanges({ sourceEntity: 'deal', sourceId: Number(dealId), changedFields })
+
+      return NextResponse.json({
         deal: updatedDeal,
-        projectsUpdated: projectUpdateResult.length,
-        success: true 
+        success: true
       })
-    } catch (projectError) {
-      console.error('Warning: Failed to sync to projects:', projectError)
-      // Still return success for deal update even if project sync fails
-      return NextResponse.json({ 
+    } catch (syncError) {
+      console.error('Warning: Entity sync failed:', syncError)
+      return NextResponse.json({
         deal: updatedDeal,
         success: true,
-        warning: 'Deal updated but project sync failed'
+        warning: 'Deal updated but entity sync failed'
       })
     }
     

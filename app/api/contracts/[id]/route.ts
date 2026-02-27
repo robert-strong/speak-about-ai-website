@@ -131,6 +131,9 @@ export async function PUT(
 
     const body = await request.json()
 
+    // Fetch original for change detection
+    const originalContract = await getContractById(contractId)
+
     // Handle full contract updates for the hub
     if (body.values || body.contract_data || body.template_id) {
       const updateData = {
@@ -151,6 +154,36 @@ export async function PUT(
 
       if (body.send_for_signature) {
         await updateContractStatus(contractId, 'sent_for_signature', updateData.updated_by)
+      }
+
+      // Extract flat syncable fields from contract_data / values
+      try {
+        const { propagateChanges, extractSyncableFields } = await import("@/lib/entity-sync")
+        const contractValues = body.values || body.contract_data || {}
+        // Build a flat object mapping contract columns to their new values
+        const flatFields: Record<string, any> = {
+          ...(contractValues.client_name !== undefined && { client_name: contractValues.client_name }),
+          ...(contractValues.client_email !== undefined && { client_email: contractValues.client_email }),
+          ...(contractValues.client_company !== undefined && { client_company: contractValues.client_company }),
+          ...(contractValues.event_title !== undefined && { event_title: contractValues.event_title }),
+          ...(contractValues.event_date !== undefined && { event_date: contractValues.event_date }),
+          ...(contractValues.event_location !== undefined && { event_location: contractValues.event_location }),
+          ...(contractValues.event_type !== undefined && { event_type: contractValues.event_type }),
+          ...(contractValues.fee_amount !== undefined && { fee_amount: contractValues.fee_amount }),
+          ...(contractValues.speaker_name !== undefined && { speaker_name: contractValues.speaker_name }),
+          // Also check top-level body fields
+          ...(body.client_name !== undefined && { client_name: body.client_name }),
+          ...(body.client_email !== undefined && { client_email: body.client_email }),
+          ...(body.event_title !== undefined && { event_title: body.event_title }),
+          ...(body.fee_amount !== undefined && { fee_amount: body.fee_amount }),
+          ...(body.speaker_name !== undefined && { speaker_name: body.speaker_name }),
+        }
+        const changedFields = extractSyncableFields('contract', flatFields, originalContract)
+        if (Object.keys(changedFields).length > 0) {
+          await propagateChanges({ sourceEntity: 'contract', sourceId: contractId, changedFields })
+        }
+      } catch (syncError) {
+        console.error("Entity sync failed (non-blocking):", syncError)
       }
 
       return NextResponse.json(contract)

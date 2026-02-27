@@ -57,6 +57,17 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Deal not found or failed to update" }, { status: 404 })
     }
 
+    // Propagate syncable field changes to linked entities
+    try {
+      const { propagateChanges, extractSyncableFields } = await import("@/lib/entity-sync")
+      const changedFields = extractSyncableFields('deal', body, originalDeal)
+      if (Object.keys(changedFields).length > 0) {
+        await propagateChanges({ sourceEntity: 'deal', sourceId: id, changedFields })
+      }
+    } catch (syncError) {
+      console.error("Entity sync failed (non-blocking):", syncError)
+    }
+
     // Send Slack notification for status changes
     if (originalDeal && originalDeal.status !== deal.status) {
       try {
@@ -423,6 +434,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     if (!deal) {
       return NextResponse.json({ error: "Deal not found or failed to update" }, { status: 404 })
+    }
+
+    // Propagate syncable field changes to linked entities
+    try {
+      const { propagateChanges, extractSyncableFields } = await import("@/lib/entity-sync")
+      const changedFields = extractSyncableFields('deal', body, originalDeal)
+      if (Object.keys(changedFields).length > 0) {
+        await propagateChanges({ sourceEntity: 'deal', sourceId: id, changedFields })
+      }
+    } catch (syncError) {
+      console.error("Entity sync failed (non-blocking):", syncError)
     }
 
     // Handle project creation/advancement based on deal status transitions (mirrors PUT logic)

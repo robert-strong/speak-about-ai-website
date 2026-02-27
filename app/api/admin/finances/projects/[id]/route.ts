@@ -50,40 +50,22 @@ export async function PUT(
     
     const updatedProject = result[0]
     
-    // Sync budget back to related deal(s)
+    // Propagate syncable field changes to all linked entities
     try {
-      const dealUpdateResult = await sql`
-        UPDATE deals 
-        SET 
-          deal_value = ${budget},
-          commission_percentage = ${commission_percentage},
-          commission_amount = ${calculatedCommission},
-          payment_status = ${payment_status},
-          payment_date = ${payment_date},
-          financial_notes = ${financial_notes},
-          updated_at = NOW()
-        WHERE company = ${updatedProject.company}
-          AND client_name = ${updatedProject.client_name}
-          AND (event_date = ${updatedProject.event_date} 
-               OR event_title = ${updatedProject.project_name})
-          AND status = 'won'
-        RETURNING id, event_title
-      `
-      
-      console.log(`Updated ${dealUpdateResult.length} related deal(s) for project ${projectId}`)
-      
-      return NextResponse.json({ 
+      const { propagateChanges } = await import("@/lib/entity-sync")
+      const changedFields: Record<string, any> = { speaker_fee: speaker_fee }
+      await propagateChanges({ sourceEntity: 'project', sourceId: Number(projectId), changedFields })
+
+      return NextResponse.json({
         project: updatedProject,
-        dealsUpdated: dealUpdateResult.length,
-        success: true 
+        success: true
       })
-    } catch (dealError) {
-      console.error('Warning: Failed to sync to deals:', dealError)
-      // Still return success for project update even if deal sync fails
-      return NextResponse.json({ 
+    } catch (syncError) {
+      console.error('Warning: Entity sync failed:', syncError)
+      return NextResponse.json({
         project: updatedProject,
         success: true,
-        warning: 'Project updated but deal sync failed'
+        warning: 'Project updated but entity sync failed'
       })
     }
     
