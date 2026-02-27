@@ -234,7 +234,10 @@ export async function POST(request: NextRequest) {
           const contractRandom = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
           const contractNumber = `CTR-${contractDate}-${contractRandom}`
           const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+          // Total to Collect = Deal Value + Travel Buyout
           const dealValue = Number(project.budget) || Number(project.deal_value) || 0
+          const travelBuyout = Number(project.travel_buyout) || 0
+          const totalToCollect = dealValue + travelBuyout
           const speakerName = project.requested_speaker_name || project.speaker_requested || null
           const speakerFee = Number(project.speaker_fee) || dealValue
           const eventTitle = project.event_name || project.deal_event_title || project.project_name
@@ -254,7 +257,7 @@ export async function POST(request: NextRequest) {
               ${`Speaker Engagement Agreement - ${eventTitle}`},
               'client_speaker',
               'draft',
-              ${dealValue},
+              ${totalToCollect},
               ${'Payment due within 30 days of event completion'},
               ${eventTitle},
               ${project.event_date || null},
@@ -273,7 +276,7 @@ export async function POST(request: NextRequest) {
           summary.entitiesCreated.contracts++
           details.push({
             action: 'create_contract', projectId: project.id,
-            contractNumber, amount: dealValue
+            contractNumber, amount: totalToCollect
           })
         } catch (err) {
           console.error(`Error creating contract for project ${project.id}:`, err)
