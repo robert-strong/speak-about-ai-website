@@ -157,8 +157,9 @@ export async function PATCH(
       RETURNING *
     `
 
-    const result = await sql.query(query, values)
-    const updated = result[0]
+    const rawResult = await sql.query(query, values)
+    const rows = rawResult.rows || rawResult
+    const updated = rows[0]
 
     if (!updated) {
       return NextResponse.json(
