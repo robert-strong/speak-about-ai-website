@@ -61,9 +61,9 @@ export function useAdminSession(options: UseAdminSessionOptions = {}) {
     }
   }, [])
 
-  // Track consecutive refresh failures
+  // Track consecutive refresh failures — high threshold to avoid accidental logouts
   const refreshFailuresRef = useRef<number>(0)
-  const MAX_REFRESH_FAILURES = 5
+  const MAX_REFRESH_FAILURES = 20
 
   // Refresh session token
   const refreshSession = async () => {
@@ -295,18 +295,10 @@ export function useAdminSession(options: UseAdminSessionOptions = {}) {
         }
 
         // Try to refresh the session if we have a token
-        // If refresh fails, only logout when both localStorage values are gone
-        // This gives a grace period for transient failures during navigation
+        // Use soft refresh — never triggers logout on failure
+        // This prevents accidental logouts during navigation or cold starts
         if (token) {
-          try {
-            await refreshSession()
-          } catch {
-            const stillHasToken = localStorage.getItem('adminSessionToken')
-            const stillLoggedIn = localStorage.getItem('adminLoggedIn')
-            if (!stillHasToken && !stillLoggedIn) {
-              performLogout()
-            }
-          }
+          await softRefreshSession()
         }
       } catch {
         // Silently ignore validation errors on mount

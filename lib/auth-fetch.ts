@@ -52,10 +52,11 @@ export async function authFetch(url: string, options: AuthFetchOptions = {}): Pr
     headers.set('Content-Type', 'application/json')
   }
 
-  // Make the request with merged headers
+  // Make the request with merged headers and credentials (sends httpOnly cookies)
   const response = await fetch(url, {
     ...fetchOptions,
     headers,
+    credentials: 'include',
   })
 
   // If we get a 401 and this isn't already a retry, try refreshing the token
