@@ -390,14 +390,14 @@ export default function ProjectEditPage() {
             </Button>
           </Link>
           
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Edit Project</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Edit Project</h1>
               <p className="text-gray-600 mt-1">{project.project_name}</p>
             </div>
 
             {/* Status Summary - Workflow Stage & Time Urgency */}
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3">
               {/* Workflow Stage Badge */}
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-50 border border-purple-200">
                 <CheckCircle className="h-4 w-4 text-purple-600" />
@@ -456,7 +456,7 @@ export default function ProjectEditPage() {
 
         {/* Main Form */}
         <Tabs defaultValue="basic" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="flex w-full overflow-x-auto lg:grid lg:grid-cols-7">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="event">Event Details</TabsTrigger>
             <TabsTrigger value="speaker">Speaker Program</TabsTrigger>
