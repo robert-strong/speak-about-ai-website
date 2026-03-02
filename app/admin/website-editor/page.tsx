@@ -178,7 +178,7 @@ export default function WebsiteEditorPage() {
         <AdminSidebar />
       </div>
 
-      <div className="flex-1 ml-72 min-h-screen">
+      <div className="flex-1 lg:ml-72 min-h-screen">
         {/* Sticky Header */}
         <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
           <div className="max-w-[1600px] mx-auto px-6 py-4">

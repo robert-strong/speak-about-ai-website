@@ -112,7 +112,8 @@ export function ContractInitialField({
               canvasProps={{
                 width: 200,
                 height: 60,
-                className: "cursor-crosshair",
+                className: "cursor-crosshair w-full",
+                style: { touchAction: "none" },
               }}
               backgroundColor="white"
             />

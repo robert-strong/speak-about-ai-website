@@ -495,7 +495,7 @@ export default function AIContentStudioPage() {
         <AdminSidebar />
       </div>
 
-      <div className="flex-1 ml-72 min-h-screen">
+      <div className="flex-1 lg:ml-72 min-h-screen">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">

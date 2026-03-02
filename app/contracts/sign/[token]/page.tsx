@@ -380,7 +380,7 @@ export default function ContractSigningPage() {
             )}
 
             {/* Contract Document */}
-            <div ref={contractRef} className="bg-white shadow-lg print:shadow-none" style={{ fontFamily: "'Calibri', 'Segoe UI', Arial, sans-serif", fontSize: "11pt", lineHeight: "1.5", padding: "0.75in 1in" }}>
+            <div ref={contractRef} className="bg-white shadow-lg print:shadow-none" style={{ fontFamily: "'Calibri', 'Segoe UI', Arial, sans-serif", fontSize: "11pt", lineHeight: "1.5", padding: "clamp(0.5in, 3vw, 0.75in) clamp(0.5in, 4vw, 1in)" }}>
               {/* Header with Logo */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
                 <h1 style={{ fontSize: "18pt", fontWeight: "bold", margin: 0 }}>SPEAKER/CLIENT/AGENT AGREEMENT</h1>
@@ -651,7 +651,8 @@ export default function ContractSigningPage() {
                             canvasProps={{
                               width: 600,
                               height: 150,
-                              className: "signature-canvas bg-white rounded border w-full cursor-crosshair"
+                              className: "signature-canvas bg-white rounded border w-full cursor-crosshair",
+                              style: { touchAction: "none" },
                             }}
                             backgroundColor="white"
                           />

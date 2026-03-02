@@ -932,7 +932,7 @@ function NewFirmOfferContent() {
         <div className="fixed left-0 top-0 h-full z-[60]">
           <AdminSidebar />
         </div>
-        <div className="flex-1 ml-72 min-h-screen flex items-center justify-center">
+        <div className="flex-1 lg:ml-72 min-h-screen flex items-center justify-center">
           <Card className="max-w-lg w-full mx-4">
             <CardContent className="pt-8 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
@@ -1005,7 +1005,7 @@ function NewFirmOfferContent() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 ml-72 min-h-screen">
+      <div className="flex-1 lg:ml-72 min-h-screen">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">

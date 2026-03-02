@@ -208,7 +208,7 @@ export default function TasksPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 ml-72 p-8">
+      <div className="flex-1 lg:ml-72 p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8 flex justify-between items-start">

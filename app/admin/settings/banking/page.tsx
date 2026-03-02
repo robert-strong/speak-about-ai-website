@@ -396,7 +396,7 @@ export default function BankingSettingsPage() {
       <div className="fixed left-0 top-0 h-full z-[60]">
         <AdminSidebar />
       </div>
-      <main className="flex-1 ml-72 min-h-screen overflow-y-auto">
+      <main className="flex-1 lg:ml-72 min-h-screen overflow-y-auto">
         <div className="p-8 max-w-6xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Banking & Payment Portal</h1>
@@ -651,6 +651,7 @@ export default function BankingSettingsPage() {
                   {links.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">No links generated yet</p>
                   ) : (
+                    <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -708,6 +709,7 @@ export default function BankingSettingsPage() {
                         ))}
                       </TableBody>
                     </Table>
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -870,6 +872,7 @@ export default function BankingSettingsPage() {
                   {auditLogs.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">No activity yet</p>
                   ) : (
+                    <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -898,6 +901,7 @@ export default function BankingSettingsPage() {
                         ))}
                       </TableBody>
                     </Table>
+                    </div>
                   )}
                 </CardContent>
               </Card>

@@ -348,7 +348,7 @@ export default function ProjectEditPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 ml-72 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 lg:ml-72 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
           <p className="text-gray-600">Loading project...</p>
@@ -359,7 +359,7 @@ export default function ProjectEditPage() {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-gray-50 ml-72 p-8">
+      <div className="min-h-screen bg-gray-50 lg:ml-72 p-8">
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardContent className="text-center py-12">
@@ -379,7 +379,7 @@ export default function ProjectEditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 ml-72">
+    <div className="min-h-screen bg-gray-50 lg:ml-72">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">

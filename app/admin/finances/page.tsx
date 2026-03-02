@@ -513,7 +513,7 @@ export default function FinancesPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex">
         <AdminSidebar />
-        <div className="flex-1 ml-72 flex items-center justify-center">
+        <div className="flex-1 lg:ml-72 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin" />
           <span className="ml-2">Loading financial data...</span>
         </div>
@@ -529,7 +529,7 @@ export default function FinancesPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 ml-72 min-h-screen">
+      <div className="flex-1 lg:ml-72 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">

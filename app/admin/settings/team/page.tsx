@@ -343,7 +343,7 @@ export default function TeamSettingsPage() {
       <div className="fixed left-0 top-0 h-full z-[60]">
         <AdminSidebar />
       </div>
-      <main className="flex-1 ml-72 min-h-screen overflow-y-auto">
+      <main className="flex-1 lg:ml-72 min-h-screen overflow-y-auto">
         <div className="p-8 max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8">

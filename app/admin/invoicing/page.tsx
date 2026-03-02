@@ -620,7 +620,7 @@ export default function InvoicingPage() {
         <div className="fixed left-0 top-0 h-full z-[60]">
           <AdminSidebar />
         </div>
-        <div className="flex-1 ml-72 flex items-center justify-center">
+        <div className="flex-1 lg:ml-72 flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
           <span className="ml-2 text-gray-600">Loading invoices...</span>
         </div>
@@ -636,7 +636,7 @@ export default function InvoicingPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 ml-72 min-h-screen">
+      <div className="flex-1 lg:ml-72 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Invoice Management</h1>
@@ -948,6 +948,7 @@ export default function InvoicingPage() {
                   </TabsTrigger>
                 </TabsList>
 
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1135,6 +1136,7 @@ export default function InvoicingPage() {
                     )}
                   </TableBody>
                 </Table>
+                </div>
               </Tabs>
             </CardContent>
           </Card>

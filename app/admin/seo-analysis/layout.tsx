@@ -13,7 +13,7 @@ export default function SEOAnalysisLayout({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 ml-72">
+      <div className="flex-1 lg:ml-72">
         {children}
       </div>
     </div>

@@ -194,7 +194,7 @@ export default function FirmOfferViewPage() {
         <div className="fixed left-0 top-0 h-full z-[60]">
           <AdminSidebar />
         </div>
-        <div className="flex-1 ml-72 min-h-screen flex items-center justify-center">
+        <div className="flex-1 lg:ml-72 min-h-screen flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function FirmOfferViewPage() {
         <div className="fixed left-0 top-0 h-full z-[60]">
           <AdminSidebar />
         </div>
-        <div className="flex-1 ml-72 min-h-screen flex items-center justify-center">
+        <div className="flex-1 lg:ml-72 min-h-screen flex items-center justify-center">
           <p className="text-gray-500">Firm offer not found</p>
         </div>
       </div>
@@ -230,7 +230,7 @@ export default function FirmOfferViewPage() {
         <AdminSidebar />
       </div>
 
-      <div className="flex-1 ml-72 min-h-screen">
+      <div className="flex-1 lg:ml-72 min-h-screen">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-6">
