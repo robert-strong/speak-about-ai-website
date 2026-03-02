@@ -2,8 +2,18 @@ import { type NextRequest, NextResponse } from "next/server"
 import { neon } from "@neondatabase/serverless"
 import { requireAdminAuth } from "@/lib/auth-middleware"
 import crypto from 'crypto'
+import { Resend } from 'resend'
 
 const sql = neon(process.env.DATABASE_URL!)
+
+// Lazy initialize Resend
+let resend: Resend | null = null
+function getResend() {
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resend
+}
 
 // Get single application
 export async function GET(
@@ -94,7 +104,7 @@ export async function PATCH(
         `
         break
 
-      case 'invite':
+      case 'invite': {
         // Generate unique invitation token
         const token = crypto.randomBytes(32).toString('hex')
         const expiresAt = new Date()
@@ -102,7 +112,7 @@ export async function PATCH(
 
         const [updatedApp] = await sql`
           UPDATE speaker_applications
-          SET 
+          SET
             status = 'invited',
             invitation_token = ${token},
             invitation_sent_at = CURRENT_TIMESTAMP,
@@ -112,14 +122,70 @@ export async function PATCH(
           RETURNING *
         `
 
-        // Send invitation email
-        await sendInvitationEmail(updatedApp)
+        // Send invitation email via Resend
+        try {
+          await sendInvitationEmail(updatedApp)
+        } catch (emailError) {
+          console.error('Failed to send invitation email:', emailError)
+          return NextResponse.json({
+            success: true,
+            message: "Invitation saved but email sending failed. You can resend it later.",
+            emailError: emailError instanceof Error ? emailError.message : "Unknown email error"
+          })
+        }
 
         return NextResponse.json({
           success: true,
-          message: "Invitation sent successfully",
-          token: token // For testing, remove in production
+          message: "Invitation sent successfully"
         })
+      }
+
+      case 'resend_invite': {
+        // Get the existing application
+        const [app] = await sql`
+          SELECT * FROM speaker_applications WHERE id = ${applicationId}
+        `
+
+        if (!app) {
+          return NextResponse.json({ error: "Application not found" }, { status: 404 })
+        }
+
+        if (app.status !== 'approved' && app.status !== 'invited') {
+          return NextResponse.json({ error: "Can only resend invitations for approved or invited applications" }, { status: 400 })
+        }
+
+        // Generate a new token
+        const newToken = crypto.randomBytes(32).toString('hex')
+        const newExpiresAt = new Date()
+        newExpiresAt.setDate(newExpiresAt.getDate() + 7)
+
+        const [refreshedApp] = await sql`
+          UPDATE speaker_applications
+          SET
+            status = 'invited',
+            invitation_token = ${newToken},
+            invitation_sent_at = CURRENT_TIMESTAMP,
+            invitation_expires_at = ${newExpiresAt.toISOString()}
+          WHERE id = ${applicationId}
+          RETURNING *
+        `
+
+        try {
+          await sendInvitationEmail(refreshedApp)
+        } catch (emailError) {
+          console.error('Failed to resend invitation email:', emailError)
+          return NextResponse.json({
+            success: false,
+            error: "Failed to send invitation email",
+            details: emailError instanceof Error ? emailError.message : "Unknown email error"
+          }, { status: 500 })
+        }
+
+        return NextResponse.json({
+          success: true,
+          message: "Invitation resent successfully"
+        })
+      }
 
       case 'update_notes':
         await sql`
@@ -182,38 +248,89 @@ export async function DELETE(
 }
 
 async function sendInvitationEmail(application: any) {
-  const inviteUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/create-account?token=${application.invitation_token}`
-  
-  // TODO: Implement actual email sending using Resend or similar service
-  console.log(`Sending invitation email to ${application.email}`)
-  console.log(`Invitation URL: ${inviteUrl}`)
-  
-  // For now, just log the email content
-  const emailContent = `
-    Dear ${application.first_name} ${application.last_name},
+  const inviteUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://speakabout.ai'}/create-account?token=${application.invitation_token}`
 
-    Congratulations! Your application to join Speak About AI has been approved.
-
-    We're excited to welcome you to our exclusive network of AI and technology thought leaders.
-
-    Please click the link below to create your speaker account:
-    ${inviteUrl}
-
-    This invitation link will expire in 7 days.
-
-    If you have any questions, please don't hesitate to reach out.
-
-    Best regards,
-    The Speak About AI Team
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Welcome to Speak About AI</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">Speak About AI</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">AI & Technology Speaker Bureau</p>
+      </div>
+      <div style="background: white; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #1f2937; margin-top: 0;">Dear ${application.first_name} ${application.last_name},</h2>
+        <p style="color: #4b5563; font-size: 16px;">
+          Congratulations! Your application to join Speak About AI has been approved.
+        </p>
+        <p style="color: #4b5563; font-size: 16px;">
+          We're excited to welcome you to our exclusive network of AI and technology thought leaders.
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${inviteUrl}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+            Create Your Account
+          </a>
+        </div>
+        <p style="color: #6b7280; font-size: 14px; text-align: center;">
+          Or copy and paste this link into your browser:
+        </p>
+        <p style="color: #3b82f6; font-size: 14px; word-break: break-all; text-align: center;">
+          ${inviteUrl}
+        </p>
+        <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+          <strong>Important:</strong> This invitation link will expire in 7 days.
+        </p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+        <p style="color: #6b7280; font-size: 14px;">
+          If you have any questions, please don't hesitate to reach out to us at
+          <a href="mailto:hello@speakabout.ai" style="color: #3b82f6;">hello@speakabout.ai</a>
+        </p>
+        <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">
+          Best regards,<br>
+          <strong>The Speak About AI Team</strong>
+        </p>
+      </div>
+      <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
+        <p style="margin: 0;">&copy; ${new Date().getFullYear()} Speak About AI. All rights reserved.</p>
+      </div>
+    </body>
+    </html>
   `
-  
-  console.log(emailContent)
-  
-  // In production, use Resend API:
-  // const { data, error } = await resend.emails.send({
-  //   from: 'Speak About AI <hello@speakabout.ai>',
-  //   to: application.email,
-  //   subject: 'Welcome to Speak About AI - Create Your Account',
-  //   html: emailContent
-  // })
+
+  const textContent = `Dear ${application.first_name} ${application.last_name},
+
+Congratulations! Your application to join Speak About AI has been approved.
+
+We're excited to welcome you to our exclusive network of AI and technology thought leaders.
+
+Please click the link below to create your speaker account:
+${inviteUrl}
+
+This invitation link will expire in 7 days.
+
+If you have any questions, please don't hesitate to reach out to us at hello@speakabout.ai.
+
+Best regards,
+The Speak About AI Team`
+
+  const { data, error } = await getResend().emails.send({
+    from: process.env.RESEND_FROM_EMAIL || 'Speak About AI <hello@speakabout.ai>',
+    to: application.email,
+    subject: 'Welcome to Speak About AI - Create Your Account',
+    html: htmlContent,
+    text: textContent
+  })
+
+  if (error) {
+    console.error('Failed to send invitation email:', error)
+    throw new Error(`Failed to send email: ${error.message}`)
+  }
+
+  console.log('Invitation email sent successfully:', data)
+  return data
 }

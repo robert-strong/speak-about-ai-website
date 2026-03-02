@@ -30,7 +30,10 @@ import {
   FileText,
   Video,
   Users,
-  TrendingUp
+  TrendingUp,
+  Trash2,
+  Send,
+  RefreshCw
 } from "lucide-react"
 import {
   Dialog,
@@ -41,7 +44,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { formatCurrency } from "@/lib/utils"
-import { authGet } from "@/lib/auth-fetch"
+import { authGet, authFetch, authDelete } from "@/lib/auth-fetch"
 
 interface Speaker {
   id: number
@@ -95,7 +98,7 @@ interface Speaker {
   why_speak_about_ai?: string
   additional_info?: string
   agree_to_terms?: boolean
-  status?: 'pending' | 'approved' | 'rejected' | 'suspended'
+  status?: 'pending' | 'approved' | 'rejected' | 'suspended' | 'invited'
   approval_notes?: string
   approved_by?: string
   approved_at?: string
@@ -118,6 +121,10 @@ export default function SpeakerApplicationsPage() {
   const [internalNotes, setInternalNotes] = useState("")
   const [internalRating, setInternalRating] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [speakerToDelete, setSpeakerToDelete] = useState<Speaker | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isResending, setIsResending] = useState(false)
 
   useEffect(() => {
     fetchSpeakers()
@@ -221,6 +228,69 @@ export default function SpeakerApplicationsPage() {
     setShowApprovalDialog(true)
   }
 
+  const handleDelete = async () => {
+    if (!speakerToDelete) return
+    setIsDeleting(true)
+    try {
+      const response = await authDelete(`/api/speaker-applications/${speakerToDelete.id}`)
+      if (response.ok) {
+        setSpeakers(speakers.filter(s => s.id !== speakerToDelete.id))
+        setShowDeleteDialog(false)
+        setSpeakerToDelete(null)
+      } else {
+        console.error("Failed to delete application")
+      }
+    } catch (error) {
+      console.error("Error deleting application:", error)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleResendInvite = async (speaker: Speaker) => {
+    setIsResending(true)
+    try {
+      const response = await authFetch(`/api/speaker-applications/${speaker.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ action: "resend_invite" })
+      })
+      const data = await response.json()
+      if (response.ok && data.success) {
+        alert(`Invitation resent to ${speaker.email}`)
+        fetchSpeakers()
+      } else {
+        alert(data.error || data.message || "Failed to resend invitation")
+      }
+    } catch (error) {
+      console.error("Error resending invitation:", error)
+      alert("Failed to resend invitation. Check console for details.")
+    } finally {
+      setIsResending(false)
+    }
+  }
+
+  const handleSendInvite = async (speaker: Speaker) => {
+    setIsResending(true)
+    try {
+      const response = await authFetch(`/api/speaker-applications/${speaker.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ action: "invite" })
+      })
+      const data = await response.json()
+      if (response.ok && data.success) {
+        alert(`Invitation sent to ${speaker.email}`)
+        fetchSpeakers()
+      } else {
+        alert(data.error || data.message || "Failed to send invitation")
+      }
+    } catch (error) {
+      console.error("Error sending invitation:", error)
+      alert("Failed to send invitation. Check console for details.")
+    } finally {
+      setIsResending(false)
+    }
+  }
+
   const getStatusBadge = (status?: string) => {
     switch (status) {
       case "pending":
@@ -229,6 +299,8 @@ export default function SpeakerApplicationsPage() {
         return <Badge className="bg-green-100 text-green-800"><Check className="h-3 w-3 mr-1" />Approved</Badge>
       case "rejected":
         return <Badge variant="destructive"><X className="h-3 w-3 mr-1" />Rejected</Badge>
+      case "invited":
+        return <Badge className="bg-blue-100 text-blue-800"><Send className="h-3 w-3 mr-1" />Invited</Badge>
       case "suspended":
         return <Badge className="bg-orange-100 text-orange-800"><AlertCircle className="h-3 w-3 mr-1" />Suspended</Badge>
       default:
@@ -418,6 +490,30 @@ export default function SpeakerApplicationsPage() {
                   
                   <div className="flex items-center gap-2">
                     {getStatusBadge(speaker.status)}
+                    {speaker.status === "approved" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSendInvite(speaker)}
+                        disabled={isResending}
+                        className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                      >
+                        <Send className="h-4 w-4 mr-1" />
+                        {isResending ? "Sending..." : "Send Invite"}
+                      </Button>
+                    )}
+                    {speaker.status === "invited" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleResendInvite(speaker)}
+                        disabled={isResending}
+                        className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                      >
+                        <RefreshCw className="h-4 w-4 mr-1" />
+                        {isResending ? "Sending..." : "Resend Invite"}
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -425,6 +521,17 @@ export default function SpeakerApplicationsPage() {
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       Review
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSpeakerToDelete(speaker)
+                        setShowDeleteDialog(true)
+                      }}
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -905,6 +1012,40 @@ export default function SpeakerApplicationsPage() {
               >
                 Cancel
               </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSpeakerToDelete(selectedSpeaker)
+                  setShowApprovalDialog(false)
+                  setShowDeleteDialog(true)
+                }}
+                className="text-red-600 border-red-200 hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
+              {selectedSpeaker.status === "approved" && (
+                <Button
+                  variant="outline"
+                  onClick={() => handleSendInvite(selectedSpeaker)}
+                  disabled={isResending}
+                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                >
+                  <Send className="h-4 w-4 mr-1" />
+                  {isResending ? "Sending..." : "Send Invite"}
+                </Button>
+              )}
+              {selectedSpeaker.status === "invited" && (
+                <Button
+                  variant="outline"
+                  onClick={() => handleResendInvite(selectedSpeaker)}
+                  disabled={isResending}
+                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                >
+                  <RefreshCw className="h-4 w-4 mr-1" />
+                  {isResending ? "Sending..." : "Resend Invite"}
+                </Button>
+              )}
               {selectedSpeaker.status === "pending" && (
                 <>
                   <Button
@@ -924,7 +1065,7 @@ export default function SpeakerApplicationsPage() {
                   </Button>
                 </>
               )}
-              {selectedSpeaker.status !== "pending" && (
+              {selectedSpeaker.status !== "pending" && selectedSpeaker.status !== "approved" && selectedSpeaker.status !== "invited" && (
                 <Button
                   onClick={() => handleApproval(selectedSpeaker.status !== "approved")}
                   disabled={isProcessing}
@@ -936,6 +1077,40 @@ export default function SpeakerApplicationsPage() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Application</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to permanently delete the application from{" "}
+              <strong>{speakerToDelete?.first_name} {speakerToDelete?.last_name}</strong> ({speakerToDelete?.email})?
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDeleteDialog(false)
+                setSpeakerToDelete(null)
+              }}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              {isDeleting ? "Deleting..." : "Delete Permanently"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
