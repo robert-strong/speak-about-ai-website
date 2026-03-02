@@ -348,6 +348,15 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           color: "text-green-600",
           bgColor: "bg-green-50",
           permissionKey: "whatsapp"
+        },
+        {
+          title: "Google Ads",
+          href: "/admin/google-ads",
+          icon: TrendingUp,
+          description: "Campaign Manager",
+          color: "text-orange-600",
+          bgColor: "bg-orange-50",
+          permissionKey: "marketing"
         }
       ]
     },
