@@ -133,102 +133,102 @@ interface Task {
 }
 
 const initialCampaigns: Campaign[] = [
-  { id: 1, name: "AI Keynote Speakers \u2014 Core", type: "Search", goal: "Lead Generation", audience: "Event planners searching for AI speakers", budgetRange: "$1,500 \u2013 $3,000", monthlyBudget: 2500, dailyBudget: 83, priority: "HIGH", status: "draft", biddingStrategy: "Target CPA", targetCPA: "$150\u2013$250", estClicks: "170\u2013310", estLeads: "10\u201317", notes: "Highest priority \u2014 pure intent", launchDate: "", endDate: "" },
-  { id: 2, name: "AI Conference Speakers \u2014 Events", type: "Search", goal: "Lead Generation", audience: "Conference organizers needing AI talent", budgetRange: "$1,000 \u2013 $2,000", monthlyBudget: 1500, dailyBudget: 50, priority: "HIGH", status: "draft", biddingStrategy: "Target CPA", targetCPA: "$125\u2013$200", estClicks: "105\u2013190", estLeads: "8\u201312", notes: "Event-specific intent", launchDate: "", endDate: "" },
-  { id: 3, name: "Named Speaker Searches", type: "Search", goal: "Lead Generation", audience: "People searching for specific speakers on roster", budgetRange: "$500 \u2013 $1,000", monthlyBudget: 750, dailyBudget: 25, priority: "MEDIUM", status: "draft", biddingStrategy: "Maximize Conversions", targetCPA: "$50\u2013$100", estClicks: "125\u2013250", estLeads: "8\u201315", notes: "Low CPC, high intent", launchDate: "", endDate: "" },
-  { id: 4, name: "AI Industry Verticals", type: "Search", goal: "Lead Generation", audience: "Industry-specific event planners (healthcare, tech, etc.)", budgetRange: "$750 \u2013 $1,500", monthlyBudget: 1000, dailyBudget: 33, priority: "MEDIUM", status: "draft", biddingStrategy: "Target CPA", targetCPA: "$150\u2013$250", estClicks: "70\u2013125", estLeads: "4\u20137", notes: "Niche but qualified", launchDate: "", endDate: "" },
-  { id: 5, name: "Competitor Conquesting", type: "Search", goal: "Market Share", audience: "Users searching competitor speaker bureaus", budgetRange: "$500 \u2013 $1,000", monthlyBudget: 750, dailyBudget: 25, priority: "LOW", status: "draft", biddingStrategy: "Target Impression Share", targetCPA: "N/A", estClicks: "95\u2013190", estLeads: "3\u20135", notes: "Awareness play", launchDate: "", endDate: "" },
-  { id: 6, name: "Performance Max \u2014 Awareness", type: "PMax", goal: "Awareness + Leads", audience: "In-market audiences for events & conferences", budgetRange: "$750 \u2013 $1,500", monthlyBudget: 1000, dailyBudget: 33, priority: "MEDIUM", status: "draft", biddingStrategy: "Maximize Conversions", targetCPA: "$200\u2013$350", estClicks: "50\u2013100", estLeads: "3\u20135", notes: "Broad awareness funnel", launchDate: "", endDate: "" },
+  { id: 1, name: "AI Keynote Speakers — Core", type: "Search", goal: "Lead Generation", audience: "Event planners searching for AI speakers", budgetRange: "$1,500 – $3,000", monthlyBudget: 2500, dailyBudget: 83, priority: "HIGH", status: "draft", biddingStrategy: "Target CPA", targetCPA: "$150–$250", estClicks: "170–310", estLeads: "10–17", notes: "Highest priority — pure intent", launchDate: "", endDate: "" },
+  { id: 2, name: "AI Conference Speakers — Events", type: "Search", goal: "Lead Generation", audience: "Conference organizers needing AI talent", budgetRange: "$1,000 – $2,000", monthlyBudget: 1500, dailyBudget: 50, priority: "HIGH", status: "draft", biddingStrategy: "Target CPA", targetCPA: "$125–$200", estClicks: "105–190", estLeads: "8–12", notes: "Event-specific intent", launchDate: "", endDate: "" },
+  { id: 3, name: "Named Speaker Searches", type: "Search", goal: "Lead Generation", audience: "People searching for specific speakers on roster", budgetRange: "$500 – $1,000", monthlyBudget: 750, dailyBudget: 25, priority: "MEDIUM", status: "draft", biddingStrategy: "Maximize Conversions", targetCPA: "$50–$100", estClicks: "125–250", estLeads: "8–15", notes: "Low CPC, high intent", launchDate: "", endDate: "" },
+  { id: 4, name: "AI Industry Verticals", type: "Search", goal: "Lead Generation", audience: "Industry-specific event planners (healthcare, tech, etc.)", budgetRange: "$750 – $1,500", monthlyBudget: 1000, dailyBudget: 33, priority: "MEDIUM", status: "draft", biddingStrategy: "Target CPA", targetCPA: "$150–$250", estClicks: "70–125", estLeads: "4–7", notes: "Niche but qualified", launchDate: "", endDate: "" },
+  { id: 5, name: "Competitor Conquesting", type: "Search", goal: "Market Share", audience: "Users searching competitor speaker bureaus", budgetRange: "$500 – $1,000", monthlyBudget: 750, dailyBudget: 25, priority: "LOW", status: "draft", biddingStrategy: "Target Impression Share", targetCPA: "N/A", estClicks: "95–190", estLeads: "3–5", notes: "Awareness play", launchDate: "", endDate: "" },
+  { id: 6, name: "Performance Max — Awareness", type: "PMax", goal: "Awareness + Leads", audience: "In-market audiences for events & conferences", budgetRange: "$750 – $1,500", monthlyBudget: 1000, dailyBudget: 33, priority: "MEDIUM", status: "draft", biddingStrategy: "Maximize Conversions", targetCPA: "$200–$350", estClicks: "50–100", estLeads: "3–5", notes: "Broad awareness funnel", launchDate: "", endDate: "" },
 ]
 
 const initialKeywords: Keyword[] = [
-  { id: 1, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Keynote Speakers", keyword: "ai keynote speaker", matchType: "Phrase", estCPC: "$8\u2013$15", intent: "High-intent booking", enabled: true },
-  { id: 2, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Keynote Speakers", keyword: "artificial intelligence keynote speaker", matchType: "Phrase", estCPC: "$7\u2013$14", intent: "High-intent booking", enabled: true },
-  { id: 3, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Keynote Speakers", keyword: "book ai speaker", matchType: "Phrase", estCPC: "$10\u2013$18", intent: "Transactional", enabled: true },
-  { id: 4, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Keynote Speakers", keyword: "hire ai keynote speaker", matchType: "Phrase", estCPC: "$12\u2013$20", intent: "Transactional", enabled: true },
-  { id: 5, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Keynote Speakers", keyword: "ai keynote speaker for event", matchType: "Phrase", estCPC: "$9\u2013$16", intent: "High-intent booking", enabled: true },
-  { id: 6, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Keynote Speakers", keyword: "best ai speakers", matchType: "Broad", estCPC: "$6\u2013$12", intent: "Research", enabled: true },
-  { id: 7, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Keynote Speakers", keyword: "top artificial intelligence speakers", matchType: "Broad", estCPC: "$6\u2013$12", intent: "Research", enabled: true },
-  { id: 8, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Speaker Bureau", keyword: "ai speaker bureau", matchType: "Exact", estCPC: "$10\u2013$18", intent: "High-intent booking", enabled: true },
-  { id: 9, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Speaker Bureau", keyword: "ai speakers bureau", matchType: "Exact", estCPC: "$10\u2013$18", intent: "High-intent booking", enabled: true },
-  { id: 10, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Speaker Bureau", keyword: "artificial intelligence speaker agency", matchType: "Phrase", estCPC: "$8\u2013$15", intent: "High-intent booking", enabled: true },
-  { id: 11, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Speaker Bureau", keyword: "ai speaking agency", matchType: "Phrase", estCPC: "$8\u2013$14", intent: "High-intent booking", enabled: true },
-  { id: 12, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "AI Speaker Bureau", keyword: "speaker bureau for technology", matchType: "Broad", estCPC: "$5\u2013$10", intent: "Research", enabled: true },
-  { id: 13, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "Generative AI Speakers", keyword: "generative ai speaker", matchType: "Phrase", estCPC: "$8\u2013$15", intent: "High-intent booking", enabled: true },
-  { id: 14, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "Generative AI Speakers", keyword: "chatgpt keynote speaker", matchType: "Phrase", estCPC: "$6\u2013$12", intent: "Research", enabled: true },
-  { id: 15, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "Generative AI Speakers", keyword: "large language model speaker", matchType: "Phrase", estCPC: "$7\u2013$13", intent: "High-intent booking", enabled: true },
-  { id: 16, campaign: "AI Keynote Speakers \u2014 Core", adGroup: "Generative AI Speakers", keyword: "generative ai expert for conference", matchType: "Phrase", estCPC: "$9\u2013$16", intent: "Transactional", enabled: true },
-  { id: 17, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Conference Speakers", keyword: "ai conference speaker", matchType: "Phrase", estCPC: "$8\u2013$14", intent: "High-intent booking", enabled: true },
-  { id: 18, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Conference Speakers", keyword: "ai speaker for conference", matchType: "Phrase", estCPC: "$9\u2013$16", intent: "High-intent booking", enabled: true },
-  { id: 19, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Conference Speakers", keyword: "artificial intelligence conference keynote", matchType: "Phrase", estCPC: "$8\u2013$14", intent: "High-intent booking", enabled: true },
-  { id: 20, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Conference Speakers", keyword: "ai summit speaker", matchType: "Phrase", estCPC: "$7\u2013$13", intent: "High-intent booking", enabled: true },
-  { id: 21, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Conference Speakers", keyword: "tech conference ai speaker", matchType: "Phrase", estCPC: "$8\u2013$14", intent: "High-intent booking", enabled: true },
-  { id: 22, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Corporate Events", keyword: "ai speaker corporate event", matchType: "Phrase", estCPC: "$10\u2013$18", intent: "Transactional", enabled: true },
-  { id: 23, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Corporate Events", keyword: "ai keynote for company event", matchType: "Phrase", estCPC: "$10\u2013$17", intent: "Transactional", enabled: true },
-  { id: 24, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Corporate Events", keyword: "hire ai expert for corporate retreat", matchType: "Phrase", estCPC: "$12\u2013$20", intent: "Transactional", enabled: true },
-  { id: 25, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Corporate Events", keyword: "ai town hall speaker", matchType: "Phrase", estCPC: "$8\u2013$15", intent: "Transactional", enabled: true },
-  { id: 26, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Corporate Events", keyword: "ai expert for executive briefing", matchType: "Phrase", estCPC: "$10\u2013$18", intent: "Transactional", enabled: true },
-  { id: 27, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Workshops & Panels", keyword: "ai workshop facilitator", matchType: "Phrase", estCPC: "$7\u2013$13", intent: "High-intent booking", enabled: true },
-  { id: 28, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Workshops & Panels", keyword: "ai panel discussion speakers", matchType: "Phrase", estCPC: "$6\u2013$12", intent: "High-intent booking", enabled: true },
-  { id: 29, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Workshops & Panels", keyword: "ai training workshop for companies", matchType: "Phrase", estCPC: "$8\u2013$14", intent: "High-intent booking", enabled: true },
-  { id: 30, campaign: "AI Conference Speakers \u2014 Events", adGroup: "Workshops & Panels", keyword: "ai fireside chat speaker", matchType: "Phrase", estCPC: "$7\u2013$13", intent: "High-intent booking", enabled: true },
-  { id: 31, campaign: "Named Speaker Searches", adGroup: "Peter Norvig", keyword: "peter norvig keynote speaker", matchType: "Exact", estCPC: "$3\u2013$6", intent: "Speaker-specific", enabled: true },
-  { id: 32, campaign: "Named Speaker Searches", adGroup: "Peter Norvig", keyword: "book peter norvig", matchType: "Phrase", estCPC: "$3\u2013$6", intent: "Speaker-specific", enabled: true },
-  { id: 33, campaign: "Named Speaker Searches", adGroup: "Peter Norvig", keyword: "peter norvig speaking fee", matchType: "Exact", estCPC: "$4\u2013$7", intent: "Speaker-specific", enabled: true },
-  { id: 34, campaign: "Named Speaker Searches", adGroup: "Adam Cheyer", keyword: "adam cheyer speaker", matchType: "Exact", estCPC: "$3\u2013$6", intent: "Speaker-specific", enabled: true },
-  { id: 35, campaign: "Named Speaker Searches", adGroup: "Adam Cheyer", keyword: "siri co-founder keynote", matchType: "Phrase", estCPC: "$5\u2013$10", intent: "Speaker-specific", enabled: true },
-  { id: 36, campaign: "Named Speaker Searches", adGroup: "Adam Cheyer", keyword: "book adam cheyer", matchType: "Phrase", estCPC: "$3\u2013$6", intent: "Speaker-specific", enabled: true },
-  { id: 37, campaign: "Named Speaker Searches", adGroup: "Gopi Kallayil", keyword: "gopi kallayil speaker", matchType: "Exact", estCPC: "$3\u2013$6", intent: "Speaker-specific", enabled: true },
-  { id: 38, campaign: "Named Speaker Searches", adGroup: "Gopi Kallayil", keyword: "google ai strategist keynote", matchType: "Phrase", estCPC: "$6\u2013$12", intent: "Speaker-specific", enabled: true },
-  { id: 39, campaign: "Named Speaker Searches", adGroup: "Allie K Miller", keyword: "allie k miller keynote", matchType: "Exact", estCPC: "$4\u2013$8", intent: "Speaker-specific", enabled: true },
-  { id: 40, campaign: "Named Speaker Searches", adGroup: "Allie K Miller", keyword: "book allie k miller", matchType: "Phrase", estCPC: "$4\u2013$8", intent: "Speaker-specific", enabled: true },
-  { id: 41, campaign: "Named Speaker Searches", adGroup: "Rana el Kaliouby", keyword: "rana el kaliouby speaker", matchType: "Exact", estCPC: "$3\u2013$6", intent: "Speaker-specific", enabled: true },
-  { id: 42, campaign: "Named Speaker Searches", adGroup: "Rana el Kaliouby", keyword: "emotion ai keynote speaker", matchType: "Phrase", estCPC: "$6\u2013$12", intent: "Speaker-specific", enabled: true },
-  { id: 43, campaign: "AI Industry Verticals", adGroup: "Healthcare AI", keyword: "ai healthcare keynote speaker", matchType: "Phrase", estCPC: "$8\u2013$15", intent: "Industry-specific", enabled: true },
-  { id: 44, campaign: "AI Industry Verticals", adGroup: "Healthcare AI", keyword: "ai in healthcare speaker", matchType: "Phrase", estCPC: "$7\u2013$13", intent: "Industry-specific", enabled: true },
-  { id: 45, campaign: "AI Industry Verticals", adGroup: "Healthcare AI", keyword: "medical ai conference speaker", matchType: "Phrase", estCPC: "$8\u2013$14", intent: "Industry-specific", enabled: true },
-  { id: 46, campaign: "AI Industry Verticals", adGroup: "AI Ethics & Policy", keyword: "ai ethics keynote speaker", matchType: "Phrase", estCPC: "$6\u2013$12", intent: "Industry-specific", enabled: true },
-  { id: 47, campaign: "AI Industry Verticals", adGroup: "AI Ethics & Policy", keyword: "responsible ai speaker", matchType: "Phrase", estCPC: "$6\u2013$11", intent: "Industry-specific", enabled: true },
-  { id: 48, campaign: "AI Industry Verticals", adGroup: "AI Ethics & Policy", keyword: "ai governance speaker", matchType: "Phrase", estCPC: "$7\u2013$13", intent: "Industry-specific", enabled: true },
-  { id: 49, campaign: "AI Industry Verticals", adGroup: "AI Leadership & Strategy", keyword: "ai leadership keynote speaker", matchType: "Phrase", estCPC: "$9\u2013$16", intent: "Industry-specific", enabled: true },
-  { id: 50, campaign: "AI Industry Verticals", adGroup: "AI Leadership & Strategy", keyword: "ai transformation speaker", matchType: "Phrase", estCPC: "$8\u2013$14", intent: "Industry-specific", enabled: true },
-  { id: 51, campaign: "AI Industry Verticals", adGroup: "AI Leadership & Strategy", keyword: "digital transformation ai speaker", matchType: "Phrase", estCPC: "$8\u2013$15", intent: "Industry-specific", enabled: true },
-  { id: 52, campaign: "AI Industry Verticals", adGroup: "Cybersecurity AI", keyword: "ai cybersecurity speaker", matchType: "Phrase", estCPC: "$8\u2013$15", intent: "Industry-specific", enabled: true },
-  { id: 53, campaign: "AI Industry Verticals", adGroup: "Cybersecurity AI", keyword: "cybersecurity keynote speaker ai", matchType: "Phrase", estCPC: "$9\u2013$16", intent: "Industry-specific", enabled: true },
-  { id: 54, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "bigspeak ai speakers", matchType: "Exact", estCPC: "$4\u2013$8", intent: "Competitor", enabled: true },
-  { id: 55, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "ai speakers agency", matchType: "Exact", estCPC: "$5\u2013$10", intent: "Competitor", enabled: true },
-  { id: 56, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "ai speaker bureau alternative", matchType: "Phrase", estCPC: "$6\u2013$12", intent: "Competitor", enabled: true },
-  { id: 57, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "washington speakers bureau ai", matchType: "Phrase", estCPC: "$5\u2013$10", intent: "Competitor", enabled: true },
-  { id: 58, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "harry walker agency ai speakers", matchType: "Phrase", estCPC: "$4\u2013$8", intent: "Competitor", enabled: true },
+  { id: 1, campaign: "AI Keynote Speakers — Core", adGroup: "AI Keynote Speakers", keyword: "ai keynote speaker", matchType: "Phrase", estCPC: "$8–$15", intent: "High-intent booking", enabled: true },
+  { id: 2, campaign: "AI Keynote Speakers — Core", adGroup: "AI Keynote Speakers", keyword: "artificial intelligence keynote speaker", matchType: "Phrase", estCPC: "$7–$14", intent: "High-intent booking", enabled: true },
+  { id: 3, campaign: "AI Keynote Speakers — Core", adGroup: "AI Keynote Speakers", keyword: "book ai speaker", matchType: "Phrase", estCPC: "$10–$18", intent: "Transactional", enabled: true },
+  { id: 4, campaign: "AI Keynote Speakers — Core", adGroup: "AI Keynote Speakers", keyword: "hire ai keynote speaker", matchType: "Phrase", estCPC: "$12–$20", intent: "Transactional", enabled: true },
+  { id: 5, campaign: "AI Keynote Speakers — Core", adGroup: "AI Keynote Speakers", keyword: "ai keynote speaker for event", matchType: "Phrase", estCPC: "$9–$16", intent: "High-intent booking", enabled: true },
+  { id: 6, campaign: "AI Keynote Speakers — Core", adGroup: "AI Keynote Speakers", keyword: "best ai speakers", matchType: "Broad", estCPC: "$6–$12", intent: "Research", enabled: true },
+  { id: 7, campaign: "AI Keynote Speakers — Core", adGroup: "AI Keynote Speakers", keyword: "top artificial intelligence speakers", matchType: "Broad", estCPC: "$6–$12", intent: "Research", enabled: true },
+  { id: 8, campaign: "AI Keynote Speakers — Core", adGroup: "AI Speaker Bureau", keyword: "ai speaker bureau", matchType: "Exact", estCPC: "$10–$18", intent: "High-intent booking", enabled: true },
+  { id: 9, campaign: "AI Keynote Speakers — Core", adGroup: "AI Speaker Bureau", keyword: "ai speakers bureau", matchType: "Exact", estCPC: "$10–$18", intent: "High-intent booking", enabled: true },
+  { id: 10, campaign: "AI Keynote Speakers — Core", adGroup: "AI Speaker Bureau", keyword: "artificial intelligence speaker agency", matchType: "Phrase", estCPC: "$8–$15", intent: "High-intent booking", enabled: true },
+  { id: 11, campaign: "AI Keynote Speakers — Core", adGroup: "AI Speaker Bureau", keyword: "ai speaking agency", matchType: "Phrase", estCPC: "$8–$14", intent: "High-intent booking", enabled: true },
+  { id: 12, campaign: "AI Keynote Speakers — Core", adGroup: "AI Speaker Bureau", keyword: "speaker bureau for technology", matchType: "Broad", estCPC: "$5–$10", intent: "Research", enabled: true },
+  { id: 13, campaign: "AI Keynote Speakers — Core", adGroup: "Generative AI Speakers", keyword: "generative ai speaker", matchType: "Phrase", estCPC: "$8–$15", intent: "High-intent booking", enabled: true },
+  { id: 14, campaign: "AI Keynote Speakers — Core", adGroup: "Generative AI Speakers", keyword: "chatgpt keynote speaker", matchType: "Phrase", estCPC: "$6–$12", intent: "Research", enabled: true },
+  { id: 15, campaign: "AI Keynote Speakers — Core", adGroup: "Generative AI Speakers", keyword: "large language model speaker", matchType: "Phrase", estCPC: "$7–$13", intent: "High-intent booking", enabled: true },
+  { id: 16, campaign: "AI Keynote Speakers — Core", adGroup: "Generative AI Speakers", keyword: "generative ai expert for conference", matchType: "Phrase", estCPC: "$9–$16", intent: "Transactional", enabled: true },
+  { id: 17, campaign: "AI Conference Speakers — Events", adGroup: "Conference Speakers", keyword: "ai conference speaker", matchType: "Phrase", estCPC: "$8–$14", intent: "High-intent booking", enabled: true },
+  { id: 18, campaign: "AI Conference Speakers — Events", adGroup: "Conference Speakers", keyword: "ai speaker for conference", matchType: "Phrase", estCPC: "$9–$16", intent: "High-intent booking", enabled: true },
+  { id: 19, campaign: "AI Conference Speakers — Events", adGroup: "Conference Speakers", keyword: "artificial intelligence conference keynote", matchType: "Phrase", estCPC: "$8–$14", intent: "High-intent booking", enabled: true },
+  { id: 20, campaign: "AI Conference Speakers — Events", adGroup: "Conference Speakers", keyword: "ai summit speaker", matchType: "Phrase", estCPC: "$7–$13", intent: "High-intent booking", enabled: true },
+  { id: 21, campaign: "AI Conference Speakers — Events", adGroup: "Conference Speakers", keyword: "tech conference ai speaker", matchType: "Phrase", estCPC: "$8–$14", intent: "High-intent booking", enabled: true },
+  { id: 22, campaign: "AI Conference Speakers — Events", adGroup: "Corporate Events", keyword: "ai speaker corporate event", matchType: "Phrase", estCPC: "$10–$18", intent: "Transactional", enabled: true },
+  { id: 23, campaign: "AI Conference Speakers — Events", adGroup: "Corporate Events", keyword: "ai keynote for company event", matchType: "Phrase", estCPC: "$10–$17", intent: "Transactional", enabled: true },
+  { id: 24, campaign: "AI Conference Speakers — Events", adGroup: "Corporate Events", keyword: "hire ai expert for corporate retreat", matchType: "Phrase", estCPC: "$12–$20", intent: "Transactional", enabled: true },
+  { id: 25, campaign: "AI Conference Speakers — Events", adGroup: "Corporate Events", keyword: "ai town hall speaker", matchType: "Phrase", estCPC: "$8–$15", intent: "Transactional", enabled: true },
+  { id: 26, campaign: "AI Conference Speakers — Events", adGroup: "Corporate Events", keyword: "ai expert for executive briefing", matchType: "Phrase", estCPC: "$10–$18", intent: "Transactional", enabled: true },
+  { id: 27, campaign: "AI Conference Speakers — Events", adGroup: "Workshops & Panels", keyword: "ai workshop facilitator", matchType: "Phrase", estCPC: "$7–$13", intent: "High-intent booking", enabled: true },
+  { id: 28, campaign: "AI Conference Speakers — Events", adGroup: "Workshops & Panels", keyword: "ai panel discussion speakers", matchType: "Phrase", estCPC: "$6–$12", intent: "High-intent booking", enabled: true },
+  { id: 29, campaign: "AI Conference Speakers — Events", adGroup: "Workshops & Panels", keyword: "ai training workshop for companies", matchType: "Phrase", estCPC: "$8–$14", intent: "High-intent booking", enabled: true },
+  { id: 30, campaign: "AI Conference Speakers — Events", adGroup: "Workshops & Panels", keyword: "ai fireside chat speaker", matchType: "Phrase", estCPC: "$7–$13", intent: "High-intent booking", enabled: true },
+  { id: 31, campaign: "Named Speaker Searches", adGroup: "Peter Norvig", keyword: "peter norvig keynote speaker", matchType: "Exact", estCPC: "$3–$6", intent: "Speaker-specific", enabled: true },
+  { id: 32, campaign: "Named Speaker Searches", adGroup: "Peter Norvig", keyword: "book peter norvig", matchType: "Phrase", estCPC: "$3–$6", intent: "Speaker-specific", enabled: true },
+  { id: 33, campaign: "Named Speaker Searches", adGroup: "Peter Norvig", keyword: "peter norvig speaking fee", matchType: "Exact", estCPC: "$4–$7", intent: "Speaker-specific", enabled: true },
+  { id: 34, campaign: "Named Speaker Searches", adGroup: "Adam Cheyer", keyword: "adam cheyer speaker", matchType: "Exact", estCPC: "$3–$6", intent: "Speaker-specific", enabled: true },
+  { id: 35, campaign: "Named Speaker Searches", adGroup: "Adam Cheyer", keyword: "siri co-founder keynote", matchType: "Phrase", estCPC: "$5–$10", intent: "Speaker-specific", enabled: true },
+  { id: 36, campaign: "Named Speaker Searches", adGroup: "Adam Cheyer", keyword: "book adam cheyer", matchType: "Phrase", estCPC: "$3–$6", intent: "Speaker-specific", enabled: true },
+  { id: 37, campaign: "Named Speaker Searches", adGroup: "Gopi Kallayil", keyword: "gopi kallayil speaker", matchType: "Exact", estCPC: "$3–$6", intent: "Speaker-specific", enabled: true },
+  { id: 38, campaign: "Named Speaker Searches", adGroup: "Gopi Kallayil", keyword: "google ai strategist keynote", matchType: "Phrase", estCPC: "$6–$12", intent: "Speaker-specific", enabled: true },
+  { id: 39, campaign: "Named Speaker Searches", adGroup: "Allie K Miller", keyword: "allie k miller keynote", matchType: "Exact", estCPC: "$4–$8", intent: "Speaker-specific", enabled: true },
+  { id: 40, campaign: "Named Speaker Searches", adGroup: "Allie K Miller", keyword: "book allie k miller", matchType: "Phrase", estCPC: "$4–$8", intent: "Speaker-specific", enabled: true },
+  { id: 41, campaign: "Named Speaker Searches", adGroup: "Rana el Kaliouby", keyword: "rana el kaliouby speaker", matchType: "Exact", estCPC: "$3–$6", intent: "Speaker-specific", enabled: true },
+  { id: 42, campaign: "Named Speaker Searches", adGroup: "Rana el Kaliouby", keyword: "emotion ai keynote speaker", matchType: "Phrase", estCPC: "$6–$12", intent: "Speaker-specific", enabled: true },
+  { id: 43, campaign: "AI Industry Verticals", adGroup: "Healthcare AI", keyword: "ai healthcare keynote speaker", matchType: "Phrase", estCPC: "$8–$15", intent: "Industry-specific", enabled: true },
+  { id: 44, campaign: "AI Industry Verticals", adGroup: "Healthcare AI", keyword: "ai in healthcare speaker", matchType: "Phrase", estCPC: "$7–$13", intent: "Industry-specific", enabled: true },
+  { id: 45, campaign: "AI Industry Verticals", adGroup: "Healthcare AI", keyword: "medical ai conference speaker", matchType: "Phrase", estCPC: "$8–$14", intent: "Industry-specific", enabled: true },
+  { id: 46, campaign: "AI Industry Verticals", adGroup: "AI Ethics & Policy", keyword: "ai ethics keynote speaker", matchType: "Phrase", estCPC: "$6–$12", intent: "Industry-specific", enabled: true },
+  { id: 47, campaign: "AI Industry Verticals", adGroup: "AI Ethics & Policy", keyword: "responsible ai speaker", matchType: "Phrase", estCPC: "$6–$11", intent: "Industry-specific", enabled: true },
+  { id: 48, campaign: "AI Industry Verticals", adGroup: "AI Ethics & Policy", keyword: "ai governance speaker", matchType: "Phrase", estCPC: "$7–$13", intent: "Industry-specific", enabled: true },
+  { id: 49, campaign: "AI Industry Verticals", adGroup: "AI Leadership & Strategy", keyword: "ai leadership keynote speaker", matchType: "Phrase", estCPC: "$9–$16", intent: "Industry-specific", enabled: true },
+  { id: 50, campaign: "AI Industry Verticals", adGroup: "AI Leadership & Strategy", keyword: "ai transformation speaker", matchType: "Phrase", estCPC: "$8–$14", intent: "Industry-specific", enabled: true },
+  { id: 51, campaign: "AI Industry Verticals", adGroup: "AI Leadership & Strategy", keyword: "digital transformation ai speaker", matchType: "Phrase", estCPC: "$8–$15", intent: "Industry-specific", enabled: true },
+  { id: 52, campaign: "AI Industry Verticals", adGroup: "Cybersecurity AI", keyword: "ai cybersecurity speaker", matchType: "Phrase", estCPC: "$8–$15", intent: "Industry-specific", enabled: true },
+  { id: 53, campaign: "AI Industry Verticals", adGroup: "Cybersecurity AI", keyword: "cybersecurity keynote speaker ai", matchType: "Phrase", estCPC: "$9–$16", intent: "Industry-specific", enabled: true },
+  { id: 54, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "bigspeak ai speakers", matchType: "Exact", estCPC: "$4–$8", intent: "Competitor", enabled: true },
+  { id: 55, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "ai speakers agency", matchType: "Exact", estCPC: "$5–$10", intent: "Competitor", enabled: true },
+  { id: 56, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "ai speaker bureau alternative", matchType: "Phrase", estCPC: "$6–$12", intent: "Competitor", enabled: true },
+  { id: 57, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "washington speakers bureau ai", matchType: "Phrase", estCPC: "$5–$10", intent: "Competitor", enabled: true },
+  { id: 58, campaign: "Competitor Conquesting", adGroup: "Competitor Names", keyword: "harry walker agency ai speakers", matchType: "Phrase", estCPC: "$4–$8", intent: "Competitor", enabled: true },
 ]
 
 const initialAdCopy: AdCopy[] = [
-  { id: "H1", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "#1 AI Speakers Bureau", charCount: 21, maxChars: 30, pinPosition: "Pin 1", theme: "Brand Authority", status: "Active", notes: "Establishes market position" },
-  { id: "H2", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "Book AI Keynote Speakers", charCount: 24, maxChars: 30, pinPosition: "Pin 1", theme: "Action CTA", status: "Active", notes: "Direct action headline" },
-  { id: "H3", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "81+ AI Expert Speakers", charCount: 22, maxChars: 30, pinPosition: "Pin 2", theme: "Social Proof", status: "Active", notes: "Roster size as proof point" },
-  { id: "H4", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "AI Builders, Not Just Talkers", charCount: 28, maxChars: 30, pinPosition: "Pin 2", theme: "Differentiation", status: "Active", notes: "KEY differentiator" },
-  { id: "H5", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "Siri Founders on Our Roster", charCount: 27, maxChars: 30, pinPosition: "Pin 3", theme: "Name Recognition", status: "Active", notes: "Marquee name draws clicks" },
-  { id: "H6", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "OpenAI & Google AI Veterans", charCount: 27, maxChars: 30, pinPosition: "Pin 3", theme: "Name Recognition", status: "Active", notes: "Institutional credibility" },
-  { id: "H7", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "24-Hour Response Guaranteed", charCount: 27, maxChars: 30, pinPosition: "\u2014", theme: "Service Promise", status: "Active", notes: "Speed commitment" },
-  { id: "H8", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "AI-Exclusive Speaker Bureau", charCount: 27, maxChars: 30, pinPosition: "\u2014", theme: "Specialization", status: "Active", notes: "Not generalist \u2014 only AI" },
-  { id: "H9", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "Practitioners Who Build AI", charCount: 25, maxChars: 30, pinPosition: "\u2014", theme: "Differentiation", status: "Active", notes: "Reinforces builder positioning" },
-  { id: "H10", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "Stanford & Harvard AI Experts", charCount: 29, maxChars: 30, pinPosition: "\u2014", theme: "Credibility", status: "Active", notes: "Academic prestige" },
-  { id: "H11", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "From Google, Amazon & OpenAI", charCount: 28, maxChars: 30, pinPosition: "\u2014", theme: "Credibility", status: "Active", notes: "Company association" },
-  { id: "H12", type: "headline", adGroup: "Core \u2014 AI Keynote", text: "Get a Custom Speaker Proposal", charCount: 29, maxChars: 30, pinPosition: "\u2014", theme: "CTA", status: "Active", notes: "Soft conversion action" },
-  { id: "H13", type: "headline", adGroup: "Events \u2014 Conference", text: "AI Speakers for Your Event", charCount: 26, maxChars: 30, pinPosition: "Pin 1", theme: "Relevance", status: "Active", notes: "Direct match to search" },
-  { id: "H14", type: "headline", adGroup: "Events \u2014 Conference", text: "Elevate Your AI Conference", charCount: 26, maxChars: 30, pinPosition: "Pin 2", theme: "Benefit", status: "Active", notes: "Aspirational framing" },
-  { id: "H15", type: "headline", adGroup: "Events \u2014 Conference", text: "Keynotes, Panels & Workshops", charCount: 29, maxChars: 30, pinPosition: "\u2014", theme: "Service Range", status: "Active", notes: "Shows format flexibility" },
-  { id: "H16", type: "headline", adGroup: "Verticals \u2014 Healthcare", text: "AI Healthcare Keynote Experts", charCount: 29, maxChars: 30, pinPosition: "Pin 1", theme: "Industry Match", status: "Active", notes: "Direct vertical targeting" },
-  { id: "H17", type: "headline", adGroup: "Verticals \u2014 Ethics", text: "AI Ethics & Policy Speakers", charCount: 27, maxChars: 30, pinPosition: "Pin 1", theme: "Industry Match", status: "Active", notes: "Hot topic targeting" },
-  { id: "H18", type: "headline", adGroup: "Verticals \u2014 Leadership", text: "AI Strategy Keynote Speakers", charCount: 28, maxChars: 30, pinPosition: "Pin 1", theme: "Industry Match", status: "Active", notes: "C-suite appeal" },
-  { id: "D1", type: "description", adGroup: "Core \u2014 All", text: "The only AI-exclusive speakers bureau. 81+ practitioners from Google, OpenAI & Stanford.", charCount: 87, maxChars: 90, pinPosition: "Pin 1", theme: "Authority + Proof", status: "Active", notes: "Primary description" },
-  { id: "D2", type: "description", adGroup: "Core \u2014 All", text: "Book real AI builders \u2014 Siri co-founders, Amazon AGI leads & top researchers. Get a proposal.", charCount: 90, maxChars: 90, pinPosition: "Pin 2", theme: "Differentiation", status: "Active", notes: "Builder positioning" },
-  { id: "D3", type: "description", adGroup: "Core \u2014 All", text: "From keynotes to workshops, we match your event with the perfect AI expert. 24hr response.", charCount: 89, maxChars: 90, pinPosition: "\u2014", theme: "Service Range", status: "Active", notes: "Format flexibility" },
-  { id: "D4", type: "description", adGroup: "Core \u2014 All", text: "Not motivational speakers \u2014 real AI practitioners who build the tech. Browse 81+ experts now.", charCount: 90, maxChars: 90, pinPosition: "\u2014", theme: "Differentiation", status: "Active", notes: "Anti-generalist messaging" },
-  { id: "D5", type: "description", adGroup: "Events \u2014 Conference", text: "Planning an AI conference or corporate event? We curate the perfect speaker for your audience.", charCount: 90, maxChars: 90, pinPosition: "\u2014", theme: "Relevance", status: "Active", notes: "Event planner targeting" },
-  { id: "D6", type: "description", adGroup: "Events \u2014 Corporate", text: "Engage your executive team with AI insights from Fortune 500 leaders and Silicon Valley pioneers.", charCount: 90, maxChars: 90, pinPosition: "\u2014", theme: "Prestige", status: "Active", notes: "C-suite targeting" },
-  { id: "D7", type: "description", adGroup: "Verticals \u2014 Healthcare", text: "AI healthcare speakers for your medical conference. Experts from Stanford, WHO & leading hospitals.", charCount: 90, maxChars: 90, pinPosition: "\u2014", theme: "Industry Match", status: "Active", notes: "Healthcare vertical" },
-  { id: "D8", type: "description", adGroup: "Verticals \u2014 Ethics", text: "Navigate responsible AI with keynote speakers on ethics, governance, and policy frameworks.", charCount: 89, maxChars: 90, pinPosition: "\u2014", theme: "Industry Match", status: "Active", notes: "Ethics vertical" },
+  { id: "H1", type: "headline", adGroup: "Core — AI Keynote", text: "#1 AI Speakers Bureau", charCount: 21, maxChars: 30, pinPosition: "Pin 1", theme: "Brand Authority", status: "Active", notes: "Establishes market position" },
+  { id: "H2", type: "headline", adGroup: "Core — AI Keynote", text: "Book AI Keynote Speakers", charCount: 24, maxChars: 30, pinPosition: "Pin 1", theme: "Action CTA", status: "Active", notes: "Direct action headline" },
+  { id: "H3", type: "headline", adGroup: "Core — AI Keynote", text: "81+ AI Expert Speakers", charCount: 22, maxChars: 30, pinPosition: "Pin 2", theme: "Social Proof", status: "Active", notes: "Roster size as proof point" },
+  { id: "H4", type: "headline", adGroup: "Core — AI Keynote", text: "AI Builders, Not Just Talkers", charCount: 28, maxChars: 30, pinPosition: "Pin 2", theme: "Differentiation", status: "Active", notes: "KEY differentiator" },
+  { id: "H5", type: "headline", adGroup: "Core — AI Keynote", text: "Siri Founders on Our Roster", charCount: 27, maxChars: 30, pinPosition: "Pin 3", theme: "Name Recognition", status: "Active", notes: "Marquee name draws clicks" },
+  { id: "H6", type: "headline", adGroup: "Core — AI Keynote", text: "OpenAI & Google AI Veterans", charCount: 27, maxChars: 30, pinPosition: "Pin 3", theme: "Name Recognition", status: "Active", notes: "Institutional credibility" },
+  { id: "H7", type: "headline", adGroup: "Core — AI Keynote", text: "24-Hour Response Guaranteed", charCount: 27, maxChars: 30, pinPosition: "—", theme: "Service Promise", status: "Active", notes: "Speed commitment" },
+  { id: "H8", type: "headline", adGroup: "Core — AI Keynote", text: "AI-Exclusive Speaker Bureau", charCount: 27, maxChars: 30, pinPosition: "—", theme: "Specialization", status: "Active", notes: "Not generalist — only AI" },
+  { id: "H9", type: "headline", adGroup: "Core — AI Keynote", text: "Practitioners Who Build AI", charCount: 25, maxChars: 30, pinPosition: "—", theme: "Differentiation", status: "Active", notes: "Reinforces builder positioning" },
+  { id: "H10", type: "headline", adGroup: "Core — AI Keynote", text: "Stanford & Harvard AI Experts", charCount: 29, maxChars: 30, pinPosition: "—", theme: "Credibility", status: "Active", notes: "Academic prestige" },
+  { id: "H11", type: "headline", adGroup: "Core — AI Keynote", text: "From Google, Amazon & OpenAI", charCount: 28, maxChars: 30, pinPosition: "—", theme: "Credibility", status: "Active", notes: "Company association" },
+  { id: "H12", type: "headline", adGroup: "Core — AI Keynote", text: "Get a Custom Speaker Proposal", charCount: 29, maxChars: 30, pinPosition: "—", theme: "CTA", status: "Active", notes: "Soft conversion action" },
+  { id: "H13", type: "headline", adGroup: "Events — Conference", text: "AI Speakers for Your Event", charCount: 26, maxChars: 30, pinPosition: "Pin 1", theme: "Relevance", status: "Active", notes: "Direct match to search" },
+  { id: "H14", type: "headline", adGroup: "Events — Conference", text: "Elevate Your AI Conference", charCount: 26, maxChars: 30, pinPosition: "Pin 2", theme: "Benefit", status: "Active", notes: "Aspirational framing" },
+  { id: "H15", type: "headline", adGroup: "Events — Conference", text: "Keynotes, Panels & Workshops", charCount: 29, maxChars: 30, pinPosition: "—", theme: "Service Range", status: "Active", notes: "Shows format flexibility" },
+  { id: "H16", type: "headline", adGroup: "Verticals — Healthcare", text: "AI Healthcare Keynote Experts", charCount: 29, maxChars: 30, pinPosition: "Pin 1", theme: "Industry Match", status: "Active", notes: "Direct vertical targeting" },
+  { id: "H17", type: "headline", adGroup: "Verticals — Ethics", text: "AI Ethics & Policy Speakers", charCount: 27, maxChars: 30, pinPosition: "Pin 1", theme: "Industry Match", status: "Active", notes: "Hot topic targeting" },
+  { id: "H18", type: "headline", adGroup: "Verticals — Leadership", text: "AI Strategy Keynote Speakers", charCount: 28, maxChars: 30, pinPosition: "Pin 1", theme: "Industry Match", status: "Active", notes: "C-suite appeal" },
+  { id: "D1", type: "description", adGroup: "Core — All", text: "The only AI-exclusive speakers bureau. 81+ practitioners from Google, OpenAI & Stanford.", charCount: 87, maxChars: 90, pinPosition: "Pin 1", theme: "Authority + Proof", status: "Active", notes: "Primary description" },
+  { id: "D2", type: "description", adGroup: "Core — All", text: "Book real AI builders — Siri co-founders, Amazon AGI leads & top researchers. Get a proposal.", charCount: 90, maxChars: 90, pinPosition: "Pin 2", theme: "Differentiation", status: "Active", notes: "Builder positioning" },
+  { id: "D3", type: "description", adGroup: "Core — All", text: "From keynotes to workshops, we match your event with the perfect AI expert. 24hr response.", charCount: 89, maxChars: 90, pinPosition: "—", theme: "Service Range", status: "Active", notes: "Format flexibility" },
+  { id: "D4", type: "description", adGroup: "Core — All", text: "Not motivational speakers — real AI practitioners who build the tech. Browse 81+ experts now.", charCount: 90, maxChars: 90, pinPosition: "—", theme: "Differentiation", status: "Active", notes: "Anti-generalist messaging" },
+  { id: "D5", type: "description", adGroup: "Events — Conference", text: "Planning an AI conference or corporate event? We curate the perfect speaker for your audience.", charCount: 90, maxChars: 90, pinPosition: "—", theme: "Relevance", status: "Active", notes: "Event planner targeting" },
+  { id: "D6", type: "description", adGroup: "Events — Corporate", text: "Engage your executive team with AI insights from Fortune 500 leaders and Silicon Valley pioneers.", charCount: 90, maxChars: 90, pinPosition: "—", theme: "Prestige", status: "Active", notes: "C-suite targeting" },
+  { id: "D7", type: "description", adGroup: "Verticals — Healthcare", text: "AI healthcare speakers for your medical conference. Experts from Stanford, WHO & leading hospitals.", charCount: 90, maxChars: 90, pinPosition: "—", theme: "Industry Match", status: "Active", notes: "Healthcare vertical" },
+  { id: "D8", type: "description", adGroup: "Verticals — Ethics", text: "Navigate responsible AI with keynote speakers on ethics, governance, and policy frameworks.", charCount: 89, maxChars: 90, pinPosition: "—", theme: "Industry Match", status: "Active", notes: "Ethics vertical" },
 ]
 
 const initialNegativeKeywords: NegativeKeyword[] = [
@@ -259,22 +259,22 @@ const initialNegativeKeywords: NegativeKeyword[] = [
   { id: 25, keyword: "diy", matchType: "Broad", reason: "Self-service intent", applyTo: "All Campaigns", enabled: true },
   { id: 26, keyword: "template", matchType: "Broad", reason: "Self-service intent", applyTo: "All Campaigns", enabled: true },
   { id: 27, keyword: "wedding speaker", matchType: "Phrase", reason: "Wrong event type", applyTo: "All Campaigns", enabled: true },
-  { id: 28, keyword: "motivational speaker", matchType: "Phrase", reason: "Generalist \u2014 not AI focused", applyTo: "All Campaigns", enabled: true },
+  { id: 28, keyword: "motivational speaker", matchType: "Phrase", reason: "Generalist — not AI focused", applyTo: "All Campaigns", enabled: true },
   { id: 29, keyword: "inspirational quotes", matchType: "Phrase", reason: "Content search, not booking", applyTo: "All Campaigns", enabled: true },
   { id: 30, keyword: "resume", matchType: "Broad", reason: "Job seekers", applyTo: "All Campaigns", enabled: true },
 ]
 
 const initialCROItems: CROItem[] = [
-  { id: 1, priority: "P1 \u2014 Critical", recommendation: "Add Google Tag Manager + conversion tracking on /contact form submissions", expectedImpact: "Track all leads accurately", effort: "Low (1-2 hours)", completed: false },
-  { id: 2, priority: "P1 \u2014 Critical", recommendation: "Implement Enhanced Conversions for better attribution", expectedImpact: "20-30% more attributed conversions", effort: "Low (1-2 hours)", completed: false },
-  { id: 3, priority: "P1 \u2014 Critical", recommendation: "Set up retargeting pixels (Google Ads + Meta) on all pages", expectedImpact: "Enable remarketing campaigns", effort: "Low (1 hour)", completed: false },
-  { id: 4, priority: "P2 \u2014 High", recommendation: "Add client logos / social proof above the fold on homepage", expectedImpact: "+15-25% CTR on landing page", effort: "Medium (half day)", completed: false },
-  { id: 5, priority: "P2 \u2014 High", recommendation: "Create dedicated landing pages for top 3 ad groups", expectedImpact: "+20-40% conversion rate", effort: "Medium (2-3 days)", completed: false },
-  { id: 6, priority: "P2 \u2014 High", recommendation: "Add live chat or chatbot for instant speaker inquiries", expectedImpact: "+10-20% lead capture", effort: "Medium (1 day)", completed: false },
-  { id: 7, priority: "P3 \u2014 Medium", recommendation: "A/B test CTA button copy: 'Book Speaker' vs 'Get a Free Proposal' vs 'Check Availability'", expectedImpact: "+5-15% conversion rate", effort: "Low (ongoing)", completed: false },
-  { id: 8, priority: "P3 \u2014 Medium", recommendation: "Add speaker video highlights on individual speaker pages", expectedImpact: "+10-20% time on page", effort: "Medium (ongoing)", completed: false },
-  { id: 9, priority: "P3 \u2014 Medium", recommendation: "Implement exit-intent popup with lead magnet", expectedImpact: "+5-10% lead capture", effort: "Low (half day)", completed: false },
-  { id: 10, priority: "P4 \u2014 Nice to Have", recommendation: "Create comparison page: 'Why Choose an AI-Exclusive Bureau'", expectedImpact: "SEO + ads landing page", effort: "Medium (1-2 days)", completed: false },
+  { id: 1, priority: "P1 — Critical", recommendation: "Add Google Tag Manager + conversion tracking on /contact form submissions", expectedImpact: "Track all leads accurately", effort: "Low (1-2 hours)", completed: false },
+  { id: 2, priority: "P1 — Critical", recommendation: "Implement Enhanced Conversions for better attribution", expectedImpact: "20-30% more attributed conversions", effort: "Low (1-2 hours)", completed: false },
+  { id: 3, priority: "P1 — Critical", recommendation: "Set up retargeting pixels (Google Ads + Meta) on all pages", expectedImpact: "Enable remarketing campaigns", effort: "Low (1 hour)", completed: false },
+  { id: 4, priority: "P2 — High", recommendation: "Add client logos / social proof above the fold on homepage", expectedImpact: "+15-25% CTR on landing page", effort: "Medium (half day)", completed: false },
+  { id: 5, priority: "P2 — High", recommendation: "Create dedicated landing pages for top 3 ad groups", expectedImpact: "+20-40% conversion rate", effort: "Medium (2-3 days)", completed: false },
+  { id: 6, priority: "P2 — High", recommendation: "Add live chat or chatbot for instant speaker inquiries", expectedImpact: "+10-20% lead capture", effort: "Medium (1 day)", completed: false },
+  { id: 7, priority: "P3 — Medium", recommendation: "A/B test CTA button copy: 'Book Speaker' vs 'Get a Free Proposal' vs 'Check Availability'", expectedImpact: "+5-15% conversion rate", effort: "Low (ongoing)", completed: false },
+  { id: 8, priority: "P3 — Medium", recommendation: "Add speaker video highlights on individual speaker pages", expectedImpact: "+10-20% time on page", effort: "Medium (ongoing)", completed: false },
+  { id: 9, priority: "P3 — Medium", recommendation: "Implement exit-intent popup with lead magnet", expectedImpact: "+5-10% lead capture", effort: "Low (half day)", completed: false },
+  { id: 10, priority: "P4 — Nice to Have", recommendation: "Create comparison page: 'Why Choose an AI-Exclusive Bureau'", expectedImpact: "SEO + ads landing page", effort: "Medium (1-2 days)", completed: false },
 ]
 
 const initialTasks: Task[] = [
@@ -282,8 +282,8 @@ const initialTasks: Task[] = [
   { id: 2, title: "Install Google Tag Manager", category: "Tracking", priority: "critical", status: "todo", dueDate: "", notes: "Add GTM container to all pages" },
   { id: 3, title: "Configure conversion tracking", category: "Tracking", priority: "critical", status: "todo", dueDate: "", notes: "Track contact form submissions, CTA clicks" },
   { id: 4, title: "Set up Enhanced Conversions", category: "Tracking", priority: "high", status: "todo", dueDate: "", notes: "Pass hashed email for better attribution" },
-  { id: 5, title: "Build Campaign 1: AI Keynote Speakers \u2014 Core", category: "Campaigns", priority: "critical", status: "todo", dueDate: "", notes: "Highest priority \u2014 start with this campaign first" },
-  { id: 6, title: "Build Campaign 2: AI Conference Speakers \u2014 Events", category: "Campaigns", priority: "high", status: "todo", dueDate: "", notes: "Launch alongside Campaign 1" },
+  { id: 5, title: "Build Campaign 1: AI Keynote Speakers — Core", category: "Campaigns", priority: "critical", status: "todo", dueDate: "", notes: "Highest priority — start with this campaign first" },
+  { id: 6, title: "Build Campaign 2: AI Conference Speakers — Events", category: "Campaigns", priority: "high", status: "todo", dueDate: "", notes: "Launch alongside Campaign 1" },
   { id: 7, title: "Build Campaign 3: Named Speaker Searches", category: "Campaigns", priority: "medium", status: "todo", dueDate: "", notes: "Low CPC, launch in week 2" },
   { id: 8, title: "Build Campaign 4: AI Industry Verticals", category: "Campaigns", priority: "medium", status: "todo", dueDate: "", notes: "Launch in week 2-3" },
   { id: 9, title: "Build Campaign 5: Competitor Conquesting", category: "Campaigns", priority: "low", status: "todo", dueDate: "", notes: "Launch in week 3-4" },
@@ -292,7 +292,7 @@ const initialTasks: Task[] = [
   { id: 12, title: "Set up remarketing audiences", category: "Audiences", priority: "high", status: "todo", dueDate: "", notes: "Website visitors, speaker page viewers" },
   { id: 13, title: "Upload CRM customer match list", category: "Audiences", priority: "medium", status: "todo", dueDate: "", notes: "Past inquiry contacts for targeting" },
   { id: 14, title: "Create ad extensions (sitelinks, callouts, snippets)", category: "Ad Copy", priority: "high", status: "todo", dueDate: "", notes: "All extensions from plan" },
-  { id: 15, title: "Set up ad schedule (dayparting)", category: "Targeting", priority: "medium", status: "todo", dueDate: "", notes: "Mon\u2013Fri 8am\u20136pm bid up, weekends bid down" },
+  { id: 15, title: "Set up ad schedule (dayparting)", category: "Targeting", priority: "medium", status: "todo", dueDate: "", notes: "Mon–Fri 8am–6pm bid up, weekends bid down" },
   { id: 16, title: "Review & optimize after Week 1", category: "Optimization", priority: "high", status: "todo", dueDate: "", notes: "Check search terms, pause poor performers" },
   { id: 17, title: "Review & optimize after Month 1", category: "Optimization", priority: "high", status: "todo", dueDate: "", notes: "Analyze CPL, adjust budgets, add negatives" },
 ]
@@ -410,7 +410,7 @@ export default function GoogleAdsCampaignPage() {
             <TrendingUp className="h-6 w-6 text-orange-600" />
             Google Ads Campaign Manager
           </h1>
-          <p className="text-gray-600 mt-1">SpeakAbout.ai \u2014 AI-Exclusive Speakers Bureau</p>
+          <p className="text-gray-600 mt-1">SpeakAbout.ai — AI-Exclusive Speakers Bureau</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setShowCalendar(true)}>
@@ -447,14 +447,14 @@ export default function GoogleAdsCampaignPage() {
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
             <MousePointerClick className="h-4 w-4" />Est. Clicks/Mo
           </div>
-          <div className="text-2xl font-bold">615\u20131,165</div>
+          <div className="text-2xl font-bold">615–1,165</div>
           <div className="text-xs text-gray-500">across all campaigns</div>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
             <Target className="h-4 w-4" />Est. Leads/Mo
           </div>
-          <div className="text-2xl font-bold">36\u201361</div>
+          <div className="text-2xl font-bold">36–61</div>
           <div className="text-xs text-gray-500">at launch</div>
         </Card>
       </div>
@@ -567,19 +567,19 @@ export default function GoogleAdsCampaignPage() {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-2 pr-4">KPI</th>
-                    <th className="text-left py-2 pr-4">Month 1\u20132</th>
-                    <th className="text-left py-2 pr-4">Month 3\u20136</th>
+                    <th className="text-left py-2 pr-4">Month 1–2</th>
+                    <th className="text-left py-2 pr-4">Month 3–6</th>
                     <th className="text-left py-2 pr-4">Benchmark</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-600">
-                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Click-Through Rate</td><td className="py-2 pr-4">3.5%\u20135%</td><td className="py-2 pr-4">5%\u20138%</td><td className="py-2 pr-4">Industry avg: 3.17%</td></tr>
-                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Cost Per Click</td><td className="py-2 pr-4">$6\u2013$15</td><td className="py-2 pr-4">$5\u2013$12</td><td className="py-2 pr-4">B2B avg: $8\u2013$14</td></tr>
-                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Conversion Rate</td><td className="py-2 pr-4">4%\u20136%</td><td className="py-2 pr-4">6%\u201310%</td><td className="py-2 pr-4">B2B avg: 3.04%</td></tr>
-                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Cost Per Lead</td><td className="py-2 pr-4">$120\u2013$250</td><td className="py-2 pr-4">$80\u2013$180</td><td className="py-2 pr-4">Bureau avg: $150\u2013$300</td></tr>
-                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Monthly Leads</td><td className="py-2 pr-4">36\u201361</td><td className="py-2 pr-4">50\u201380+</td><td className="py-2 pr-4">\u2014</td></tr>
-                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Quality Score</td><td className="py-2 pr-4">6\u20137</td><td className="py-2 pr-4">7\u20139</td><td className="py-2 pr-4">Avg: 5\u20136</td></tr>
-                  <tr><td className="py-2 pr-4 font-medium">Impression Share</td><td className="py-2 pr-4">40%\u201360%</td><td className="py-2 pr-4">60%\u201380%</td><td className="py-2 pr-4">\u2014</td></tr>
+                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Click-Through Rate</td><td className="py-2 pr-4">3.5%–5%</td><td className="py-2 pr-4">5%–8%</td><td className="py-2 pr-4">Industry avg: 3.17%</td></tr>
+                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Cost Per Click</td><td className="py-2 pr-4">$6–$15</td><td className="py-2 pr-4">$5–$12</td><td className="py-2 pr-4">B2B avg: $8–$14</td></tr>
+                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Conversion Rate</td><td className="py-2 pr-4">4%–6%</td><td className="py-2 pr-4">6%–10%</td><td className="py-2 pr-4">B2B avg: 3.04%</td></tr>
+                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Cost Per Lead</td><td className="py-2 pr-4">$120–$250</td><td className="py-2 pr-4">$80–$180</td><td className="py-2 pr-4">Bureau avg: $150–$300</td></tr>
+                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Monthly Leads</td><td className="py-2 pr-4">36–61</td><td className="py-2 pr-4">50–80+</td><td className="py-2 pr-4">—</td></tr>
+                  <tr className="border-b"><td className="py-2 pr-4 font-medium">Quality Score</td><td className="py-2 pr-4">6–7</td><td className="py-2 pr-4">7–9</td><td className="py-2 pr-4">Avg: 5–6</td></tr>
+                  <tr><td className="py-2 pr-4 font-medium">Impression Share</td><td className="py-2 pr-4">40%–60%</td><td className="py-2 pr-4">60%–80%</td><td className="py-2 pr-4">—</td></tr>
                 </tbody>
               </table>
             </div>
@@ -641,7 +641,7 @@ export default function GoogleAdsCampaignPage() {
               </table>
             </div>
             <div className="p-3 bg-gray-50 text-sm text-gray-500">
-              Showing {filteredKeywords.length} of {keywords.length} keywords \u2022 {keywords.filter(k => k.enabled).length} enabled
+              Showing {filteredKeywords.length} of {keywords.length} keywords • {keywords.filter(k => k.enabled).length} enabled
             </div>
           </Card>
         </TabsContent>
@@ -658,7 +658,7 @@ export default function GoogleAdsCampaignPage() {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-mono text-gray-400">{ad.id}</span>
                         <Badge variant="outline" className="text-xs">{ad.adGroup}</Badge>
-                        {ad.pinPosition !== "\u2014" && (
+                        {ad.pinPosition !== "—" && (
                           <Badge className="bg-blue-100 text-blue-800 text-xs">{ad.pinPosition}</Badge>
                         )}
                         <Badge className={getStatusColor(ad.status.toLowerCase())}>{ad.status}</Badge>
@@ -694,7 +694,7 @@ export default function GoogleAdsCampaignPage() {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-mono text-gray-400">{ad.id}</span>
                         <Badge variant="outline" className="text-xs">{ad.adGroup}</Badge>
-                        {ad.pinPosition !== "\u2014" && (
+                        {ad.pinPosition !== "—" && (
                           <Badge className="bg-blue-100 text-blue-800 text-xs">{ad.pinPosition}</Badge>
                         )}
                         <Badge className={getStatusColor(ad.status.toLowerCase())}>{ad.status}</Badge>
@@ -810,7 +810,7 @@ export default function GoogleAdsCampaignPage() {
             <h3 className="font-semibold mb-3">In-Market & Affinity Audiences</h3>
             <div className="grid gap-3">
               {[
-                { segment: "Event Planning Services", category: "In-Market", bid: "+25%", rationale: "Active event planners \u2014 core buyer", applyTo: "All Search" },
+                { segment: "Event Planning Services", category: "In-Market", bid: "+25%", rationale: "Active event planners — core buyer", applyTo: "All Search" },
                 { segment: "Conference & Event Tickets", category: "In-Market", bid: "+15%", rationale: "Conference attendees who may plan events", applyTo: "Core & Events" },
                 { segment: "Business Technology Solutions", category: "In-Market", bid: "+10%", rationale: "Tech decision makers exploring AI", applyTo: "Verticals & Events" },
                 { segment: "Corporate Training & Development", category: "In-Market", bid: "+20%", rationale: "L&D buyers often book speakers", applyTo: "Core & Events" },
@@ -841,9 +841,9 @@ export default function GoogleAdsCampaignPage() {
             <h3 className="font-semibold mb-3">Remarketing Lists</h3>
             <div className="grid gap-3">
               {[
-                { segment: "Uploaded CRM List (past inquiries)", bid: "+40%", rationale: "Highest intent \u2014 past contacts returning" },
+                { segment: "Uploaded CRM List (past inquiries)", bid: "+40%", rationale: "Highest intent — past contacts returning" },
                 { segment: "Website Visitors (speakabout.ai)", bid: "+30%", rationale: "Site visitors who didn't convert" },
-                { segment: "Speaker Page Viewers", bid: "+35%", rationale: "Viewed specific speaker \u2014 very high intent" },
+                { segment: "Speaker Page Viewers", bid: "+35%", rationale: "Viewed specific speaker — very high intent" },
               ].map((r, i) => (
                 <Card key={i} className="p-4 flex items-center justify-between border-l-4 border-l-purple-400">
                   <div>
@@ -862,15 +862,15 @@ export default function GoogleAdsCampaignPage() {
               <Card className="p-4">
                 <h4 className="font-medium mb-3 flex items-center gap-2"><Users className="h-4 w-4" />Demographics</h4>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span>Age: 25\u201364 (include)</span><span className="text-gray-400">\u2014</span></div>
-                  <div className="flex justify-between"><span>Age: 35\u201354 (bid up)</span><Badge className="bg-green-100 text-green-800">+15%</Badge></div>
+                  <div className="flex justify-between"><span>Age: 25–64 (include)</span><span className="text-gray-400">—</span></div>
+                  <div className="flex justify-between"><span>Age: 35–54 (bid up)</span><Badge className="bg-green-100 text-green-800">+15%</Badge></div>
                   <div className="flex justify-between"><span>Household Income: Top 30%</span><Badge className="bg-green-100 text-green-800">+10%</Badge></div>
                 </div>
               </Card>
               <Card className="p-4">
                 <h4 className="font-medium mb-3 flex items-center gap-2"><Globe className="h-4 w-4" />Geography</h4>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span>Primary: United States</span><span className="text-gray-400">\u2014</span></div>
+                  <div className="flex justify-between"><span>Primary: United States</span><span className="text-gray-400">—</span></div>
                   <div className="flex justify-between"><span>Tier 1: NYC, SF, LA, Chicago, Boston, Austin, Seattle, DC</span><Badge className="bg-green-100 text-green-800">+20%</Badge></div>
                   <div className="flex justify-between"><span>Secondary: UK, Canada, Australia</span><Badge className="bg-red-100 text-red-800">-10%</Badge></div>
                 </div>
@@ -885,7 +885,7 @@ export default function GoogleAdsCampaignPage() {
               <Card className="p-4">
                 <h4 className="font-medium mb-3 flex items-center gap-2"><Clock className="h-4 w-4" />Schedule (Dayparting)</h4>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span>Mon\u2013Fri, 8am\u20136pm</span><Badge className="bg-green-100 text-green-800">+15%</Badge></div>
+                  <div className="flex justify-between"><span>Mon–Fri, 8am–6pm</span><Badge className="bg-green-100 text-green-800">+15%</Badge></div>
                   <div className="flex justify-between"><span>Weekends</span><Badge className="bg-red-100 text-red-800">-25%</Badge></div>
                 </div>
               </Card>
@@ -899,11 +899,11 @@ export default function GoogleAdsCampaignPage() {
             <h3 className="font-semibold mb-3">Landing Page Mapping</h3>
             <div className="grid gap-3">
               {[
-                { campaign: "AI Keynote Speakers \u2014 Core", page: "speakabout.ai (homepage) or /speakers", cta: "Book Speaker Today", notes: "Add trust badges, speaker count, and client logos above the fold" },
-                { campaign: "AI Conference Speakers \u2014 Events", page: "speakabout.ai/our-services", cta: "Get a Custom Proposal", notes: "Highlight format flexibility (keynotes, panels, workshops)" },
-                { campaign: "Named Speaker \u2014 Peter Norvig", page: "speakabout.ai/speakers/peter-norvig", cta: "Check Availability", notes: "Ensure each speaker page has strong CTA and social proof" },
-                { campaign: "Named Speaker \u2014 Adam Cheyer", page: "speakabout.ai/speakers/adam-cheyer", cta: "Check Availability", notes: "Feature video clips and past event testimonials" },
-                { campaign: "Named Speaker \u2014 Gopi Kallayil", page: "speakabout.ai/speakers/gopi-kallayil", cta: "Check Availability", notes: "Highlight Google credentials prominently" },
+                { campaign: "AI Keynote Speakers — Core", page: "speakabout.ai (homepage) or /speakers", cta: "Book Speaker Today", notes: "Add trust badges, speaker count, and client logos above the fold" },
+                { campaign: "AI Conference Speakers — Events", page: "speakabout.ai/our-services", cta: "Get a Custom Proposal", notes: "Highlight format flexibility (keynotes, panels, workshops)" },
+                { campaign: "Named Speaker — Peter Norvig", page: "speakabout.ai/speakers/peter-norvig", cta: "Check Availability", notes: "Ensure each speaker page has strong CTA and social proof" },
+                { campaign: "Named Speaker — Adam Cheyer", page: "speakabout.ai/speakers/adam-cheyer", cta: "Check Availability", notes: "Feature video clips and past event testimonials" },
+                { campaign: "Named Speaker — Gopi Kallayil", page: "speakabout.ai/speakers/gopi-kallayil", cta: "Check Availability", notes: "Highlight Google credentials prominently" },
                 { campaign: "Healthcare AI Vertical", page: "speakabout.ai/industries/healthcare-keynote-speakers", cta: "Find Healthcare AI Speaker", notes: "Include healthcare-specific case studies" },
                 { campaign: "AI Ethics & Policy", page: "speakabout.ai/ethics-speakers-in-ai", cta: "Book Ethics Speaker", notes: "Feature timely policy content" },
                 { campaign: "Technology AI Vertical", page: "speakabout.ai/industries/technology-keynote-speakers", cta: "Explore Tech Speakers", notes: "Emphasize Fortune 500 experience" },
@@ -1111,8 +1111,8 @@ export default function GoogleAdsCampaignPage() {
                     <p className="font-medium">Foundation & High-Priority Campaigns</p>
                     <ul className="text-gray-600 list-disc ml-4 mt-1">
                       <li>Set up Google Ads account, GTM, conversion tracking</li>
-                      <li>Launch Campaign 1: AI Keynote Speakers \u2014 Core</li>
-                      <li>Launch Campaign 2: AI Conference Speakers \u2014 Events</li>
+                      <li>Launch Campaign 1: AI Keynote Speakers — Core</li>
+                      <li>Launch Campaign 2: AI Conference Speakers — Events</li>
                       <li>Upload all negative keywords</li>
                     </ul>
                   </div>
@@ -1130,7 +1130,7 @@ export default function GoogleAdsCampaignPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Badge className="bg-yellow-100 text-yellow-800 flex-shrink-0">Week 3\u20134</Badge>
+                  <Badge className="bg-yellow-100 text-yellow-800 flex-shrink-0">Week 3–4</Badge>
                   <div>
                     <p className="font-medium">Full Rollout & Optimization</p>
                     <ul className="text-gray-600 list-disc ml-4 mt-1">
@@ -1164,7 +1164,7 @@ export default function GoogleAdsCampaignPage() {
                     <Badge className={getStatusColor(c.status)} >{c.status}</Badge>
                     <span className="font-medium flex-1 truncate">{c.name}</span>
                     <Input type="date" value={c.launchDate} onChange={e => updateCampaignDate(c.id, "launchDate", e.target.value)} className="h-8 text-xs w-36" />
-                    <span className="text-gray-400">\u2192</span>
+                    <span className="text-gray-400">→</span>
                     <Input type="date" value={c.endDate} onChange={e => updateCampaignDate(c.id, "endDate", e.target.value)} className="h-8 text-xs w-36" />
                   </div>
                 ))}
