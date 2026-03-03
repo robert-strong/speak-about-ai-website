@@ -24,6 +24,7 @@ export const PERMISSION_KEYS = [
   { key: 'vendor_directory', label: 'Vendor Directory', section: 'Marketing', description: 'Vendor Management' },
   { key: 'landing_resources', label: 'Landing Resources', section: 'Marketing', description: 'Email Resources' },
   { key: 'whatsapp', label: 'WhatsApp Group', section: 'Marketing', description: 'Event Pro Community' },
+  { key: 'google_ads', label: 'Google Ads', section: 'Marketing', description: 'Campaign Manager' },
   { key: 'system', label: 'System / Database', section: 'System', description: 'System Debug tools' },
   { key: 'settings', label: 'Settings', section: 'System', description: 'Admin Settings pages' },
 ]

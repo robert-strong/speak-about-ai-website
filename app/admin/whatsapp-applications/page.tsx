@@ -24,7 +24,6 @@ import {
   Users,
   Download
 } from "lucide-react"
-import { AdminSidebar } from "@/components/admin-sidebar"
 import {
   Dialog,
   DialogContent,
@@ -218,10 +217,6 @@ export default function WhatsAppApplicationsPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-8">
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">WhatsApp Group Applications</h1>
@@ -541,9 +536,6 @@ export default function WhatsAppApplicationsPage() {
           </DialogContent>
         </Dialog>
       )}
-    </div>
-        </div>
-      </div>
     </div>
   )
 }

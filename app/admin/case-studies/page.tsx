@@ -31,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { AdminSidebar } from "@/components/admin-sidebar"
 import { Building2, Plus, Edit, Trash2, Upload, X, ArrowUp, ArrowDown, Eye, EyeOff, Loader2, Image as ImageIcon } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -488,11 +487,7 @@ export default function CaseStudiesManagementPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-900">
-      <AdminSidebar />
-
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-8">
+    <div className="space-y-6">
           <Card className="border-gray-700 bg-gray-800">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -622,8 +617,6 @@ export default function CaseStudiesManagementPage() {
               )}
             </CardContent>
           </Card>
-        </div>
-      </div>
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

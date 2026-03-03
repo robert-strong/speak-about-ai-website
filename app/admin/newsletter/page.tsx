@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { AdminSidebar } from '@/components/admin-sidebar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -168,11 +167,7 @@ export default function AdminNewsletterPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-8">
-          <div className="space-y-6">
+    <div className="space-y-6">
         {/* Header with tabs */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
@@ -532,9 +527,6 @@ export default function AdminNewsletterPage() {
         </Card>
           </>
         )}
-      </div>
-        </div>
-      </div>
     </div>
   )
 }

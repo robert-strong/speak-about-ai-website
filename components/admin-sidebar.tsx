@@ -356,7 +356,7 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           description: "Campaign Manager",
           color: "text-orange-600",
           bgColor: "bg-orange-50",
-          permissionKey: "marketing"
+          permissionKey: "google_ads"
         }
       ]
     },
