@@ -36,7 +36,10 @@ import {
   Video,
   BarChart3,
   MousePointer,
-  TrendingUp
+  TrendingUp,
+  RefreshCw,
+  Save,
+  MailOpen
 } from "lucide-react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
@@ -62,7 +65,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { authGet, authPost, authPatch, authDelete } from "@/lib/auth-fetch"
+import { authGet, authPost, authPut, authPatch, authDelete } from "@/lib/auth-fetch"
 
 interface Speaker {
   id: number
@@ -140,6 +143,14 @@ interface SpeakerAnalytics {
   topics?: string
 }
 
+interface EmailTemplate {
+  id?: number
+  template_key: string
+  subject: string
+  body_html: string
+  updated_at?: string
+}
+
 export default function AdminSpeakersPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -169,6 +180,26 @@ export default function AdminSpeakersPage() {
   const [sendingInvite, setSendingInvite] = useState(false)
   const [speakerAnalytics, setSpeakerAnalytics] = useState<SpeakerAnalytics[]>([])
   const [loadingAnalytics, setLoadingAnalytics] = useState(false)
+  // Delete application state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [applicationToDelete, setApplicationToDelete] = useState<SpeakerApplication | null>(null)
+  const [deletingApplication, setDeletingApplication] = useState(false)
+  // Resend letter state
+  const [resendingLetter, setResendingLetter] = useState<number | null>(null)
+  // Email templates state
+  const [approvedTemplate, setApprovedTemplate] = useState<EmailTemplate>({
+    template_key: 'application_approved',
+    subject: '',
+    body_html: ''
+  })
+  const [rejectedTemplate, setRejectedTemplate] = useState<EmailTemplate>({
+    template_key: 'application_rejected',
+    subject: '',
+    body_html: ''
+  })
+  const [loadingTemplates, setLoadingTemplates] = useState(false)
+  const [savingTemplate, setSavingTemplate] = useState<string | null>(null)
+  const [activeTemplateTab, setActiveTemplateTab] = useState("approved")
 
   // Check authentication and load data
   useEffect(() => {
@@ -203,7 +234,6 @@ export default function AdminSpeakersPage() {
           title: "Success",
           description: `${speakerName} has been deleted successfully`,
         })
-        // Reload speakers list
         loadSpeakers()
       } else {
         const errorData = await response.json()
@@ -230,7 +260,6 @@ export default function AdminSpeakersPage() {
 
       if (response.ok) {
         const data = await response.json()
-        // Ensure applications is always an array
         const applications = Array.isArray(data.applications) ? data.applications : []
         setApplications(applications)
       } else {
@@ -242,15 +271,81 @@ export default function AdminSpeakersPage() {
           // If response isn't JSON, use default message
         }
         console.warn("Applications API error:", errorMessage)
-        // Don't show toast for applications - they're optional
         setApplications([])
       }
     } catch (error) {
       console.error("Error loading applications:", error)
-      // Don't show toast for applications - they're optional
       setApplications([])
     } finally {
       setLoadingApplications(false)
+    }
+  }
+
+  const handleDeleteApplication = async () => {
+    if (!applicationToDelete) return
+
+    setDeletingApplication(true)
+    try {
+      const response = await authDelete(`/api/speaker-applications/${applicationToDelete.id}`)
+
+      if (response.ok) {
+        toast({
+          title: "Deleted",
+          description: `Application from ${applicationToDelete.first_name} ${applicationToDelete.last_name} has been deleted`,
+        })
+        loadApplications()
+        setDeleteDialogOpen(false)
+        setApplicationToDelete(null)
+      } else {
+        const errorData = await response.json()
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to delete application",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error deleting application:", error)
+      toast({
+        title: "Error",
+        description: "Failed to delete application",
+        variant: "destructive",
+      })
+    } finally {
+      setDeletingApplication(false)
+    }
+  }
+
+  const handleResendLetter = async (application: SpeakerApplication) => {
+    setResendingLetter(application.id)
+    try {
+      const action = application.status === 'rejected' ? 'resend_rejected_letter' : 'resend_approved_letter'
+      const response = await authPatch(`/api/speaker-applications/${application.id}`, { action })
+
+      if (response.ok) {
+        const data = await response.json()
+        toast({
+          title: "Sent",
+          description: data.message || `Letter resent to ${application.email}`,
+        })
+        loadApplications()
+      } else {
+        const errorData = await response.json()
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to resend letter",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error resending letter:", error)
+      toast({
+        title: "Error",
+        description: "Failed to resend letter",
+        variant: "destructive",
+      })
+    } finally {
+      setResendingLetter(null)
     }
   }
 
@@ -320,7 +415,6 @@ export default function AdminSpeakersPage() {
       })
 
       if (response.ok) {
-        const data = await response.json()
         toast({
           title: "Success",
           description: `Account creation invitation sent to ${selectedSpeaker.name}`,
@@ -331,7 +425,6 @@ export default function AdminSpeakersPage() {
           personal_message: ""
         })
         setSelectedSpeaker(null)
-        // Reload applications to show the new invitation
         loadApplications()
       } else {
         const errorData = await response.json()
@@ -377,9 +470,7 @@ export default function AdminSpeakersPage() {
 
       if (response.ok) {
         const speakersData = await response.json()
-        // Ensure speakers is always an array
         const speakers = Array.isArray(speakersData.speakers) ? speakersData.speakers : []
-        // Validate and sanitize speaker data
         const validatedSpeakers = speakers.map((speaker: any) => ({
           ...speaker,
           name: speaker.name || 'Unknown Speaker',
@@ -413,6 +504,80 @@ export default function AdminSpeakersPage() {
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Email templates functions
+  const loadEmailTemplates = async () => {
+    setLoadingTemplates(true)
+    try {
+      const [approvedRes, rejectedRes] = await Promise.all([
+        authGet("/api/admin/email-templates?key=application_approved"),
+        authGet("/api/admin/email-templates?key=application_rejected"),
+      ])
+
+      if (approvedRes.ok) {
+        const data = await approvedRes.json()
+        if (data.template) {
+          setApprovedTemplate({
+            template_key: 'application_approved',
+            subject: data.template.subject || '',
+            body_html: data.template.body_html || '',
+            updated_at: data.template.updated_at,
+          })
+        }
+      }
+
+      if (rejectedRes.ok) {
+        const data = await rejectedRes.json()
+        if (data.template) {
+          setRejectedTemplate({
+            template_key: 'application_rejected',
+            subject: data.template.subject || '',
+            body_html: data.template.body_html || '',
+            updated_at: data.template.updated_at,
+          })
+        }
+      }
+    } catch (error) {
+      console.error("Error loading email templates:", error)
+    } finally {
+      setLoadingTemplates(false)
+    }
+  }
+
+  const handleSaveTemplate = async (template: EmailTemplate) => {
+    setSavingTemplate(template.template_key)
+    try {
+      const response = await authPut("/api/admin/email-templates", {
+        template_key: template.template_key,
+        subject: template.subject,
+        body_html: template.body_html,
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Saved",
+          description: "Email template saved successfully",
+        })
+        loadEmailTemplates()
+      } else {
+        const errorData = await response.json()
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to save template",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error saving template:", error)
+      toast({
+        title: "Error",
+        description: "Failed to save template",
+        variant: "destructive",
+      })
+    } finally {
+      setSavingTemplate(null)
     }
   }
 
@@ -475,7 +640,7 @@ export default function AdminSpeakersPage() {
       (speaker.topics || []).some(topic => topic.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (speaker.industries || []).some(industry => industry.toLowerCase().includes(searchTerm.toLowerCase()))
 
-    const matchesActive = activeFilter === "all" || 
+    const matchesActive = activeFilter === "all" ||
       (activeFilter === "active" && speaker.active) ||
       (activeFilter === "inactive" && !speaker.active)
 
@@ -529,7 +694,7 @@ export default function AdminSpeakersPage() {
       <div className="fixed left-0 top-0 h-full z-[60]">
         <AdminSidebar />
       </div>
-      
+
       {/* Main Content */}
       <div className="flex-1 lg:ml-72 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -553,8 +718,12 @@ export default function AdminSpeakersPage() {
             </div>
           </div>
 
-          <Tabs defaultValue="speakers" className="space-y-6">
-            <TabsList className="grid w-full max-w-lg grid-cols-3">
+          <Tabs defaultValue="speakers" className="space-y-6" onValueChange={(val) => {
+            if (val === 'email-templates') {
+              loadEmailTemplates()
+            }
+          }}>
+            <TabsList className="grid w-full max-w-2xl grid-cols-4">
               <TabsTrigger value="speakers" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 Speakers ({speakers.length})
@@ -566,6 +735,10 @@ export default function AdminSpeakersPage() {
               <TabsTrigger value="analytics" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Analytics
+              </TabsTrigger>
+              <TabsTrigger value="email-templates" className="flex items-center gap-2">
+                <MailOpen className="h-4 w-4" />
+                Email Templates
               </TabsTrigger>
             </TabsList>
 
@@ -590,7 +763,7 @@ export default function AdminSpeakersPage() {
             <CardContent>
               <div className="text-2xl font-bold">{activeSpeakers}</div>
               <p className="text-xs text-muted-foreground">
-                {Math.round((activeSpeakers / totalSpeakers) * 100)}% of total
+                {totalSpeakers > 0 ? Math.round((activeSpeakers / totalSpeakers) * 100) : 0}% of total
               </p>
             </CardContent>
           </Card>
@@ -611,7 +784,7 @@ export default function AdminSpeakersPage() {
             <CardContent>
               <div className="text-2xl font-bold">{speakersWithVideos}</div>
               <p className="text-xs text-muted-foreground">
-                {Math.round((speakersWithVideos / totalSpeakers) * 100)}% have videos
+                {totalSpeakers > 0 ? Math.round((speakersWithVideos / totalSpeakers) * 100) : 0}% have videos
               </p>
             </CardContent>
           </Card>
@@ -888,9 +1061,22 @@ export default function AdminSpeakersPage() {
                               {application.title} at {application.company}
                             </CardDescription>
                           </div>
-                          <div className="text-sm text-gray-500">
-                            <Calendar className="inline h-3 w-3 mr-1" />
-                            {new Date(application.created_at).toLocaleDateString()}
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500">
+                              <Calendar className="inline h-3 w-3 mr-1" />
+                              {new Date(application.created_at).toLocaleDateString()}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => {
+                                setApplicationToDelete(application)
+                                setDeleteDialogOpen(true)
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
                         </div>
                       </CardHeader>
@@ -991,10 +1177,10 @@ export default function AdminSpeakersPage() {
                               {application.video_links.slice(0, 3).map((link, idx) => (
                                 <div key={idx} className="flex items-center gap-2">
                                   <Video className="h-3 w-3 text-gray-400" />
-                                  <a 
-                                    href={link} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
+                                  <a
+                                    href={link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="text-sm text-blue-600 hover:underline truncate max-w-md"
                                   >
                                     {link}
@@ -1044,6 +1230,36 @@ export default function AdminSpeakersPage() {
                               </Button>
                             </>
                           )}
+                          {(application.status === 'approved' || application.status === 'invited') && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleResendLetter(application)}
+                              disabled={resendingLetter === application.id}
+                            >
+                              {resendingLetter === application.id ? (
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              ) : (
+                                <RefreshCw className="h-3 w-3 mr-1" />
+                              )}
+                              Resend Approval Letter
+                            </Button>
+                          )}
+                          {application.status === 'rejected' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleResendLetter(application)}
+                              disabled={resendingLetter === application.id}
+                            >
+                              {resendingLetter === application.id ? (
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              ) : (
+                                <RefreshCw className="h-3 w-3 mr-1" />
+                              )}
+                              Resend Rejection Letter
+                            </Button>
+                          )}
                           {application.status === 'approved' && !application.invitation_sent_at && (
                             <Button
                               size="sm"
@@ -1053,9 +1269,9 @@ export default function AdminSpeakersPage() {
                               Send Invitation
                             </Button>
                           )}
-                          {application.status === 'invited' && (
+                          {application.invitation_sent_at && (application.status === 'invited' || application.status === 'approved') && (
                             <Badge variant="outline" className="text-xs">
-                              Invitation sent {new Date(application.invitation_sent_at!).toLocaleDateString()}
+                              Invitation sent {new Date(application.invitation_sent_at).toLocaleDateString()}
                             </Badge>
                           )}
                         </div>
@@ -1109,8 +1325,8 @@ export default function AdminSpeakersPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {speakerAnalytics.length > 0 
-                        ? (speakerAnalytics.reduce((sum, s) => sum + parseFloat(s.conversionRate || 0), 0) / speakerAnalytics.length).toFixed(1)
+                      {speakerAnalytics.length > 0
+                        ? (speakerAnalytics.reduce((sum, s) => sum + parseFloat(String(s.conversionRate || 0)), 0) / speakerAnalytics.length).toFixed(1)
                         : '0'}%
                     </div>
                     <p className="text-xs text-muted-foreground">Views to book clicks</p>
@@ -1166,7 +1382,7 @@ export default function AdminSpeakersPage() {
                             <TableRow key={index}>
                               <TableCell className="font-medium">
                                 {speaker.slug ? (
-                                  <Link 
+                                  <Link
                                     href={`/speakers/${speaker.slug}`}
                                     target="_blank"
                                     className="text-blue-600 hover:underline flex items-center gap-1"
@@ -1186,7 +1402,7 @@ export default function AdminSpeakersPage() {
                                 {speaker.bookClicks || 0}
                               </TableCell>
                               <TableCell className="text-center">
-                                <Badge variant={parseFloat(speaker.conversionRate) > 5 ? 'default' : 'secondary'}>
+                                <Badge variant={parseFloat(String(speaker.conversionRate)) > 5 ? 'default' : 'secondary'}>
                                   {speaker.conversionRate || 0}%
                                 </Badge>
                               </TableCell>
@@ -1201,6 +1417,165 @@ export default function AdminSpeakersPage() {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Email Templates Tab */}
+            <TabsContent value="email-templates" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Application Email Templates</CardTitle>
+                  <CardDescription>
+                    Customize the email letters sent to applicants when their application is approved or rejected.
+                    Use variables like {"{{first_name}}"}, {"{{last_name}}"}, {"{{email}}"}, {"{{company}}"}, {"{{title}}"}, {"{{invite_url}}"}, {"{{rejection_reason}}"}, {"{{rejection_reason_block}}"} in your templates.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              {loadingTemplates ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                  <span className="ml-2">Loading templates...</span>
+                </div>
+              ) : (
+                <Tabs value={activeTemplateTab} onValueChange={setActiveTemplateTab}>
+                  <TabsList className="grid w-full max-w-md grid-cols-2">
+                    <TabsTrigger value="approved" className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      Approved Letter
+                    </TabsTrigger>
+                    <TabsTrigger value="rejected" className="flex items-center gap-2">
+                      <XCircle className="h-4 w-4" />
+                      Rejected Letter
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="approved" className="space-y-4 mt-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Approved Application Letter</CardTitle>
+                        <CardDescription>
+                          This email is sent when a speaker application is approved. It includes the account creation link.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <Label htmlFor="approved-subject">Email Subject</Label>
+                          <Input
+                            id="approved-subject"
+                            value={approvedTemplate.subject}
+                            onChange={(e) => setApprovedTemplate({...approvedTemplate, subject: e.target.value})}
+                            placeholder="Enter email subject..."
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="approved-body">Email Body (HTML)</Label>
+                          <Textarea
+                            id="approved-body"
+                            value={approvedTemplate.body_html}
+                            onChange={(e) => setApprovedTemplate({...approvedTemplate, body_html: e.target.value})}
+                            placeholder="Enter email HTML content..."
+                            rows={20}
+                            className="font-mono text-sm"
+                          />
+                        </div>
+                        <Alert>
+                          <Mail className="h-4 w-4" />
+                          <AlertTitle>Available Variables</AlertTitle>
+                          <AlertDescription>
+                            <code className="text-xs">{"{{first_name}}"}</code>, <code className="text-xs">{"{{last_name}}"}</code>, <code className="text-xs">{"{{email}}"}</code>, <code className="text-xs">{"{{company}}"}</code>, <code className="text-xs">{"{{title}}"}</code>, <code className="text-xs">{"{{invite_url}}"}</code>
+                          </AlertDescription>
+                        </Alert>
+                        {approvedTemplate.updated_at && (
+                          <p className="text-xs text-gray-500">
+                            Last updated: {new Date(approvedTemplate.updated_at).toLocaleString()}
+                          </p>
+                        )}
+                      </CardContent>
+                      <CardFooter>
+                        <Button
+                          onClick={() => handleSaveTemplate(approvedTemplate)}
+                          disabled={savingTemplate === 'application_approved'}
+                        >
+                          {savingTemplate === 'application_approved' ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="mr-2 h-4 w-4" />
+                              Save Template
+                            </>
+                          )}
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="rejected" className="space-y-4 mt-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Rejected Application Letter</CardTitle>
+                        <CardDescription>
+                          This email is sent when a speaker application is rejected.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <Label htmlFor="rejected-subject">Email Subject</Label>
+                          <Input
+                            id="rejected-subject"
+                            value={rejectedTemplate.subject}
+                            onChange={(e) => setRejectedTemplate({...rejectedTemplate, subject: e.target.value})}
+                            placeholder="Enter email subject..."
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="rejected-body">Email Body (HTML)</Label>
+                          <Textarea
+                            id="rejected-body"
+                            value={rejectedTemplate.body_html}
+                            onChange={(e) => setRejectedTemplate({...rejectedTemplate, body_html: e.target.value})}
+                            placeholder="Enter email HTML content..."
+                            rows={20}
+                            className="font-mono text-sm"
+                          />
+                        </div>
+                        <Alert>
+                          <Mail className="h-4 w-4" />
+                          <AlertTitle>Available Variables</AlertTitle>
+                          <AlertDescription>
+                            <code className="text-xs">{"{{first_name}}"}</code>, <code className="text-xs">{"{{last_name}}"}</code>, <code className="text-xs">{"{{email}}"}</code>, <code className="text-xs">{"{{company}}"}</code>, <code className="text-xs">{"{{title}}"}</code>, <code className="text-xs">{"{{rejection_reason}}"}</code>, <code className="text-xs">{"{{rejection_reason_block}}"}</code>
+                          </AlertDescription>
+                        </Alert>
+                        {rejectedTemplate.updated_at && (
+                          <p className="text-xs text-gray-500">
+                            Last updated: {new Date(rejectedTemplate.updated_at).toLocaleString()}
+                          </p>
+                        )}
+                      </CardContent>
+                      <CardFooter>
+                        <Button
+                          onClick={() => handleSaveTemplate(rejectedTemplate)}
+                          disabled={savingTemplate === 'application_rejected'}
+                        >
+                          {savingTemplate === 'application_rejected' ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="mr-2 h-4 w-4" />
+                              Save Template
+                            </>
+                          )}
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              )}
             </TabsContent>
           </Tabs>
         </div>
@@ -1238,10 +1613,28 @@ export default function AdminSpeakersPage() {
                     id="rejection_reason"
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
-                    placeholder="Provide a reason for rejection (optional)..."
+                    placeholder="Provide a reason for rejection (optional - will be included in the email)..."
                     rows={3}
                   />
                 </div>
+              )}
+              {actionType === 'approve' && (
+                <Alert>
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertTitle>Approval Email</AlertTitle>
+                  <AlertDescription>
+                    An approval email with an account creation link will be sent to the applicant. The link expires in 7 days. You can customize the email template in the Email Templates tab.
+                  </AlertDescription>
+                </Alert>
+              )}
+              {actionType === 'reject' && (
+                <Alert>
+                  <XCircle className="h-4 w-4" />
+                  <AlertTitle>Rejection Email</AlertTitle>
+                  <AlertDescription>
+                    A rejection notification will be sent to the applicant. You can customize the email template in the Email Templates tab.
+                  </AlertDescription>
+                </Alert>
               )}
               {actionType === 'invite' && (
                 <Alert>
@@ -1269,9 +1662,48 @@ export default function AdminSpeakersPage() {
                   </>
                 ) : (
                   <>
-                    {actionType === 'approve' && 'Approve'}
-                    {actionType === 'reject' && 'Reject'}
+                    {actionType === 'approve' && 'Approve & Send Email'}
+                    {actionType === 'reject' && 'Reject & Send Email'}
                     {actionType === 'invite' && 'Send Invitation'}
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Application Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-[450px]">
+            <DialogHeader>
+              <DialogTitle>Delete Application</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete the application from{" "}
+                <strong>{applicationToDelete?.first_name} {applicationToDelete?.last_name}</strong>?
+                This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {
+                setDeleteDialogOpen(false)
+                setApplicationToDelete(null)
+              }}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteApplication}
+                disabled={deletingApplication}
+              >
+                {deletingApplication ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Application
                   </>
                 )}
               </Button>
