@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
+import { AdminSidebar } from "@/components/admin-sidebar"
 import {
   TrendingUp,
   DollarSign,
@@ -392,6 +393,15 @@ export default function GoogleAdsCampaignPage() {
   }
 
   return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile sidebar */}
+      <div className="lg:hidden">
+        <AdminSidebar />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 lg:ml-72 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-8">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
@@ -1163,6 +1173,9 @@ export default function GoogleAdsCampaignPage() {
           </div>
         </DialogContent>
       </Dialog>
+    </div>
+        </div>
+      </div>
     </div>
   )
 }
