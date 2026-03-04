@@ -529,7 +529,11 @@ export default function AdminSpeakersPage() {
 
     // Inject personal feedback section before the sign-off <hr>
     if (feedbackText.trim()) {
-      const feedbackHtml = `    <p style="color: #4b5563; font-size: 16px;">${feedbackText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>`
+      const safeFeedback = feedbackText
+        .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" style="color: #1E68C6; text-decoration: underline;">$1</a>')
+        .replace(/\n/g, '<br>')
+      const feedbackHtml = `    <p style="color: #4b5563; font-size: 16px;">${safeFeedback}</p>`
       // Insert before the <hr> that precedes sign-off
       html = html.replace(/<hr\s*style="border:\s*none;\s*border-top:\s*1px\s*solid\s*#e5e7eb;\s*margin:\s*30px\s*0;">/,
         feedbackHtml + '<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">')
@@ -1745,9 +1749,12 @@ export default function AdminSpeakersPage() {
                               id="response-text"
                               value={newResponseText}
                               onChange={(e) => setNewResponseText(e.target.value)}
-                              placeholder="The text that will be inserted into the email body..."
+                              placeholder="The text that will be inserted into the email body. Use [link text](https://url) for hyperlinks."
                               rows={3}
                             />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Supports hyperlinks: <code className="bg-muted px-1 rounded">[click here](https://example.com)</code>
+                            </p>
                           </div>
                           <Button
                             onClick={addFrequentResponse}

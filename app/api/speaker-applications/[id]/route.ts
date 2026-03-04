@@ -555,7 +555,10 @@ async function sendApplicationEmail(application: any, templateKey: string, perso
 
   // Inject personal feedback section before the sign-off <hr>
   if (personalFeedback && personalFeedback.trim()) {
-    const escapedFeedback = personalFeedback.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
+    const escapedFeedback = personalFeedback
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" style="color: #1E68C6; text-decoration: underline;">$1</a>')
+      .replace(/\n/g, '<br>')
     const feedbackHtml = `    <p style="color: #4b5563; font-size: 16px;">${escapedFeedback}</p>`
     htmlContent = htmlContent.replace(
       /<hr\s*style="border:\s*none;\s*border-top:\s*1px\s*solid\s*#e5e7eb;\s*margin:\s*30px\s*0;">/,
