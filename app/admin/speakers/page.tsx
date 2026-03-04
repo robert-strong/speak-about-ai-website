@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -214,6 +214,8 @@ export default function AdminSpeakersPage() {
   const [editingResponseId, setEditingResponseId] = useState<string | null>(null)
   const [editResponseLabel, setEditResponseLabel] = useState("")
   const [editResponseText, setEditResponseText] = useState("")
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const newTextareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Check authentication and load data
   useEffect(() => {
@@ -768,6 +770,26 @@ export default function AdminSpeakersPage() {
     setEditingResponseId(response.id)
     setEditResponseLabel(response.label)
     setEditResponseText(response.text)
+  }
+
+  const insertLink = (textareaRef: React.RefObject<HTMLTextAreaElement | null>, getText: () => string, setText: (val: string) => void) => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const text = getText()
+    const selected = text.substring(start, end)
+    const linkText = selected || 'link text'
+    const insertion = `[${linkText}](https://)`
+    const newText = text.substring(0, start) + insertion + text.substring(end)
+    setText(newText)
+    // Focus and position cursor inside the URL parentheses
+    setTimeout(() => {
+      textarea.focus()
+      const urlStart = start + linkText.length + 3 // after [text](
+      const urlEnd = urlStart + 8 // select "https://"
+      textarea.setSelectionRange(urlStart, urlEnd)
+    }, 0)
   }
 
   const saveEditResponse = () => {
@@ -1740,13 +1762,29 @@ export default function AdminSpeakersPage() {
                                       placeholder="Label"
                                       className="text-sm"
                                     />
-                                    <Textarea
-                                      value={editResponseText}
-                                      onChange={(e) => setEditResponseText(e.target.value)}
-                                      placeholder="Response text. Use [link text](https://url) for hyperlinks."
-                                      rows={3}
-                                      className="text-sm"
-                                    />
+                                    <div>
+                                      <Textarea
+                                        ref={editTextareaRef}
+                                        value={editResponseText}
+                                        onChange={(e) => setEditResponseText(e.target.value)}
+                                        placeholder="Response text. Select text and click the link button to add a hyperlink."
+                                        rows={3}
+                                        className="text-sm"
+                                      />
+                                      <div className="flex items-center mt-1">
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="sm"
+                                          className="h-7 text-xs gap-1"
+                                          onClick={() => insertLink(editTextareaRef, () => editResponseText, setEditResponseText)}
+                                        >
+                                          <ExternalLink className="h-3 w-3" />
+                                          Insert Link
+                                        </Button>
+                                        <span className="text-xs text-muted-foreground ml-2">Select text first, then click to wrap it as a link</span>
+                                      </div>
+                                    </div>
                                     <div className="flex gap-2">
                                       <Button size="sm" onClick={saveEditResponse} disabled={!editResponseLabel.trim() || !editResponseText.trim()}>
                                         <Save className="h-3 w-3 mr-1" />
@@ -1803,15 +1841,26 @@ export default function AdminSpeakersPage() {
                           <div>
                             <Label htmlFor="response-text" className="text-xs text-muted-foreground">Response Text</Label>
                             <Textarea
+                              ref={newTextareaRef}
                               id="response-text"
                               value={newResponseText}
                               onChange={(e) => setNewResponseText(e.target.value)}
-                              placeholder="The text that will be inserted into the email body. Use [link text](https://url) for hyperlinks."
+                              placeholder="The text that will be inserted into the email body. Select text and click Insert Link to add a hyperlink."
                               rows={3}
                             />
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Supports hyperlinks: <code className="bg-muted px-1 rounded">[click here](https://example.com)</code>
-                            </p>
+                            <div className="flex items-center mt-1">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs gap-1"
+                                onClick={() => insertLink(newTextareaRef, () => newResponseText, setNewResponseText)}
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                                Insert Link
+                              </Button>
+                              <span className="text-xs text-muted-foreground ml-2">Select text first, then click to wrap it as a link</span>
+                            </div>
                           </div>
                           <Button
                             onClick={addFrequentResponse}
