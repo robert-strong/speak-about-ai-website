@@ -1914,32 +1914,6 @@ export default function AdminSpeakersPage() {
                   </AlertDescription>
                 </Alert>
               )}
-              {/* Rejection Reason */}
-              {actionType === 'reject' && (
-                <div className="space-y-2">
-                  <Label htmlFor="rejection-reason" className="text-sm font-medium flex items-center gap-1.5">
-                    <XCircle className="h-3.5 w-3.5" />
-                    Rejection Reason
-                  </Label>
-                  <Textarea
-                    id="rejection-reason"
-                    value={rejectionReason}
-                    onChange={(e) => {
-                      setRejectionReason(e.target.value)
-                      if (selectedApplication && actionType) {
-                        buildEmailPreview(selectedApplication, actionType, e.target.value, personalFeedback)
-                      }
-                    }}
-                    placeholder="Enter the reason for rejection (will appear in the Feedback section of the email)..."
-                    rows={2}
-                    className="text-sm"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {rejectionReason.trim() ? 'The reason will appear in the "Feedback" block in the email.' : 'Leave blank to send without a specific reason.'}
-                  </p>
-                </div>
-              )}
-
               {/* CC Emails */}
               <div className="space-y-1">
                 <Label htmlFor="cc-emails" className="text-sm font-medium flex items-center gap-1.5">
@@ -2001,6 +1975,32 @@ export default function AdminSpeakersPage() {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Click to toggle responses into the email. Manage these in the Email Templates &gt; Frequent Responses tab.
+                  </p>
+                </div>
+              )}
+
+              {/* Rejection Reason */}
+              {actionType === 'reject' && (
+                <div className="space-y-2">
+                  <Label htmlFor="rejection-reason" className="text-sm font-medium flex items-center gap-1.5">
+                    <XCircle className="h-3.5 w-3.5" />
+                    Rejection Reason
+                  </Label>
+                  <Textarea
+                    id="rejection-reason"
+                    value={rejectionReason}
+                    onChange={(e) => {
+                      setRejectionReason(e.target.value)
+                      if (selectedApplication && actionType) {
+                        buildEmailPreview(selectedApplication, actionType, e.target.value, personalFeedback)
+                      }
+                    }}
+                    placeholder="Enter the reason for rejection (will appear in the email body)..."
+                    rows={2}
+                    className="text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {rejectionReason.trim() ? 'The reason will appear in the email body.' : 'Leave blank to send without a specific reason.'}
                   </p>
                 </div>
               )}
