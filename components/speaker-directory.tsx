@@ -10,11 +10,10 @@ import { SpeakerCard } from "@/components/speaker-card"
 
 // Fee range filter options
 const FEE_RANGES: Record<string, { label: string; min: number; max: number }> = {
-  "under-10k": { label: "Under $10K", min: 0, max: 10000 },
-  "10k-20k": { label: "$10K - $20K", min: 10000, max: 20000 },
-  "20k-30k": { label: "$20K - $30K", min: 20000, max: 30000 },
-  "30k-50k": { label: "$30K - $50K", min: 30000, max: 50000 },
-  "50k-plus": { label: "$50K+", min: 50000, max: Infinity },
+  "20k-25k": { label: "$20K - $25K", min: 20000, max: 25000 },
+  "25k-50k": { label: "$25K - $50K", min: 25000, max: 50000 },
+  "50k-100k": { label: "$50K - $100K", min: 50000, max: 100000 },
+  "100k-plus": { label: "$100K+", min: 100000, max: Infinity },
 }
 
 // Location region buckets
