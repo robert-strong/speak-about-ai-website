@@ -217,6 +217,7 @@ export default function AdminSpeakersPage() {
       loadSpeakers()
       loadApplications()
       loadSpeakerAnalytics()
+      loadEmailTemplates()
     } catch (error) {
       console.error("Error in useEffect:", error)
       setPageError("Failed to initialize page. Please refresh.")

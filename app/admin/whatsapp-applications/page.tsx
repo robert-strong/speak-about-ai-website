@@ -217,7 +217,8 @@ export default function WhatsAppApplicationsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 lg:ml-72 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold">WhatsApp Group Applications</h1>
         <p className="text-gray-600">Review and approve event professional networking group applications</p>
@@ -536,6 +537,7 @@ export default function WhatsAppApplicationsPage() {
           </DialogContent>
         </Dialog>
       )}
+      </div>
     </div>
   )
 }

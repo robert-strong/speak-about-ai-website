@@ -177,6 +177,15 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           color: "text-blue-600",
           bgColor: "bg-blue-50",
           permissionKey: "contacts"
+        },
+        {
+          title: "WhatsApp Group",
+          href: "/admin/whatsapp-applications",
+          icon: MessageSquare,
+          description: "Event Pro Community",
+          color: "text-green-600",
+          bgColor: "bg-green-50",
+          permissionKey: "whatsapp"
         }
       ]
     },
@@ -294,16 +303,34 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           color: "text-amber-600",
           bgColor: "bg-amber-50",
           permissionKey: "workshops"
+        },
+        {
+          title: "Landing Resources",
+          href: "/admin/landing-resources",
+          icon: Send,
+          description: "Email Resources",
+          color: "text-cyan-600",
+          bgColor: "bg-cyan-50",
+          permissionKey: "landing_resources"
         }
       ]
     },
     {
-      title: "Marketing",
+      title: "Marketing & SEO",
       icon: Megaphone,
       sectionKey: "marketing",
       color: "text-pink-600",
       bgColor: "bg-pink-50",
       items: [
+        {
+          title: "SEO & Strategy",
+          href: "/admin/marketing",
+          icon: TrendingUp,
+          description: "SEO, Keywords & Plans",
+          color: "text-pink-600",
+          bgColor: "bg-pink-50",
+          permissionKey: "marketing"
+        },
         {
           title: "Newsletter",
           href: "/admin/newsletter",
@@ -330,24 +357,6 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           color: "text-blue-600",
           bgColor: "bg-blue-50",
           permissionKey: "vendor_directory"
-        },
-        {
-          title: "Landing Resources",
-          href: "/admin/landing-resources",
-          icon: Send,
-          description: "Email Resources",
-          color: "text-cyan-600",
-          bgColor: "bg-cyan-50",
-          permissionKey: "landing_resources"
-        },
-        {
-          title: "WhatsApp Group",
-          href: "/admin/whatsapp-applications",
-          icon: MessageSquare,
-          description: "Event Pro Community",
-          color: "text-green-600",
-          bgColor: "bg-green-50",
-          permissionKey: "whatsapp"
         },
         {
           title: "Google Ads",
