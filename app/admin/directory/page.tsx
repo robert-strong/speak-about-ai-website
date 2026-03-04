@@ -521,7 +521,8 @@ export default function AdminDirectoryPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 lg:ml-72 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Vendor Directory Management</h1>
           <p className="text-gray-600">Manage vendors, subscribers, and directory settings</p>
@@ -2130,6 +2131,7 @@ export default function AdminDirectoryPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   )
 }

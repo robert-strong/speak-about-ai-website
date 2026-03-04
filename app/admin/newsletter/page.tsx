@@ -167,7 +167,8 @@ export default function AdminNewsletterPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 lg:ml-72 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header with tabs */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
@@ -527,6 +528,7 @@ export default function AdminNewsletterPage() {
         </Card>
           </>
         )}
+      </div>
     </div>
   )
 }
