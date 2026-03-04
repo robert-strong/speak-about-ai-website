@@ -231,11 +231,10 @@ function estimateDealValue(budgetRange?: string): number {
   const budget = budgetRange.toLowerCase()
   
   if (budget.includes('under') || budget.includes('< ')) {
-    if (budget.includes('10k') || budget.includes('10,000')) return 7500
     if (budget.includes('25k') || budget.includes('25,000')) return 15000
   }
-  
-  if (budget.includes('10k') && budget.includes('25k')) return 17500
+
+  if (budget.includes('20k') && budget.includes('25k')) return 22500
   if (budget.includes('25k') && budget.includes('50k')) return 37500
   if (budget.includes('50k') && budget.includes('100k')) return 75000
   if (budget.includes('100k+') || budget.includes('over 100k')) return 150000

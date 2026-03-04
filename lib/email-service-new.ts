@@ -371,8 +371,7 @@ The Speak About AI Team
  */
 function formatBudget(budget: string): string {
   const budgetMap: Record<string, string> = {
-    'under-10k': 'Under $10,000',
-    '10k-25k': '$10,000 - $25,000',
+    '20k-25k': '$20,000 - $25,000',
     '25k-50k': '$25,000 - $50,000',
     '50k-100k': '$50,000 - $100,000',
     'over-100k': 'Over $100,000',

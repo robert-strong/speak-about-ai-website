@@ -147,8 +147,7 @@ export function CustomContactForm({
   })
 
   const budgetOptions = [
-    { value: 'under-10k', label: 'Under $10,000' },
-    { value: '10k-25k', label: '$10,000 - $25,000' },
+    { value: '20k-25k', label: '$20,000 - $25,000' },
     { value: '25k-50k', label: '$25,000 - $50,000' },
     { value: '50k-100k', label: '$50,000 - $100,000' },
     { value: 'over-100k', label: 'Over $100,000' },
