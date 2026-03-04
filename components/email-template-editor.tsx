@@ -31,6 +31,7 @@ interface VisualContent {
   buttonNote: string
   expiryNote: string
   contactEmail: string
+  contactLine: string
   signOffLine: string
   signOffName: string
 }
@@ -118,7 +119,7 @@ function buildTemplateHtml(content: VisualContent, type: "approved" | "rejected"
   <div style="background: white; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
     <h2 style="color: #1f2937; margin-top: 0;">${escapeHtml(content.greeting)}</h2>
 ${bodyHtml}    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-${content.contactEmail.trim() ? `    <p style="color: #6b7280; font-size: 14px;">Questions? Reach out at <a href="mailto:${escapeHtml(content.contactEmail)}" style="color: #1E68C6;">${escapeHtml(content.contactEmail)}</a></p>\n` : ''}    <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">${escapeHtml(content.signOffLine)}<br><strong>${escapeHtml(content.signOffName)}</strong></p>
+${content.contactEmail.trim() ? `    <p style="color: #6b7280; font-size: 14px;">${escapeHtml(content.contactLine)} <a href="mailto:${escapeHtml(content.contactEmail)}" style="color: #1E68C6;">${escapeHtml(content.contactEmail)}</a></p>\n` : ''}    <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">${escapeHtml(content.signOffLine)}<br><strong>${escapeHtml(content.signOffName)}</strong></p>
   </div>
 </body>
 </html>`
@@ -184,8 +185,11 @@ function parseTemplateHtml(html: string, type: "approved" | "rejected"): VisualC
     if (expiryMatch) expiryNote = expiryMatch[1].replace(/<[^>]+>/g, "").trim()
 
     let contactEmail = "hello@speakabout.ai"
+    let contactLine = "Questions? Reach out at"
     const contactMatch = html.match(/mailto:([\w@.]+)/)
     if (contactMatch) contactEmail = contactMatch[1]
+    const contactLineMatch = html.match(/<p[^>]*>(.*?)\s*<a\s+href="mailto:/)
+    if (contactLineMatch) contactLine = contactLineMatch[1].replace(/<[^>]+>/g, "").trim() || "Questions? Reach out at"
 
     let signOffLine = "Best regards,"
     let signOffName = "The Speak About AI Team"
@@ -219,7 +223,7 @@ function parseTemplateHtml(html: string, type: "approved" | "rejected"): VisualC
     // Still no paragraphs? Return null to show HTML editor
     if (blocks.filter(b => b.type === "paragraph").length === 0) return null
 
-    return { greeting, blocks, buttonText, buttonNote, expiryNote, contactEmail, signOffLine, signOffName }
+    return { greeting, blocks, buttonText, buttonNote, expiryNote, contactEmail, contactLine, signOffLine, signOffName }
   } catch {
     return null
   }
@@ -238,6 +242,7 @@ function getDefaultVisualContent(type: "approved" | "rejected"): VisualContent {
       buttonNote: "",
       expiryNote: "",
       contactEmail: "hello@speakabout.ai",
+      contactLine: "Questions? Reach out at",
       signOffLine: "Best regards,",
       signOffName: "The Speak About AI Team",
     }
@@ -583,7 +588,17 @@ export function EmailTemplateEditor({
             <div className="space-y-3">
               <Label className="text-sm font-medium">Sign-off</Label>
               <div>
-                <Label htmlFor={`${templateType}-contact-email`} className="text-xs text-muted-foreground">Contact Email (leave empty to hide &quot;Questions? Reach out&quot; line)</Label>
+                <Label htmlFor={`${templateType}-contact-line`} className="text-xs text-muted-foreground">Contact Line (leave email empty to hide this line)</Label>
+                <Input
+                  id={`${templateType}-contact-line`}
+                  value={visualContent.contactLine}
+                  onChange={(e) => updateVisual({ ...visualContent, contactLine: e.target.value })}
+                  onFocus={() => { lastFocusedField.current = "contactLine" }}
+                  placeholder="Questions? Reach out at"
+                />
+              </div>
+              <div>
+                <Label htmlFor={`${templateType}-contact-email`} className="text-xs text-muted-foreground">Contact Email</Label>
                 <Input
                   id={`${templateType}-contact-email`}
                   value={visualContent.contactEmail}
