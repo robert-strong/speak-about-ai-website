@@ -206,6 +206,23 @@ function parseTemplateHtml(html: string, type: "approved" | "rejected"): VisualC
     const signOffMatch = html.match(/Best regards,[\s\S]*?<strong>([\s\S]*?)<\/strong>/)
     if (signOffMatch) signOffName = signOffMatch[1].replace(/<[^>]+>/g, "").trim()
 
+    // If no styled paragraphs found, try matching any <p> tags in the body section
+    if (blocks.filter(b => b.type === "paragraph").length === 0) {
+      const anyParagraphs = bodySection.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)
+      for (const m of anyParagraphs) {
+        const text = m[1]
+          .replace(/<br\s*\/?>/g, "\n")
+          .replace(/<[^>]+>/g, "")
+          .replace(/\s+/g, " ")
+          .trim()
+        // Skip paragraphs that are part of button notes, expiry notes, or contact info
+        if (text && !text.includes("copy and paste") && !text.includes("Important:") && !text.includes("Questions?") && !text.includes("Best regards")) {
+          blocks.push({ type: "paragraph", id: nextId(), text })
+        }
+      }
+    }
+
+    // Still no paragraphs? Return null to show HTML editor
     if (blocks.filter(b => b.type === "paragraph").length === 0) return null
 
     return { greeting, blocks, buttonText, buttonNote, expiryNote, contactEmail, signOffName }

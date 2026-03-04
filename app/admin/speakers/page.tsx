@@ -204,6 +204,7 @@ export default function AdminSpeakersPage() {
   const [activeTemplateTab, setActiveTemplateTab] = useState("approved")
   const [emailPreviewHtml, setEmailPreviewHtml] = useState("")
   const [emailPreviewSubject, setEmailPreviewSubject] = useState("")
+  const [personalFeedback, setPersonalFeedback] = useState("")
 
   // Check authentication and load data
   useEffect(() => {
@@ -398,6 +399,8 @@ export default function AdminSpeakersPage() {
       const response = await authPatch(`/api/speaker-applications/${selectedApplication.id}`, {
         action: 'send_letter',
         letter_type: letterType,
+        personal_feedback: personalFeedback.trim() || undefined,
+        rejection_reason: letterType === 'rejected' && rejectionReason.trim() ? rejectionReason.trim() : undefined,
       })
 
       if (response.ok) {
@@ -471,11 +474,14 @@ export default function AdminSpeakersPage() {
     }
   }
 
-  const buildEmailPreview = (application: SpeakerApplication, action: 'approve' | 'reject' | 'invite', reason?: string) => {
+  const buildEmailPreview = (application: SpeakerApplication, action: 'approve' | 'reject' | 'invite', reason?: string, feedback?: string) => {
     const template = action === 'approve' ? approvedTemplate : rejectedTemplate
     const expertiseAreas = Array.isArray(application.expertise_areas)
       ? application.expertise_areas.join(', ')
       : (application.expertise_areas || '')
+
+    const feedbackText = feedback || ''
+    const reasonText = reason || ''
 
     const variables: Record<string, string> = {
       '{{first_name}}': application.first_name || '',
@@ -485,12 +491,12 @@ export default function AdminSpeakersPage() {
       '{{title}}': application.title || '',
       '{{expertise_areas}}': expertiseAreas,
       '{{invite_url}}': 'https://speakabout.ai/invite/preview-token',
-      '{{rejection_reason}}': reason || '',
+      '{{rejection_reason}}': reasonText,
     }
 
     // Build rejection reason block
-    const rejectionBlock = reason
-      ? `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;"><strong>Reason:</strong> ${reason.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>`
+    const rejectionBlock = reasonText
+      ? `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;"><strong>Reason:</strong> ${reasonText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>`
       : ''
     variables['{{rejection_reason_block}}'] = rejectionBlock
 
@@ -500,6 +506,18 @@ export default function AdminSpeakersPage() {
       html = html.split(key).join(value)
       subject = subject.split(key).join(value)
     }
+
+    // Inject personal feedback section before the sign-off <hr>
+    if (feedbackText.trim()) {
+      const feedbackHtml = `<div style="background: #f0f7ff; border-left: 4px solid #1E68C6; padding: 16px; margin: 20px 0; border-radius: 4px;">
+        <p style="color: #1e40af; font-size: 14px; margin: 0;"><strong>Personal Note:</strong></p>
+        <p style="color: #374151; font-size: 14px; margin: 8px 0 0 0;">${feedbackText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>
+      </div>`
+      // Insert before the <hr> that precedes sign-off
+      html = html.replace(/<hr\s*style="border:\s*none;\s*border-top:\s*1px\s*solid\s*#e5e7eb;\s*margin:\s*30px\s*0;">/,
+        feedbackHtml + '<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">')
+    }
+
     setEmailPreviewHtml(html)
     setEmailPreviewSubject(subject)
   }
@@ -509,6 +527,7 @@ export default function AdminSpeakersPage() {
     setActionType(action)
     setRejectionReason("")
     setAdminNotes("")
+    setPersonalFeedback("")
     buildEmailPreview(application, action)
     setReviewDialogOpen(true)
   }
@@ -1651,6 +1670,32 @@ export default function AdminSpeakersPage() {
                   </AlertDescription>
                 </Alert>
               )}
+              {/* Rejection Reason */}
+              {actionType === 'reject' && (
+                <div className="space-y-2">
+                  <Label htmlFor="rejection-reason" className="text-sm font-medium flex items-center gap-1.5">
+                    <XCircle className="h-3.5 w-3.5" />
+                    Rejection Reason
+                  </Label>
+                  <Textarea
+                    id="rejection-reason"
+                    value={rejectionReason}
+                    onChange={(e) => {
+                      setRejectionReason(e.target.value)
+                      if (selectedApplication && actionType) {
+                        buildEmailPreview(selectedApplication, actionType, e.target.value, personalFeedback)
+                      }
+                    }}
+                    placeholder="Enter the reason for rejection (will appear in the Feedback section of the email)..."
+                    rows={2}
+                    className="text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {rejectionReason.trim() ? 'The reason will appear in the "Feedback" block in the email.' : 'Leave blank to send without a specific reason.'}
+                  </p>
+                </div>
+              )}
+
               {/* Email Preview */}
               <div className="space-y-2">
                 <div>
@@ -1671,8 +1716,30 @@ export default function AdminSpeakersPage() {
                     sandbox="allow-same-origin"
                   />
                 </div>
+              </div>
+
+              {/* Personal Feedback */}
+              <div className="space-y-2">
+                <Label htmlFor="personal-feedback" className="text-sm font-medium flex items-center gap-1.5">
+                  <FileText className="h-3.5 w-3.5" />
+                  Personal Note <span className="text-xs text-muted-foreground font-normal">(optional)</span>
+                </Label>
+                <Textarea
+                  id="personal-feedback"
+                  value={personalFeedback}
+                  onChange={(e) => {
+                    setPersonalFeedback(e.target.value)
+                    if (selectedApplication && actionType) {
+                      buildEmailPreview(selectedApplication, actionType, rejectionReason, e.target.value)
+                    }
+                  }}
+                  placeholder="Add a personalized note to include in the email..."
+                  rows={3}
+                  className="text-sm"
+                />
                 <p className="text-xs text-muted-foreground">
-                  You can customize this template in the Email Templates tab.
+                  {personalFeedback.trim() ? 'A "Personal Note" section will appear in the email above the sign-off.' : 'Leave blank to send without a personal note.'}{' '}
+                  You can customize the base template in the Email Templates tab.
                 </p>
               </div>
             </div>

@@ -53,7 +53,7 @@ export async function PATCH(
     const applicationId = parseInt(id)
     const body = await request.json()
 
-    const { action, admin_notes, rejection_reason } = body
+    const { action, admin_notes, rejection_reason, personal_feedback } = body
 
     // Handle different actions
     switch (action) {
@@ -219,7 +219,7 @@ export async function PATCH(
           `
 
           try {
-            await sendApplicationEmail(updatedApp, 'application_approved')
+            await sendApplicationEmail(updatedApp, 'application_approved', personal_feedback)
           } catch (emailError) {
             console.error('Failed to send approval letter:', emailError)
             return NextResponse.json({
@@ -234,8 +234,20 @@ export async function PATCH(
             message: "Approval letter sent successfully"
           })
         } else if (letter_type === 'rejected') {
+          // Update rejection_reason if provided
+          let rejectedApp = app
+          if (rejection_reason) {
+            const [updated] = await sql`
+              UPDATE speaker_applications
+              SET rejection_reason = ${rejection_reason}
+              WHERE id = ${applicationId}
+              RETURNING *
+            `
+            rejectedApp = updated
+          }
+
           try {
-            await sendApplicationEmail(app, 'application_rejected')
+            await sendApplicationEmail(rejectedApp, 'application_rejected', personal_feedback)
           } catch (emailError) {
             console.error('Failed to send rejection letter:', emailError)
             return NextResponse.json({
@@ -483,7 +495,7 @@ export async function DELETE(
 /**
  * Send application email using Gmail SMTP (via DB config) with customizable template
  */
-async function sendApplicationEmail(application: any, templateKey: string) {
+async function sendApplicationEmail(application: any, templateKey: string, personalFeedback?: string) {
   // Load template from DB
   let template: any = null
   try {
@@ -541,6 +553,19 @@ async function sendApplicationEmail(application: any, templateKey: string) {
       subject = `Update on Your Speak About AI Application`
       htmlContent = getDefaultRejectedHtml(application, rejectionReasonBlock)
     }
+  }
+
+  // Inject personal feedback section before the sign-off <hr>
+  if (personalFeedback && personalFeedback.trim()) {
+    const escapedFeedback = personalFeedback.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
+    const feedbackHtml = `<div style="background: #f0f7ff; border-left: 4px solid #1E68C6; padding: 16px; margin: 20px 0; border-radius: 4px;">
+      <p style="color: #1e40af; font-size: 14px; margin: 0;"><strong>Personal Note:</strong></p>
+      <p style="color: #374151; font-size: 14px; margin: 8px 0 0 0;">${escapedFeedback}</p>
+    </div>`
+    htmlContent = htmlContent.replace(
+      /<hr\s*style="border:\s*none;\s*border-top:\s*1px\s*solid\s*#e5e7eb;\s*margin:\s*30px\s*0;">/,
+      feedbackHtml + '<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">'
+    )
   }
 
   const textContent = htmlContent.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
