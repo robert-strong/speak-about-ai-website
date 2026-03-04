@@ -55,6 +55,7 @@ const APPROVED_VARIABLES = [
   { label: "Company", value: "{{company}}" },
   { label: "Title", value: "{{title}}" },
   { label: "Invite URL", value: "{{invite_url}}" },
+  { label: "Expertise Areas", value: "{{expertise_areas}}" },
 ]
 
 const REJECTED_VARIABLES = [
@@ -64,6 +65,7 @@ const REJECTED_VARIABLES = [
   { label: "Company", value: "{{company}}" },
   { label: "Title", value: "{{title}}" },
   { label: "Rejection Reason", value: "{{rejection_reason}}" },
+  { label: "Expertise Areas", value: "{{expertise_areas}}" },
 ]
 
 const SAMPLE_DATA: Record<string, string> = {
@@ -74,6 +76,7 @@ const SAMPLE_DATA: Record<string, string> = {
   "{{title}}": "Director of AI",
   "{{invite_url}}": "https://speakabout.ai/invite/sample-token-12345",
   "{{rejection_reason}}": "We are currently at capacity for speakers in your topic area.",
+  "{{expertise_areas}}": "Machine Learning, Natural Language Processing, Computer Vision",
   "{{rejection_reason_block}}": `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;"><strong>Reason:</strong> We are currently at capacity for speakers in your topic area.</p></div>`,
 }
 

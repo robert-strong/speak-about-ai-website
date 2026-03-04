@@ -39,7 +39,8 @@ import {
   TrendingUp,
   RefreshCw,
   Save,
-  MailOpen
+  MailOpen,
+  Undo2
 } from "lucide-react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
@@ -201,6 +202,8 @@ export default function AdminSpeakersPage() {
   const [loadingTemplates, setLoadingTemplates] = useState(false)
   const [savingTemplate, setSavingTemplate] = useState<string | null>(null)
   const [activeTemplateTab, setActiveTemplateTab] = useState("approved")
+  const [emailPreviewHtml, setEmailPreviewHtml] = useState("")
+  const [emailPreviewSubject, setEmailPreviewSubject] = useState("")
 
   // Check authentication and load data
   useEffect(() => {
@@ -350,6 +353,81 @@ export default function AdminSpeakersPage() {
     }
   }
 
+  const handleSetStatus = async (application: SpeakerApplication, newStatus: 'set_approved' | 'set_rejected' | 'set_pending', reason?: string) => {
+    setProcessingAction(true)
+    try {
+      const response = await authPatch(`/api/speaker-applications/${application.id}`, {
+        action: newStatus,
+        rejection_reason: newStatus === 'set_rejected' ? reason : undefined,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        toast({
+          title: "Updated",
+          description: data.message || `Application status updated`,
+        })
+        loadApplications()
+      } else {
+        const errorData = await response.json()
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to update application status",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error updating application status:", error)
+      toast({
+        title: "Error",
+        description: "Failed to update application status",
+        variant: "destructive",
+      })
+    } finally {
+      setProcessingAction(false)
+    }
+  }
+
+  const handleSendLetter = async () => {
+    if (!selectedApplication) return
+
+    setProcessingAction(true)
+    try {
+      const letterType = selectedApplication.status === 'rejected' ? 'rejected' : 'approved'
+      const response = await authPatch(`/api/speaker-applications/${selectedApplication.id}`, {
+        action: 'send_letter',
+        letter_type: letterType,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        toast({
+          title: "Sent",
+          description: data.message || "Letter sent successfully",
+        })
+        loadApplications()
+        setReviewDialogOpen(false)
+        setSelectedApplication(null)
+      } else {
+        const errorData = await response.json()
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to send letter",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error sending letter:", error)
+      toast({
+        title: "Error",
+        description: "Failed to send letter",
+        variant: "destructive",
+      })
+    } finally {
+      setProcessingAction(false)
+    }
+  }
+
   const handleApplicationAction = async () => {
     if (!selectedApplication || !actionType) return
 
@@ -392,9 +470,45 @@ export default function AdminSpeakersPage() {
     }
   }
 
+  const buildEmailPreview = (application: SpeakerApplication, action: 'approve' | 'reject' | 'invite', reason?: string) => {
+    const template = action === 'approve' ? approvedTemplate : rejectedTemplate
+    const expertiseAreas = Array.isArray(application.expertise_areas)
+      ? application.expertise_areas.join(', ')
+      : (application.expertise_areas || '')
+
+    const variables: Record<string, string> = {
+      '{{first_name}}': application.first_name || '',
+      '{{last_name}}': application.last_name || '',
+      '{{email}}': application.email || '',
+      '{{company}}': application.company || '',
+      '{{title}}': application.title || '',
+      '{{expertise_areas}}': expertiseAreas,
+      '{{invite_url}}': 'https://speakabout.ai/invite/preview-token',
+      '{{rejection_reason}}': reason || '',
+    }
+
+    // Build rejection reason block
+    const rejectionBlock = reason
+      ? `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;"><strong>Reason:</strong> ${reason.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>`
+      : ''
+    variables['{{rejection_reason_block}}'] = rejectionBlock
+
+    let html = template.body_html
+    let subject = template.subject
+    for (const [key, value] of Object.entries(variables)) {
+      html = html.split(key).join(value)
+      subject = subject.split(key).join(value)
+    }
+    setEmailPreviewHtml(html)
+    setEmailPreviewSubject(subject)
+  }
+
   const openReviewDialog = (application: SpeakerApplication, action: 'approve' | 'reject' | 'invite') => {
     setSelectedApplication(application)
     setActionType(action)
+    setRejectionReason("")
+    setAdminNotes("")
+    buildEmailPreview(application, action)
     setReviewDialogOpen(true)
   }
 
@@ -1204,19 +1318,22 @@ export default function AdminSpeakersPage() {
                           </div>
                         )}
 
-                        <div className="flex justify-end gap-2 pt-2">
+                        <div className="flex flex-wrap justify-end items-center gap-2 pt-2">
                           <Link href={`/admin/speakers/applications/${application.id}`}>
                             <Button variant="outline" size="sm">
                               <Eye className="h-3 w-3 mr-1" />
                               View Details
                             </Button>
                           </Link>
-                          {application.status === 'pending' && (
+
+                          {/* Status actions */}
+                          {(application.status === 'pending' || application.status === 'under_review') && (
                             <>
                               <Button
                                 size="sm"
                                 variant="default"
-                                onClick={() => openReviewDialog(application, 'approve')}
+                                onClick={() => handleSetStatus(application, 'set_approved')}
+                                disabled={processingAction}
                               >
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 Approve
@@ -1224,55 +1341,89 @@ export default function AdminSpeakersPage() {
                               <Button
                                 size="sm"
                                 variant="destructive"
-                                onClick={() => openReviewDialog(application, 'reject')}
+                                onClick={() => handleSetStatus(application, 'set_rejected')}
+                                disabled={processingAction}
                               >
                                 <XCircle className="h-3 w-3 mr-1" />
                                 Reject
                               </Button>
                             </>
                           )}
+
+                          {/* Change status back */}
+                          {application.status === 'approved' && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleSetStatus(application, 'set_pending')}
+                                disabled={processingAction}
+                                className="text-muted-foreground"
+                              >
+                                <Undo2 className="h-3 w-3 mr-1" />
+                                Revert to Pending
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleSetStatus(application, 'set_rejected')}
+                                disabled={processingAction}
+                              >
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Reject Instead
+                              </Button>
+                            </>
+                          )}
+                          {application.status === 'rejected' && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleSetStatus(application, 'set_pending')}
+                                disabled={processingAction}
+                                className="text-muted-foreground"
+                              >
+                                <Undo2 className="h-3 w-3 mr-1" />
+                                Revert to Pending
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="default"
+                                onClick={() => handleSetStatus(application, 'set_approved')}
+                                disabled={processingAction}
+                              >
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Approve Instead
+                              </Button>
+                            </>
+                          )}
+
+                          {/* Send letter button (separate from status) */}
                           {(application.status === 'approved' || application.status === 'invited') && (
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleResendLetter(application)}
-                              disabled={resendingLetter === application.id}
+                              onClick={() => openReviewDialog(application, 'approve')}
                             >
-                              {resendingLetter === application.id ? (
-                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                              ) : (
-                                <RefreshCw className="h-3 w-3 mr-1" />
-                              )}
-                              Resend Approval Letter
+                              <Send className="h-3 w-3 mr-1" />
+                              {application.invitation_sent_at ? 'Resend Approval Letter' : 'Send Approval Letter'}
                             </Button>
                           )}
                           {application.status === 'rejected' && (
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleResendLetter(application)}
-                              disabled={resendingLetter === application.id}
-                            >
-                              {resendingLetter === application.id ? (
-                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                              ) : (
-                                <RefreshCw className="h-3 w-3 mr-1" />
-                              )}
-                              Resend Rejection Letter
-                            </Button>
-                          )}
-                          {application.status === 'approved' && !application.invitation_sent_at && (
-                            <Button
-                              size="sm"
-                              onClick={() => openReviewDialog(application, 'invite')}
+                              onClick={() => openReviewDialog(application, 'reject')}
                             >
                               <Send className="h-3 w-3 mr-1" />
-                              Send Invitation
+                              Send Rejection Letter
                             </Button>
                           )}
+
+                          {/* Invitation sent indicator */}
                           {application.invitation_sent_at && (application.status === 'invited' || application.status === 'approved') && (
                             <Badge variant="outline" className="text-xs">
-                              Invitation sent {new Date(application.invitation_sent_at).toLocaleDateString()}
+                              Letter sent {new Date(application.invitation_sent_at).toLocaleDateString()}
                             </Badge>
                           )}
                         </div>
@@ -1465,59 +1616,28 @@ export default function AdminSpeakersPage() {
           </Tabs>
         </div>
 
-        {/* Review Dialog */}
+        {/* Send Letter Dialog with Email Preview */}
         <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {actionType === 'approve' && 'Approve Application'}
-                {actionType === 'reject' && 'Reject Application'}
+                {actionType === 'approve' && 'Send Approval Letter'}
+                {actionType === 'reject' && 'Send Rejection Letter'}
                 {actionType === 'invite' && 'Send Invitation'}
               </DialogTitle>
               <DialogDescription>
                 {selectedApplication && (
-                  <span>{selectedApplication.first_name} {selectedApplication.last_name} - {selectedApplication.email}</span>
+                  <span>Review the email below before sending to <strong>{selectedApplication.first_name} {selectedApplication.last_name}</strong> ({selectedApplication.email})</span>
                 )}
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div>
-                <Label htmlFor="admin_notes">Admin Notes</Label>
-                <Textarea
-                  id="admin_notes"
-                  value={adminNotes}
-                  onChange={(e) => setAdminNotes(e.target.value)}
-                  placeholder="Add any internal notes about this decision..."
-                  rows={3}
-                />
-              </div>
-              {actionType === 'reject' && (
-                <div>
-                  <Label htmlFor="rejection_reason">Rejection Reason</Label>
-                  <Textarea
-                    id="rejection_reason"
-                    value={rejectionReason}
-                    onChange={(e) => setRejectionReason(e.target.value)}
-                    placeholder="Provide a reason for rejection (optional - will be included in the email)..."
-                    rows={3}
-                  />
-                </div>
-              )}
+            <div className="space-y-4 py-2">
               {actionType === 'approve' && (
                 <Alert>
                   <CheckCircle className="h-4 w-4" />
-                  <AlertTitle>Approval Email</AlertTitle>
+                  <AlertTitle>Approval Letter</AlertTitle>
                   <AlertDescription>
-                    An approval email with an account creation link will be sent to the applicant. The link expires in 7 days. You can customize the email template in the Email Templates tab.
-                  </AlertDescription>
-                </Alert>
-              )}
-              {actionType === 'reject' && (
-                <Alert>
-                  <XCircle className="h-4 w-4" />
-                  <AlertTitle>Rejection Email</AlertTitle>
-                  <AlertDescription>
-                    A rejection notification will be sent to the applicant. You can customize the email template in the Email Templates tab.
+                    An account creation link will be included in the email. The link expires in 7 days.
                   </AlertDescription>
                 </Alert>
               )}
@@ -1530,26 +1650,48 @@ export default function AdminSpeakersPage() {
                   </AlertDescription>
                 </Alert>
               )}
+              {/* Email Preview */}
+              <div className="space-y-2">
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-1.5">
+                    <Eye className="h-3.5 w-3.5" />
+                    Email Preview
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    <strong>To:</strong> {selectedApplication?.email} &nbsp;&bull;&nbsp; <strong>Subject:</strong> {emailPreviewSubject}
+                  </p>
+                </div>
+                <div className="border rounded-lg overflow-hidden bg-gray-50">
+                  <iframe
+                    srcDoc={emailPreviewHtml}
+                    className="w-full border-0"
+                    style={{ height: "420px" }}
+                    title="Email preview"
+                    sandbox="allow-same-origin"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  You can customize this template in the Email Templates tab.
+                </p>
+              </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>
                 Cancel
               </Button>
               <Button
-                onClick={handleApplicationAction}
+                onClick={handleSendLetter}
                 disabled={processingAction}
-                variant={actionType === 'reject' ? 'destructive' : 'default'}
               >
                 {processingAction ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
+                    Sending...
                   </>
                 ) : (
                   <>
-                    {actionType === 'approve' && 'Approve & Send Email'}
-                    {actionType === 'reject' && 'Reject & Send Email'}
-                    {actionType === 'invite' && 'Send Invitation'}
+                    <Send className="mr-2 h-4 w-4" />
+                    Send Email
                   </>
                 )}
               </Button>

@@ -70,7 +70,7 @@ export async function PATCH(
         break
 
       case 'approve': {
-        // Generate invitation token on approval
+        // Generate invitation token on approval and send email
         const token = crypto.randomBytes(32).toString('hex')
         const expiresAt = new Date()
         expiresAt.setDate(expiresAt.getDate() + 7)
@@ -136,6 +136,119 @@ export async function PATCH(
           success: true,
           message: "Application rejected and notification sent"
         })
+      }
+
+      // Set status without sending email
+      case 'set_approved': {
+        await sql`
+          UPDATE speaker_applications
+          SET
+            status = 'approved',
+            reviewed_at = CURRENT_TIMESTAMP,
+            reviewed_by = 'admin',
+            admin_notes = ${admin_notes || null}
+          WHERE id = ${applicationId}
+        `
+        return NextResponse.json({
+          success: true,
+          message: "Application marked as approved"
+        })
+      }
+
+      case 'set_rejected': {
+        await sql`
+          UPDATE speaker_applications
+          SET
+            status = 'rejected',
+            reviewed_at = CURRENT_TIMESTAMP,
+            reviewed_by = 'admin',
+            rejection_reason = ${rejection_reason || null},
+            admin_notes = ${admin_notes || null}
+          WHERE id = ${applicationId}
+        `
+        return NextResponse.json({
+          success: true,
+          message: "Application marked as rejected"
+        })
+      }
+
+      case 'set_pending': {
+        await sql`
+          UPDATE speaker_applications
+          SET
+            status = 'pending',
+            reviewed_at = NULL,
+            reviewed_by = NULL,
+            rejection_reason = NULL,
+            admin_notes = ${admin_notes || null}
+          WHERE id = ${applicationId}
+        `
+        return NextResponse.json({
+          success: true,
+          message: "Application reverted to pending"
+        })
+      }
+
+      case 'send_letter': {
+        const { letter_type } = body
+        const [app] = await sql`
+          SELECT * FROM speaker_applications WHERE id = ${applicationId}
+        `
+
+        if (!app) {
+          return NextResponse.json({ error: "Application not found" }, { status: 404 })
+        }
+
+        if (letter_type === 'approved') {
+          // Generate/refresh invitation token when sending approval letter
+          const sendToken = crypto.randomBytes(32).toString('hex')
+          const sendExpiresAt = new Date()
+          sendExpiresAt.setDate(sendExpiresAt.getDate() + 7)
+
+          const [updatedApp] = await sql`
+            UPDATE speaker_applications
+            SET
+              invitation_token = ${sendToken},
+              invitation_sent_at = CURRENT_TIMESTAMP,
+              invitation_expires_at = ${sendExpiresAt.toISOString()}
+            WHERE id = ${applicationId}
+            RETURNING *
+          `
+
+          try {
+            await sendApplicationEmail(updatedApp, 'application_approved')
+          } catch (emailError) {
+            console.error('Failed to send approval letter:', emailError)
+            return NextResponse.json({
+              success: false,
+              error: "Failed to send approval letter",
+              details: emailError instanceof Error ? emailError.message : "Unknown email error"
+            }, { status: 500 })
+          }
+
+          return NextResponse.json({
+            success: true,
+            message: "Approval letter sent successfully"
+          })
+        } else if (letter_type === 'rejected') {
+          try {
+            await sendApplicationEmail(app, 'application_rejected')
+          } catch (emailError) {
+            console.error('Failed to send rejection letter:', emailError)
+            return NextResponse.json({
+              success: false,
+              error: "Failed to send rejection letter",
+              details: emailError instanceof Error ? emailError.message : "Unknown email error"
+            }, { status: 500 })
+          }
+
+          return NextResponse.json({
+            success: true,
+            message: "Rejection letter sent successfully"
+          })
+        }
+
+        return NextResponse.json({ error: "Invalid letter_type" }, { status: 400 })
       }
 
       case 'invite': {
@@ -392,6 +505,11 @@ async function sendApplicationEmail(application: any, templateKey: string) {
       </div>`
     : ''
 
+  // Format expertise areas as comma-separated string
+  const expertiseAreas = Array.isArray(application.expertise_areas)
+    ? application.expertise_areas.join(', ')
+    : (application.expertise_areas || '')
+
   const variables: Record<string, string> = {
     '{{first_name}}': application.first_name || '',
     '{{last_name}}': application.last_name || '',
@@ -399,6 +517,7 @@ async function sendApplicationEmail(application: any, templateKey: string) {
     '{{email}}': application.email || '',
     '{{company}}': application.company || '',
     '{{title}}': application.title || '',
+    '{{expertise_areas}}': expertiseAreas,
     '{{invite_url}}': inviteUrl,
     '{{rejection_reason}}': application.rejection_reason || '',
     '{{rejection_reason_block}}': rejectionReasonBlock,
