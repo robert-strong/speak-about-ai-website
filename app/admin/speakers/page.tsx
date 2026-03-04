@@ -66,6 +66,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { authGet, authPost, authPut, authPatch, authDelete } from "@/lib/auth-fetch"
+import { EmailTemplateEditor } from "@/components/email-template-editor"
 
 interface Speaker {
   id: number
@@ -1421,16 +1422,6 @@ export default function AdminSpeakersPage() {
 
             {/* Email Templates Tab */}
             <TabsContent value="email-templates" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Application Email Templates</CardTitle>
-                  <CardDescription>
-                    Customize the email letters sent to applicants when their application is approved or rejected.
-                    Use variables like {"{{first_name}}"}, {"{{last_name}}"}, {"{{email}}"}, {"{{company}}"}, {"{{title}}"}, {"{{invite_url}}"}, {"{{rejection_reason}}"}, {"{{rejection_reason_block}}"} in your templates.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-
               {loadingTemplates ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin" />
@@ -1449,130 +1440,24 @@ export default function AdminSpeakersPage() {
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="approved" className="space-y-4 mt-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Approved Application Letter</CardTitle>
-                        <CardDescription>
-                          This email is sent when a speaker application is approved. It includes the account creation link.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div>
-                          <Label htmlFor="approved-subject">Email Subject</Label>
-                          <Input
-                            id="approved-subject"
-                            value={approvedTemplate.subject}
-                            onChange={(e) => setApprovedTemplate({...approvedTemplate, subject: e.target.value})}
-                            placeholder="Enter email subject..."
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="approved-body">Email Body (HTML)</Label>
-                          <Textarea
-                            id="approved-body"
-                            value={approvedTemplate.body_html}
-                            onChange={(e) => setApprovedTemplate({...approvedTemplate, body_html: e.target.value})}
-                            placeholder="Enter email HTML content..."
-                            rows={20}
-                            className="font-mono text-sm"
-                          />
-                        </div>
-                        <Alert>
-                          <Mail className="h-4 w-4" />
-                          <AlertTitle>Available Variables</AlertTitle>
-                          <AlertDescription>
-                            <code className="text-xs">{"{{first_name}}"}</code>, <code className="text-xs">{"{{last_name}}"}</code>, <code className="text-xs">{"{{email}}"}</code>, <code className="text-xs">{"{{company}}"}</code>, <code className="text-xs">{"{{title}}"}</code>, <code className="text-xs">{"{{invite_url}}"}</code>
-                          </AlertDescription>
-                        </Alert>
-                        {approvedTemplate.updated_at && (
-                          <p className="text-xs text-gray-500">
-                            Last updated: {new Date(approvedTemplate.updated_at).toLocaleString()}
-                          </p>
-                        )}
-                      </CardContent>
-                      <CardFooter>
-                        <Button
-                          onClick={() => handleSaveTemplate(approvedTemplate)}
-                          disabled={savingTemplate === 'application_approved'}
-                        >
-                          {savingTemplate === 'application_approved' ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Saving...
-                            </>
-                          ) : (
-                            <>
-                              <Save className="mr-2 h-4 w-4" />
-                              Save Template
-                            </>
-                          )}
-                        </Button>
-                      </CardFooter>
-                    </Card>
+                  <TabsContent value="approved" className="mt-4">
+                    <EmailTemplateEditor
+                      template={approvedTemplate}
+                      onTemplateChange={setApprovedTemplate}
+                      onSave={handleSaveTemplate}
+                      saving={savingTemplate === 'application_approved'}
+                      templateType="approved"
+                    />
                   </TabsContent>
 
-                  <TabsContent value="rejected" className="space-y-4 mt-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Rejected Application Letter</CardTitle>
-                        <CardDescription>
-                          This email is sent when a speaker application is rejected.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div>
-                          <Label htmlFor="rejected-subject">Email Subject</Label>
-                          <Input
-                            id="rejected-subject"
-                            value={rejectedTemplate.subject}
-                            onChange={(e) => setRejectedTemplate({...rejectedTemplate, subject: e.target.value})}
-                            placeholder="Enter email subject..."
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="rejected-body">Email Body (HTML)</Label>
-                          <Textarea
-                            id="rejected-body"
-                            value={rejectedTemplate.body_html}
-                            onChange={(e) => setRejectedTemplate({...rejectedTemplate, body_html: e.target.value})}
-                            placeholder="Enter email HTML content..."
-                            rows={20}
-                            className="font-mono text-sm"
-                          />
-                        </div>
-                        <Alert>
-                          <Mail className="h-4 w-4" />
-                          <AlertTitle>Available Variables</AlertTitle>
-                          <AlertDescription>
-                            <code className="text-xs">{"{{first_name}}"}</code>, <code className="text-xs">{"{{last_name}}"}</code>, <code className="text-xs">{"{{email}}"}</code>, <code className="text-xs">{"{{company}}"}</code>, <code className="text-xs">{"{{title}}"}</code>, <code className="text-xs">{"{{rejection_reason}}"}</code>, <code className="text-xs">{"{{rejection_reason_block}}"}</code>
-                          </AlertDescription>
-                        </Alert>
-                        {rejectedTemplate.updated_at && (
-                          <p className="text-xs text-gray-500">
-                            Last updated: {new Date(rejectedTemplate.updated_at).toLocaleString()}
-                          </p>
-                        )}
-                      </CardContent>
-                      <CardFooter>
-                        <Button
-                          onClick={() => handleSaveTemplate(rejectedTemplate)}
-                          disabled={savingTemplate === 'application_rejected'}
-                        >
-                          {savingTemplate === 'application_rejected' ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Saving...
-                            </>
-                          ) : (
-                            <>
-                              <Save className="mr-2 h-4 w-4" />
-                              Save Template
-                            </>
-                          )}
-                        </Button>
-                      </CardFooter>
-                    </Card>
+                  <TabsContent value="rejected" className="mt-4">
+                    <EmailTemplateEditor
+                      template={rejectedTemplate}
+                      onTemplateChange={setRejectedTemplate}
+                      onSave={handleSaveTemplate}
+                      saving={savingTemplate === 'application_rejected'}
+                      templateType="rejected"
+                    />
                   </TabsContent>
                 </Tabs>
               )}

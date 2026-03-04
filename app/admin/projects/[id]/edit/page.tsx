@@ -276,12 +276,34 @@ export default function ProjectEditPage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
+  // Payment line items state
+  interface PaymentLineItem {
+    id: number
+    project_id: number
+    payment_type: 'client_payment' | 'speaker_payout'
+    amount: number
+    payment_date: string
+    description: string | null
+    created_at: string
+  }
+  const [clientPayments, setClientPayments] = useState<PaymentLineItem[]>([])
+  const [speakerPayouts, setSpeakerPayouts] = useState<PaymentLineItem[]>([])
+  const [clientPaymentTotal, setClientPaymentTotal] = useState(0)
+  const [speakerPayoutTotal, setSpeakerPayoutTotal] = useState(0)
+  const [loadingPayments, setLoadingPayments] = useState(false)
+  const [addingPayment, setAddingPayment] = useState(false)
+  const [newClientPayment, setNewClientPayment] = useState({ amount: '', date: '', description: '' })
+  const [newSpeakerPayout, setNewSpeakerPayout] = useState({ amount: '', date: '', description: '' })
+  const [showAddClientPayment, setShowAddClientPayment] = useState(false)
+  const [showAddSpeakerPayout, setShowAddSpeakerPayout] = useState(false)
+
   // Safely extract project ID - handle both string and array cases
   const projectId = Array.isArray(params.id) ? params.id[0] : params.id
 
   useEffect(() => {
     if (projectId) {
       loadProject()
+      loadPayments()
     }
   }, [projectId])
 
@@ -339,6 +361,72 @@ export default function ProjectEditPage() {
 
   const updateField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  // Payment line items functions
+  const loadPayments = async () => {
+    if (!projectId) return
+    setLoadingPayments(true)
+    try {
+      const response = await authFetch(`/api/projects/${projectId}/payments`)
+      if (response.ok) {
+        const data = await response.json()
+        setClientPayments(data.client_payments || [])
+        setSpeakerPayouts(data.speaker_payouts || [])
+        setClientPaymentTotal(data.client_total || 0)
+        setSpeakerPayoutTotal(data.speaker_total || 0)
+      }
+    } catch (err) {
+      console.error("Failed to load payments:", err)
+    } finally {
+      setLoadingPayments(false)
+    }
+  }
+
+  const addPaymentLineItem = async (type: 'client_payment' | 'speaker_payout') => {
+    if (!projectId) return
+    const data = type === 'client_payment' ? newClientPayment : newSpeakerPayout
+    if (!data.amount || Number(data.amount) <= 0) return
+    setAddingPayment(true)
+    try {
+      const response = await authFetch(`/api/projects/${projectId}/payments`, {
+        method: "POST",
+        body: JSON.stringify({
+          payment_type: type,
+          amount: Number(data.amount),
+          payment_date: data.date || new Date().toISOString().split('T')[0],
+          description: data.description || null,
+        }),
+      })
+      if (response.ok) {
+        if (type === 'client_payment') {
+          setNewClientPayment({ amount: '', date: '', description: '' })
+          setShowAddClientPayment(false)
+        } else {
+          setNewSpeakerPayout({ amount: '', date: '', description: '' })
+          setShowAddSpeakerPayout(false)
+        }
+        await loadPayments()
+      }
+    } catch (err) {
+      console.error("Failed to add payment:", err)
+    } finally {
+      setAddingPayment(false)
+    }
+  }
+
+  const deletePaymentLineItem = async (paymentId: number) => {
+    if (!projectId) return
+    try {
+      const response = await authFetch(`/api/projects/${projectId}/payments?paymentId=${paymentId}`, {
+        method: "DELETE",
+      })
+      if (response.ok) {
+        await loadPayments()
+      }
+    } catch (err) {
+      console.error("Failed to delete payment:", err)
+    }
   }
 
   const formatTime = (time?: string) => {
@@ -1713,11 +1801,17 @@ export default function ProjectEditPage() {
                       <span className="text-gray-500">Total to Collect</span>
                       <p className="font-semibold text-lg text-blue-600">${(Number(formData.budget || 0) + Number(formData.travel_buyout || 0)).toLocaleString()}</p>
                       <span className="text-xs text-gray-400">Deal + Travel</span>
+                      {clientPaymentTotal > 0 && (
+                        <p className="text-xs text-green-600 mt-1">Collected: ${clientPaymentTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      )}
                     </div>
                     <div>
                       <span className="text-gray-500">Speaker Payout</span>
                       <p className="font-semibold text-lg text-orange-600">${(Number(formData.speaker_fee || 0) + Number(formData.travel_expenses_amount || 0)).toLocaleString()}</p>
                       <span className="text-xs text-gray-400">Fee + Travel Expenses</span>
+                      {speakerPayoutTotal > 0 && (
+                        <p className="text-xs text-orange-600 mt-1">Paid: ${speakerPayoutTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      )}
                     </div>
                     <div>
                       <span className="text-gray-500">Net Commission</span>
@@ -1729,98 +1823,284 @@ export default function ProjectEditPage() {
                   </div>
                 </div>
 
-                {/* Client Payment */}
+                {/* Client Payments */}
                 <div className="space-y-4">
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <Building2 className="h-4 w-4" />
-                    Client Payment
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="payment_status">Payment Status</Label>
-                      <Select
-                        value={formData.payment_status || "pending"}
-                        onValueChange={(value) => updateField("payment_status", value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                              Pending
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="partial">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-blue-500" />
-                              Partial
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="paid">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-green-500" />
-                              Paid
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="payment_date">Payment Date</Label>
-                      <Input
-                        id="payment_date"
-                        type="date"
-                        value={formData.payment_date?.split('T')[0] || ""}
-                        onChange={(e) => updateField("payment_date", e.target.value)}
-                      />
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      Client Payments
+                    </h4>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowAddClientPayment(true)}
+                      className="gap-1"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add Payment
+                    </Button>
                   </div>
+
+                  {/* Client payment progress */}
+                  {(() => {
+                    const totalToCollect = Number(formData.budget || 0) + Number(formData.travel_buyout || 0)
+                    const pctPaid = totalToCollect > 0 ? Math.min(100, (clientPaymentTotal / totalToCollect) * 100) : 0
+                    const remaining = totalToCollect - clientPaymentTotal
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            ${clientPaymentTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} received of ${totalToCollect.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </span>
+                          <span className={remaining <= 0 ? "text-green-600 font-medium" : "text-amber-600 font-medium"}>
+                            {remaining <= 0 ? "Paid in Full" : `$${remaining.toLocaleString(undefined, { minimumFractionDigits: 2 })} remaining`}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div
+                            className={`h-2.5 rounded-full transition-all ${pctPaid >= 100 ? 'bg-green-500' : pctPaid > 0 ? 'bg-blue-500' : 'bg-gray-200'}`}
+                            style={{ width: `${pctPaid}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })()}
+
+                  {/* Client payment line items */}
+                  {clientPayments.length > 0 && (
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="text-left px-3 py-2 font-medium text-gray-600">Date</th>
+                            <th className="text-left px-3 py-2 font-medium text-gray-600">Description</th>
+                            <th className="text-right px-3 py-2 font-medium text-gray-600">Amount</th>
+                            <th className="w-10 px-3 py-2"></th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {clientPayments.map((payment) => (
+                            <tr key={payment.id} className="hover:bg-gray-50">
+                              <td className="px-3 py-2 text-gray-700">
+                                {new Date(payment.payment_date).toLocaleDateString()}
+                              </td>
+                              <td className="px-3 py-2 text-gray-600">
+                                {payment.description || "—"}
+                              </td>
+                              <td className="px-3 py-2 text-right font-medium text-green-700">
+                                ${Number(payment.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                              </td>
+                              <td className="px-3 py-2 text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                  onClick={() => deletePaymentLineItem(payment.id)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  {clientPayments.length === 0 && !showAddClientPayment && (
+                    <p className="text-sm text-muted-foreground italic">No payments recorded yet.</p>
+                  )}
+
+                  {/* Add client payment form */}
+                  {showAddClientPayment && (
+                    <div className="border rounded-lg p-3 bg-blue-50/50 space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <Label className="text-xs">Amount ($) *</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            value={newClientPayment.amount}
+                            onChange={(e) => setNewClientPayment(p => ({ ...p, amount: e.target.value }))}
+                            autoFocus
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Date *</Label>
+                          <Input
+                            type="date"
+                            value={newClientPayment.date || new Date().toISOString().split('T')[0]}
+                            onChange={(e) => setNewClientPayment(p => ({ ...p, date: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Description</Label>
+                          <Input
+                            placeholder="e.g. 50% deposit"
+                            value={newClientPayment.description}
+                            onChange={(e) => setNewClientPayment(p => ({ ...p, description: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => addPaymentLineItem('client_payment')}
+                          disabled={addingPayment || !newClientPayment.amount}
+                        >
+                          {addingPayment ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Plus className="h-3.5 w-3.5 mr-1" />}
+                          Add Payment
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => { setShowAddClientPayment(false); setNewClientPayment({ amount: '', date: '', description: '' }) }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Speaker Payment */}
+                {/* Speaker Payouts */}
                 <div className="space-y-4">
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <Mic className="h-4 w-4" />
-                    Speaker Payment
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="speaker_payment_status">Speaker Payment Status</Label>
-                      <Select
-                        value={formData.speaker_payment_status || "pending"}
-                        onValueChange={(value) => updateField("speaker_payment_status", value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                              Pending
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="paid">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-green-500" />
-                              Paid
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="speaker_payment_date">Speaker Payment Date</Label>
-                      <Input
-                        id="speaker_payment_date"
-                        type="date"
-                        value={formData.speaker_payment_date?.split('T')[0] || ""}
-                        onChange={(e) => updateField("speaker_payment_date", e.target.value)}
-                      />
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Mic className="h-4 w-4" />
+                      Speaker Payouts
+                    </h4>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowAddSpeakerPayout(true)}
+                      className="gap-1"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add Payout
+                    </Button>
                   </div>
+
+                  {/* Speaker payout progress */}
+                  {(() => {
+                    const totalOwed = Number(formData.speaker_fee || 0) + Number(formData.travel_expenses_amount || 0)
+                    const pctPaid = totalOwed > 0 ? Math.min(100, (speakerPayoutTotal / totalOwed) * 100) : 0
+                    const remaining = totalOwed - speakerPayoutTotal
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            ${speakerPayoutTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} paid of ${totalOwed.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </span>
+                          <span className={remaining <= 0 ? "text-green-600 font-medium" : "text-orange-600 font-medium"}>
+                            {remaining <= 0 ? "Fully Paid" : `$${remaining.toLocaleString(undefined, { minimumFractionDigits: 2 })} remaining`}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div
+                            className={`h-2.5 rounded-full transition-all ${pctPaid >= 100 ? 'bg-green-500' : pctPaid > 0 ? 'bg-orange-500' : 'bg-gray-200'}`}
+                            style={{ width: `${pctPaid}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })()}
+
+                  {/* Speaker payout line items */}
+                  {speakerPayouts.length > 0 && (
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="text-left px-3 py-2 font-medium text-gray-600">Date</th>
+                            <th className="text-left px-3 py-2 font-medium text-gray-600">Description</th>
+                            <th className="text-right px-3 py-2 font-medium text-gray-600">Amount</th>
+                            <th className="w-10 px-3 py-2"></th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {speakerPayouts.map((payment) => (
+                            <tr key={payment.id} className="hover:bg-gray-50">
+                              <td className="px-3 py-2 text-gray-700">
+                                {new Date(payment.payment_date).toLocaleDateString()}
+                              </td>
+                              <td className="px-3 py-2 text-gray-600">
+                                {payment.description || "—"}
+                              </td>
+                              <td className="px-3 py-2 text-right font-medium text-orange-700">
+                                ${Number(payment.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                              </td>
+                              <td className="px-3 py-2 text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                  onClick={() => deletePaymentLineItem(payment.id)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  {speakerPayouts.length === 0 && !showAddSpeakerPayout && (
+                    <p className="text-sm text-muted-foreground italic">No payouts recorded yet.</p>
+                  )}
+
+                  {/* Add speaker payout form */}
+                  {showAddSpeakerPayout && (
+                    <div className="border rounded-lg p-3 bg-orange-50/50 space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <Label className="text-xs">Amount ($) *</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            value={newSpeakerPayout.amount}
+                            onChange={(e) => setNewSpeakerPayout(p => ({ ...p, amount: e.target.value }))}
+                            autoFocus
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Date *</Label>
+                          <Input
+                            type="date"
+                            value={newSpeakerPayout.date || new Date().toISOString().split('T')[0]}
+                            onChange={(e) => setNewSpeakerPayout(p => ({ ...p, date: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Description</Label>
+                          <Input
+                            placeholder="e.g. Speaker fee payment"
+                            value={newSpeakerPayout.description}
+                            onChange={(e) => setNewSpeakerPayout(p => ({ ...p, description: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => addPaymentLineItem('speaker_payout')}
+                          disabled={addingPayment || !newSpeakerPayout.amount}
+                        >
+                          {addingPayment ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Plus className="h-3.5 w-3.5 mr-1" />}
+                          Add Payout
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => { setShowAddSpeakerPayout(false); setNewSpeakerPayout({ amount: '', date: '', description: '' }) }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
