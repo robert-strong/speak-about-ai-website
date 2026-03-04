@@ -31,6 +31,7 @@ interface VisualContent {
   buttonNote: string
   expiryNote: string
   contactEmail: string
+  signOffLine: string
   signOffName: string
 }
 
@@ -117,7 +118,7 @@ function buildTemplateHtml(content: VisualContent, type: "approved" | "rejected"
   <div style="background: white; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
     <h2 style="color: #1f2937; margin-top: 0;">${escapeHtml(content.greeting)}</h2>
 ${bodyHtml}    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-    <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">Best regards,<br><strong>${escapeHtml(content.signOffName)}</strong></p>
+${content.contactEmail.trim() ? `    <p style="color: #6b7280; font-size: 14px;">Questions? Reach out at <a href="mailto:${escapeHtml(content.contactEmail)}" style="color: #1E68C6;">${escapeHtml(content.contactEmail)}</a></p>\n` : ''}    <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">${escapeHtml(content.signOffLine)}<br><strong>${escapeHtml(content.signOffName)}</strong></p>
   </div>
 </body>
 </html>`
@@ -186,9 +187,18 @@ function parseTemplateHtml(html: string, type: "approved" | "rejected"): VisualC
     const contactMatch = html.match(/mailto:([\w@.]+)/)
     if (contactMatch) contactEmail = contactMatch[1]
 
+    let signOffLine = "Best regards,"
     let signOffName = "The Speak About AI Team"
-    const signOffMatch = html.match(/Best regards,[\s\S]*?<strong>([\s\S]*?)<\/strong>/)
-    if (signOffMatch) signOffName = signOffMatch[1].replace(/<[^>]+>/g, "").trim()
+    // Match: signOffLine<br><strong>signOffName</strong>
+    const signOffMatch = html.match(/>([^<]*?)<br\s*\/?><strong>([\s\S]*?)<\/strong><\/p>\s*<\/div>\s*<\/body>/s)
+    if (signOffMatch) {
+      signOffLine = signOffMatch[1].trim() || "Best regards,"
+      signOffName = signOffMatch[2].replace(/<[^>]+>/g, "").trim() || "The Speak About AI Team"
+    } else {
+      // Fallback: try old format
+      const oldMatch = html.match(/Best regards,[\s\S]*?<strong>([\s\S]*?)<\/strong>/)
+      if (oldMatch) signOffName = oldMatch[1].replace(/<[^>]+>/g, "").trim()
+    }
 
     // If no styled paragraphs found, try matching any <p> tags in the body section
     if (blocks.filter(b => b.type === "paragraph").length === 0) {
@@ -209,7 +219,7 @@ function parseTemplateHtml(html: string, type: "approved" | "rejected"): VisualC
     // Still no paragraphs? Return null to show HTML editor
     if (blocks.filter(b => b.type === "paragraph").length === 0) return null
 
-    return { greeting, blocks, buttonText, buttonNote, expiryNote, contactEmail, signOffName }
+    return { greeting, blocks, buttonText, buttonNote, expiryNote, contactEmail, signOffLine, signOffName }
   } catch {
     return null
   }
@@ -228,6 +238,7 @@ function getDefaultVisualContent(type: "approved" | "rejected"): VisualContent {
       buttonNote: "",
       expiryNote: "",
       contactEmail: "hello@speakabout.ai",
+      signOffLine: "Best regards,",
       signOffName: "The Speak About AI Team",
     }
   }
@@ -244,6 +255,7 @@ function getDefaultVisualContent(type: "approved" | "rejected"): VisualContent {
     buttonNote: "",
     expiryNote: "",
     contactEmail: "hello@speakabout.ai",
+    signOffLine: "Best regards,",
     signOffName: "The Speak About AI Team",
   }
 }
@@ -313,6 +325,8 @@ export function EmailTemplateEditor({
       updateVisual({ ...visualContent, blocks: newBlocks })
     } else if (key === "contactEmail") {
       updateVisual({ ...visualContent, contactEmail: visualContent.contactEmail + variable })
+    } else if (key === "signOffLine") {
+      updateVisual({ ...visualContent, signOffLine: visualContent.signOffLine + variable })
     } else if (key === "signOffName") {
       updateVisual({ ...visualContent, signOffName: visualContent.signOffName + variable })
     }
@@ -568,6 +582,26 @@ export function EmailTemplateEditor({
             <Separator />
             <div className="space-y-3">
               <Label className="text-sm font-medium">Sign-off</Label>
+              <div>
+                <Label htmlFor={`${templateType}-contact-email`} className="text-xs text-muted-foreground">Contact Email (leave empty to hide &quot;Questions? Reach out&quot; line)</Label>
+                <Input
+                  id={`${templateType}-contact-email`}
+                  value={visualContent.contactEmail}
+                  onChange={(e) => updateVisual({ ...visualContent, contactEmail: e.target.value })}
+                  onFocus={() => { lastFocusedField.current = "contactEmail" }}
+                  placeholder="hello@speakabout.ai"
+                />
+              </div>
+              <div>
+                <Label htmlFor={`${templateType}-signoff-line`} className="text-xs text-muted-foreground">Closing Line</Label>
+                <Input
+                  id={`${templateType}-signoff-line`}
+                  value={visualContent.signOffLine}
+                  onChange={(e) => updateVisual({ ...visualContent, signOffLine: e.target.value })}
+                  onFocus={() => { lastFocusedField.current = "signOffLine" }}
+                  placeholder="Best regards,"
+                />
+              </div>
               <div>
                 <Label htmlFor={`${templateType}-signoff`} className="text-xs text-muted-foreground">Team / Sender Name</Label>
                 <Input
