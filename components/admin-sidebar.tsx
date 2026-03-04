@@ -359,6 +359,15 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           permissionKey: "vendor_directory"
         },
         {
+          title: "SEO Dashboard",
+          href: "/admin/seo-analysis",
+          icon: TrendingUp,
+          description: "Keywords & Analysis",
+          color: "text-pink-600",
+          bgColor: "bg-pink-50",
+          permissionKey: "marketing"
+        },
+        {
           title: "Google Ads",
           href: "/admin/google-ads",
           icon: TrendingUp,
@@ -465,15 +474,6 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           description: "Speaker Updates",
           color: "text-indigo-600",
           bgColor: "bg-indigo-50",
-          permissionKey: "system"
-        },
-        {
-          title: "SEO Dashboard",
-          href: "/admin/seo-analysis",
-          icon: TrendingUp,
-          description: "Semrush Analytics",
-          color: "text-pink-600",
-          bgColor: "bg-pink-50",
           permissionKey: "system"
         },
         {
