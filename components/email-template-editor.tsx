@@ -109,7 +109,7 @@ function buildTemplateHtml(content: VisualContent, type: "approved" | "rejected"
   let buttonSection = ""
   if (type === "approved" && content.buttonText) {
     buttonSection = `    <div style="text-align: center; margin: 30px 0;">
-      <a href="{{invite_url}}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">${escapeHtml(content.buttonText)}</a>
+      <a href="{{invite_url}}" style="display: inline-block; background: #1E68C6; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">${escapeHtml(content.buttonText)}</a>
     </div>
     <p style="color: #6b7280; font-size: 14px; text-align: center;">${escapeHtml(content.buttonNote)}</p>\n`
   }
@@ -123,14 +123,13 @@ function buildTemplateHtml(content: VisualContent, type: "approved" | "rejected"
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-    <h1 style="color: white; margin: 0; font-size: 28px;">Speak About AI</h1>
-    <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">AI &amp; Technology Speaker Bureau</p>
+  <div style="background: #1E68C6; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+    <img src="https://speakabout.ai/speak-about-ai-dark-logo.png" alt="Speak About AI" style="max-width: 220px; height: auto; display: block; margin: 0 auto;" />
   </div>
   <div style="background: white; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
     <h2 style="color: #1f2937; margin-top: 0;">${escapeHtml(content.greeting)}</h2>
 ${bodyHtml}${buttonSection}${expirySection}    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-    <p style="color: #6b7280; font-size: 14px;">Questions? Reach out at <a href="mailto:${escapeHtml(content.contactEmail)}" style="color: #3b82f6;">${escapeHtml(content.contactEmail)}</a></p>
+    <p style="color: #6b7280; font-size: 14px;">Questions? Reach out at <a href="mailto:${escapeHtml(content.contactEmail)}" style="color: #1E68C6;">${escapeHtml(content.contactEmail)}</a></p>
     <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">Best regards,<br><strong>${escapeHtml(content.signOffName)}</strong></p>
   </div>
 </body>
