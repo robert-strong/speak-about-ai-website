@@ -516,7 +516,7 @@ export default function AdminSpeakersPage() {
 
     // Build rejection reason block
     const rejectionBlock = reasonText
-      ? `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;">${reasonText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>`
+      ? `<p style="color: #4b5563; font-size: 16px;">${reasonText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`
       : ''
     variables['{{rejection_reason_block}}'] = rejectionBlock
 
@@ -529,9 +529,7 @@ export default function AdminSpeakersPage() {
 
     // Inject personal feedback section before the sign-off <hr>
     if (feedbackText.trim()) {
-      const feedbackHtml = `<div style="background: #f0f7ff; border-left: 4px solid #1E68C6; padding: 16px; margin: 20px 0; border-radius: 4px;">
-        <p style="color: #374151; font-size: 14px; margin: 0;">${feedbackText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>
-      </div>`
+      const feedbackHtml = `    <p style="color: #4b5563; font-size: 16px;">${feedbackText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>`
       // Insert before the <hr> that precedes sign-off
       html = html.replace(/<hr\s*style="border:\s*none;\s*border-top:\s*1px\s*solid\s*#e5e7eb;\s*margin:\s*30px\s*0;">/,
         feedbackHtml + '<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">')

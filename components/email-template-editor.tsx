@@ -75,7 +75,7 @@ const SAMPLE_DATA: Record<string, string> = {
   "{{title}}": "Director of AI",
   "{{rejection_reason}}": "We are currently at capacity for speakers in your topic area.",
   "{{expertise_areas}}": "Machine Learning, Natural Language Processing, Computer Vision",
-  "{{rejection_reason_block}}": `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;">We are currently at capacity for speakers in your topic area.</p></div>`,
+  "{{rejection_reason_block}}": `<p style="color: #4b5563; font-size: 16px;">We are currently at capacity for speakers in your topic area.</p>`,
 }
 
 // ─── Utility Functions ─────────────────────────────────────────────────────────
@@ -117,7 +117,6 @@ function buildTemplateHtml(content: VisualContent, type: "approved" | "rejected"
   <div style="background: white; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
     <h2 style="color: #1f2937; margin-top: 0;">${escapeHtml(content.greeting)}</h2>
 ${bodyHtml}    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-    <p style="color: #6b7280; font-size: 14px;">Questions? Reach out at <a href="mailto:${escapeHtml(content.contactEmail)}" style="color: #1E68C6;">${escapeHtml(content.contactEmail)}</a></p>
     <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">Best regards,<br><strong>${escapeHtml(content.signOffName)}</strong></p>
   </div>
 </body>
@@ -569,27 +568,15 @@ export function EmailTemplateEditor({
             <Separator />
             <div className="space-y-3">
               <Label className="text-sm font-medium">Sign-off</Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor={`${templateType}-contact`} className="text-xs text-muted-foreground">Contact Email</Label>
-                  <Input
-                    id={`${templateType}-contact`}
-                    value={visualContent.contactEmail}
-                    onChange={(e) => updateVisual({ ...visualContent, contactEmail: e.target.value })}
-                    onFocus={() => { lastFocusedField.current = "contactEmail" }}
-                    placeholder="hello@speakabout.ai"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor={`${templateType}-signoff`} className="text-xs text-muted-foreground">Team / Sender Name</Label>
-                  <Input
-                    id={`${templateType}-signoff`}
-                    value={visualContent.signOffName}
-                    onChange={(e) => updateVisual({ ...visualContent, signOffName: e.target.value })}
-                    onFocus={() => { lastFocusedField.current = "signOffName" }}
-                    placeholder="The Speak About AI Team"
-                  />
-                </div>
+              <div>
+                <Label htmlFor={`${templateType}-signoff`} className="text-xs text-muted-foreground">Team / Sender Name</Label>
+                <Input
+                  id={`${templateType}-signoff`}
+                  value={visualContent.signOffName}
+                  onChange={(e) => updateVisual({ ...visualContent, signOffName: e.target.value })}
+                  onFocus={() => { lastFocusedField.current = "signOffName" }}
+                  placeholder="The Speak About AI Team"
+                />
               </div>
             </div>
           </div>
