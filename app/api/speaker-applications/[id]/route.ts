@@ -516,7 +516,7 @@ async function sendApplicationEmail(application: any, templateKey: string, perso
 
   const rejectionReasonBlock = application.rejection_reason
     ? `<div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #6b7280;">
-        <p style="color: #4b5563; font-size: 14px; margin: 0;"><strong>Feedback:</strong> ${application.rejection_reason}</p>
+        <p style="color: #4b5563; font-size: 14px; margin: 0;">${application.rejection_reason}</p>
       </div>`
     : ''
 
@@ -559,8 +559,7 @@ async function sendApplicationEmail(application: any, templateKey: string, perso
   if (personalFeedback && personalFeedback.trim()) {
     const escapedFeedback = personalFeedback.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
     const feedbackHtml = `<div style="background: #f0f7ff; border-left: 4px solid #1E68C6; padding: 16px; margin: 20px 0; border-radius: 4px;">
-      <p style="color: #1e40af; font-size: 14px; margin: 0;"><strong>Personal Note:</strong></p>
-      <p style="color: #374151; font-size: 14px; margin: 8px 0 0 0;">${escapedFeedback}</p>
+      <p style="color: #374151; font-size: 14px; margin: 0;">${escapedFeedback}</p>
     </div>`
     htmlContent = htmlContent.replace(
       /<hr\s*style="border:\s*none;\s*border-top:\s*1px\s*solid\s*#e5e7eb;\s*margin:\s*30px\s*0;">/,

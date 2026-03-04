@@ -54,7 +54,6 @@ const APPROVED_VARIABLES = [
   { label: "Email", value: "{{email}}" },
   { label: "Company", value: "{{company}}" },
   { label: "Title", value: "{{title}}" },
-  { label: "Invite URL", value: "{{invite_url}}" },
   { label: "Expertise Areas", value: "{{expertise_areas}}" },
 ]
 
@@ -74,10 +73,9 @@ const SAMPLE_DATA: Record<string, string> = {
   "{{email}}": "john.smith@example.com",
   "{{company}}": "Acme Technology Corp",
   "{{title}}": "Director of AI",
-  "{{invite_url}}": "https://speakabout.ai/invite/sample-token-12345",
   "{{rejection_reason}}": "We are currently at capacity for speakers in your topic area.",
   "{{expertise_areas}}": "Machine Learning, Natural Language Processing, Computer Vision",
-  "{{rejection_reason_block}}": `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;"><strong>Reason:</strong> We are currently at capacity for speakers in your topic area.</p></div>`,
+  "{{rejection_reason_block}}": `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;">We are currently at capacity for speakers in your topic area.</p></div>`,
 }
 
 // ─── Utility Functions ─────────────────────────────────────────────────────────
@@ -109,19 +107,6 @@ function buildTemplateHtml(content: VisualContent, type: "approved" | "rejected"
     }
   }
 
-  let buttonSection = ""
-  if (type === "approved" && content.buttonText) {
-    buttonSection = `    <div style="text-align: center; margin: 30px 0;">
-      <a href="{{invite_url}}" style="display: inline-block; background: #1E68C6; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">${escapeHtml(content.buttonText)}</a>
-    </div>
-    <p style="color: #6b7280; font-size: 14px; text-align: center;">${escapeHtml(content.buttonNote)}</p>\n`
-  }
-
-  let expirySection = ""
-  if (type === "approved" && content.expiryNote) {
-    expirySection = `    <p style="color: #6b7280; font-size: 14px; margin-top: 30px;"><strong>Important:</strong> ${escapeHtml(content.expiryNote)}</p>\n`
-  }
-
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -131,7 +116,7 @@ function buildTemplateHtml(content: VisualContent, type: "approved" | "rejected"
   </div>
   <div style="background: white; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
     <h2 style="color: #1f2937; margin-top: 0;">${escapeHtml(content.greeting)}</h2>
-${bodyHtml}${buttonSection}${expirySection}    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+${bodyHtml}    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
     <p style="color: #6b7280; font-size: 14px;">Questions? Reach out at <a href="mailto:${escapeHtml(content.contactEmail)}" style="color: #1E68C6;">${escapeHtml(content.contactEmail)}</a></p>
     <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">Best regards,<br><strong>${escapeHtml(content.signOffName)}</strong></p>
   </div>
@@ -240,9 +225,9 @@ function getDefaultVisualContent(type: "approved" | "rejected"): VisualContent {
         { type: "paragraph", id: nextId(), text: "We are excited to welcome you to our exclusive network of AI and technology thought leaders." },
         { type: "paragraph", id: nextId(), text: "Please click the button below to create your speaker account:" },
       ],
-      buttonText: "Create Your Account",
-      buttonNote: "Or copy and paste this link: {{invite_url}}",
-      expiryNote: "This invitation link will expire in 7 days.",
+      buttonText: "",
+      buttonNote: "",
+      expiryNote: "",
       contactEmail: "hello@speakabout.ai",
       signOffName: "The Speak About AI Team",
     }
@@ -327,8 +312,6 @@ export function EmailTemplateEditor({
         paragraphs[idx].text += variable
       }
       updateVisual({ ...visualContent, blocks: newBlocks })
-    } else if (key === "buttonText") {
-      updateVisual({ ...visualContent, buttonText: visualContent.buttonText + variable })
     } else if (key === "contactEmail") {
       updateVisual({ ...visualContent, contactEmail: visualContent.contactEmail + variable })
     } else if (key === "signOffName") {
@@ -581,46 +564,6 @@ export function EmailTemplateEditor({
                 })}
               </div>
             </div>
-
-            {/* Button Section (Approved only) */}
-            {templateType === "approved" && (
-              <>
-                <Separator />
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">Call-to-Action Button</Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <Label htmlFor={`${templateType}-btntext`} className="text-xs text-muted-foreground">Button Text</Label>
-                      <Input
-                        id={`${templateType}-btntext`}
-                        value={visualContent.buttonText}
-                        onChange={(e) => updateVisual({ ...visualContent, buttonText: e.target.value })}
-                        onFocus={() => { lastFocusedField.current = "buttonText" }}
-                        placeholder="Create Your Account"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor={`${templateType}-btnnote`} className="text-xs text-muted-foreground">Below-Button Note</Label>
-                      <Input
-                        id={`${templateType}-btnnote`}
-                        value={visualContent.buttonNote}
-                        onChange={(e) => updateVisual({ ...visualContent, buttonNote: e.target.value })}
-                        placeholder="Or copy and paste this link..."
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor={`${templateType}-expiry`} className="text-xs text-muted-foreground">Expiry Note</Label>
-                    <Input
-                      id={`${templateType}-expiry`}
-                      value={visualContent.expiryNote}
-                      onChange={(e) => updateVisual({ ...visualContent, expiryNote: e.target.value })}
-                      placeholder="This invitation link will expire in 7 days."
-                    />
-                  </div>
-                </div>
-              </>
-            )}
 
             {/* Footer / Sign-off */}
             <Separator />

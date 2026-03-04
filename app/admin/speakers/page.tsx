@@ -490,13 +490,13 @@ export default function AdminSpeakersPage() {
       '{{company}}': application.company || '',
       '{{title}}': application.title || '',
       '{{expertise_areas}}': expertiseAreas,
-      '{{invite_url}}': 'https://speakabout.ai/invite/preview-token',
+      '{{invite_url}}': '',
       '{{rejection_reason}}': reasonText,
     }
 
     // Build rejection reason block
     const rejectionBlock = reasonText
-      ? `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;"><strong>Reason:</strong> ${reasonText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>`
+      ? `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;"><p style="color: #92400e; font-size: 14px; margin: 0;">${reasonText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>`
       : ''
     variables['{{rejection_reason_block}}'] = rejectionBlock
 
@@ -510,8 +510,7 @@ export default function AdminSpeakersPage() {
     // Inject personal feedback section before the sign-off <hr>
     if (feedbackText.trim()) {
       const feedbackHtml = `<div style="background: #f0f7ff; border-left: 4px solid #1E68C6; padding: 16px; margin: 20px 0; border-radius: 4px;">
-        <p style="color: #1e40af; font-size: 14px; margin: 0;"><strong>Personal Note:</strong></p>
-        <p style="color: #374151; font-size: 14px; margin: 8px 0 0 0;">${feedbackText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>
+        <p style="color: #374151; font-size: 14px; margin: 0;">${feedbackText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>
       </div>`
       // Insert before the <hr> that precedes sign-off
       html = html.replace(/<hr\s*style="border:\s*none;\s*border-top:\s*1px\s*solid\s*#e5e7eb;\s*margin:\s*30px\s*0;">/,
@@ -1657,7 +1656,7 @@ export default function AdminSpeakersPage() {
                   <CheckCircle className="h-4 w-4" />
                   <AlertTitle>Approval Letter</AlertTitle>
                   <AlertDescription>
-                    An account creation link will be included in the email. The link expires in 7 days.
+                    This will send an approval notification to the applicant.
                   </AlertDescription>
                 </Alert>
               )}
