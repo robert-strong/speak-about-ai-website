@@ -205,6 +205,11 @@ export default function AdminSpeakersPage() {
   const [emailPreviewHtml, setEmailPreviewHtml] = useState("")
   const [emailPreviewSubject, setEmailPreviewSubject] = useState("")
   const [personalFeedback, setPersonalFeedback] = useState("")
+  // Frequent responses
+  const [frequentResponses, setFrequentResponses] = useState<Array<{ id: string; label: string; text: string }>>([])
+  const [newResponseLabel, setNewResponseLabel] = useState("")
+  const [newResponseText, setNewResponseText] = useState("")
+  const [selectedResponses, setSelectedResponses] = useState<Set<string>>(new Set())
 
   // Check authentication and load data
   useEffect(() => {
@@ -219,6 +224,12 @@ export default function AdminSpeakersPage() {
       loadApplications()
       loadSpeakerAnalytics()
       loadEmailTemplates()
+      // Load frequent responses from localStorage
+      try {
+        const saved = localStorage.getItem("frequentResponses")
+        if (saved) setFrequentResponses(JSON.parse(saved))
+      } catch {}
+
     } catch (error) {
       console.error("Error in useEffect:", error)
       setPageError("Failed to initialize page. Please refresh.")
@@ -396,10 +407,15 @@ export default function AdminSpeakersPage() {
     setProcessingAction(true)
     try {
       const letterType = selectedApplication.status === 'rejected' ? 'rejected' : 'approved'
+      // Combine personal note with selected frequent responses
+      const responseTexts = frequentResponses
+        .filter(r => selectedResponses.has(r.id))
+        .map(r => r.text)
+      const combinedFeedback = [personalFeedback, ...responseTexts].filter(Boolean).join('\n\n').trim()
       const response = await authPatch(`/api/speaker-applications/${selectedApplication.id}`, {
         action: 'send_letter',
         letter_type: letterType,
-        personal_feedback: personalFeedback.trim() || undefined,
+        personal_feedback: combinedFeedback || undefined,
         rejection_reason: letterType === 'rejected' && rejectionReason.trim() ? rejectionReason.trim() : undefined,
       })
 
@@ -527,6 +543,7 @@ export default function AdminSpeakersPage() {
     setRejectionReason("")
     setAdminNotes("")
     setPersonalFeedback("")
+    setSelectedResponses(new Set())
     buildEmailPreview(application, action)
     setReviewDialogOpen(true)
   }
@@ -712,6 +729,46 @@ export default function AdminSpeakersPage() {
       })
     } finally {
       setSavingTemplate(null)
+    }
+  }
+
+  const saveFrequentResponses = (responses: typeof frequentResponses) => {
+    setFrequentResponses(responses)
+    localStorage.setItem("frequentResponses", JSON.stringify(responses))
+  }
+
+  const addFrequentResponse = () => {
+    if (!newResponseLabel.trim() || !newResponseText.trim()) return
+    const newResponse = {
+      id: `fr-${Date.now()}`,
+      label: newResponseLabel.trim(),
+      text: newResponseText.trim(),
+    }
+    saveFrequentResponses([...frequentResponses, newResponse])
+    setNewResponseLabel("")
+    setNewResponseText("")
+    toast({ title: "Added", description: "Frequent response saved" })
+  }
+
+  const deleteFrequentResponse = (id: string) => {
+    saveFrequentResponses(frequentResponses.filter(r => r.id !== id))
+  }
+
+  const toggleResponse = (id: string) => {
+    const newSelected = new Set(selectedResponses)
+    if (newSelected.has(id)) {
+      newSelected.delete(id)
+    } else {
+      newSelected.add(id)
+    }
+    setSelectedResponses(newSelected)
+    // Rebuild preview with selected responses
+    if (selectedApplication && actionType) {
+      const responseTexts = frequentResponses
+        .filter(r => newSelected.has(r.id))
+        .map(r => r.text)
+      const combinedFeedback = [personalFeedback, ...responseTexts].filter(Boolean).join('\n\n')
+      buildEmailPreview(selectedApplication, actionType, rejectionReason, combinedFeedback)
     }
   }
 
@@ -1599,7 +1656,7 @@ export default function AdminSpeakersPage() {
                 </div>
               ) : (
                 <Tabs value={activeTemplateTab} onValueChange={setActiveTemplateTab}>
-                  <TabsList className="grid w-full max-w-md grid-cols-2">
+                  <TabsList className="grid w-full max-w-lg grid-cols-3">
                     <TabsTrigger value="approved" className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />
                       Approved Letter
@@ -1607,6 +1664,10 @@ export default function AdminSpeakersPage() {
                     <TabsTrigger value="rejected" className="flex items-center gap-2">
                       <XCircle className="h-4 w-4" />
                       Rejected Letter
+                    </TabsTrigger>
+                    <TabsTrigger value="frequent" className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Frequent Responses
                     </TabsTrigger>
                   </TabsList>
 
@@ -1628,6 +1689,74 @@ export default function AdminSpeakersPage() {
                       saving={savingTemplate === 'application_rejected'}
                       templateType="rejected"
                     />
+                  </TabsContent>
+
+                  <TabsContent value="frequent" className="mt-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Frequent Responses</CardTitle>
+                        <CardDescription>
+                          Save reusable snippets that can be quickly toggled into approval or rejection letters when sending.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Existing responses */}
+                        {frequentResponses.length === 0 ? (
+                          <p className="text-sm text-muted-foreground py-4 text-center">No frequent responses saved yet. Add one below.</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {frequentResponses.map((response) => (
+                              <div key={response.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium">{response.label}</p>
+                                  <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{response.text}</p>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
+                                  onClick={() => deleteFrequentResponse(response.id)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Add new response */}
+                        <div className="border-t pt-4 space-y-3">
+                          <Label className="text-sm font-medium">Add New Response</Label>
+                          <div>
+                            <Label htmlFor="response-label" className="text-xs text-muted-foreground">Label</Label>
+                            <Input
+                              id="response-label"
+                              value={newResponseLabel}
+                              onChange={(e) => setNewResponseLabel(e.target.value)}
+                              placeholder='e.g. "Encourage reapply", "Thank for patience"'
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="response-text" className="text-xs text-muted-foreground">Response Text</Label>
+                            <Textarea
+                              id="response-text"
+                              value={newResponseText}
+                              onChange={(e) => setNewResponseText(e.target.value)}
+                              placeholder="The text that will be inserted into the email body..."
+                              rows={3}
+                            />
+                          </div>
+                          <Button
+                            onClick={addFrequentResponse}
+                            disabled={!newResponseLabel.trim() || !newResponseText.trim()}
+                            size="sm"
+                          >
+                            <Plus className="h-3.5 w-3.5 mr-1" />
+                            Add Response
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                 </Tabs>
               )}
@@ -1717,10 +1846,36 @@ export default function AdminSpeakersPage() {
                 </div>
               </div>
 
-              {/* Personal Feedback */}
+              {/* Frequent Responses */}
+              {frequentResponses.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5" />
+                    Quick Add
+                  </Label>
+                  <div className="flex flex-wrap gap-2">
+                    {frequentResponses.map((response) => (
+                      <Badge
+                        key={response.id}
+                        variant={selectedResponses.has(response.id) ? "default" : "outline"}
+                        className="cursor-pointer transition-colors text-xs py-1 px-2.5"
+                        onClick={() => toggleResponse(response.id)}
+                      >
+                        {selectedResponses.has(response.id) && <CheckCircle className="h-3 w-3 mr-1" />}
+                        {response.label}
+                      </Badge>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Click to toggle responses into the email. Manage these in the Email Templates &gt; Frequent Responses tab.
+                  </p>
+                </div>
+              )}
+
+              {/* Personal Note */}
               <div className="space-y-2">
                 <Label htmlFor="personal-feedback" className="text-sm font-medium flex items-center gap-1.5">
-                  <FileText className="h-3.5 w-3.5" />
+                  <Edit className="h-3.5 w-3.5" />
                   Personal Note <span className="text-xs text-muted-foreground font-normal">(optional)</span>
                 </Label>
                 <Textarea
@@ -1729,7 +1884,11 @@ export default function AdminSpeakersPage() {
                   onChange={(e) => {
                     setPersonalFeedback(e.target.value)
                     if (selectedApplication && actionType) {
-                      buildEmailPreview(selectedApplication, actionType, rejectionReason, e.target.value)
+                      const responseTexts = frequentResponses
+                        .filter(r => selectedResponses.has(r.id))
+                        .map(r => r.text)
+                      const combined = [e.target.value, ...responseTexts].filter(Boolean).join('\n\n')
+                      buildEmailPreview(selectedApplication, actionType, rejectionReason, combined)
                     }
                   }}
                   placeholder="Add a personalized note to include in the email..."
@@ -1737,8 +1896,7 @@ export default function AdminSpeakersPage() {
                   className="text-sm"
                 />
                 <p className="text-xs text-muted-foreground">
-                  {personalFeedback.trim() ? 'A "Personal Note" section will appear in the email above the sign-off.' : 'Leave blank to send without a personal note.'}{' '}
-                  You can customize the base template in the Email Templates tab.
+                  {(personalFeedback.trim() || selectedResponses.size > 0) ? 'Additional content will appear in the email above the sign-off.' : 'Leave blank to send without additional notes.'}
                 </p>
               </div>
             </div>
