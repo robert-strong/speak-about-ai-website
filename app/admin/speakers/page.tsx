@@ -211,6 +211,9 @@ export default function AdminSpeakersPage() {
   const [newResponseLabel, setNewResponseLabel] = useState("")
   const [newResponseText, setNewResponseText] = useState("")
   const [selectedResponses, setSelectedResponses] = useState<Set<string>>(new Set())
+  const [editingResponseId, setEditingResponseId] = useState<string | null>(null)
+  const [editResponseLabel, setEditResponseLabel] = useState("")
+  const [editResponseText, setEditResponseText] = useState("")
 
   // Check authentication and load data
   useEffect(() => {
@@ -759,6 +762,21 @@ export default function AdminSpeakersPage() {
 
   const deleteFrequentResponse = (id: string) => {
     saveFrequentResponses(frequentResponses.filter(r => r.id !== id))
+  }
+
+  const startEditResponse = (response: { id: string; label: string; text: string }) => {
+    setEditingResponseId(response.id)
+    setEditResponseLabel(response.label)
+    setEditResponseText(response.text)
+  }
+
+  const saveEditResponse = () => {
+    if (!editingResponseId || !editResponseLabel.trim() || !editResponseText.trim()) return
+    saveFrequentResponses(frequentResponses.map(r =>
+      r.id === editingResponseId ? { ...r, label: editResponseLabel.trim(), text: editResponseText.trim() } : r
+    ))
+    setEditingResponseId(null)
+    toast({ title: "Updated", description: "Frequent response updated" })
   }
 
   const toggleResponse = (id: string) => {
@@ -1713,19 +1731,58 @@ export default function AdminSpeakersPage() {
                         ) : (
                           <div className="space-y-3">
                             {frequentResponses.map((response) => (
-                              <div key={response.id} className="flex items-start gap-3 p-3 border rounded-lg">
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium">{response.label}</p>
-                                  <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{response.text}</p>
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
-                                  onClick={() => deleteFrequentResponse(response.id)}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
+                              <div key={response.id} className="p-3 border rounded-lg">
+                                {editingResponseId === response.id ? (
+                                  <div className="space-y-2">
+                                    <Input
+                                      value={editResponseLabel}
+                                      onChange={(e) => setEditResponseLabel(e.target.value)}
+                                      placeholder="Label"
+                                      className="text-sm"
+                                    />
+                                    <Textarea
+                                      value={editResponseText}
+                                      onChange={(e) => setEditResponseText(e.target.value)}
+                                      placeholder="Response text. Use [link text](https://url) for hyperlinks."
+                                      rows={3}
+                                      className="text-sm"
+                                    />
+                                    <div className="flex gap-2">
+                                      <Button size="sm" onClick={saveEditResponse} disabled={!editResponseLabel.trim() || !editResponseText.trim()}>
+                                        <Save className="h-3 w-3 mr-1" />
+                                        Save
+                                      </Button>
+                                      <Button size="sm" variant="ghost" onClick={() => setEditingResponseId(null)}>
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-start gap-3">
+                                    <div className="flex-1">
+                                      <p className="text-sm font-medium">{response.label}</p>
+                                      <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{response.text}</p>
+                                    </div>
+                                    <div className="flex gap-1 shrink-0">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                                        onClick={() => startEditResponse(response)}
+                                      >
+                                        <Edit className="h-3.5 w-3.5" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                        onClick={() => deleteFrequentResponse(response.id)}
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
