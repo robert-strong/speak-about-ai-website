@@ -689,7 +689,6 @@ function getDefaultApprovedHtml(app: any, inviteUrl: string): string {
     <p style="color: #6b7280; font-size: 14px; text-align: center;">Or copy this link: ${inviteUrl}</p>
     <p style="color: #6b7280; font-size: 14px; margin-top: 30px;"><strong>Important:</strong> This invitation link will expire in 7 days.</p>
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-    <p style="color: #6b7280; font-size: 14px;">Questions? Email <a href="mailto:hello@speakabout.ai" style="color: #1E68C6;">hello@speakabout.ai</a></p>
     <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">Best regards,<br><strong>The Speak About AI Team</strong></p>
   </div>
   <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
@@ -714,7 +713,6 @@ function getDefaultRejectedHtml(app: any, rejectionReasonBlock: string): string 
     ${rejectionReasonBlock}
     <p style="color: #4b5563; font-size: 16px;">We encourage you to continue developing your speaking career and welcome you to reapply in the future.</p>
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-    <p style="color: #6b7280; font-size: 14px;">Questions? Email <a href="mailto:hello@speakabout.ai" style="color: #1E68C6;">hello@speakabout.ai</a></p>
     <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">Best regards,<br><strong>The Speak About AI Team</strong></p>
   </div>
   <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">

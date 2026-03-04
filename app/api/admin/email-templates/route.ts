@@ -124,7 +124,6 @@ function getDefaultApprovedTemplate(): string {
     <p style="color: #6b7280; font-size: 14px; text-align: center;">Or copy and paste this link: {{invite_url}}</p>
     <p style="color: #6b7280; font-size: 14px; margin-top: 30px;"><strong>Important:</strong> This invitation link will expire in 7 days.</p>
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-    <p style="color: #6b7280; font-size: 14px;">Questions? Reach out at <a href="mailto:hello@speakabout.ai" style="color: #1E68C6;">hello@speakabout.ai</a></p>
     <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">Best regards,<br><strong>The Speak About AI Team</strong></p>
   </div>
 </body>
@@ -147,7 +146,6 @@ function getDefaultRejectedTemplate(): string {
     <p style="color: #4b5563; font-size: 16px;">We encourage you to continue developing your speaking career and welcome you to reapply in the future.</p>
     <p style="color: #4b5563; font-size: 16px;">We wish you the very best in your professional endeavors.</p>
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-    <p style="color: #6b7280; font-size: 14px;">Questions? Reach out at <a href="mailto:hello@speakabout.ai" style="color: #1E68C6;">hello@speakabout.ai</a></p>
     <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">Best regards,<br><strong>The Speak About AI Team</strong></p>
   </div>
 </body>
