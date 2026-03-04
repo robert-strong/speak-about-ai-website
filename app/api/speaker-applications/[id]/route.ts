@@ -53,7 +53,7 @@ export async function PATCH(
     const applicationId = parseInt(id)
     const body = await request.json()
 
-    const { action, admin_notes, rejection_reason, personal_feedback } = body
+    const { action, admin_notes, rejection_reason, personal_feedback, cc_emails } = body
 
     // Handle different actions
     switch (action) {
@@ -219,7 +219,7 @@ export async function PATCH(
           `
 
           try {
-            await sendApplicationEmail(updatedApp, 'application_approved', personal_feedback)
+            await sendApplicationEmail(updatedApp, 'application_approved', personal_feedback, cc_emails)
           } catch (emailError) {
             console.error('Failed to send approval letter:', emailError)
             return NextResponse.json({
@@ -247,7 +247,7 @@ export async function PATCH(
           }
 
           try {
-            await sendApplicationEmail(rejectedApp, 'application_rejected', personal_feedback)
+            await sendApplicationEmail(rejectedApp, 'application_rejected', personal_feedback, cc_emails)
           } catch (emailError) {
             console.error('Failed to send rejection letter:', emailError)
             return NextResponse.json({
@@ -495,7 +495,7 @@ export async function DELETE(
 /**
  * Send application email using Gmail SMTP (via DB config) with customizable template
  */
-async function sendApplicationEmail(application: any, templateKey: string, personalFeedback?: string) {
+async function sendApplicationEmail(application: any, templateKey: string, personalFeedback?: string, ccEmails?: string[]) {
   // Load template from DB
   let template: any = null
   try {
@@ -570,7 +570,7 @@ async function sendApplicationEmail(application: any, templateKey: string, perso
   const textContent = htmlContent.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
 
   // Send via Gmail SMTP using DB config
-  await sendViaSmtp(application.email, subject, htmlContent, textContent)
+  await sendViaSmtp(application.email, subject, htmlContent, textContent, ccEmails)
 }
 
 function replaceVariables(text: string, variables: Record<string, string>): string {
@@ -584,7 +584,7 @@ function replaceVariables(text: string, variables: Record<string, string>): stri
 /**
  * Send email via SMTP config from database (Gmail SMTP)
  */
-async function sendViaSmtp(to: string, subject: string, html: string, text: string) {
+async function sendViaSmtp(to: string, subject: string, html: string, text: string, cc?: string[]) {
   // Try SMTP config from database first
   try {
     const rows = await sql`SELECT * FROM smtp_config LIMIT 1`
@@ -609,12 +609,13 @@ async function sendViaSmtp(to: string, subject: string, html: string, text: stri
       await transporter.sendMail({
         from: `"${senderName}" <${fromAddress}>`,
         to,
+        cc: cc && cc.length > 0 ? cc.join(', ') : undefined,
         subject,
         html,
         text,
       })
 
-      console.log(`Email sent via SMTP to ${to}`)
+      console.log(`Email sent via SMTP to ${to}${cc?.length ? ` (CC: ${cc.join(', ')})` : ''}`)
       return
     }
   } catch (smtpError) {
@@ -636,12 +637,13 @@ async function sendViaSmtp(to: string, subject: string, html: string, text: stri
     await transporter.sendMail({
       from: `"Speak About AI" <${process.env.GMAIL_USER}>`,
       to,
+      cc: cc && cc.length > 0 ? cc.join(', ') : undefined,
       subject,
       html,
       text,
     })
 
-    console.log(`Email sent via Gmail env vars to ${to}`)
+    console.log(`Email sent via Gmail env vars to ${to}${cc?.length ? ` (CC: ${cc.join(', ')})` : ''}`)
     return
   }
 
@@ -653,6 +655,7 @@ async function sendViaSmtp(to: string, subject: string, html: string, text: stri
     const { error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'Speak About AI <hello@speakabout.ai>',
       to,
+      cc: cc && cc.length > 0 ? cc : undefined,
       subject,
       html,
       text,
@@ -662,7 +665,7 @@ async function sendViaSmtp(to: string, subject: string, html: string, text: stri
       throw new Error(`Resend error: ${error.message}`)
     }
 
-    console.log(`Email sent via Resend to ${to}`)
+    console.log(`Email sent via Resend to ${to}${cc?.length ? ` (CC: ${cc.join(', ')})` : ''}`)
     return
   }
 

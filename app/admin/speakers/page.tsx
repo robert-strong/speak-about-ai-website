@@ -205,6 +205,7 @@ export default function AdminSpeakersPage() {
   const [emailPreviewHtml, setEmailPreviewHtml] = useState("")
   const [emailPreviewSubject, setEmailPreviewSubject] = useState("")
   const [personalFeedback, setPersonalFeedback] = useState("")
+  const [ccEmails, setCcEmails] = useState("")
   // Frequent responses
   const [frequentResponses, setFrequentResponses] = useState<Array<{ id: string; label: string; text: string }>>([])
   const [newResponseLabel, setNewResponseLabel] = useState("")
@@ -412,11 +413,14 @@ export default function AdminSpeakersPage() {
         .filter(r => selectedResponses.has(r.id))
         .map(r => r.text)
       const combinedFeedback = [personalFeedback, ...responseTexts].filter(Boolean).join('\n\n').trim()
+      // Parse CC emails
+      const ccList = ccEmails.split(',').map(e => e.trim()).filter(e => e.includes('@'))
       const response = await authPatch(`/api/speaker-applications/${selectedApplication.id}`, {
         action: 'send_letter',
         letter_type: letterType,
         personal_feedback: combinedFeedback || undefined,
         rejection_reason: letterType === 'rejected' && rejectionReason.trim() ? rejectionReason.trim() : undefined,
+        cc_emails: ccList.length > 0 ? ccList : undefined,
       })
 
       if (response.ok) {
@@ -543,6 +547,7 @@ export default function AdminSpeakersPage() {
     setRejectionReason("")
     setAdminNotes("")
     setPersonalFeedback("")
+    setCcEmails("")
     setSelectedResponses(new Set())
     buildEmailPreview(application, action)
     setReviewDialogOpen(true)
@@ -1824,6 +1829,21 @@ export default function AdminSpeakersPage() {
                 </div>
               )}
 
+              {/* CC Emails */}
+              <div className="space-y-1">
+                <Label htmlFor="cc-emails" className="text-sm font-medium flex items-center gap-1.5">
+                  <Mail className="h-3.5 w-3.5" />
+                  CC <span className="text-xs text-muted-foreground font-normal">(optional)</span>
+                </Label>
+                <Input
+                  id="cc-emails"
+                  value={ccEmails}
+                  onChange={(e) => setCcEmails(e.target.value)}
+                  placeholder="email1@example.com, email2@example.com"
+                  className="text-sm"
+                />
+              </div>
+
               {/* Email Preview */}
               <div className="space-y-2">
                 <div>
@@ -1832,7 +1852,9 @@ export default function AdminSpeakersPage() {
                     Email Preview
                   </Label>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    <strong>To:</strong> {selectedApplication?.email} &nbsp;&bull;&nbsp; <strong>Subject:</strong> {emailPreviewSubject}
+                    <strong>To:</strong> {selectedApplication?.email}
+                    {ccEmails.trim() && <> &nbsp;&bull;&nbsp; <strong>CC:</strong> {ccEmails.trim()}</>}
+                    {' '}&nbsp;&bull;&nbsp; <strong>Subject:</strong> {emailPreviewSubject}
                   </p>
                 </div>
                 <div className="border rounded-lg overflow-hidden bg-gray-50">
