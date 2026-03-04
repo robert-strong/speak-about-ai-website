@@ -180,6 +180,9 @@ export async function PATCH(
             reviewed_at = NULL,
             reviewed_by = NULL,
             rejection_reason = NULL,
+            invitation_token = NULL,
+            invitation_sent_at = NULL,
+            invitation_expires_at = NULL,
             admin_notes = ${admin_notes || null}
           WHERE id = ${applicationId}
         `

@@ -1352,7 +1352,7 @@ export default function AdminSpeakersPage() {
                           )}
 
                           {/* Change status back */}
-                          {application.status === 'approved' && (
+                          {(application.status === 'approved' || application.status === 'invited') && (
                             <>
                               <Button
                                 size="sm"
