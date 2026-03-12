@@ -46,7 +46,8 @@ import {
   Shield,
   Landmark,
   UserCog,
-  MailIcon
+  MailIcon,
+  KeyRound
 } from "lucide-react"
 
 interface AdminSidebarProps {
@@ -402,6 +403,14 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           color: "text-blue-600",
           bgColor: "bg-blue-50",
           permissionKey: "settings"
+        },
+        {
+          title: "Account Security",
+          href: "/admin/settings/security",
+          icon: KeyRound,
+          description: "Change Password",
+          color: "text-amber-600",
+          bgColor: "bg-amber-50"
         },
         {
           title: "Email / SMTP",
