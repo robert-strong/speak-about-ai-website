@@ -45,22 +45,6 @@ export async function POST(request: NextRequest) {
 
     const sql = neon(process.env.DATABASE_URL!)
 
-    // Check if this is the environment admin (superadmin)
-    const ADMIN_EMAIL = process.env.ADMIN_EMAIL
-    const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH
-
-    if (ADMIN_EMAIL && ADMIN_PASSWORD_HASH &&
-        payload.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-      // Verify current password against env var
-      if (!verifyPassword(currentPassword, ADMIN_PASSWORD_HASH)) {
-        return NextResponse.json({ error: "Current password is incorrect" }, { status: 401 })
-      }
-      // Environment admin password cannot be changed via UI - it's set in env vars
-      return NextResponse.json({
-        error: "Environment admin password must be changed via environment variables"
-      }, { status: 400 })
-    }
-
     // Look up team member by email from JWT
     const members = await sql`
       SELECT id, password_hash
@@ -68,26 +52,39 @@ export async function POST(request: NextRequest) {
       WHERE LOWER(email) = LOWER(${payload.email})
     `
 
-    if (members.length === 0) {
-      return NextResponse.json({ error: "Account not found" }, { status: 404 })
+    // If team member exists with a password, verify and update that
+    if (members.length > 0 && members[0].password_hash) {
+      const member = members[0]
+
+      // Verify current password against database
+      if (!verifyPassword(currentPassword, member.password_hash)) {
+        return NextResponse.json({ error: "Current password is incorrect" }, { status: 401 })
+      }
+
+      // Hash new password and update
+      const newHash = hashPassword(newPassword)
+      await sql`
+        UPDATE team_members
+        SET password_hash = ${newHash}, must_change_password = FALSE
+        WHERE id = ${member.id}
+      `
+
+      return NextResponse.json({ success: true, message: "Password changed successfully" })
     }
 
-    const member = members[0]
+    // No team member with password - check if this is environment admin
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL
+    const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH
 
-    // Verify current password
-    if (!member.password_hash || !verifyPassword(currentPassword, member.password_hash)) {
-      return NextResponse.json({ error: "Current password is incorrect" }, { status: 401 })
+    if (ADMIN_EMAIL && ADMIN_PASSWORD_HASH &&
+        payload.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+      return NextResponse.json({
+        error: "Environment admin password must be changed via environment variables"
+      }, { status: 400 })
     }
 
-    // Hash new password and update
-    const newHash = hashPassword(newPassword)
-    await sql`
-      UPDATE team_members
-      SET password_hash = ${newHash}, must_change_password = FALSE
-      WHERE id = ${member.id}
-    `
-
-    return NextResponse.json({ success: true, message: "Password changed successfully" })
+    // No valid account found
+    return NextResponse.json({ error: "Account not found" }, { status: 404 })
 
   } catch (error) {
     console.error("Change password error:", error)
