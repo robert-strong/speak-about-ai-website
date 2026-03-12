@@ -44,6 +44,12 @@ export async function POST(request: NextRequest) {
     }
 
     const sql = neon(process.env.DATABASE_URL!)
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL
+    const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH
+
+    // Check if user is the environment admin (for password verification purposes)
+    const isEnvAdmin = ADMIN_EMAIL && ADMIN_PASSWORD_HASH &&
+        payload.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()
 
     // Look up team member by email from JWT
     const members = await sql`
@@ -52,12 +58,15 @@ export async function POST(request: NextRequest) {
       WHERE LOWER(email) = LOWER(${payload.email})
     `
 
-    // If team member exists with a password, verify and update that
-    if (members.length > 0 && members[0].password_hash) {
+    // If team member exists, update their password
+    if (members.length > 0) {
       const member = members[0]
 
-      // Verify current password against database
-      if (!verifyPassword(currentPassword, member.password_hash)) {
+      // Verify current password - accept either database password OR env admin password
+      const dbPasswordValid = member.password_hash && verifyPassword(currentPassword, member.password_hash)
+      const envPasswordValid = isEnvAdmin && verifyPassword(currentPassword, ADMIN_PASSWORD_HASH!)
+
+      if (!dbPasswordValid && !envPasswordValid) {
         return NextResponse.json({ error: "Current password is incorrect" }, { status: 401 })
       }
 
@@ -72,12 +81,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: "Password changed successfully" })
     }
 
-    // No team member with password - check if this is environment admin
-    const ADMIN_EMAIL = process.env.ADMIN_EMAIL
-    const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH
-
-    if (ADMIN_EMAIL && ADMIN_PASSWORD_HASH &&
-        payload.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    // No team member - if env admin only, they can't change password via UI
+    if (isEnvAdmin) {
       return NextResponse.json({
         error: "Environment admin password must be changed via environment variables"
       }, { status: 400 })
