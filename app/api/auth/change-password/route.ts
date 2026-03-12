@@ -45,6 +45,22 @@ export async function POST(request: NextRequest) {
 
     const sql = neon(process.env.DATABASE_URL!)
 
+    // Check if this is the environment admin (superadmin)
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL
+    const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH
+
+    if (ADMIN_EMAIL && ADMIN_PASSWORD_HASH &&
+        payload.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+      // Verify current password against env var
+      if (!verifyPassword(currentPassword, ADMIN_PASSWORD_HASH)) {
+        return NextResponse.json({ error: "Current password is incorrect" }, { status: 401 })
+      }
+      // Environment admin password cannot be changed via UI - it's set in env vars
+      return NextResponse.json({
+        error: "Environment admin password must be changed via environment variables"
+      }, { status: 400 })
+    }
+
     // Look up team member by email from JWT
     const members = await sql`
       SELECT id, password_hash
