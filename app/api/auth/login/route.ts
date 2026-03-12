@@ -42,28 +42,10 @@ export async function POST(request: NextRequest) {
     // Add small delay to prevent brute force attacks
     await new Promise(resolve => setTimeout(resolve, 1000))
 
-    // ---- Check 1: Environment admin (superadmin) ----
     const ADMIN_EMAIL = process.env.ADMIN_EMAIL
     const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH
 
-    if (ADMIN_EMAIL && ADMIN_PASSWORD_HASH &&
-        email.toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
-        verifyPassword(password, ADMIN_PASSWORD_HASH)) {
-
-      // Env admin gets all permissions
-      const allPermissions = getAllPermissions()
-
-      return buildLoginResponse({
-        email: ADMIN_EMAIL,
-        name: "Admin",
-        role: "admin",
-        role_name: "Admin Team",
-        user_id: null,
-        permissions: allPermissions,
-      })
-    }
-
-    // ---- Check 2: Team member from database ----
+    // ---- Check 1: Team member from database (prioritized) ----
     try {
       const sql = neon(process.env.DATABASE_URL!)
       const members = await sql`
@@ -86,32 +68,78 @@ export async function POST(request: NextRequest) {
           )
         }
 
-        // Verify password
-        if (!member.password_hash || !verifyPassword(password, member.password_hash)) {
-          return NextResponse.json(
-            { error: "Invalid credentials" },
-            { status: 401 }
-          )
+        // If team member has a password set, use that exclusively
+        if (member.password_hash) {
+          if (!verifyPassword(password, member.password_hash)) {
+            return NextResponse.json(
+              { error: "Invalid credentials" },
+              { status: 401 }
+            )
+          }
+
+          // Update last login
+          await sql`UPDATE team_members SET last_login = NOW() WHERE id = ${member.id}`
+
+          const permissions = member.role_permissions || {}
+
+          return buildLoginResponse({
+            email: member.email,
+            name: member.name,
+            role: "admin",
+            role_name: member.role_name || "Team Member",
+            user_id: member.id,
+            permissions,
+            must_change_password: member.must_change_password,
+          })
         }
 
-        // Update last login
-        await sql`UPDATE team_members SET last_login = NOW() WHERE id = ${member.id}`
+        // Team member exists but no password set - check if they can use env admin password
+        if (ADMIN_EMAIL && ADMIN_PASSWORD_HASH &&
+            email.toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
+            verifyPassword(password, ADMIN_PASSWORD_HASH)) {
 
-        const permissions = member.role_permissions || {}
+          // Update last login
+          await sql`UPDATE team_members SET last_login = NOW() WHERE id = ${member.id}`
 
-        return buildLoginResponse({
-          email: member.email,
-          name: member.name,
-          role: "admin",
-          role_name: member.role_name || "Team Member",
-          user_id: member.id,
-          permissions,
-          must_change_password: member.must_change_password,
-        })
+          const permissions = member.role_permissions || {}
+
+          return buildLoginResponse({
+            email: member.email,
+            name: member.name,
+            role: "admin",
+            role_name: member.role_name || "Team Member",
+            user_id: member.id,
+            permissions,
+            must_change_password: member.must_change_password,
+          })
+        }
+
+        return NextResponse.json(
+          { error: "Invalid credentials" },
+          { status: 401 }
+        )
       }
     } catch (dbError) {
-      // If team_members table doesn't exist yet, just fall through to invalid credentials
+      // If team_members table doesn't exist yet, fall through to env admin check
       console.warn("Team member lookup failed (table may not exist):", dbError)
+    }
+
+    // ---- Check 2: Environment admin (fallback for emails not in team_members) ----
+    if (ADMIN_EMAIL && ADMIN_PASSWORD_HASH &&
+        email.toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
+        verifyPassword(password, ADMIN_PASSWORD_HASH)) {
+
+      // Env admin gets all permissions
+      const allPermissions = getAllPermissions()
+
+      return buildLoginResponse({
+        email: ADMIN_EMAIL,
+        name: "Admin",
+        role: "admin",
+        role_name: "Admin Team",
+        user_id: null,
+        permissions: allPermissions,
+      })
     }
 
     // ---- No match found ----
