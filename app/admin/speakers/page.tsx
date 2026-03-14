@@ -115,6 +115,7 @@ interface SpeakerApplication {
   title: string
   company: string
   bio: string
+  headshot_url?: string
   expertise_areas: string[]
   speaking_topics: string
   years_speaking?: number
@@ -188,6 +189,8 @@ export default function AdminSpeakersPage() {
   const [deletingApplication, setDeletingApplication] = useState(false)
   // Resend letter state
   const [resendingLetter, setResendingLetter] = useState<number | null>(null)
+  // Add to speakers state
+  const [addingToSpeakers, setAddingToSpeakers] = useState<number | null>(null)
   // Email templates state
   const [approvedTemplate, setApprovedTemplate] = useState<EmailTemplate>({
     template_key: 'application_approved',
@@ -369,6 +372,57 @@ export default function AdminSpeakersPage() {
       })
     } finally {
       setResendingLetter(null)
+    }
+  }
+
+  const handleAddToSpeakers = async (application: SpeakerApplication) => {
+    setAddingToSpeakers(application.id)
+    try {
+      // Map application data to speaker format
+      const speakerData = {
+        name: `${application.first_name} ${application.last_name}`,
+        email: application.email,
+        bio: application.bio || '',
+        short_bio: application.bio ? application.bio.substring(0, 200) : '',
+        headshot_url: application.headshot_url || '',
+        website: application.website || '',
+        location: application.location || '',
+        title: application.title || '',
+        topics: application.expertise_areas || [],
+        speaking_fee_range: application.speaking_fee_range || '',
+        travel_preferences: application.travel_requirements || '',
+        videos: application.video_links || [],
+        active: true,
+        listed: true,
+        social_media: application.linkedin_url ? { linkedin: application.linkedin_url } : {}
+      }
+
+      const response = await authPost('/api/admin/speakers', speakerData)
+
+      if (response.ok) {
+        const data = await response.json()
+        toast({
+          title: "Success",
+          description: `${speakerData.name} has been added to the speakers list`,
+        })
+        loadSpeakers() // Refresh speakers list
+      } else {
+        const errorData = await response.json()
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to add speaker",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error adding speaker from application:", error)
+      toast({
+        title: "Error",
+        description: "Failed to add speaker. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setAddingToSpeakers(null)
     }
   }
 
@@ -1496,6 +1550,24 @@ export default function AdminSpeakersPage() {
                                 Reject Instead
                               </Button>
                             </>
+                          )}
+
+                          {/* Add to Speakers button - only for approved applications */}
+                          {application.status === 'approved' && (
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleAddToSpeakers(application)}
+                              disabled={addingToSpeakers === application.id}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              {addingToSpeakers === application.id ? (
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              ) : (
+                                <Plus className="h-3 w-3 mr-1" />
+                              )}
+                              Add Speaker
+                            </Button>
                           )}
                           {application.status === 'rejected' && (
                             <>
