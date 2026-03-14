@@ -31,6 +31,7 @@ import {
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { authGet, authPut } from "@/lib/auth-fetch"
+import { AdminSidebar } from "@/components/admin-sidebar"
 
 interface Program {
   title: string
@@ -565,8 +566,15 @@ export default function AdminSpeakerEditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <div className="fixed left-0 top-0 h-full z-[60]">
+        <AdminSidebar />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 lg:ml-72 min-h-screen">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
@@ -1508,6 +1516,7 @@ export default function AdminSpeakerEditPage() {
             </Card>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
     </div>
   )
