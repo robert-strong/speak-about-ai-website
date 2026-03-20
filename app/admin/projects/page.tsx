@@ -790,7 +790,16 @@ export default function EnhancedProjectManagementPage() {
           client_name: newProjectData.client_name,
           client_email: newProjectData.client_email,
           company: newProjectData.company,
-          speaker_fee: parseFloat(newProjectData.speaker_fee)
+          speaker_fee: parseFloat(newProjectData.speaker_fee),
+          event_location: newProjectData.event_location,
+          event_type: newProjectData.event_type,
+          event_classification: newProjectData.event_classification,
+          travel_required: newProjectData.travel_required,
+          travel_stipend: newProjectData.travel_stipend ? parseFloat(newProjectData.travel_stipend) : null,
+          flight_required: newProjectData.flight_required,
+          hotel_required: newProjectData.hotel_required,
+          travel_notes: newProjectData.travel_notes,
+          description: newProjectData.description
       })
 
       if (response.ok) {
