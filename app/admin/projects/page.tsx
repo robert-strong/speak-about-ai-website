@@ -435,7 +435,7 @@ export default function EnhancedProjectManagementPage() {
     client_name: "",
     client_email: "",
     company: "",
-    speaker_fee: "",
+    deal_value: "",
     event_location: "",
     event_type: "in-person",
     event_classification: "travel" as "virtual" | "local" | "travel",
@@ -773,8 +773,8 @@ export default function EnhancedProjectManagementPage() {
   const handleCreateProject = async () => {
     try {
       // Validate required fields
-      if (!newProjectData.project_name || !newProjectData.event_date || !newProjectData.client_name || 
-          !newProjectData.client_email || !newProjectData.company || !newProjectData.speaker_fee ||
+      if (!newProjectData.project_name || !newProjectData.event_date || !newProjectData.client_name ||
+          !newProjectData.client_email || !newProjectData.company || !newProjectData.deal_value ||
           !newProjectData.event_location || !newProjectData.event_type) {
         toast({
           title: "Validation Error",
@@ -790,7 +790,7 @@ export default function EnhancedProjectManagementPage() {
           client_name: newProjectData.client_name,
           client_email: newProjectData.client_email,
           company: newProjectData.company,
-          speaker_fee: parseFloat(newProjectData.speaker_fee),
+          deal_value: parseFloat(newProjectData.deal_value),
           event_location: newProjectData.event_location,
           event_type: newProjectData.event_type,
           event_classification: newProjectData.event_classification,
@@ -839,7 +839,7 @@ export default function EnhancedProjectManagementPage() {
           client_name: "",
           client_email: "",
           company: "",
-          speaker_fee: "",
+          deal_value: "",
           event_location: "",
           event_type: "in-person",
           event_classification: "travel",
@@ -1560,13 +1560,13 @@ export default function EnhancedProjectManagementPage() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor="new-speaker-fee">Speaker Fee *</Label>
-                              <Input 
-                                id="new-speaker-fee" 
-                                type="number" 
+                              <Label htmlFor="new-deal-value">Deal Value *</Label>
+                              <Input
+                                id="new-deal-value"
+                                type="number"
                                 placeholder="25000"
-                                value={newProjectData.speaker_fee}
-                                onChange={(e) => setNewProjectData({...newProjectData, speaker_fee: e.target.value})}
+                                value={newProjectData.deal_value}
+                                onChange={(e) => setNewProjectData({...newProjectData, deal_value: e.target.value})}
                               />
                             </div>
                           </div>

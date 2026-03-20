@@ -82,6 +82,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Calculate commission from deal value
+    const dealValue = parseFloat(body.deal_value) || parseFloat(body.speaker_fee) || 0
+    const commissionPercentage = parseFloat(body.commission_percentage) || 20
+    const commissionAmount = dealValue * commissionPercentage / 100
+    const speakerFee = dealValue - commissionAmount
+
     // Set default values and map frontend fields to database fields
     const projectData = {
       ...body,
@@ -89,10 +95,12 @@ export async function POST(request: NextRequest) {
       status: body.status || "qualified",
       priority: body.priority || "medium",
       start_date: body.start_date || body.event_date || new Date().toISOString(),
-      budget: parseFloat(body.budget) || parseFloat(body.speaker_fee) || 0,
+      budget: dealValue,
       spent: parseFloat(body.spent) || 0,
       completion_percentage: parseInt(body.completion_percentage) || 0,
-      speaker_fee: parseFloat(body.speaker_fee) || 0,
+      speaker_fee: speakerFee,
+      commission_percentage: commissionPercentage,
+      commission_amount: commissionAmount,
       // Handle optional fields
       travel_required: body.travel_required || false,
       flight_required: body.flight_required || body.fly_required || false,
