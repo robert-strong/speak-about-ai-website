@@ -61,7 +61,8 @@ import {
   MoreHorizontal,
   LayoutGrid,
   List,
-  ArrowUpDown
+  ArrowUpDown,
+  Sparkles
 } from "lucide-react"
 import { AdminSidebar } from "@/components/admin-sidebar"
 import { useToast } from "@/hooks/use-toast"
@@ -421,6 +422,7 @@ export default function EnhancedProjectManagementPage() {
   const [showCreateInvoice, setShowCreateInvoice] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showCreateProject, setShowCreateProject] = useState(false)
+  const [isParsingDescription, setIsParsingDescription] = useState(false)
   const [selectedInvoiceForPDF, setSelectedInvoiceForPDF] = useState<{id: number, number: string} | null>(null)
   const [selectedInvoiceForEdit, setSelectedInvoiceForEdit] = useState<number | null>(null)
   const [calendarMonth, setCalendarMonth] = useState(new Date())
@@ -770,6 +772,71 @@ export default function EnhancedProjectManagementPage() {
     }
   }
 
+  const handleGenerateDetails = async () => {
+    if (!newProjectData.description.trim()) {
+      toast({
+        title: "No Description",
+        description: "Please enter event details in the description field first",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setIsParsingDescription(true)
+    try {
+      const response = await fetch("/api/ai/parse-event-details", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: newProjectData.description })
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to parse details")
+      }
+
+      const parsed = await response.json()
+
+      // Map parsed fields to form fields
+      setNewProjectData(prev => ({
+        ...prev,
+        project_name: parsed.event_name || prev.project_name,
+        event_date: parsed.event_date || prev.event_date,
+        client_name: parsed.billing_contact_name || prev.client_name,
+        client_email: parsed.billing_contact_email || prev.client_email,
+        company: parsed.company_name || prev.company,
+        deal_value: parsed.speaker_fee ? String(parsed.speaker_fee) : prev.deal_value,
+        event_location: parsed.event_location || parsed.venue_address || prev.event_location,
+        event_type: parsed.program_type === "keynote" ? "Keynote" :
+                   parsed.program_type === "workshop" ? "Workshop" :
+                   parsed.program_type === "panel_discussion" ? "Panel" :
+                   prev.event_type,
+        event_classification: parsed.event_type === "virtual" ? "virtual" :
+                             parsed.event_type === "local" ? "local" :
+                             parsed.event_type === "travel" ? "travel" :
+                             parsed.hotel_required ? "travel" : prev.event_classification,
+        travel_required: parsed.event_type === "travel" || parsed.hotel_required || false,
+        flight_required: parsed.fly_in_date ? true : prev.flight_required,
+        hotel_required: parsed.hotel_required || false,
+        travel_stipend: parsed.travel_expenses_amount ? String(parsed.travel_expenses_amount) : prev.travel_stipend,
+        travel_notes: parsed.notes || prev.travel_notes
+      }))
+
+      toast({
+        title: "Details Generated",
+        description: "Form fields have been populated from the description"
+      })
+    } catch (error) {
+      console.error("Error parsing description:", error)
+      toast({
+        title: "Parsing Failed",
+        description: "Could not extract details from description. Please fill in manually.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsParsingDescription(false)
+    }
+  }
+
   const handleCreateProject = async () => {
     try {
       // Validate required fields
@@ -833,7 +900,8 @@ export default function EnhancedProjectManagementPage() {
         }
         
         setShowCreateProject(false)
-        setNewProjectData({
+        // Keep description for reference/reuse, clear other fields
+        setNewProjectData(prev => ({
           project_name: "",
           event_date: "",
           client_name: "",
@@ -848,8 +916,8 @@ export default function EnhancedProjectManagementPage() {
           flight_required: false,
           hotel_required: false,
           travel_notes: "",
-          description: ""
-        })
+          description: prev.description
+        }))
         loadData()
       } else {
         const errorData = await response.json()
@@ -1506,11 +1574,59 @@ export default function EnhancedProjectManagementPage() {
                           <DialogDescription>Add a new event project to the system</DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 mt-4">
+                          {/* AI-Assisted Entry */}
+                          <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <Label htmlFor="new-description-ai" className="text-sm font-medium text-purple-900">
+                                Paste Event Details
+                              </Label>
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={handleGenerateDetails}
+                                disabled={isParsingDescription || !newProjectData.description.trim()}
+                                className="bg-purple-600 hover:bg-purple-700"
+                              >
+                                {isParsingDescription ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    Parsing...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Sparkles className="h-4 w-4 mr-2" />
+                                    Generate Details
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                            <Textarea
+                              id="new-description-ai"
+                              placeholder="Paste email, contract details, or event information here. Click 'Generate Details' to auto-fill the form fields below..."
+                              rows={4}
+                              value={newProjectData.description}
+                              onChange={(e) => setNewProjectData({...newProjectData, description: e.target.value})}
+                              className="bg-white"
+                            />
+                            <p className="text-xs text-purple-600 mt-1">
+                              AI will extract project name, date, client info, location, fees, and more
+                            </p>
+                          </div>
+
+                          <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                              <span className="w-full border-t" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                              <span className="bg-white px-2 text-muted-foreground">Or fill in manually</span>
+                            </div>
+                          </div>
+
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <Label htmlFor="new-project-name">Project Name *</Label>
-                              <Input 
-                                id="new-project-name" 
+                              <Input
+                                id="new-project-name"
                                 placeholder="Event name or project title"
                                 value={newProjectData.project_name}
                                 onChange={(e) => setNewProjectData({...newProjectData, project_name: e.target.value})}
@@ -1677,17 +1793,6 @@ export default function EnhancedProjectManagementPage() {
                                 />
                               </div>
                             )}
-                          </div>
-                          
-                          <div>
-                            <Label htmlFor="new-description">Description</Label>
-                            <Textarea 
-                              id="new-description" 
-                              placeholder="Event details, special requirements, notes..."
-                              rows={4}
-                              value={newProjectData.description}
-                              onChange={(e) => setNewProjectData({...newProjectData, description: e.target.value})}
-                            />
                           </div>
                           
                           <div className="flex justify-end gap-2 mt-6">
