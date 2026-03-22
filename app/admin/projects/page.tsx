@@ -72,6 +72,7 @@ import { TASK_DEFINITIONS, calculateTaskUrgency, getTaskOwnerLabel, getPriorityC
 import { ProjectDetailsManager } from "@/components/project-details-manager"
 import { ProjectDetails } from "@/lib/project-details-schema"
 import { authGet, authPost, authPut, authDelete, authFetch } from "@/lib/auth-fetch"
+import { EmailActivity } from "@/components/email-activity"
 
 interface Project {
   id: number
@@ -101,6 +102,15 @@ interface Project {
   notes?: string
   event_name?: string
   deal_id?: number
+  billing_contact_name?: string
+  billing_contact_email?: string
+  billing_contact_phone?: string
+  logistics_contact_name?: string
+  logistics_contact_email?: string
+  logistics_contact_phone?: string
+  venue_contact_name?: string
+  venue_contact_email?: string
+  venue_contact_phone?: string
   created_at: string
   updated_at: string
 
@@ -3850,36 +3860,87 @@ export default function EnhancedProjectManagementPage() {
               <div className="bg-blue-50 p-4 rounded-lg space-y-3">
                 <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Client Information
+                  Contacts
                 </h4>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <span className="text-gray-500">Name:</span>
-                    <span className="ml-2 font-medium">{calendarSelectedProject.client_name}</span>
+                {/* Primary Contact */}
+                <div className="text-sm space-y-1">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Primary Contact</p>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{calendarSelectedProject.client_name}</span>
+                    {calendarSelectedProject.company && (
+                      <span className="text-gray-500">• {calendarSelectedProject.company}</span>
+                    )}
                   </div>
-                  {calendarSelectedProject.company && (
-                    <div>
-                      <span className="text-gray-500">Company:</span>
-                      <span className="ml-2 font-medium">{calendarSelectedProject.company}</span>
-                    </div>
-                  )}
                   {calendarSelectedProject.client_email && (
-                    <div className="col-span-2 flex items-center gap-1">
+                    <div className="flex items-center gap-1">
                       <Mail className="h-3 w-3 text-gray-500" />
-                      <a href={`mailto:${calendarSelectedProject.client_email}`} className="text-blue-600 hover:underline">
-                        {calendarSelectedProject.client_email}
-                      </a>
+                      <a href={`mailto:${calendarSelectedProject.client_email}`} className="text-blue-600 hover:underline">{calendarSelectedProject.client_email}</a>
                     </div>
                   )}
                   {calendarSelectedProject.client_phone && (
-                    <div className="col-span-2 flex items-center gap-1">
+                    <div className="flex items-center gap-1">
                       <span className="text-gray-500">Phone:</span>
-                      <a href={`tel:${calendarSelectedProject.client_phone}`} className="text-blue-600 hover:underline ml-1">
-                        {calendarSelectedProject.client_phone}
-                      </a>
+                      <a href={`tel:${calendarSelectedProject.client_phone}`} className="text-blue-600 hover:underline ml-1">{calendarSelectedProject.client_phone}</a>
                     </div>
                   )}
                 </div>
+                {/* Billing Contact */}
+                {calendarSelectedProject.billing_contact_name && (
+                  <div className="text-sm space-y-1 pt-2 border-t border-blue-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Billing Contact</p>
+                    <p className="font-medium">{calendarSelectedProject.billing_contact_name}</p>
+                    {calendarSelectedProject.billing_contact_email && (
+                      <div className="flex items-center gap-1">
+                        <Mail className="h-3 w-3 text-gray-500" />
+                        <a href={`mailto:${calendarSelectedProject.billing_contact_email}`} className="text-blue-600 hover:underline">{calendarSelectedProject.billing_contact_email}</a>
+                      </div>
+                    )}
+                    {calendarSelectedProject.billing_contact_phone && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-500">Phone:</span>
+                        <a href={`tel:${calendarSelectedProject.billing_contact_phone}`} className="text-blue-600 hover:underline ml-1">{calendarSelectedProject.billing_contact_phone}</a>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {/* Logistics Contact */}
+                {calendarSelectedProject.logistics_contact_name && (
+                  <div className="text-sm space-y-1 pt-2 border-t border-blue-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Logistics Contact</p>
+                    <p className="font-medium">{calendarSelectedProject.logistics_contact_name}</p>
+                    {calendarSelectedProject.logistics_contact_email && (
+                      <div className="flex items-center gap-1">
+                        <Mail className="h-3 w-3 text-gray-500" />
+                        <a href={`mailto:${calendarSelectedProject.logistics_contact_email}`} className="text-blue-600 hover:underline">{calendarSelectedProject.logistics_contact_email}</a>
+                      </div>
+                    )}
+                    {calendarSelectedProject.logistics_contact_phone && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-500">Phone:</span>
+                        <a href={`tel:${calendarSelectedProject.logistics_contact_phone}`} className="text-blue-600 hover:underline ml-1">{calendarSelectedProject.logistics_contact_phone}</a>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {/* Venue Contact */}
+                {calendarSelectedProject.venue_contact_name && (
+                  <div className="text-sm space-y-1 pt-2 border-t border-blue-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Venue Contact</p>
+                    <p className="font-medium">{calendarSelectedProject.venue_contact_name}</p>
+                    {calendarSelectedProject.venue_contact_email && (
+                      <div className="flex items-center gap-1">
+                        <Mail className="h-3 w-3 text-gray-500" />
+                        <a href={`mailto:${calendarSelectedProject.venue_contact_email}`} className="text-blue-600 hover:underline">{calendarSelectedProject.venue_contact_email}</a>
+                      </div>
+                    )}
+                    {calendarSelectedProject.venue_contact_phone && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-500">Phone:</span>
+                        <a href={`tel:${calendarSelectedProject.venue_contact_phone}`} className="text-blue-600 hover:underline ml-1">{calendarSelectedProject.venue_contact_phone}</a>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Project Information */}
@@ -3928,6 +3989,9 @@ export default function EnhancedProjectManagementPage() {
                   <p className="text-sm text-gray-700 whitespace-pre-wrap">{calendarSelectedProject.notes}</p>
                 </div>
               )}
+
+              {/* Email Activity */}
+              <EmailActivity projectId={calendarSelectedProject.id} dealId={calendarSelectedProject.deal_id} />
 
               {/* Timestamps */}
               <div className="text-xs text-gray-500 pt-4 border-t flex justify-between">
@@ -4119,6 +4183,9 @@ export default function EnhancedProjectManagementPage() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Email Activity */}
+              <EmailActivity projectId={selectedProject.id} dealId={selectedProject.deal_id} />
 
               {/* Task stages */}
               {Object.entries(TASK_DEFINITIONS).map(([stage, tasks]) => {
