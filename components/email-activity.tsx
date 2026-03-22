@@ -82,7 +82,9 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
         const details = (data.results || []).map((r: any) => {
           if (r.success) {
             const res = r.data?.results
-            return `${r.userEmail}: ${res?.stored || 0} stored, ${res?.totalMessages || 0} fetched`
+            const errorCount = res?.errors?.length || 0
+            const errorInfo = errorCount > 0 ? `, ${errorCount} errors` : ''
+            return `${r.userEmail}: ${res?.stored || 0} stored, ${res?.totalMessages || 0} fetched${errorInfo}`
           }
           return `${r.userEmail}: failed - ${r.error}`
         }).join(' | ')

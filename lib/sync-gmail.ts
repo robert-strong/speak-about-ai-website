@@ -78,9 +78,10 @@ export async function syncGmailForUser(userEmail: string, fullSync = false, sear
       const to = gmailClient.extractHeader(message, 'To') || ''
       const cc = gmailClient.extractHeader(message, 'Cc') || ''
       const subject = gmailClient.extractHeader(message, 'Subject') || '(no subject)'
-      const bodySnippet = message.snippet
+      const bodySnippet = message.snippet || ''
       const bodyFull = gmailClient.extractBody(message)
       const receivedAt = new Date(parseInt(message.internalDate))
+      const labelIds = message.labelIds || []
 
       // Parse email addresses
       const fromEmails = gmailClient.parseEmailList(from)
@@ -165,9 +166,9 @@ export async function syncGmailForUser(userEmail: string, fullSync = false, sear
           ${bodySnippet},
           ${bodyFull},
           ${direction},
-          ${!message.labelIds.includes('UNREAD')},
+          ${!labelIds.includes('UNREAD')},
           ${receivedAt},
-          ${message.labelIds},
+          ${labelIds},
           NOW(),
           NOW()
         )
@@ -180,8 +181,14 @@ export async function syncGmailForUser(userEmail: string, fullSync = false, sear
       `
       results.stored++
     } catch (error) {
-      console.error('Error processing message:', error)
-      results.errors.push(message.id)
+      const errMsg = error instanceof Error ? error.message : 'Unknown error'
+      console.error('Error processing message:', message.id, errMsg)
+      // Store error detail (first 5 only to avoid huge responses)
+      if (results.errors.length < 5) {
+        results.errors.push(`${message.id}: ${errMsg}`)
+      } else if (results.errors.length === 5) {
+        results.errors.push('... and more errors')
+      }
     }
   }
 
