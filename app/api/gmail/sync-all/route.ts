@@ -36,6 +36,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Ensure email_threads allows emails without lead/deal
+    await sql`ALTER TABLE email_threads DROP CONSTRAINT IF EXISTS check_related_entity`
+
     // Get all authenticated Gmail users
     const users = await sql`SELECT user_email FROM gmail_auth_tokens`
 
