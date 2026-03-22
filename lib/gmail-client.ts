@@ -128,22 +128,37 @@ export class GmailClient {
     return data.email
   }
 
-  async listMessages(query?: string, maxResults: number = 50): Promise<GmailMessage[]> {
+  async listMessages(query?: string, maxResults: number = 500): Promise<GmailMessage[]> {
     const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client })
 
-    const response = await gmail.users.messages.list({
-      userId: 'me',
-      q: query,
-      maxResults,
-    })
+    // Paginate through all message IDs up to maxResults
+    const allMessageIds: Array<{ id: string }> = []
+    let pageToken: string | undefined = undefined
 
-    const messages = response.data.messages || []
+    while (allMessageIds.length < maxResults) {
+      const pageSize = Math.min(100, maxResults - allMessageIds.length)
+      const response = await gmail.users.messages.list({
+        userId: 'me',
+        q: query,
+        maxResults: pageSize,
+        pageToken,
+      })
+
+      const messages = response.data.messages || []
+      if (messages.length === 0) break
+
+      allMessageIds.push(...messages.map(m => ({ id: m.id! })))
+
+      pageToken = response.data.nextPageToken || undefined
+      if (!pageToken) break
+    }
+
+    // Fetch full message details
     const fullMessages: GmailMessage[] = []
-
-    for (const message of messages) {
+    for (const message of allMessageIds) {
       const fullMessage = await gmail.users.messages.get({
         userId: 'me',
-        id: message.id!,
+        id: message.id,
         format: 'full',
       })
       fullMessages.push(fullMessage.data as GmailMessage)

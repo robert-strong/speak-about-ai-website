@@ -39,8 +39,8 @@ export async function syncGmailForUser(userEmail: string, fullSync = false): Pro
   const afterTimestamp = Math.floor(lastSyncDate.getTime() / 1000)
   const query = `after:${afterTimestamp}`
 
-  // Fetch messages
-  const messages = await gmailClient.listMessages(query, 100)
+  // Fetch messages (up to 500 to ensure we get all emails in the time window)
+  const messages = await gmailClient.listMessages(query, 500)
 
   const results: SyncResults = {
     totalMessages: messages.length,

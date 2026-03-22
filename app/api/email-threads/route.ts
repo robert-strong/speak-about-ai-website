@@ -137,10 +137,15 @@ export async function GET(request: NextRequest) {
       `
     }
 
+    // Get total email count for diagnostics
+    const totalCount = await sql`SELECT COUNT(*) as total FROM email_threads`
+    const totalEmails = totalCount[0]?.total || 0
+
     return NextResponse.json({
       success: true,
       threads,
       count: threads.length,
+      totalEmails,
       ...(projectId ? { searchedDealId, searchedClientEmail, searchedTerms } : {})
     })
   } catch (error) {

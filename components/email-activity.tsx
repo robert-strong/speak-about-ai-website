@@ -34,7 +34,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [syncMessage, setSyncMessage] = useState("")
-  const [searchInfo, setSearchInfo] = useState<{ dealId?: number; clientEmail?: string; searchTerms?: string[] }>({})
+  const [searchInfo, setSearchInfo] = useState<{ dealId?: number; clientEmail?: string; searchTerms?: string[]; totalEmails?: number }>({})
   const [expandedEmails, setExpandedEmails] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
       if (data.success) {
         setThreads(data.threads || [])
         if (data.searchedDealId !== undefined || data.searchedClientEmail !== undefined || data.searchedTerms) {
-          setSearchInfo({ dealId: data.searchedDealId, clientEmail: data.searchedClientEmail, searchTerms: data.searchedTerms })
+          setSearchInfo({ dealId: data.searchedDealId, clientEmail: data.searchedClientEmail, searchTerms: data.searchedTerms, totalEmails: data.totalEmails })
         }
       }
     } catch (error) {
@@ -196,6 +196,11 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
           {!searchInfo.clientEmail && !searchInfo.dealId && (!searchInfo.searchTerms || searchInfo.searchTerms.length === 0) && projectId && (
             <p className="text-xs text-amber-600 mb-3">
               This project has no client email, linked deal, or event details — add a client email or event info in Basic Info to match emails.
+            </p>
+          )}
+          {searchInfo.totalEmails !== undefined && (
+            <p className="text-xs text-gray-400 mb-3">
+              {searchInfo.totalEmails} total emails in database. None matched this project's criteria. Try "Full Sync" to pull more emails.
             </p>
           )}
           <Button
