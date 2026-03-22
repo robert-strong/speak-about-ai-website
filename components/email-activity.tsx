@@ -82,9 +82,11 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
         const details = (data.results || []).map((r: any) => {
           if (r.success) {
             const res = r.data?.results
-            const errorCount = res?.errors?.length || 0
-            const errorInfo = errorCount > 0 ? `, ${errorCount} errors` : ''
-            return `${r.userEmail}: ${res?.stored || 0} stored, ${res?.totalMessages || 0} fetched${errorInfo}`
+            const errCount = res?.errorCount || 0
+            const errSamples = res?.errors || []
+            const errorInfo = errCount > 0 ? `, ${errCount} errors` : ''
+            const errorDetails = errSamples.length > 0 ? ` [${errSamples.join('; ')}]` : ''
+            return `${r.userEmail}: ${res?.stored || 0} stored, ${res?.totalMessages || 0} fetched${errorInfo}${errorDetails}`
           }
           return `${r.userEmail}: failed - ${r.error}`
         }).join(' | ')

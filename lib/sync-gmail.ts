@@ -8,6 +8,7 @@ export interface SyncResults {
   stored: number
   matched: { leads: number; deals: number }
   unmatched: number
+  errorCount: number
   errors: string[]
 }
 
@@ -44,8 +45,11 @@ export async function syncGmailForUser(userEmail: string, fullSync = false, sear
   let messages
   if (searchEmails && searchEmails.length > 0) {
     // Targeted search: find emails from/to these specific addresses
+    // Use Gmail OR syntax without curly braces
     const emailQuery = searchEmails.map(e => `from:${e} OR to:${e}`).join(' OR ')
-    const targetedMessages = await gmailClient.listMessages(`{${emailQuery}}`, 200)
+    console.log('Targeted Gmail search query:', emailQuery)
+    const targetedMessages = await gmailClient.listMessages(emailQuery, 200)
+    console.log('Targeted search found:', targetedMessages.length, 'messages')
     // Also do the regular time-based sync
     const timeBasedMessages = await gmailClient.listMessages(query, 500)
     // Merge and deduplicate by message ID
@@ -68,6 +72,7 @@ export async function syncGmailForUser(userEmail: string, fullSync = false, sear
     stored: 0,
     matched: { leads: 0, deals: 0 },
     unmatched: 0,
+    errorCount: 0,
     errors: []
   }
 
@@ -183,11 +188,10 @@ export async function syncGmailForUser(userEmail: string, fullSync = false, sear
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : 'Unknown error'
       console.error('Error processing message:', message.id, errMsg)
-      // Store error detail (first 5 only to avoid huge responses)
-      if (results.errors.length < 5) {
-        results.errors.push(`${message.id}: ${errMsg}`)
-      } else if (results.errors.length === 5) {
-        results.errors.push('... and more errors')
+      results.errorCount++
+      // Store first 3 error details for debugging
+      if (results.errors.length < 3) {
+        results.errors.push(`${errMsg}`)
       }
     }
   }
