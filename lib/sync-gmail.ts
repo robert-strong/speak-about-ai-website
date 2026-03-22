@@ -11,7 +11,7 @@ export interface SyncResults {
   errors: string[]
 }
 
-export async function syncGmailForUser(userEmail: string, fullSync = false): Promise<SyncResults> {
+export async function syncGmailForUser(userEmail: string, fullSync = false, searchEmails?: string[]): Promise<SyncResults> {
   const gmailClient = createGmailClient()
 
   // Load tokens
@@ -37,10 +37,31 @@ export async function syncGmailForUser(userEmail: string, fullSync = false): Pro
 
   // Build query for emails after last sync
   const afterTimestamp = Math.floor(lastSyncDate.getTime() / 1000)
-  const query = `after:${afterTimestamp}`
+  let query = `after:${afterTimestamp}`
 
-  // Fetch messages (up to 500 to ensure we get all emails in the time window)
-  const messages = await gmailClient.listMessages(query, 500)
+  // If specific emails are provided, do a targeted search instead
+  // This searches for emails involving those addresses (any time period)
+  let messages
+  if (searchEmails && searchEmails.length > 0) {
+    // Targeted search: find emails from/to these specific addresses
+    const emailQuery = searchEmails.map(e => `from:${e} OR to:${e}`).join(' OR ')
+    const targetedMessages = await gmailClient.listMessages(`{${emailQuery}}`, 200)
+    // Also do the regular time-based sync
+    const timeBasedMessages = await gmailClient.listMessages(query, 500)
+    // Merge and deduplicate by message ID
+    const seenIds = new Set<string>()
+    const allMessages = []
+    for (const msg of [...targetedMessages, ...timeBasedMessages]) {
+      if (!seenIds.has(msg.id)) {
+        seenIds.add(msg.id)
+        allMessages.push(msg)
+      }
+    }
+    messages = allMessages
+  } else {
+    // Regular time-based sync
+    messages = await gmailClient.listMessages(query, 500)
+  }
 
   const results: SyncResults = {
     totalMessages: messages.length,

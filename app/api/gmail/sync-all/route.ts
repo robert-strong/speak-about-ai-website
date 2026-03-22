@@ -9,11 +9,31 @@ const sql = neon(process.env.DATABASE_URL!)
 export async function POST(request: NextRequest) {
   try {
     let fullSync = false
+    let projectId: number | null = null
     try {
       const body = await request.json()
       fullSync = body.fullSync === true
+      projectId = body.projectId || null
     } catch {
       // No body or invalid JSON is fine, default to incremental sync
+    }
+
+    // If a project_id is provided, look up its contact emails for targeted search
+    let searchEmails: string[] = []
+    if (projectId) {
+      const projects = await sql`
+        SELECT client_email, billing_contact_email, logistics_contact_email, venue_contact_email
+        FROM projects WHERE id = ${projectId}
+      `
+      if (projects.length > 0) {
+        const p = projects[0]
+        searchEmails = [
+          p.client_email,
+          p.billing_contact_email,
+          p.logistics_contact_email,
+          p.venue_contact_email
+        ].filter((e): e is string => !!e)
+      }
     }
 
     // Get all authenticated Gmail users
@@ -30,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     for (const user of users) {
       try {
-        const syncResults = await syncGmailForUser(user.user_email, fullSync)
+        const syncResults = await syncGmailForUser(user.user_email, fullSync, searchEmails.length > 0 ? searchEmails : undefined)
         results.push({
           userEmail: user.user_email,
           success: true,

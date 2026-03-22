@@ -74,7 +74,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
       const response = await fetch('/api/gmail/sync-all', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullSync })
+        body: JSON.stringify({ fullSync, projectId })
       })
       const data = await response.json()
       if (data.success) {
