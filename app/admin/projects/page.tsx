@@ -2420,6 +2420,11 @@ export default function EnhancedProjectManagementPage() {
                                           )}
                                         </div>
 
+                                        {/* Latest Email */}
+                                        <div className="mt-4 pt-3 border-t border-gray-200">
+                                          <EmailActivity projectId={project.id} dealId={project.deal_id} compact />
+                                        </div>
+
                                         {/* Action buttons */}
                                         <div className="flex justify-end mt-4 pt-3 border-t border-gray-200 gap-2">
                                           <Button
@@ -4183,9 +4188,6 @@ export default function EnhancedProjectManagementPage() {
                   )}
                 </CardContent>
               </Card>
-
-              {/* Latest Email - compact view */}
-              <EmailActivity projectId={selectedProject.id} dealId={selectedProject.deal_id} compact />
 
               {/* Full Email Activity */}
               <EmailActivity projectId={selectedProject.id} dealId={selectedProject.deal_id} />
