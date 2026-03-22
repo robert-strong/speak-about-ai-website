@@ -139,6 +139,18 @@ export function EmailActivity({ leadId, dealId, projectId, compact = false }: Em
     )
   }
 
+  const decodeHtmlEntities = (text: string) => {
+    return text
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#x27;/g, "'")
+      .replace(/&#x2F;/g, "/")
+      .replace(/&nbsp;/g, " ")
+  }
+
   const syncButton = (
     <Button
       variant="outline"
@@ -198,7 +210,7 @@ export function EmailActivity({ leadId, dealId, projectId, compact = false }: Em
               </Badge>
             </div>
             <p className="text-xs text-gray-600 mb-1">{latest.from_email} → {latest.to_email}</p>
-            <p className="text-sm text-gray-700 line-clamp-2">{latest.body_snippet}</p>
+            <p className="text-sm text-gray-700 line-clamp-2">{decodeHtmlEntities(latest.body_snippet)}</p>
           </div>
         </div>
         {syncMessage && <p className="text-xs text-blue-600">{syncMessage}</p>}
@@ -359,13 +371,13 @@ export function EmailActivity({ leadId, dealId, projectId, compact = false }: Em
 
                     {!isExpanded && (
                       <p className="text-sm text-gray-700 line-clamp-2 mb-2">
-                        {thread.body_snippet}
+                        {decodeHtmlEntities(thread.body_snippet)}
                       </p>
                     )}
 
                     {isExpanded && (
                       <div className="text-sm text-gray-700 mb-2 whitespace-pre-wrap max-h-96 overflow-y-auto bg-white p-3 rounded border">
-                        {thread.body_full || thread.body_snippet}
+                        {decodeHtmlEntities(thread.body_full || thread.body_snippet)}
                       </div>
                     )}
 
