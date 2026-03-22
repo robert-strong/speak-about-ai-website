@@ -34,7 +34,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [syncMessage, setSyncMessage] = useState("")
-  const [searchInfo, setSearchInfo] = useState<{ dealId?: number; clientEmail?: string }>({})
+  const [searchInfo, setSearchInfo] = useState<{ dealId?: number; clientEmail?: string; searchTerms?: string[] }>({})
   const [expandedEmails, setExpandedEmails] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -56,8 +56,8 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
 
       if (data.success) {
         setThreads(data.threads || [])
-        if (data.searchedDealId !== undefined || data.searchedClientEmail !== undefined) {
-          setSearchInfo({ dealId: data.searchedDealId, clientEmail: data.searchedClientEmail })
+        if (data.searchedDealId !== undefined || data.searchedClientEmail !== undefined || data.searchedTerms) {
+          setSearchInfo({ dealId: data.searchedDealId, clientEmail: data.searchedClientEmail, searchTerms: data.searchedTerms })
         }
       }
     } catch (error) {
@@ -183,16 +183,19 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
             <p className="text-sm text-blue-600 mb-2">{syncMessage}</p>
           )}
           <p className="text-sm text-gray-500 mb-2">No email activity yet. Click "Sync Emails" to pull new emails, or "Full Sync" to pull the last 90 days.</p>
-          {(searchInfo.clientEmail || searchInfo.dealId) && (
+          {(searchInfo.clientEmail || searchInfo.dealId || (searchInfo.searchTerms && searchInfo.searchTerms.length > 0)) && (
             <p className="text-xs text-gray-400 mb-3">
               Searching for: {searchInfo.clientEmail && <span className="font-mono">{searchInfo.clientEmail}</span>}
               {searchInfo.clientEmail && searchInfo.dealId && ' / '}
               {searchInfo.dealId && <span>Deal #{searchInfo.dealId}</span>}
+              {searchInfo.searchTerms && searchInfo.searchTerms.length > 0 && (
+                <span>{(searchInfo.clientEmail || searchInfo.dealId) ? ' / ' : ''}Keywords: {searchInfo.searchTerms.join(', ')}</span>
+              )}
             </p>
           )}
-          {!searchInfo.clientEmail && !searchInfo.dealId && projectId && (
+          {!searchInfo.clientEmail && !searchInfo.dealId && (!searchInfo.searchTerms || searchInfo.searchTerms.length === 0) && projectId && (
             <p className="text-xs text-amber-600 mb-3">
-              This project has no client email or linked deal — add a client email in Basic Info to match emails.
+              This project has no client email, linked deal, or event details — add a client email or event info in Basic Info to match emails.
             </p>
           )}
           <Button
