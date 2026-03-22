@@ -34,7 +34,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [syncMessage, setSyncMessage] = useState("")
-  const [searchInfo, setSearchInfo] = useState<{ dealId?: number; clientEmail?: string; searchTerms?: string[]; totalEmails?: number }>({})
+  const [searchInfo, setSearchInfo] = useState<{ dealId?: number; clientEmail?: string; searchTerms?: string[]; totalEmails?: number; debugInfo?: any }>({})
   const [expandedEmails, setExpandedEmails] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
       if (data.success) {
         setThreads(data.threads || [])
         if (data.searchedDealId !== undefined || data.searchedClientEmail !== undefined || data.searchedTerms) {
-          setSearchInfo({ dealId: data.searchedDealId, clientEmail: data.searchedClientEmail, searchTerms: data.searchedTerms, totalEmails: data.totalEmails })
+          setSearchInfo({ dealId: data.searchedDealId, clientEmail: data.searchedClientEmail, searchTerms: data.searchedTerms, totalEmails: data.totalEmails, debugInfo: data.debugInfo })
         }
       }
     } catch (error) {
@@ -198,10 +198,21 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
               This project has no client email, linked deal, or event details — add a client email or event info in Basic Info to match emails.
             </p>
           )}
-          {searchInfo.totalEmails !== undefined && (
-            <p className="text-xs text-gray-400 mb-3">
-              {searchInfo.totalEmails} total emails in database. None matched this project's criteria. Try "Full Sync" to pull more emails.
-            </p>
+          {searchInfo.debugInfo && (
+            <div className="text-xs text-gray-400 mb-3 bg-gray-50 p-2 rounded border">
+              <p className="font-medium mb-1">{searchInfo.debugInfo.totalEmails} total emails in database</p>
+              {searchInfo.debugInfo.clientEmailMatchCount !== undefined && (
+                <p>Emails matching "{searchInfo.clientEmail}": {searchInfo.debugInfo.clientEmailMatchCount}</p>
+              )}
+              {searchInfo.debugInfo.sampleEmails?.length > 0 && (
+                <div className="mt-1">
+                  <p className="font-medium">Recent emails in DB:</p>
+                  {searchInfo.debugInfo.sampleEmails.map((e: any, i: number) => (
+                    <p key={i} className="font-mono truncate">{e.from} → {e.to}: {e.subject}</p>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
           <Button
             variant="outline"

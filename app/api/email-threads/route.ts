@@ -66,30 +66,70 @@ export async function GET(request: NextRequest) {
       if (!hasEmailMatch && !hasTextMatch) {
         threads = []
       } else {
-        // Use a single query with OR conditions for all criteria
         // Escape regex special characters for PostgreSQL ~* operator
         const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         const textPattern = searchTerms.length > 0
           ? searchTerms.map(escapeRegex).join('|')
-          : null
+          : ''
         const datePattern = dateSearchTerms.length > 0
           ? dateSearchTerms.map(escapeRegex).join('|')
-          : null
+          : ''
 
-        threads = await sql`
-          SELECT DISTINCT
-            id, gmail_message_id, gmail_thread_id, subject,
-            from_email, to_email, cc_emails, body_snippet, body_full,
-            direction, is_read, received_at, labels, created_at
-          FROM email_threads
-          WHERE
-            (${projectDealId}::int IS NOT NULL AND deal_id = ${projectDealId})
-            OR (${clientEmail}::text IS NOT NULL AND (LOWER(from_email) = LOWER(${clientEmail}) OR LOWER(to_email) = LOWER(${clientEmail})))
-            OR (${textPattern}::text IS NOT NULL AND (subject ~* ${textPattern} OR body_snippet ~* ${textPattern} OR body_full ~* ${textPattern}))
-            OR (${datePattern}::text IS NOT NULL AND (subject ~* ${datePattern} OR body_snippet ~* ${datePattern}))
-          ORDER BY received_at DESC
-          LIMIT 50
-        `
+        // Run separate targeted queries and merge results to avoid complex null-handling in SQL
+        const resultSets: any[][] = []
+
+        // Match by deal_id
+        if (projectDealId) {
+          const r = await sql`
+            SELECT id, gmail_message_id, gmail_thread_id, subject, from_email, to_email, cc_emails, body_snippet, body_full, direction, is_read, received_at, labels, created_at
+            FROM email_threads WHERE deal_id = ${projectDealId}
+            ORDER BY received_at DESC LIMIT 50
+          `
+          resultSets.push(r)
+        }
+
+        // Match by client email
+        if (clientEmail) {
+          const r = await sql`
+            SELECT id, gmail_message_id, gmail_thread_id, subject, from_email, to_email, cc_emails, body_snippet, body_full, direction, is_read, received_at, labels, created_at
+            FROM email_threads WHERE LOWER(from_email) = LOWER(${clientEmail}) OR LOWER(to_email) = LOWER(${clientEmail})
+            ORDER BY received_at DESC LIMIT 50
+          `
+          resultSets.push(r)
+        }
+
+        // Match by text keywords (project name, event name, location, venue)
+        if (textPattern) {
+          const r = await sql`
+            SELECT id, gmail_message_id, gmail_thread_id, subject, from_email, to_email, cc_emails, body_snippet, body_full, direction, is_read, received_at, labels, created_at
+            FROM email_threads WHERE subject ~* ${textPattern} OR body_snippet ~* ${textPattern} OR body_full ~* ${textPattern}
+            ORDER BY received_at DESC LIMIT 50
+          `
+          resultSets.push(r)
+        }
+
+        // Match by date keywords
+        if (datePattern) {
+          const r = await sql`
+            SELECT id, gmail_message_id, gmail_thread_id, subject, from_email, to_email, cc_emails, body_snippet, body_full, direction, is_read, received_at, labels, created_at
+            FROM email_threads WHERE subject ~* ${datePattern} OR body_snippet ~* ${datePattern}
+            ORDER BY received_at DESC LIMIT 50
+          `
+          resultSets.push(r)
+        }
+
+        // Merge and deduplicate by id, sort by received_at desc
+        const seenIds = new Set<number>()
+        const merged: any[] = []
+        for (const rs of resultSets) {
+          for (const row of rs) {
+            if (!seenIds.has(row.id)) {
+              seenIds.add(row.id)
+              merged.push(row)
+            }
+          }
+        }
+        threads = merged.sort((a, b) => new Date(b.received_at).getTime() - new Date(a.received_at).getTime()).slice(0, 50)
       }
     } else if (leadId) {
       threads = await sql`
@@ -137,16 +177,41 @@ export async function GET(request: NextRequest) {
       `
     }
 
-    // Get total email count for diagnostics
+    // Get diagnostics
     const totalCount = await sql`SELECT COUNT(*) as total FROM email_threads`
     const totalEmails = totalCount[0]?.total || 0
+
+    // Debug: sample stored emails to verify what's in DB
+    let debugInfo: any = undefined
+    if (projectId && threads.length === 0) {
+      const sample = await sql`
+        SELECT id, from_email, to_email, subject, received_at
+        FROM email_threads
+        ORDER BY received_at DESC
+        LIMIT 5
+      `
+      debugInfo = {
+        sampleEmails: sample.map((e: any) => ({ from: e.from_email, to: e.to_email, subject: e.subject?.substring(0, 50), date: e.received_at })),
+        totalEmails,
+      }
+      // Also check if client email exists anywhere
+      if (searchedClientEmail) {
+        const emailCheck = await sql`
+          SELECT COUNT(*) as cnt FROM email_threads
+          WHERE LOWER(from_email) = LOWER(${searchedClientEmail})
+            OR LOWER(to_email) = LOWER(${searchedClientEmail})
+        `
+        debugInfo.clientEmailMatchCount = emailCheck[0]?.cnt || 0
+      }
+    }
 
     return NextResponse.json({
       success: true,
       threads,
       count: threads.length,
       totalEmails,
-      ...(projectId ? { searchedDealId, searchedClientEmail, searchedTerms } : {})
+      ...(projectId ? { searchedDealId, searchedClientEmail, searchedTerms } : {}),
+      ...(debugInfo ? { debugInfo } : {})
     })
   } catch (error) {
     console.error('Error fetching email threads:', error)
