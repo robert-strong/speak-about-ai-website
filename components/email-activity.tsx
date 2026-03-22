@@ -27,9 +27,10 @@ interface EmailActivityProps {
   leadId?: number
   dealId?: number
   projectId?: number
+  compact?: boolean
 }
 
-export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps) {
+export function EmailActivity({ leadId, dealId, projectId, compact = false }: EmailActivityProps) {
   const [threads, setThreads] = useState<EmailThread[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
@@ -154,6 +155,56 @@ export function EmailActivity({ leadId, dealId, projectId }: EmailActivityProps)
       {syncing ? "Syncing..." : "Sync Emails"}
     </Button>
   )
+
+  // Compact mode: show only the most recent email inline
+  if (compact) {
+    if (loading) {
+      return (
+        <div className="text-xs text-gray-400 py-2">Loading latest email...</div>
+      )
+    }
+    if (threads.length === 0) {
+      return (
+        <div className="bg-gray-50 rounded-lg p-3 border">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-500">No email correspondence yet</p>
+            <Button variant="outline" size="sm" className="h-6 text-xs" onClick={() => handleSync()} disabled={syncing}>
+              {syncing ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <RefreshCw className="w-3 h-3 mr-1" />}
+              {syncing ? "Syncing..." : "Sync"}
+            </Button>
+          </div>
+          {syncMessage && <p className="text-xs text-blue-600 mt-1">{syncMessage}</p>}
+        </div>
+      )
+    }
+    const latest = threads[0]
+    return (
+      <div className="bg-gray-50 rounded-lg p-3 border space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-gray-500" />
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Latest Email</span>
+            <Badge variant="secondary" className="text-xs h-5">{threads.length} total</Badge>
+          </div>
+          <span className="text-xs text-gray-500">{formatDate(latest.received_at)}</span>
+        </div>
+        <div className="flex items-start gap-2">
+          {getDirectionIcon(latest.direction)}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-sm font-medium truncate">{latest.subject || "(no subject)"}</span>
+              <Badge variant="outline" className={`text-xs h-5 ${latest.direction === "outbound" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-green-50 text-green-700 border-green-200"}`}>
+                {latest.direction === "outbound" ? "Sent" : "Received"}
+              </Badge>
+            </div>
+            <p className="text-xs text-gray-600 mb-1">{latest.from_email} → {latest.to_email}</p>
+            <p className="text-sm text-gray-700 line-clamp-2">{latest.body_snippet}</p>
+          </div>
+        </div>
+        {syncMessage && <p className="text-xs text-blue-600">{syncMessage}</p>}
+      </div>
+    )
+  }
 
   if (loading) {
     return (

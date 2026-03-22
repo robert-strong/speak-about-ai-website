@@ -4184,7 +4184,10 @@ export default function EnhancedProjectManagementPage() {
                 </CardContent>
               </Card>
 
-              {/* Email Activity */}
+              {/* Latest Email - compact view */}
+              <EmailActivity projectId={selectedProject.id} dealId={selectedProject.deal_id} compact />
+
+              {/* Full Email Activity */}
               <EmailActivity projectId={selectedProject.id} dealId={selectedProject.deal_id} />
 
               {/* Task stages */}
