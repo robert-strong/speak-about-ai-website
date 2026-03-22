@@ -180,6 +180,32 @@ export default function SmtpSettingsPage() {
             </AlertDescription>
           </Alert>
 
+          {/* Gmail Sync Connection */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Gmail Sync (OAuth)
+              </CardTitle>
+              <CardDescription>
+                Connect your Gmail account to sync emails for project email activity tracking
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                This uses Google OAuth to securely read your Gmail and sync email threads to projects, leads, and deals.
+                If email sync stops working (e.g. after a password change), re-connect here.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/api/auth/gmail', '_blank')}
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Connect Gmail Account
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Provider Selection */}
           <Card className="mb-6">
             <CardHeader>
