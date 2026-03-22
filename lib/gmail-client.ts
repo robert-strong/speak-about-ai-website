@@ -153,15 +153,21 @@ export class GmailClient {
       if (!pageToken) break
     }
 
-    // Fetch full message details
+    // Fetch full message details in parallel batches of 10
     const fullMessages: GmailMessage[] = []
-    for (const message of allMessageIds) {
-      const fullMessage = await gmail.users.messages.get({
-        userId: 'me',
-        id: message.id,
-        format: 'full',
-      })
-      fullMessages.push(fullMessage.data as GmailMessage)
+    const batchSize = 10
+    for (let i = 0; i < allMessageIds.length; i += batchSize) {
+      const batch = allMessageIds.slice(i, i + batchSize)
+      const results = await Promise.all(
+        batch.map(message =>
+          gmail.users.messages.get({
+            userId: 'me',
+            id: message.id,
+            format: 'full',
+          })
+        )
+      )
+      fullMessages.push(...results.map(r => r.data as GmailMessage))
     }
 
     return fullMessages

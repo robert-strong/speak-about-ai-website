@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import { syncGmailForUser } from '@/lib/sync-gmail'
 
+export const maxDuration = 120 // Allow up to 2 minutes for full sync
+
 const sql = neon(process.env.DATABASE_URL!)
 
 export async function POST(request: NextRequest) {
