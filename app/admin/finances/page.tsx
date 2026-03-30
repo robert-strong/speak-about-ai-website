@@ -184,6 +184,42 @@ export default function FinancesPage() {
     loadPaymentMethods()
   }, [router])
 
+  // Auto-update payment status based on payment totals
+  useEffect(() => {
+    if (!editingProject) return
+
+    const clientTotal = editPayments
+      .filter(p => p.payment_type === 'client')
+      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+
+    const speakerTotal = editPayments
+      .filter(p => p.payment_type === 'speaker')
+      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+
+    const toCollect = editingProject.total_to_collect
+    const speakerPayout = editingProject.speaker_payout
+
+    let newClientStatus: "pending" | "partial" | "paid" = "pending"
+    if (toCollect > 0 && clientTotal >= toCollect) {
+      newClientStatus = "paid"
+    } else if (clientTotal > 0) {
+      newClientStatus = "partial"
+    }
+
+    let newSpeakerStatus: "pending" | "paid" = "pending"
+    if (speakerPayout > 0 && speakerTotal >= speakerPayout) {
+      newSpeakerStatus = "paid"
+    }
+
+    if (editingProject.payment_status !== newClientStatus || editingProject.speaker_payment_status !== newSpeakerStatus) {
+      setEditingProject(prev => prev ? {
+        ...prev,
+        payment_status: newClientStatus,
+        speaker_payment_status: newSpeakerStatus,
+      } : prev)
+    }
+  }, [editPayments, editingProject?.total_to_collect, editingProject?.speaker_payout])
+
   const loadFinancialData = async () => {
     try {
       setLoading(true)
