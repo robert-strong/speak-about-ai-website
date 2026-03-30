@@ -1354,10 +1354,8 @@ export default function FinancesPage() {
                               type="date"
                               className="h-8 text-sm"
                               value={payment.payment_date?.split('T')[0] || ''}
-                              onChange={(e) => {
-                                updatePaymentLocal(payment.id, { payment_date: e.target.value || undefined })
-                                handleUpdatePayment(payment.id, { payment_date: e.target.value || undefined })
-                              }}
+                              onChange={(e) => updatePaymentLocal(payment.id, { payment_date: e.target.value || undefined })}
+                              onBlur={(e) => handleUpdatePayment(payment.id, { payment_date: e.target.value || undefined })}
                             />
                             <Select
                               value={payment.payment_method || "none"}
@@ -1500,10 +1498,8 @@ export default function FinancesPage() {
                                 type="date"
                                 className="h-8 text-sm"
                                 value={payment.payment_date?.split('T')[0] || ''}
-                                onChange={(e) => {
-                                  updatePaymentLocal(payment.id, { payment_date: e.target.value || undefined })
-                                  handleUpdatePayment(payment.id, { payment_date: e.target.value || undefined })
-                                }}
+                                onChange={(e) => updatePaymentLocal(payment.id, { payment_date: e.target.value || undefined })}
+                                onBlur={(e) => handleUpdatePayment(payment.id, { payment_date: e.target.value || undefined })}
                               />
                               <Select
                                 value={payment.payment_method || "none"}
