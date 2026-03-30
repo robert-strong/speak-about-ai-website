@@ -2,11 +2,27 @@
  * Authenticated fetch utility for admin API calls
  * Automatically includes JWT token from localStorage in Authorization header
  * Automatically refreshes expired tokens and retries on 401
+ * Automatically logs out and redirects on unrecoverable 401
  */
 
 interface AuthFetchOptions extends RequestInit {
   headers?: HeadersInit
   _isRetry?: boolean // internal flag to prevent infinite retry loops
+}
+
+let isLoggingOut = false
+
+function forceLogout() {
+  if (isLoggingOut || typeof window === 'undefined') return
+  isLoggingOut = true
+
+  localStorage.removeItem('adminLoggedIn')
+  localStorage.removeItem('adminSessionToken')
+  localStorage.removeItem('adminUser')
+
+  fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
+
+  window.location.href = '/admin'
 }
 
 async function tryRefreshToken(): Promise<string | null> {
@@ -66,6 +82,13 @@ export async function authFetch(url: string, options: AuthFetchOptions = {}): Pr
       // Retry the original request with the new token
       return authFetch(url, { ...options, _isRetry: true })
     }
+    // Refresh failed — token is unrecoverable, force logout
+    forceLogout()
+  }
+
+  // If this was a retry and still got 401, token is invalid — force logout
+  if (response.status === 401 && _isRetry) {
+    forceLogout()
   }
 
   return response
