@@ -388,6 +388,31 @@ export default function FinancesPage() {
     }
   }
 
+  // Delete payment from the Payments tab (refreshes project data after)
+  const handleDeletePaymentFromTab = async (paymentId: number) => {
+    try {
+      const token = localStorage.getItem("adminSessionToken")
+      const response = await fetch("/api/admin/project-payments", {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: JSON.stringify({ id: paymentId })
+      })
+      if (response.ok) {
+        // Remove from local projects state so UI updates immediately
+        setProjects(prev => prev.map(p => ({
+          ...p,
+          payments: (p.payments || []).filter(pay => pay.id !== paymentId)
+        })))
+        toast({ title: "Success", description: "Payment deleted" })
+      }
+    } catch {
+      toast({ title: "Error", description: "Failed to delete payment", variant: "destructive" })
+    }
+  }
+
   const handleSaveProject = async () => {
     if (!editingProject) return
 
@@ -903,6 +928,8 @@ export default function FinancesPage() {
                     company: project.company,
                     speaker_name: project.speaker_name,
                     project_id: project.id,
+                    invoice_number: project.invoice_number,
+                    payment_status: project.payment_status,
                   }))
                 ).sort((a, b) => {
                   const dateA = a.payment_date || a.created_at || ''
@@ -969,9 +996,11 @@ export default function FinancesPage() {
                               <TableHead>Date</TableHead>
                               <TableHead>Project</TableHead>
                               <TableHead>Client</TableHead>
+                              <TableHead>Invoice #</TableHead>
                               <TableHead>Notes</TableHead>
                               <TableHead>Method</TableHead>
                               <TableHead className="text-right">Amount</TableHead>
+                              <TableHead className="text-right w-10"></TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -989,6 +1018,13 @@ export default function FinancesPage() {
                                     {payment.company && <span className="text-gray-500"> - {payment.company}</span>}
                                   </div>
                                 </TableCell>
+                                <TableCell>
+                                  {payment.invoice_number ? (
+                                    <span className="text-sm font-mono text-gray-700">{payment.invoice_number}</span>
+                                  ) : (
+                                    <span className="text-gray-400 text-sm">-</span>
+                                  )}
+                                </TableCell>
                                 <TableCell className="text-sm text-gray-600">{payment.label || '-'}</TableCell>
                                 <TableCell>
                                   {payment.payment_method ? (
@@ -1000,11 +1036,21 @@ export default function FinancesPage() {
                                 <TableCell className="text-right font-semibold text-green-600">
                                   {formatCurrency(Number(payment.amount) || 0)}
                                 </TableCell>
+                                <TableCell className="text-right">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 w-7 p-0 text-gray-400 hover:text-red-600"
+                                    onClick={() => handleDeletePaymentFromTab(payment.id)}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </TableCell>
                               </TableRow>
                             ))}
                             {clientPayments.length === 0 && (
                               <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-gray-500">No client payments recorded yet</TableCell>
+                                <TableCell colSpan={8} className="text-center py-8 text-gray-500">No client payments recorded yet</TableCell>
                               </TableRow>
                             )}
                           </TableBody>
@@ -1031,6 +1077,7 @@ export default function FinancesPage() {
                               <TableHead>Notes</TableHead>
                               <TableHead>Method</TableHead>
                               <TableHead className="text-right">Amount</TableHead>
+                              <TableHead className="text-right w-10"></TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -1063,17 +1110,111 @@ export default function FinancesPage() {
                                 <TableCell className="text-right font-semibold text-orange-600">
                                   {formatCurrency(Number(payment.amount) || 0)}
                                 </TableCell>
+                                <TableCell className="text-right">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 w-7 p-0 text-gray-400 hover:text-red-600"
+                                    onClick={() => handleDeletePaymentFromTab(payment.id)}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </TableCell>
                               </TableRow>
                             ))}
                             {speakerPayments.length === 0 && (
                               <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-gray-500">No speaker payments recorded yet</TableCell>
+                                <TableCell colSpan={7} className="text-center py-8 text-gray-500">No speaker payments recorded yet</TableCell>
                               </TableRow>
                             )}
                           </TableBody>
                         </Table>
                       </CardContent>
                     </Card>
+
+                    {/* Paid Invoices History */}
+                    {(() => {
+                      const paidProjects = projects.filter(p => p.payment_status === 'paid' || (p.client_paid_total ?? 0) > 0)
+                        .sort((a, b) => {
+                          const dateA = a.payment_date || a.event_date || ''
+                          const dateB = b.payment_date || b.event_date || ''
+                          return dateB.localeCompare(dateA)
+                        })
+                      return paidProjects.length > 0 ? (
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                              <CheckCircle className="h-5 w-5" />
+                              Invoice Payment History
+                            </CardTitle>
+                            <CardDescription>{paidProjects.length} projects with payments</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Project</TableHead>
+                                  <TableHead>Client</TableHead>
+                                  <TableHead>Invoice #</TableHead>
+                                  <TableHead>Event Date</TableHead>
+                                  <TableHead className="text-right">Deal Value</TableHead>
+                                  <TableHead className="text-right">Collected</TableHead>
+                                  <TableHead className="text-right">Balance</TableHead>
+                                  <TableHead>Status</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {paidProjects.map((project) => {
+                                  const collected = project.client_paid_total ?? 0
+                                  const balance = project.total_to_collect - collected
+                                  return (
+                                    <TableRow key={project.id}>
+                                      <TableCell>
+                                        <Link href={`/admin/projects/${project.id}/edit`} className="text-blue-600 hover:underline font-medium">
+                                          {project.project_name}
+                                        </Link>
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="text-sm">
+                                          {project.client_name}
+                                          {project.company && <span className="text-gray-500"> - {project.company}</span>}
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        {project.invoice_number ? (
+                                          <span className="text-sm font-mono text-gray-700">{project.invoice_number}</span>
+                                        ) : (
+                                          <span className="text-gray-400 text-sm">-</span>
+                                        )}
+                                      </TableCell>
+                                      <TableCell>{project.event_date ? formatDate(project.event_date) : '-'}</TableCell>
+                                      <TableCell className="text-right font-medium">{formatCurrency(project.total_to_collect)}</TableCell>
+                                      <TableCell className="text-right font-semibold text-green-600">{formatCurrency(collected)}</TableCell>
+                                      <TableCell className={`text-right font-semibold ${balance <= 0 ? 'text-green-600' : 'text-yellow-600'}`}>
+                                        {balance <= 0 ? 'Paid in full' : formatCurrency(balance)}
+                                      </TableCell>
+                                      <TableCell>
+                                        {project.payment_status === 'paid' ? (
+                                          <Badge className="bg-green-100 text-green-800">
+                                            <CheckCircle className="h-3 w-3 mr-1" />
+                                            Paid
+                                          </Badge>
+                                        ) : (
+                                          <Badge className="bg-blue-100 text-blue-800">
+                                            <Clock className="h-3 w-3 mr-1" />
+                                            Partial
+                                          </Badge>
+                                        )}
+                                      </TableCell>
+                                    </TableRow>
+                                  )
+                                })}
+                              </TableBody>
+                            </Table>
+                          </CardContent>
+                        </Card>
+                      ) : null
+                    })()}
                   </div>
                 )
               })()}
