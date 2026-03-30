@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import {
   DollarSign,
@@ -286,9 +287,27 @@ export default function FinancesPage() {
     setShowEditDialog(true)
   }
 
-  const handleAddPayment = async (projectId: number, paymentType: "client" | "speaker") => {
+  // Counter for temporary IDs (negative to distinguish from real DB IDs)
+  const [tempIdCounter, setTempIdCounter] = useState(-1)
+
+  const handleAddPayment = (projectId: number, paymentType: "client" | "speaker") => {
+    const tempId = tempIdCounter
+    setTempIdCounter(prev => prev - 1)
+    setEditPayments(prev => [...prev, {
+      id: tempId,
+      payment_type: paymentType,
+      amount: 0,
+      label: '',
+      payment_date: undefined,
+      payment_method: undefined,
+    }])
+  }
+
+  // Create a new payment record on the server (for temp/unsaved payments)
+  const handleCreatePayment = async (tempId: number, projectId: number, updates: Partial<PaymentRecord>) => {
     try {
-      setSavingPayment(true)
+      const payment = editPayments.find(p => p.id === tempId)
+      if (!payment) return
       const token = localStorage.getItem("adminSessionToken")
       const response = await fetch("/api/admin/project-payments", {
         method: 'POST',
@@ -298,19 +317,20 @@ export default function FinancesPage() {
         },
         body: JSON.stringify({
           project_id: projectId,
-          payment_type: paymentType,
-          amount: 0,
+          payment_type: payment.payment_type,
+          amount: updates.amount ?? payment.amount ?? 0,
+          label: updates.label ?? payment.label,
+          payment_date: updates.payment_date ?? payment.payment_date,
+          payment_method: updates.payment_method ?? payment.payment_method,
         })
       })
       if (response.ok) {
         const data = await response.json()
-        setEditPayments(prev => [...prev, data.payment])
-        toast({ title: "Success", description: "Payment record added" })
+        // Replace the temp record with the real one from the server
+        setEditPayments(prev => prev.map(p => p.id === tempId ? { ...data.payment, amount: Number(data.payment.amount) || 0 } : p))
       }
     } catch {
-      toast({ title: "Error", description: "Failed to add payment", variant: "destructive" })
-    } finally {
-      setSavingPayment(false)
+      toast({ title: "Error", description: "Failed to save payment", variant: "destructive" })
     }
   }
 
@@ -319,8 +339,12 @@ export default function FinancesPage() {
     setEditPayments(prev => prev.map(p => p.id === paymentId ? { ...p, ...updates } : p))
   }
 
-  // Save payment to server
+  // Save payment to server (creates if temp, patches if existing)
   const handleUpdatePayment = async (paymentId: number, updates: Partial<PaymentRecord>) => {
+    // If this is a temp (unsaved) payment, create it on the server first
+    if (paymentId < 0 && editingProject) {
+      return handleCreatePayment(paymentId, editingProject.id, updates)
+    }
     try {
       const token = localStorage.getItem("adminSessionToken")
       const response = await fetch("/api/admin/project-payments", {
@@ -341,6 +365,11 @@ export default function FinancesPage() {
   }
 
   const handleDeletePayment = async (paymentId: number) => {
+    // Temp (unsaved) payments can just be removed locally
+    if (paymentId < 0) {
+      setEditPayments(prev => prev.filter(p => p.id !== paymentId))
+      return
+    }
     try {
       const token = localStorage.getItem("adminSessionToken")
       const response = await fetch("/api/admin/project-payments", {
@@ -353,7 +382,6 @@ export default function FinancesPage() {
       })
       if (response.ok) {
         setEditPayments(prev => prev.filter(p => p.id !== paymentId))
-        toast({ title: "Success", description: "Payment removed" })
       }
     } catch {
       toast({ title: "Error", description: "Failed to remove payment", variant: "destructive" })
@@ -675,187 +703,382 @@ export default function FinancesPage() {
             </Card>
           </div>
 
-          {/* Filters */}
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Search by project, client, or company..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                <Select value={paymentFilter} onValueChange={setPaymentFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Client payment" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Client Payments</SelectItem>
-                    <SelectItem value="paid">Client Paid</SelectItem>
-                    <SelectItem value="pending">Client Pending</SelectItem>
-                    <SelectItem value="partial">Client Partial</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={speakerPaymentFilter} onValueChange={setSpeakerPaymentFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Speaker payment" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Speaker Payments</SelectItem>
-                    <SelectItem value="due">Speaker Due</SelectItem>
-                    <SelectItem value="paid">Speaker Paid</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="projects" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="projects">Project Finances</TabsTrigger>
+              <TabsTrigger value="payments">Payments</TabsTrigger>
+            </TabsList>
 
-          {/* Projects Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Finances</CardTitle>
-              <CardDescription>
-                Showing {filteredProjects.length} of {projects.length} projects
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <SortableHeader field="project_name">Project</SortableHeader>
-                    <SortableHeader field="speaker_name">Speaker</SortableHeader>
-                    <SortableHeader field="event_date">Event Date</SortableHeader>
-                    <SortableHeader field="budget" className="text-right">Deal Value</SortableHeader>
-                    <SortableHeader field="speaker_fee" className="text-right">Speaker Fee</SortableHeader>
-                    <SortableHeader field="travel_buyout" className="text-right">Travel</SortableHeader>
-                    <SortableHeader field="net_commission" className="text-right">Net Commission</SortableHeader>
-                    <SortableHeader field="invoice_number">Invoice #</SortableHeader>
-                    <SortableHeader field="payment_status">Client Payment</SortableHeader>
-                    <SortableHeader field="speaker_payment_status">Speaker Payment</SortableHeader>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedProjects.map((project) => (
-                    <TableRow key={project.id}>
-                      <TableCell>
-                        <div>
-                          <Link
-                            href={`/admin/projects/${project.id}/edit`}
-                            className="font-medium text-blue-600 hover:underline"
-                          >
-                            {project.project_name}
-                          </Link>
-                          <div className="text-sm text-gray-500">
-                            {project.client_name}
-                            {project.company && ` - ${project.company}`}
+            <TabsContent value="projects">
+              {/* Filters */}
+              <Card className="mb-6">
+                <CardContent className="pt-6">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          placeholder="Search by project, client, or company..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <Select value={paymentFilter} onValueChange={setPaymentFilter}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue placeholder="Client payment" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Client Payments</SelectItem>
+                        <SelectItem value="paid">Client Paid</SelectItem>
+                        <SelectItem value="pending">Client Pending</SelectItem>
+                        <SelectItem value="partial">Client Partial</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={speakerPaymentFilter} onValueChange={setSpeakerPaymentFilter}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue placeholder="Speaker payment" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Speaker Payments</SelectItem>
+                        <SelectItem value="due">Speaker Due</SelectItem>
+                        <SelectItem value="paid">Speaker Paid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Projects Table */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Project Finances</CardTitle>
+                  <CardDescription>
+                    Showing {filteredProjects.length} of {projects.length} projects
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <SortableHeader field="project_name">Project</SortableHeader>
+                        <SortableHeader field="speaker_name">Speaker</SortableHeader>
+                        <SortableHeader field="event_date">Event Date</SortableHeader>
+                        <SortableHeader field="budget" className="text-right">Deal Value</SortableHeader>
+                        <SortableHeader field="speaker_fee" className="text-right">Speaker Fee</SortableHeader>
+                        <SortableHeader field="travel_buyout" className="text-right">Travel</SortableHeader>
+                        <SortableHeader field="net_commission" className="text-right">Net Commission</SortableHeader>
+                        <SortableHeader field="invoice_number">Invoice #</SortableHeader>
+                        <SortableHeader field="payment_status">Client Payment</SortableHeader>
+                        <SortableHeader field="speaker_payment_status">Speaker Payment</SortableHeader>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {sortedProjects.map((project) => (
+                        <TableRow key={project.id}>
+                          <TableCell>
+                            <div>
+                              <Link
+                                href={`/admin/projects/${project.id}/edit`}
+                                className="font-medium text-blue-600 hover:underline"
+                              >
+                                {project.project_name}
+                              </Link>
+                              <div className="text-sm text-gray-500">
+                                {project.client_name}
+                                {project.company && ` - ${project.company}`}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {project.speaker_name ? (
+                              <div className="flex items-center gap-2">
+                                <Mic className="h-4 w-4 text-gray-400" />
+                                <span className="font-medium">{project.speaker_name}</span>
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 text-sm">Not assigned</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {project.event_date ? formatDate(project.event_date) : '-'}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {formatCurrency(project.budget)}
+                          </TableCell>
+                          <TableCell className="text-right text-orange-600">
+                            {formatCurrency(project.speaker_fee)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {project.travel_buyout > 0 ? formatCurrency(project.travel_buyout) : '-'}
+                          </TableCell>
+                          <TableCell className={`text-right font-semibold ${project.net_commission >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatCurrency(project.net_commission)}
+                          </TableCell>
+                          <TableCell>
+                            {project.invoice_number ? (
+                              <span className="text-sm font-mono text-gray-700">{project.invoice_number}</span>
+                            ) : (
+                              <span className="text-gray-400 text-sm">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {project.payment_status === 'paid' ? (
+                              <Badge className="bg-green-100 text-green-800">
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Paid
+                              </Badge>
+                            ) : project.payment_status === 'partial' ? (
+                              <Badge className="bg-blue-100 text-blue-800">
+                                <Clock className="h-3 w-3 mr-1" />
+                                Partial
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary">
+                                <Clock className="h-3 w-3 mr-1" />
+                                Pending
+                              </Badge>
+                            )}
+                            {(project.client_paid_total ?? 0) > 0 && (
+                              <p className="text-xs text-green-600 mt-1 font-medium">
+                                {formatCurrency(project.client_paid_total!)} received
+                              </p>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {project.speaker_fee > 0 ? (
+                              project.speaker_payment_status === 'paid' ? (
+                                <Badge className="bg-green-100 text-green-800">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Paid
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-orange-100 text-orange-800">
+                                  <AlertCircle className="h-3 w-3 mr-1" />
+                                  Due
+                                </Badge>
+                              )
+                            ) : (
+                              <span className="text-gray-400 text-sm">N/A</span>
+                            )}
+                            {(project.speaker_paid_total ?? 0) > 0 && (
+                              <p className="text-xs text-green-600 mt-1 font-medium">
+                                {formatCurrency(project.speaker_paid_total!)} paid
+                              </p>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditProject(project)}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {sortedProjects.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={11} className="text-center py-8 text-gray-500">
+                            No projects match your filters
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="payments">
+              {(() => {
+                const allPayments = projects.flatMap(project =>
+                  (project.payments || []).map(payment => ({
+                    ...payment,
+                    project_name: project.project_name,
+                    client_name: project.client_name,
+                    company: project.company,
+                    speaker_name: project.speaker_name,
+                    project_id: project.id,
+                  }))
+                ).sort((a, b) => {
+                  const dateA = a.payment_date || a.created_at || ''
+                  const dateB = b.payment_date || b.created_at || ''
+                  return dateB.localeCompare(dateA)
+                })
+
+                const clientPayments = allPayments.filter(p => p.payment_type === 'client')
+                const speakerPayments = allPayments.filter(p => p.payment_type === 'speaker')
+                const totalReceived = clientPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+                const totalPaid = speakerPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+
+                return (
+                  <div className="space-y-6">
+                    {/* Payment Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Card className="border-green-200 bg-green-50/50">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                          <CardTitle className="text-sm font-medium">Total Received</CardTitle>
+                          <Building2 className="h-4 w-4 text-green-600" />
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold text-green-600">{formatCurrency(totalReceived)}</div>
+                          <p className="text-xs text-muted-foreground">{clientPayments.length} client payments</p>
+                        </CardContent>
+                      </Card>
+                      <Card className="border-orange-200 bg-orange-50/50">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                          <CardTitle className="text-sm font-medium">Total Paid Out</CardTitle>
+                          <Mic className="h-4 w-4 text-orange-600" />
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold text-orange-600">{formatCurrency(totalPaid)}</div>
+                          <p className="text-xs text-muted-foreground">{speakerPayments.length} speaker payments</p>
+                        </CardContent>
+                      </Card>
+                      <Card className="border-purple-200 bg-purple-50/50">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                          <CardTitle className="text-sm font-medium">Net Cash Flow</CardTitle>
+                          <TrendingUp className="h-4 w-4 text-purple-600" />
+                        </CardHeader>
+                        <CardContent>
+                          <div className={`text-2xl font-bold ${totalReceived - totalPaid >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
+                            {formatCurrency(totalReceived - totalPaid)}
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {project.speaker_name ? (
-                          <div className="flex items-center gap-2">
-                            <Mic className="h-4 w-4 text-gray-400" />
-                            <span className="font-medium">{project.speaker_name}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-sm">Not assigned</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {project.event_date ? formatDate(project.event_date) : '-'}
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatCurrency(project.budget)}
-                      </TableCell>
-                      <TableCell className="text-right text-orange-600">
-                        {formatCurrency(project.speaker_fee)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {project.travel_buyout > 0 ? formatCurrency(project.travel_buyout) : '-'}
-                      </TableCell>
-                      <TableCell className={`text-right font-semibold ${project.net_commission >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatCurrency(project.net_commission)}
-                      </TableCell>
-                      <TableCell>
-                        {project.invoice_number ? (
-                          <span className="text-sm font-mono text-gray-700">{project.invoice_number}</span>
-                        ) : (
-                          <span className="text-gray-400 text-sm">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {project.payment_status === 'paid' ? (
-                          <Badge className="bg-green-100 text-green-800">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Paid
-                          </Badge>
-                        ) : project.payment_status === 'partial' ? (
-                          <Badge className="bg-blue-100 text-blue-800">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Partial
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Pending
-                          </Badge>
-                        )}
-                        {(project.client_paid_total ?? 0) > 0 && (
-                          <p className="text-xs text-green-600 mt-1 font-medium">
-                            {formatCurrency(project.client_paid_total!)} received
-                          </p>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {project.speaker_fee > 0 ? (
-                          project.speaker_payment_status === 'paid' ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Paid
-                            </Badge>
-                          ) : (
-                            <Badge className="bg-orange-100 text-orange-800">
-                              <AlertCircle className="h-3 w-3 mr-1" />
-                              Due
-                            </Badge>
-                          )
-                        ) : (
-                          <span className="text-gray-400 text-sm">N/A</span>
-                        )}
-                        {(project.speaker_paid_total ?? 0) > 0 && (
-                          <p className="text-xs text-green-600 mt-1 font-medium">
-                            {formatCurrency(project.speaker_paid_total!)} paid
-                          </p>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEditProject(project)}
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {sortedProjects.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={11} className="text-center py-8 text-gray-500">
-                        No projects match your filters
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                          <p className="text-xs text-muted-foreground">{allPayments.length} total transactions</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Client Payments Table */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Building2 className="h-5 w-5" />
+                          Payments Received
+                        </CardTitle>
+                        <CardDescription>{clientPayments.length} client payments recorded</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Date</TableHead>
+                              <TableHead>Project</TableHead>
+                              <TableHead>Client</TableHead>
+                              <TableHead>Notes</TableHead>
+                              <TableHead>Method</TableHead>
+                              <TableHead className="text-right">Amount</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {clientPayments.map((payment) => (
+                              <TableRow key={payment.id}>
+                                <TableCell>{payment.payment_date ? formatDate(payment.payment_date) : <span className="text-gray-400">-</span>}</TableCell>
+                                <TableCell>
+                                  <Link href={`/admin/projects/${payment.project_id}/edit`} className="text-blue-600 hover:underline font-medium">
+                                    {payment.project_name}
+                                  </Link>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="text-sm">
+                                    {payment.client_name}
+                                    {payment.company && <span className="text-gray-500"> - {payment.company}</span>}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-sm text-gray-600">{payment.label || '-'}</TableCell>
+                                <TableCell>
+                                  {payment.payment_method ? (
+                                    <Badge variant="secondary" className="text-xs">{payment.payment_method}</Badge>
+                                  ) : (
+                                    <span className="text-gray-400 text-sm">-</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right font-semibold text-green-600">
+                                  {formatCurrency(Number(payment.amount) || 0)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            {clientPayments.length === 0 && (
+                              <TableRow>
+                                <TableCell colSpan={6} className="text-center py-8 text-gray-500">No client payments recorded yet</TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+
+                    {/* Speaker Payments Table */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Mic className="h-5 w-5" />
+                          Payments Made
+                        </CardTitle>
+                        <CardDescription>{speakerPayments.length} speaker payments recorded</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Date</TableHead>
+                              <TableHead>Project</TableHead>
+                              <TableHead>Speaker</TableHead>
+                              <TableHead>Notes</TableHead>
+                              <TableHead>Method</TableHead>
+                              <TableHead className="text-right">Amount</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {speakerPayments.map((payment) => (
+                              <TableRow key={payment.id}>
+                                <TableCell>{payment.payment_date ? formatDate(payment.payment_date) : <span className="text-gray-400">-</span>}</TableCell>
+                                <TableCell>
+                                  <Link href={`/admin/projects/${payment.project_id}/edit`} className="text-blue-600 hover:underline font-medium">
+                                    {payment.project_name}
+                                  </Link>
+                                </TableCell>
+                                <TableCell>
+                                  {payment.speaker_name ? (
+                                    <div className="flex items-center gap-1">
+                                      <Mic className="h-3 w-3 text-gray-400" />
+                                      <span className="font-medium">{payment.speaker_name}</span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-gray-400 text-sm">-</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-sm text-gray-600">{payment.label || '-'}</TableCell>
+                                <TableCell>
+                                  {payment.payment_method ? (
+                                    <Badge variant="secondary" className="text-xs">{payment.payment_method}</Badge>
+                                  ) : (
+                                    <span className="text-gray-400 text-sm">-</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right font-semibold text-orange-600">
+                                  {formatCurrency(Number(payment.amount) || 0)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            {speakerPayments.length === 0 && (
+                              <TableRow>
+                                <TableCell colSpan={6} className="text-center py-8 text-gray-500">No speaker payments recorded yet</TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )
+              })()}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 
