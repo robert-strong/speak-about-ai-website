@@ -241,19 +241,21 @@ export function createEventFromProject(project: {
   notes?: string
   event_type?: string
 }): CalendarEvent {
-  const eventDate = new Date(project.event_date)
-  const eventEnd = new Date(eventDate.getTime() + 2 * 60 * 60 * 1000) // 2 hours
+  // Parse the date as a local date string (YYYY-MM-DD) to avoid UTC shift
+  const dateStr = project.event_date.split('T')[0] // e.g. "2024-10-21"
+  const startDateTime = `${dateStr}T09:00:00` // 9 AM Pacific
+  const endDateTime = `${dateStr}T11:00:00`   // 11 AM Pacific (2 hours)
 
   return {
     summary: project.project_name,
     description: `Event Type: ${project.event_type || 'N/A'}\nClient: ${project.client_name}\n\n${project.notes || ''}`,
     location: project.event_location,
     start: {
-      dateTime: eventDate.toISOString(),
+      dateTime: startDateTime,
       timeZone: 'America/Los_Angeles',
     },
     end: {
-      dateTime: eventEnd.toISOString(),
+      dateTime: endDateTime,
       timeZone: 'America/Los_Angeles',
     },
     attendees: undefined,
