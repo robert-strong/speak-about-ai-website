@@ -57,40 +57,57 @@ export async function POST(request: NextRequest) {
     `
 
     let created = 0
-    let skipped = 0
+    let updated = 0
     let failed = 0
     const errors: string[] = []
+    let processed = 0
 
     for (const project of projects) {
-      // Skip if already synced
-      if (project.google_calendar_event_id) {
-        skipped++
-        continue
-      }
-
       // Throttle to avoid Google API rate limits
-      if (created > 0) {
+      if (processed > 0) {
         await new Promise(resolve => setTimeout(resolve, 350))
       }
+      processed++
+
+      const alreadySynced = !!project.google_calendar_event_id
 
       let success = false
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
           const calendarEvent = createEventFromProject(project)
           const enrichedEvent = applyConfigDefaults(calendarEvent, calendarConfig)
-          const event = await calendarClient.createEvent(enrichedEvent, targetCalendarId)
 
-          // Save the Google Calendar event ID back to the project
-          if (event.id) {
-            await sql`
-              UPDATE projects SET google_calendar_event_id = ${event.id} WHERE id = ${project.id}
-            `
+          if (alreadySynced) {
+            // Update existing event
+            await calendarClient.updateEvent(
+              project.google_calendar_event_id,
+              enrichedEvent,
+              targetCalendarId
+            )
+            updated++
+          } else {
+            // Create new event
+            const event = await calendarClient.createEvent(enrichedEvent, targetCalendarId)
+            if (event.id) {
+              await sql`
+                UPDATE projects SET google_calendar_event_id = ${event.id} WHERE id = ${project.id}
+              `
+            }
+            created++
           }
 
-          created++
           success = true
           break
         } catch (err: any) {
+          // If update fails because event was deleted on Google's side, create a new one
+          if (alreadySynced && attempt === 0 && (err.code === 404 || err.code === 410)) {
+            // Clear stale ID and retry as a create
+            await sql`UPDATE projects SET google_calendar_event_id = NULL WHERE id = ${project.id}`
+            project.google_calendar_event_id = null
+            await new Promise(resolve => setTimeout(resolve, 500))
+            continue
+          }
+
           // On first attempt failure, wait longer and retry
           if (attempt === 0) {
             await new Promise(resolve => setTimeout(resolve, 2000))
@@ -104,11 +121,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const parts = []
+    if (created > 0) parts.push(`${created} created`)
+    if (updated > 0) parts.push(`${updated} updated`)
+    if (failed > 0) parts.push(`${failed} failed`)
+
     return NextResponse.json({
       success: true,
-      message: `Synced ${created} event${created !== 1 ? 's' : ''} to Google Calendar${skipped > 0 ? `, ${skipped} already synced` : ''}${failed > 0 ? `, ${failed} failed` : ''}`,
+      message: `Google Calendar sync: ${parts.join(', ') || 'no changes'}`,
       created,
-      skipped,
+      updated,
       failed,
       errors: errors.length > 0 ? errors : undefined,
     })
