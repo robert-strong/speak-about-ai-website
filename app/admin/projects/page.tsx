@@ -437,6 +437,7 @@ export default function EnhancedProjectManagementPage() {
   const [selectedInvoiceForEdit, setSelectedInvoiceForEdit] = useState<number | null>(null)
   const [calendarMonth, setCalendarMonth] = useState(new Date())
   const [calendarSelectedProject, setCalendarSelectedProject] = useState<Project | null>(null)
+  const [syncingCalendar, setSyncingCalendar] = useState(false)
   const [addingTaskFor, setAddingTaskFor] = useState<{ projectId: number; stageId: string } | null>(null)
   const [newTaskName, setNewTaskName] = useState("")
   const [editingNotesFor, setEditingNotesFor] = useState<number | null>(null)
@@ -1209,6 +1210,36 @@ export default function EnhancedProjectManagementPage() {
         description: "Failed to create calendar event",
         variant: "destructive"
       })
+    }
+  }
+
+  const handleSyncAllToCalendar = async () => {
+    try {
+      setSyncingCalendar(true)
+      const response = await authPost("/api/calendar/sync-all", {})
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "Calendar Sync Complete",
+          description: data.message,
+        })
+      } else {
+        toast({
+          title: "Sync Failed",
+          description: data.error || "Failed to sync events to Google Calendar",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      console.error("Error syncing to calendar:", error)
+      toast({
+        title: "Error",
+        description: "Failed to sync events to Google Calendar",
+        variant: "destructive"
+      })
+    } finally {
+      setSyncingCalendar(false)
     }
   }
 
@@ -2939,7 +2970,7 @@ export default function EnhancedProjectManagementPage() {
                         View all projects by their event dates
                       </CardDescription>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Button
                         variant="outline"
                         size="sm"
@@ -2968,6 +2999,24 @@ export default function EnhancedProjectManagementPage() {
                         }}
                       >
                         Next →
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleSyncAllToCalendar}
+                        disabled={syncingCalendar}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        {syncingCalendar ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                            Syncing...
+                          </>
+                        ) : (
+                          <>
+                            <Calendar className="h-4 w-4 mr-1.5" />
+                            Sync All to Google Calendar
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>
