@@ -202,6 +202,25 @@ export class GoogleCalendarClient {
   }
 
   /**
+   * Get all events in a date range (for pull sync)
+   */
+  async getEvents(calendarId: string = 'primary', timeMin?: string, timeMax?: string) {
+    const calendar = google.calendar({ version: 'v3', auth: this.oauth2Client })
+
+    const params: any = {
+      calendarId,
+      singleEvents: true,
+      orderBy: 'startTime',
+      maxResults: 2500,
+    }
+    if (timeMin) params.timeMin = timeMin
+    if (timeMax) params.timeMax = timeMax
+
+    const response = await calendar.events.list(params)
+    return response.data.items || []
+  }
+
+  /**
    * Get event by ID
    */
   async getEvent(eventId: string, calendarId: string = 'primary') {

@@ -439,6 +439,7 @@ export default function EnhancedProjectManagementPage() {
   const [calendarSelectedProject, setCalendarSelectedProject] = useState<Project | null>(null)
   const [syncingCalendar, setSyncingCalendar] = useState(false)
   const [removingSyncedEvents, setRemovingSyncedEvents] = useState(false)
+  const [pullingFromGoogle, setPullingFromGoogle] = useState(false)
   const [addingTaskFor, setAddingTaskFor] = useState<{ projectId: number; stageId: string } | null>(null)
   const [newTaskName, setNewTaskName] = useState("")
   const [editingNotesFor, setEditingNotesFor] = useState<number | null>(null)
@@ -1279,6 +1280,41 @@ export default function EnhancedProjectManagementPage() {
       })
     } finally {
       setRemovingSyncedEvents(false)
+    }
+  }
+
+  const handlePullFromGoogle = async () => {
+    try {
+      setPullingFromGoogle(true)
+      const response = await authPost("/api/calendar/pull", {})
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: data.failed > 0 ? "Pull Partial" : "Pull Complete",
+          description: data.message,
+          variant: data.failed > 0 ? "destructive" : "default",
+        })
+        // Refresh projects list to show new pulled events
+        if (data.created > 0 || data.updated > 0) {
+          loadData(false)
+        }
+      } else {
+        toast({
+          title: "Pull Failed",
+          description: data.error || "Failed to pull from Google Calendar",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      console.error("Error pulling from Google Calendar:", error)
+      toast({
+        title: "Error",
+        description: "Failed to pull from Google Calendar",
+        variant: "destructive"
+      })
+    } finally {
+      setPullingFromGoogle(false)
     }
   }
 
@@ -3073,6 +3109,25 @@ export default function EnhancedProjectManagementPage() {
                           <>
                             <Trash2 className="h-4 w-4 mr-1.5" />
                             Remove Synced Events
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handlePullFromGoogle}
+                        disabled={syncingCalendar || removingSyncedEvents || pullingFromGoogle}
+                        className="text-green-600 border-green-200 hover:bg-green-50"
+                      >
+                        {pullingFromGoogle ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                            Pulling...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="h-4 w-4 mr-1.5" />
+                            Pull from Google Calendar
                           </>
                         )}
                       </Button>
