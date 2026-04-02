@@ -241,8 +241,11 @@ export function createEventFromProject(project: {
   notes?: string
   event_type?: string
 }): CalendarEvent {
-  // Parse the date as a local date string (YYYY-MM-DD) to avoid UTC shift
-  const dateStr = project.event_date.split('T')[0] // e.g. "2024-10-21"
+  // Convert to string if Date object, then extract YYYY-MM-DD to avoid UTC shift
+  const rawDate = project.event_date instanceof Date
+    ? project.event_date.toISOString()
+    : String(project.event_date)
+  const dateStr = rawDate.split('T')[0] // e.g. "2024-10-21"
   const startDateTime = `${dateStr}T09:00:00` // 9 AM Pacific
   const endDateTime = `${dateStr}T11:00:00`   // 11 AM Pacific (2 hours)
 
