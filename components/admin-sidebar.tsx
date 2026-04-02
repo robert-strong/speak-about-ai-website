@@ -47,7 +47,8 @@ import {
   Landmark,
   UserCog,
   MailIcon,
-  KeyRound
+  KeyRound,
+  CalendarClock
 } from "lucide-react"
 
 interface AdminSidebarProps {
@@ -419,6 +420,15 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           description: "Email Configuration",
           color: "text-violet-600",
           bgColor: "bg-violet-50",
+          permissionKey: "settings"
+        },
+        {
+          title: "Google Calendar",
+          href: "/admin/settings/google-calendar",
+          icon: CalendarClock,
+          description: "Calendar Sync",
+          color: "text-green-600",
+          bgColor: "bg-green-50",
           permissionKey: "settings"
         },
         {
