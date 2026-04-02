@@ -397,7 +397,6 @@ export default function GoogleCalendarSettingsPage() {
                 <li>Go to <strong>Project Management</strong> and open any project</li>
                 <li>Click the <strong>&quot;Push to Google Calendar&quot;</strong> button on a project with an event date</li>
                 <li>The event will be created on your selected Google Calendar with project details, location, and attendees</li>
-                <li>Email invitations are automatically sent to the client and admin</li>
                 {config.auto_sync && (
                   <li>With auto-sync enabled, new projects with event dates will automatically create calendar events</li>
                 )}

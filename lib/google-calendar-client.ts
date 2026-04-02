@@ -156,7 +156,7 @@ export class GoogleCalendarClient {
     const response = await calendar.events.insert({
       calendarId,
       requestBody: eventWithAdmin,
-      sendUpdates: 'all', // Send email invitations to all attendees
+      sendUpdates: 'none',
       conferenceDataVersion: event.conferenceData ? 1 : 0, // Required for Google Meet
     })
 
@@ -197,7 +197,7 @@ export class GoogleCalendarClient {
       calendarId,
       eventId,
       requestBody: eventUpdate,
-      sendUpdates: 'all',
+      sendUpdates: 'none',
     })
 
     return response.data
@@ -212,7 +212,7 @@ export class GoogleCalendarClient {
     await calendar.events.delete({
       calendarId,
       eventId,
-      sendUpdates: 'all', // Notify attendees
+      sendUpdates: 'none',
     })
   }
 
