@@ -42,19 +42,36 @@ export async function POST(request: NextRequest) {
 
     const targetCalendarId = calendarConfig?.calendar_id || 'primary'
 
-    // Ensure the tracking column exists
-    await sql`
-      ALTER TABLE projects ADD COLUMN IF NOT EXISTS google_calendar_event_id VARCHAR(500)
-    `
+    // Ensure tracking columns exist
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS google_calendar_event_id VARCHAR(500)`
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS google_calendar_synced_at TIMESTAMP WITH TIME ZONE`
 
-    // Get all projects with event dates
+    // Get only projects that need syncing:
+    // 1. New: has event_date but no google_calendar_event_id
+    // 2. Changed: updated_at is newer than google_calendar_synced_at
     const projects = await sql`
       SELECT id, project_name, event_date, event_location, client_name,
-             client_email, notes, event_type, google_calendar_event_id
+             client_email, notes, event_type, google_calendar_event_id,
+             updated_at, google_calendar_synced_at
       FROM projects
       WHERE event_date IS NOT NULL
+        AND (
+          google_calendar_event_id IS NULL
+          OR google_calendar_synced_at IS NULL
+          OR updated_at > google_calendar_synced_at
+        )
       ORDER BY event_date ASC
     `
+
+    // Also count how many are already up to date
+    const upToDateResult = await sql`
+      SELECT COUNT(*) as count FROM projects
+      WHERE event_date IS NOT NULL
+        AND google_calendar_event_id IS NOT NULL
+        AND google_calendar_synced_at IS NOT NULL
+        AND updated_at <= google_calendar_synced_at
+    `
+    const skipped = parseInt(upToDateResult[0]?.count || '0')
 
     let created = 0
     let updated = 0
@@ -71,7 +88,6 @@ export async function POST(request: NextRequest) {
 
       const alreadySynced = !!project.google_calendar_event_id
 
-      let success = false
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
           const calendarEvent = createEventFromProject(project)
@@ -84,31 +100,34 @@ export async function POST(request: NextRequest) {
               enrichedEvent,
               targetCalendarId
             )
+            await sql`
+              UPDATE projects SET google_calendar_synced_at = NOW() WHERE id = ${project.id}
+            `
             updated++
           } else {
             // Create new event
             const event = await calendarClient.createEvent(enrichedEvent, targetCalendarId)
             if (event.id) {
               await sql`
-                UPDATE projects SET google_calendar_event_id = ${event.id} WHERE id = ${project.id}
+                UPDATE projects
+                SET google_calendar_event_id = ${event.id},
+                    google_calendar_synced_at = NOW()
+                WHERE id = ${project.id}
               `
             }
             created++
           }
 
-          success = true
           break
         } catch (err: any) {
           // If update fails because event was deleted on Google's side, create a new one
           if (alreadySynced && attempt === 0 && (err.code === 404 || err.code === 410)) {
-            // Clear stale ID and retry as a create
             await sql`UPDATE projects SET google_calendar_event_id = NULL WHERE id = ${project.id}`
             project.google_calendar_event_id = null
             await new Promise(resolve => setTimeout(resolve, 500))
             continue
           }
 
-          // On first attempt failure, wait longer and retry
           if (attempt === 0) {
             await new Promise(resolve => setTimeout(resolve, 2000))
           } else {
@@ -124,13 +143,15 @@ export async function POST(request: NextRequest) {
     const parts = []
     if (created > 0) parts.push(`${created} created`)
     if (updated > 0) parts.push(`${updated} updated`)
+    if (skipped > 0) parts.push(`${skipped} unchanged`)
     if (failed > 0) parts.push(`${failed} failed`)
 
     return NextResponse.json({
       success: true,
-      message: `Google Calendar sync: ${parts.join(', ') || 'no changes'}`,
+      message: `Google Calendar sync: ${parts.join(', ') || 'everything up to date'}`,
       created,
       updated,
+      skipped,
       failed,
       errors: errors.length > 0 ? errors : undefined,
     })
@@ -196,9 +217,9 @@ export async function DELETE(request: NextRequest) {
         }
       }
 
-      // Clear the event ID from our database regardless
+      // Clear the event ID and sync timestamp from our database regardless
       await sql`
-        UPDATE projects SET google_calendar_event_id = NULL WHERE id = ${project.id}
+        UPDATE projects SET google_calendar_event_id = NULL, google_calendar_synced_at = NULL WHERE id = ${project.id}
       `
     }
 
