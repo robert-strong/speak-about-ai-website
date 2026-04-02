@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     const projects = await sql`
       SELECT id, project_name, event_date, event_location, client_name,
              client_email, notes, event_type, google_calendar_event_id,
-             updated_at, google_calendar_synced_at
+             updated_at, google_calendar_synced_at, project_details
       FROM projects
       WHERE event_date IS NOT NULL
         AND (

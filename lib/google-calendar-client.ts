@@ -240,6 +240,7 @@ export function createEventFromProject(project: {
   client_email?: string
   notes?: string
   event_type?: string
+  project_details?: any
 }): CalendarEvent {
   // Convert to string if Date object, then extract YYYY-MM-DD to avoid UTC shift
   const rawDate = project.event_date instanceof Date
@@ -249,9 +250,12 @@ export function createEventFromProject(project: {
   const startDateTime = `${dateStr}T09:00:00` // 9 AM Pacific
   const endDateTime = `${dateStr}T11:00:00`   // 11 AM Pacific (2 hours)
 
+  // Build rich description from project details
+  const description = buildEventDescription(project)
+
   return {
     summary: project.project_name,
-    description: `Event Type: ${project.event_type || 'N/A'}\nClient: ${project.client_name}\n\n${project.notes || ''}`,
+    description,
     location: project.event_location,
     start: {
       dateTime: startDateTime,
@@ -270,4 +274,99 @@ export function createEventFromProject(project: {
       ],
     },
   }
+}
+
+/**
+ * Build a rich event description from project data and project_details JSONB
+ */
+function buildEventDescription(project: {
+  project_name: string
+  client_name: string
+  event_type?: string
+  notes?: string
+  project_details?: any
+}): string {
+  const details = project.project_details || {}
+  const sections: string[] = []
+
+  // -- EVENT DETAILS --
+  const eventLines: string[] = []
+  eventLines.push(`Client: ${project.client_name}`)
+  if (project.event_type) eventLines.push(`Event Type: ${project.event_type}`)
+
+  const ed = details.event_details
+  if (ed) {
+    if (ed.event_title) eventLines.push(`Event Title: ${ed.event_title}`)
+    if (ed.event_theme) eventLines.push(`Theme: ${ed.event_theme}`)
+    if (ed.event_purpose) eventLines.push(`Purpose: ${ed.event_purpose}`)
+    if (ed.organization_description) eventLines.push(`Organization: ${ed.organization_description}`)
+    if (ed.key_message_goals) eventLines.push(`Key Message Goals: ${ed.key_message_goals}`)
+    if (ed.speaker_selection_reason) eventLines.push(`Why This Speaker: ${ed.speaker_selection_reason}`)
+  }
+
+  const overview = details.overview
+  if (overview) {
+    if (overview.speaker_name) eventLines.push(`Speaker: ${overview.speaker_name}${overview.speaker_title ? ` (${overview.speaker_title})` : ''}`)
+    if (overview.event_name) eventLines.push(`Event Name: ${overview.event_name}`)
+    if (overview.event_website) eventLines.push(`Website: ${overview.event_website}`)
+  }
+
+  if (eventLines.length > 0) {
+    sections.push(`── EVENT DETAILS ──\n${eventLines.join('\n')}`)
+  }
+
+  // -- SPEAKER PROGRAM --
+  const prog = details.program_details
+  if (prog) {
+    const progLines: string[] = []
+    if (prog.requested_speaker_name) progLines.push(`Speaker: ${prog.requested_speaker_name}`)
+    if (prog.program_topic) progLines.push(`Topic: ${prog.program_topic}`)
+    if (prog.program_type) {
+      const typeLabel = prog.program_type === 'other' ? (prog.program_type_other || 'Other') : prog.program_type.replace(/_/g, ' ')
+      progLines.push(`Format: ${typeLabel}`)
+    }
+    if (prog.audience_size) progLines.push(`Audience Size: ${prog.audience_size}`)
+    if (prog.audience_demographics) progLines.push(`Audience: ${prog.audience_demographics}`)
+    if (prog.speaker_attire) progLines.push(`Attire: ${prog.speaker_attire.replace(/_/g, ' ')}`)
+
+    if (progLines.length > 0) {
+      sections.push(`── SPEAKER PROGRAM ──\n${progLines.join('\n')}`)
+    }
+  }
+
+  // -- SCHEDULE --
+  const sched = details.event_schedule
+  if (sched) {
+    const schedLines: string[] = []
+    if (sched.event_start_time) schedLines.push(`Event Start: ${sched.event_start_time}`)
+    if (sched.event_end_time) schedLines.push(`Event End: ${sched.event_end_time}`)
+    if (sched.speaker_arrival_time) schedLines.push(`Speaker Arrival: ${sched.speaker_arrival_time}`)
+    if (sched.program_start_time) schedLines.push(`Program Start: ${sched.program_start_time}`)
+    if (sched.program_length_minutes) schedLines.push(`Program Length: ${sched.program_length_minutes} min`)
+    if (sched.qa_length_minutes) schedLines.push(`Q&A: ${sched.qa_length_minutes} min`)
+    if (sched.speaker_departure_time) schedLines.push(`Speaker Departure: ${sched.speaker_departure_time}`)
+    if (sched.detailed_timeline) schedLines.push(`\nTimeline:\n${sched.detailed_timeline}`)
+    if (sched.timezone) schedLines.push(`Timezone: ${sched.timezone}`)
+
+    if (schedLines.length > 0) {
+      sections.push(`── SCHEDULE ──\n${schedLines.join('\n')}`)
+    }
+  }
+
+  // -- ITINERARY (day-of schedule items) --
+  const itin = details.itinerary
+  if (itin?.schedule && itin.schedule.length > 0) {
+    const itinLines = itin.schedule.map((item: any) => {
+      const time = [item.start_time, item.end_time].filter(Boolean).join(' - ')
+      return `${time ? time + ': ' : ''}${item.activity || ''}${item.location ? ` (${item.location})` : ''}${item.notes ? ` — ${item.notes}` : ''}`
+    })
+    sections.push(`── DAY-OF ITINERARY ──\n${itinLines.join('\n')}`)
+  }
+
+  // -- NOTES --
+  if (project.notes) {
+    sections.push(`── NOTES ──\n${project.notes}`)
+  }
+
+  return sections.join('\n\n')
 }
