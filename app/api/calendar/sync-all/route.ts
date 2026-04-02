@@ -68,22 +68,37 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      try {
-        const calendarEvent = createEventFromProject(project)
-        const enrichedEvent = applyConfigDefaults(calendarEvent, calendarConfig)
-        const event = await calendarClient.createEvent(enrichedEvent, targetCalendarId)
+      // Throttle to avoid Google API rate limits
+      if (created > 0) {
+        await new Promise(resolve => setTimeout(resolve, 350))
+      }
 
-        // Save the Google Calendar event ID back to the project
-        if (event.id) {
-          await sql`
-            UPDATE projects SET google_calendar_event_id = ${event.id} WHERE id = ${project.id}
-          `
+      let success = false
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const calendarEvent = createEventFromProject(project)
+          const enrichedEvent = applyConfigDefaults(calendarEvent, calendarConfig)
+          const event = await calendarClient.createEvent(enrichedEvent, targetCalendarId)
+
+          // Save the Google Calendar event ID back to the project
+          if (event.id) {
+            await sql`
+              UPDATE projects SET google_calendar_event_id = ${event.id} WHERE id = ${project.id}
+            `
+          }
+
+          created++
+          success = true
+          break
+        } catch (err: any) {
+          // On first attempt failure, wait longer and retry
+          if (attempt === 0) {
+            await new Promise(resolve => setTimeout(resolve, 2000))
+          } else {
+            failed++
+            errors.push(`${project.project_name}: ${err.message || 'Unknown error'}`)
+          }
         }
-
-        created++
-      } catch (err: any) {
-        failed++
-        errors.push(`${project.project_name}: ${err.message || 'Unknown error'}`)
       }
     }
 

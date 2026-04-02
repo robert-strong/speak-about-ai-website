@@ -1225,6 +1225,9 @@ export default function EnhancedProjectManagementPage() {
           title: "Calendar Sync Complete",
           description: data.message,
         })
+        if (data.errors?.length) {
+          console.warn("Sync errors:", data.errors)
+        }
       } else {
         toast({
           title: "Sync Failed",
