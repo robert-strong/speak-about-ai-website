@@ -104,6 +104,81 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// DELETE - Remove all synced events from Google Calendar
+export async function DELETE(request: NextRequest) {
+  try {
+    const authError = requireAdminAuth(request)
+    if (authError) return authError
+
+    const calendarClient = createGoogleCalendarClient()
+
+    let calendarConfig: any = null
+    try {
+      const configResult = await sql`SELECT * FROM google_calendar_config LIMIT 1`
+      calendarConfig = configResult[0] || null
+    } catch {}
+
+    const email = calendarConfig?.user_email || process.env.ADMIN_EMAIL || 'noah@speakabout.ai'
+    const tokens = await calendarClient.loadTokens(email)
+
+    if (!tokens) {
+      return NextResponse.json(
+        { error: 'Not authenticated with Google Calendar.' },
+        { status: 401 }
+      )
+    }
+
+    await calendarClient.setCredentials(tokens.access_token, tokens.refresh_token)
+
+    const targetCalendarId = calendarConfig?.calendar_id || 'primary'
+
+    // Get all projects that have been synced
+    const projects = await sql`
+      SELECT id, project_name, google_calendar_event_id
+      FROM projects
+      WHERE google_calendar_event_id IS NOT NULL
+    `
+
+    let deleted = 0
+    let failed = 0
+    const errors: string[] = []
+
+    for (const project of projects) {
+      try {
+        await calendarClient.deleteEvent(project.google_calendar_event_id, targetCalendarId)
+        deleted++
+      } catch (err: any) {
+        // If event already deleted on Google's side, still clear our reference
+        if (err.code === 410 || err.code === 404) {
+          deleted++
+        } else {
+          failed++
+          errors.push(`${project.project_name}: ${err.message || 'Unknown error'}`)
+        }
+      }
+
+      // Clear the event ID from our database regardless
+      await sql`
+        UPDATE projects SET google_calendar_event_id = NULL WHERE id = ${project.id}
+      `
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Removed ${deleted} event${deleted !== 1 ? 's' : ''} from Google Calendar${failed > 0 ? `, ${failed} failed` : ''}`,
+      deleted,
+      failed,
+      errors: errors.length > 0 ? errors : undefined,
+    })
+  } catch (error) {
+    console.error('Error removing synced events:', error)
+    return NextResponse.json(
+      { error: 'Failed to remove events', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
 function applyConfigDefaults(event: CalendarEvent, config: any): CalendarEvent {
   if (!config) return event
 

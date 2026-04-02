@@ -438,6 +438,7 @@ export default function EnhancedProjectManagementPage() {
   const [calendarMonth, setCalendarMonth] = useState(new Date())
   const [calendarSelectedProject, setCalendarSelectedProject] = useState<Project | null>(null)
   const [syncingCalendar, setSyncingCalendar] = useState(false)
+  const [removingSyncedEvents, setRemovingSyncedEvents] = useState(false)
   const [addingTaskFor, setAddingTaskFor] = useState<{ projectId: number; stageId: string } | null>(null)
   const [newTaskName, setNewTaskName] = useState("")
   const [editingNotesFor, setEditingNotesFor] = useState<number | null>(null)
@@ -1240,6 +1241,38 @@ export default function EnhancedProjectManagementPage() {
       })
     } finally {
       setSyncingCalendar(false)
+    }
+  }
+
+  const handleRemoveSyncedEvents = async () => {
+    if (!confirm("Remove all previously synced events from Google Calendar? This cannot be undone.")) return
+
+    try {
+      setRemovingSyncedEvents(true)
+      const response = await authDelete("/api/calendar/sync-all")
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "Events Removed",
+          description: data.message,
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Failed to remove synced events",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      console.error("Error removing synced events:", error)
+      toast({
+        title: "Error",
+        description: "Failed to remove synced events",
+        variant: "destructive"
+      })
+    } finally {
+      setRemovingSyncedEvents(false)
     }
   }
 
@@ -3003,7 +3036,7 @@ export default function EnhancedProjectManagementPage() {
                       <Button
                         size="sm"
                         onClick={handleSyncAllToCalendar}
-                        disabled={syncingCalendar}
+                        disabled={syncingCalendar || removingSyncedEvents}
                         className="bg-blue-600 hover:bg-blue-700 text-white"
                       >
                         {syncingCalendar ? (
@@ -3015,6 +3048,25 @@ export default function EnhancedProjectManagementPage() {
                           <>
                             <Calendar className="h-4 w-4 mr-1.5" />
                             Sync All to Google Calendar
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleRemoveSyncedEvents}
+                        disabled={syncingCalendar || removingSyncedEvents}
+                        className="text-red-600 border-red-200 hover:bg-red-50"
+                      >
+                        {removingSyncedEvents ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                            Removing...
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="h-4 w-4 mr-1.5" />
+                            Remove Synced Events
                           </>
                         )}
                       </Button>
