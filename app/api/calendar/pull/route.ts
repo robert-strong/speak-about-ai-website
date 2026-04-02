@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
           await sql`
             INSERT INTO projects (
               project_name, client_name, client_email, project_type,
-              event_date, event_location, event_type, status, priority,
+              start_date, event_date, event_location, event_type, status, priority,
               budget, notes, google_calendar_event_id, sync_source,
               google_calendar_event_updated, created_at, updated_at
             ) VALUES (
@@ -124,6 +124,7 @@ export async function POST(request: NextRequest) {
               '(Google Calendar)',
               '',
               'external',
+              ${eventDate},
               ${eventDate},
               ${location},
               'external',
