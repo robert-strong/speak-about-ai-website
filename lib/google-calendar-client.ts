@@ -135,27 +135,12 @@ export class GoogleCalendarClient {
   async createEvent(event: CalendarEvent, calendarId: string = 'primary') {
     const calendar = google.calendar({ version: 'v3', auth: this.oauth2Client })
 
-    // Always add human@speakabout.ai to attendees
-    const attendees = event.attendees || []
-    const adminEmail = 'human@speakabout.ai'
-
-    // Check if admin email is already in the list
-    const hasAdmin = attendees.some(a => a.email === adminEmail)
-    if (!hasAdmin) {
-      attendees.push({
-        email: adminEmail,
-        displayName: 'Speak About AI Admin'
-      })
-    }
-
-    const eventWithAdmin = {
-      ...event,
-      attendees
-    }
+    // Strip attendees — no guests added to calendar events
+    const { attendees, ...eventWithoutAttendees } = event
 
     const response = await calendar.events.insert({
       calendarId,
-      requestBody: eventWithAdmin,
+      requestBody: eventWithoutAttendees,
       sendUpdates: 'none',
       conferenceDataVersion: event.conferenceData ? 1 : 0, // Required for Google Meet
     })
@@ -173,30 +158,13 @@ export class GoogleCalendarClient {
   ) {
     const calendar = google.calendar({ version: 'v3', auth: this.oauth2Client })
 
-    // If attendees are being updated, ensure admin is included
-    let eventUpdate = event
-    if (event.attendees) {
-      const attendees = event.attendees
-      const adminEmail = 'human@speakabout.ai'
-      const hasAdmin = attendees.some(a => a.email === adminEmail)
-
-      if (!hasAdmin) {
-        attendees.push({
-          email: adminEmail,
-          displayName: 'Speak About AI Admin'
-        })
-      }
-
-      eventUpdate = {
-        ...event,
-        attendees
-      }
-    }
+    // Strip attendees — no guests added to calendar events
+    const { attendees, ...eventWithoutAttendees } = event
 
     const response = await calendar.events.patch({
       calendarId,
       eventId,
-      requestBody: eventUpdate,
+      requestBody: eventWithoutAttendees,
       sendUpdates: 'none',
     })
 
@@ -288,14 +256,7 @@ export function createEventFromProject(project: {
       dateTime: eventEnd.toISOString(),
       timeZone: 'America/Los_Angeles',
     },
-    attendees: project.client_email
-      ? [
-          {
-            email: project.client_email,
-            displayName: project.client_name,
-          },
-        ]
-      : undefined,
+    attendees: undefined,
     reminders: {
       useDefault: false,
       overrides: [
