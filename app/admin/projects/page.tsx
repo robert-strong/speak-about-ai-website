@@ -1222,8 +1222,11 @@ export default function EnhancedProjectManagementPage() {
 
       if (response.ok) {
         toast({
-          title: "Calendar Sync Complete",
-          description: data.message,
+          title: data.failed > 0 ? "Calendar Sync Partial" : "Calendar Sync Complete",
+          description: data.errors?.length
+            ? `${data.message}\n\nFirst error: ${data.errors[0]}`
+            : data.message,
+          variant: data.failed > 0 ? "destructive" : "default",
         })
         if (data.errors?.length) {
           console.warn("Sync errors:", data.errors)

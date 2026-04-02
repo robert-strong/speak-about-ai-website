@@ -96,7 +96,9 @@ export async function POST(request: NextRequest) {
             await new Promise(resolve => setTimeout(resolve, 2000))
           } else {
             failed++
-            errors.push(`${project.project_name}: ${err.message || 'Unknown error'}`)
+            const errMsg = err?.response?.data?.error?.message || err?.errors?.[0]?.message || err?.message || JSON.stringify(err)
+            console.error(`Calendar sync failed for "${project.project_name}":`, errMsg)
+            errors.push(`${project.project_name}: ${errMsg}`)
           }
         }
       }
