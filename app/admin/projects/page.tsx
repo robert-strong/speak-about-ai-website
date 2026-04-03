@@ -189,6 +189,7 @@ interface Project {
       lessons_documented?: boolean
     }
   }
+  project_details?: any
 }
 
 interface Invoice {
@@ -4004,6 +4005,52 @@ export default function EnhancedProjectManagementPage() {
                     <span className="text-gray-500">Type:</span>
                     <span className="ml-2 font-medium capitalize">{calendarSelectedProject.event_type}</span>
                   </div>
+                  {(() => {
+                    const pd = calendarSelectedProject.project_details
+                    const eventTime = pd?.overview?.event_time
+                    const startTime = pd?.event_schedule?.event_start_time
+                    const endTime = pd?.event_schedule?.event_end_time
+                    const progStart = pd?.event_schedule?.program_start_time
+                    const progLength = pd?.event_schedule?.program_length_minutes
+                    const speakerArrival = pd?.event_schedule?.speaker_arrival_time
+                    const speakerDeparture = pd?.event_schedule?.speaker_departure_time
+
+                    const hasTime = eventTime || startTime || endTime || progStart
+                    if (!hasTime) return null
+
+                    return (
+                      <>
+                        {(startTime || eventTime) && (
+                          <div className="col-span-2">
+                            <span className="text-gray-500">Time:</span>
+                            <span className="ml-2 font-medium">
+                              {startTime && endTime ? `${startTime} – ${endTime}` : startTime || eventTime}
+                            </span>
+                          </div>
+                        )}
+                        {progStart && (
+                          <div>
+                            <span className="text-gray-500">Program:</span>
+                            <span className="ml-2 font-medium">
+                              {progStart}{progLength ? ` (${progLength} min)` : ''}
+                            </span>
+                          </div>
+                        )}
+                        {speakerArrival && (
+                          <div>
+                            <span className="text-gray-500">Speaker Arrival:</span>
+                            <span className="ml-2 font-medium">{speakerArrival}</span>
+                          </div>
+                        )}
+                        {speakerDeparture && (
+                          <div>
+                            <span className="text-gray-500">Speaker Departure:</span>
+                            <span className="ml-2 font-medium">{speakerDeparture}</span>
+                          </div>
+                        )}
+                      </>
+                    )
+                  })()}
                   <div className="col-span-2">
                     <span className="text-gray-500">Location:</span>
                     <span className="ml-2 font-medium">{calendarSelectedProject.event_location || 'TBD'}</span>
