@@ -375,14 +375,20 @@ export function EmailActivity({ leadId, dealId, projectId, compact = false }: Em
                       </p>
                     )}
 
-                    {isExpanded && (
-                      <div
-                        className="text-sm text-gray-700 mb-2 max-h-96 overflow-y-auto bg-white p-3 rounded border [&_blockquote]:border-l-2 [&_blockquote]:border-gray-300 [&_blockquote]:pl-3 [&_blockquote]:ml-2 [&_blockquote]:text-gray-600 [&_a]:text-blue-600 [&_a]:underline [&_img]:max-w-full [&_table]:border-collapse"
-                        dangerouslySetInnerHTML={{
-                          __html: thread.body_full || thread.body_snippet
-                        }}
-                      />
-                    )}
+                    {isExpanded && (() => {
+                      const content = thread.body_full || thread.body_snippet
+                      const isHtml = /<\s*(div|p|br|table|html|body|span|a|img|ul|ol|li|h[1-6]|blockquote)\b/i.test(content)
+                      return isHtml ? (
+                        <div
+                          className="text-sm text-gray-700 mb-2 max-h-96 overflow-y-auto bg-white p-3 rounded border [&_blockquote]:border-l-2 [&_blockquote]:border-gray-300 [&_blockquote]:pl-3 [&_blockquote]:ml-2 [&_blockquote]:text-gray-600 [&_a]:text-blue-600 [&_a]:underline [&_img]:max-w-full [&_table]:border-collapse"
+                          dangerouslySetInnerHTML={{ __html: content }}
+                        />
+                      ) : (
+                        <div className="text-sm text-gray-700 mb-2 whitespace-pre-wrap max-h-96 overflow-y-auto bg-white p-3 rounded border">
+                          {decodeHtmlEntities(content)}
+                        </div>
+                      )
+                    })()}
 
                     <Button
                       variant="ghost"
