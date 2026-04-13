@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { neon } from "@neondatabase/serverless"
-import { requireAdminAuth } from "@/lib/auth-middleware"
+import { requireAdminAuth, getDemoFlag } from "@/lib/auth-middleware"
 
 const sql = neon(process.env.DATABASE_URL!)
 
@@ -9,14 +9,16 @@ export async function GET(request: NextRequest) {
     // Require admin authentication
     const authError = requireAdminAuth(request)
     if (authError) return authError
+    const isDemo = getDemoFlag(request)
 
     const invoices = await sql`
-      SELECT 
+      SELECT
         i.*,
         p.project_name as project_title,
         p.client_name
       FROM invoices i
       LEFT JOIN projects p ON i.project_id = p.id
+      WHERE COALESCE(i.is_demo, false) = ${isDemo}
       ORDER BY i.created_at DESC
     `
 
@@ -38,6 +40,7 @@ export async function POST(request: NextRequest) {
     // Require admin authentication
     const authError = requireAdminAuth(request)
     if (authError) return authError
+    const isDemo = getDemoFlag(request)
 
     const body = await request.json()
 
@@ -111,7 +114,8 @@ export async function POST(request: NextRequest) {
         issue_date,
         due_date,
         description,
-        notes
+        notes,
+        is_demo
       ) VALUES (
         ${projectId},
         ${contractId},
@@ -126,7 +130,8 @@ export async function POST(request: NextRequest) {
         ${new Date().toISOString().split('T')[0]},
         ${body.due_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]},
         ${description || ''},
-        ${body.notes || ''}
+        ${body.notes || ''},
+        ${isDemo}
       )
       RETURNING *
     `

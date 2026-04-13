@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       const sql = neon(process.env.DATABASE_URL!)
       const members = await sql`
         SELECT tm.id, tm.name, tm.email, tm.password_hash, tm.status,
-               tm.must_change_password, tm.role_id,
+               tm.must_change_password, tm.role_id, tm.is_demo,
                r.name as role_name, r.permissions as role_permissions
         FROM team_members tm
         LEFT JOIN roles r ON tm.role_id = r.id
@@ -90,6 +90,7 @@ export async function POST(request: NextRequest) {
             user_id: member.id,
             permissions,
             must_change_password: member.must_change_password,
+            is_demo: member.is_demo || false,
           })
         }
 
@@ -111,6 +112,7 @@ export async function POST(request: NextRequest) {
             user_id: member.id,
             permissions,
             must_change_password: member.must_change_password,
+            is_demo: member.is_demo || false,
           })
         }
 
@@ -175,12 +177,14 @@ function buildLoginResponse(user: {
   user_id: number | null
   permissions: Record<string, boolean>
   must_change_password?: boolean
+  is_demo?: boolean
 }) {
   let sessionToken: string
   try {
     sessionToken = createToken({
       email: user.email,
-      role: "admin"
+      role: "admin",
+      is_demo: user.is_demo || false,
     }, 24)
   } catch (tokenError) {
     console.error("JWT token creation failed:", tokenError)
@@ -200,6 +204,7 @@ function buildLoginResponse(user: {
       user_id: user.user_id,
       permissions: user.permissions,
       must_change_password: user.must_change_password || false,
+      is_demo: user.is_demo || false,
     },
     sessionToken
   })

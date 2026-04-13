@@ -168,11 +168,12 @@ export interface Project {
   completed_at?: string
 }
 
-export async function getAllProjects(): Promise<Project[]> {
+export async function getAllProjects(isDemo: boolean = false): Promise<Project[]> {
   try {
     const sql = getSQL()
     const projects = await sql`
       SELECT * FROM projects
+      WHERE COALESCE(is_demo, false) = ${isDemo}
       ORDER BY created_at DESC
     `
     return projects as Project[]
@@ -209,7 +210,7 @@ export async function getProjectById(id: number): Promise<Project | null> {
   }
 }
 
-export async function createProject(projectData: Omit<Project, "id" | "created_at" | "updated_at">): Promise<Project | null> {
+export async function createProject(projectData: Omit<Project, "id" | "created_at" | "updated_at">, isDemo: boolean = false): Promise<Project | null> {
   try {
     const sql = getSQL()
 
@@ -298,7 +299,8 @@ export async function createProject(projectData: Omit<Project, "id" | "created_a
         billing_contact_phone,
         requested_speaker_name,
         deal_id,
-        stage_completion
+        stage_completion,
+        is_demo
       ) VALUES (
         ${finalProjectData.project_name},
         ${finalProjectData.client_name},
@@ -328,7 +330,8 @@ export async function createProject(projectData: Omit<Project, "id" | "created_a
         ${finalProjectData.billing_contact_phone || finalProjectData.client_phone || null},
         ${finalProjectData.requested_speaker_name || null},
         ${finalProjectData.deal_id || null},
-        ${JSON.stringify(initialStageCompletion)}
+        ${JSON.stringify(initialStageCompletion)},
+        ${isDemo}
       )
       RETURNING *
     `
@@ -543,12 +546,12 @@ export async function updateProject(id: number, projectData: Partial<Project>): 
 }
 
 
-export async function getProjectsByStatus(status: string): Promise<Project[]> {
+export async function getProjectsByStatus(status: string, isDemo: boolean = false): Promise<Project[]> {
   try {
     const sql = getSQL()
     const projects = await sql`
       SELECT * FROM projects
-      WHERE status = ${status}
+      WHERE status = ${status} AND COALESCE(is_demo, false) = ${isDemo}
       ORDER BY created_at DESC
     `
     return projects as Project[]
@@ -557,16 +560,17 @@ export async function getProjectsByStatus(status: string): Promise<Project[]> {
   }
 }
 
-export async function searchProjects(searchTerm: string): Promise<Project[]> {
+export async function searchProjects(searchTerm: string, isDemo: boolean = false): Promise<Project[]> {
   try {
     const sql = getSQL()
     const projects = await sql`
       SELECT * FROM projects
-      WHERE
+      WHERE COALESCE(is_demo, false) = ${isDemo} AND (
         project_name ILIKE ${"%" + searchTerm + "%"} OR
         client_name ILIKE ${"%" + searchTerm + "%"} OR
         company ILIKE ${"%" + searchTerm + "%"} OR
         description ILIKE ${"%" + searchTerm + "%"}
+      )
       ORDER BY created_at DESC
     `
     return projects as Project[]
@@ -576,12 +580,12 @@ export async function searchProjects(searchTerm: string): Promise<Project[]> {
 }
 
 // Get active projects (not completed or cancelled)
-export async function getActiveProjects(): Promise<Project[]> {
+export async function getActiveProjects(isDemo: boolean = false): Promise<Project[]> {
   try {
     const sql = getSQL()
     const projects = await sql`
       SELECT * FROM projects
-      WHERE status NOT IN ('completed', 'cancelled')
+      WHERE status NOT IN ('completed', 'cancelled') AND COALESCE(is_demo, false) = ${isDemo}
       ORDER BY deadline ASC, priority DESC
     `
     return projects as Project[]
@@ -592,12 +596,12 @@ export async function getActiveProjects(): Promise<Project[]> {
 
 
 // Get projects by priority
-export async function getProjectsByPriority(priority: string): Promise<Project[]> {
+export async function getProjectsByPriority(priority: string, isDemo: boolean = false): Promise<Project[]> {
   try {
     const sql = getSQL()
     const projects = await sql`
       SELECT * FROM projects
-      WHERE priority = ${priority}
+      WHERE priority = ${priority} AND COALESCE(is_demo, false) = ${isDemo}
       ORDER BY deadline ASC
     `
     return projects as Project[]
@@ -607,12 +611,12 @@ export async function getProjectsByPriority(priority: string): Promise<Project[]
 }
 
 // Get overdue projects
-export async function getOverdueProjects(): Promise<Project[]> {
+export async function getOverdueProjects(isDemo: boolean = false): Promise<Project[]> {
   try {
     const sql = getSQL()
     const projects = await sql`
       SELECT * FROM projects
-      WHERE deadline < CURRENT_DATE AND status NOT IN ('completed', 'cancelled')
+      WHERE deadline < CURRENT_DATE AND status NOT IN ('completed', 'cancelled') AND COALESCE(is_demo, false) = ${isDemo}
       ORDER BY deadline ASC
     `
     return projects as Project[]

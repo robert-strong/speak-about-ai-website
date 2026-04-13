@@ -1,23 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { neon } from '@neondatabase/serverless';
+import { getDemoFlag } from '@/lib/auth-middleware';
 
 // GET all contacts or filtered contacts
 export async function GET(request: NextRequest) {
   try {
     const sql = neon(process.env.DATABASE_URL!);
+    const isDemo = getDemoFlag(request);
     const searchParams = request.nextUrl.searchParams;
     const type = searchParams.get('type'); // 'internal', 'external', or null for all
     const search = searchParams.get('search');
     const active = searchParams.get('active') !== 'false'; // Default to true
-    
+
     // Build query based on filters
     let contacts;
-    
+
     if (type && search) {
       const searchPattern = `%${search}%`;
       contacts = await sql`
         SELECT * FROM contacts
-        WHERE is_active = ${active}
+        WHERE is_active = ${active} AND COALESCE(is_demo, false) = ${isDemo}
         AND type = ${type}
         AND (
           LOWER(first_name) LIKE LOWER(${searchPattern}) OR
@@ -30,7 +32,7 @@ export async function GET(request: NextRequest) {
     } else if (type) {
       contacts = await sql`
         SELECT * FROM contacts
-        WHERE is_active = ${active}
+        WHERE is_active = ${active} AND COALESCE(is_demo, false) = ${isDemo}
         AND type = ${type}
         ORDER BY type, last_name, first_name
       `;
@@ -38,7 +40,7 @@ export async function GET(request: NextRequest) {
       const searchPattern = `%${search}%`;
       contacts = await sql`
         SELECT * FROM contacts
-        WHERE is_active = ${active}
+        WHERE is_active = ${active} AND COALESCE(is_demo, false) = ${isDemo}
         AND (
           LOWER(first_name) LIKE LOWER(${searchPattern}) OR
           LOWER(last_name) LIKE LOWER(${searchPattern}) OR
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest) {
     } else {
       contacts = await sql`
         SELECT * FROM contacts
-        WHERE is_active = ${active}
+        WHERE is_active = ${active} AND COALESCE(is_demo, false) = ${isDemo}
         ORDER BY type, last_name, first_name
       `;
     }

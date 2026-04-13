@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getAllDeals, createDeal, searchDeals, getDealsByStatus } from "@/lib/deals-db"
 import { createProject } from "@/lib/projects-db"
 import { getAutomaticProjectStatus } from "@/lib/project-status-utils"
-import { requireAdminAuth } from "@/lib/auth-middleware"
+import { requireAdminAuth, getDemoFlag } from "@/lib/auth-middleware"
 import { sendSlackWebhook, buildNewDealMessage, buildDealWonMessage } from "@/lib/slack"
 
 export async function GET(request: NextRequest) {
@@ -11,17 +11,18 @@ export async function GET(request: NextRequest) {
     // TODO: Implement proper JWT auth across all admin APIs
     // const authError = requireAdminAuth(request)
     // if (authError) return authError
+    const isDemo = getDemoFlag(request)
     const { searchParams } = new URL(request.url)
     const search = searchParams.get("search")
     const status = searchParams.get("status")
 
     let deals
     if (search) {
-      deals = await searchDeals(search)
+      deals = await searchDeals(search, isDemo)
     } else if (status) {
-      deals = await getDealsByStatus(status)
+      deals = await getDealsByStatus(status, isDemo)
     } else {
-      deals = await getAllDeals()
+      deals = await getAllDeals(isDemo)
     }
 
     return NextResponse.json(deals)
@@ -86,7 +87,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const deal = await createDeal(body)
+    const isDemo = getDemoFlag(request)
+    const deal = await createDeal(body, isDemo)
 
     if (!deal) {
       return NextResponse.json({ error: "Failed to create deal" }, { status: 500 })

@@ -7,6 +7,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'crypto'
 export interface JWTPayload {
   email: string
   role: 'admin' | 'speaker' | 'client'
+  is_demo?: boolean
   iat: number
   exp: number
 }

@@ -100,6 +100,15 @@ export function getAuthenticatedUser(request: NextRequest) {
 }
 
 /**
+ * Get the is_demo flag from the authenticated admin user's JWT
+ * Returns true if the user is a demo account, false otherwise
+ */
+export function getDemoFlag(request: NextRequest): boolean {
+  const user = getAuthenticatedUser(request)
+  return (user as any)?.is_demo || false
+}
+
+/**
  * Get speaker ID from authenticated speaker token
  * For backwards compatibility with existing speaker auth system
  */

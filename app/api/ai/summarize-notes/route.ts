@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     // Fetch project details
     const projects = await sql`
       SELECT project_name, client_name, company, event_date, event_type,
-             event_location, venue_name, notes, speaker_name, requested_speaker_name,
+             event_location, venue_name, notes, requested_speaker_name,
              budget, speaker_fee, status
       FROM projects WHERE id = ${projectId}
     `
@@ -48,8 +48,8 @@ export async function POST(request: NextRequest) {
       `Event Type: ${project.event_type || 'TBD'}`,
       project.event_location ? `Location: ${project.event_location}` : null,
       project.venue_name ? `Venue: ${project.venue_name}` : null,
-      project.speaker_name || project.requested_speaker_name
-        ? `Speaker: ${project.speaker_name || project.requested_speaker_name}`
+      project.requested_speaker_name
+        ? `Speaker: ${project.requested_speaker_name}`
         : null,
       project.status ? `Status: ${project.status}` : null,
     ].filter(Boolean).join('\n')

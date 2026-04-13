@@ -212,19 +212,20 @@ export async function createContractFromDeal(
   }
 }
 
-export async function getAllContracts(): Promise<Contract[]> {
+export async function getAllContracts(isDemo: boolean = false): Promise<Contract[]> {
   initializeDatabase()
   if (!databaseAvailable || !sql) {
     console.warn("getAllContracts: Database not available")
     return []
   }
-  
+
   try {
     console.log("Fetching all contracts from database...")
     const contracts = await sql`
       SELECT c.*, d.client_name as deal_client_name, d.event_title as deal_event_title, d.deal_value
       FROM contracts c
       LEFT JOIN deals d ON c.deal_id = d.id
+      WHERE COALESCE(c.is_demo, false) = ${isDemo}
       ORDER BY c.generated_at DESC
     `
     console.log(`Successfully fetched ${contracts.length} contracts`)

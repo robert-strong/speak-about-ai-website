@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getAllContracts, createContractFromDeal, updateContractStatus } from "@/lib/contracts-db"
 import { getDealById, type Deal } from "@/lib/deals-db"
-import { requireAdminAuth } from "@/lib/auth-middleware"
+import { requireAdminAuth, getDemoFlag } from "@/lib/auth-middleware"
 import { generateContractContent } from "@/lib/contract-template"
 import { sendSpeakerContractEmail, sendClientContractEmail } from "@/lib/email-service"
 
@@ -12,7 +12,8 @@ export async function GET(request: NextRequest) {
     // const authError = requireAdminAuth(request)
     // if (authError) return authError
 
-    const contracts = await getAllContracts()
+    const isDemo = getDemoFlag(request)
+    const contracts = await getAllContracts(isDemo)
     return NextResponse.json(contracts)
   } catch (error) {
     console.error("Error in GET /api/contracts:", error)

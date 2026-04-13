@@ -82,13 +82,13 @@ export interface Deal {
   email_thread_count?: number
 }
 
-export async function getAllDeals(): Promise<Deal[]> {
+export async function getAllDeals(isDemo: boolean = false): Promise<Deal[]> {
   initializeDatabase()
   if (!databaseAvailable || !sql) {
     console.warn("getAllDeals: Database not available")
     return []
   }
-  
+
   try {
     console.log("Fetching all deals from database...")
     const deals = await sql`
@@ -107,6 +107,7 @@ export async function getAllDeals(): Promise<Deal[]> {
           0
         ) as email_thread_count
       FROM deals d
+      WHERE COALESCE(d.is_demo, false) = ${isDemo}
       ORDER BY d.created_at DESC
     `
     console.log(`Successfully fetched ${deals.length} deals`)
@@ -144,7 +145,7 @@ export async function getDealById(id: number): Promise<Deal | null> {
   }
 }
 
-export async function createDeal(dealData: Omit<Deal, "id" | "created_at" | "updated_at">): Promise<Deal | null> {
+export async function createDeal(dealData: Omit<Deal, "id" | "created_at" | "updated_at">, isDemo: boolean = false): Promise<Deal | null> {
   initializeDatabase()
   if (!databaseAvailable || !sql) {
     console.warn("createDeal: Database not available")
@@ -158,15 +159,17 @@ export async function createDeal(dealData: Omit<Deal, "id" | "created_at" | "upd
         event_title, event_date, event_location, event_type,
         speaker_requested, attendee_count, budget_range, deal_value,
         status, priority, source, notes, last_contact, next_follow_up,
-        travel_required, flight_required, hotel_required, travel_stipend, travel_notes
+        travel_required, flight_required, hotel_required, travel_stipend, travel_notes,
+        is_demo
       ) VALUES (
         ${dealData.client_name}, ${dealData.client_email}, ${dealData.client_phone}, ${dealData.company},
         ${dealData.event_title}, ${dealData.event_date}, ${dealData.event_location}, ${dealData.event_type},
         ${dealData.speaker_requested || null}, ${dealData.attendee_count}, ${dealData.budget_range}, ${dealData.deal_value},
-        ${dealData.status}, ${dealData.priority}, ${dealData.source}, ${dealData.notes}, 
+        ${dealData.status}, ${dealData.priority}, ${dealData.source}, ${dealData.notes},
         ${dealData.last_contact}, ${dealData.next_follow_up || null},
-        ${dealData.travel_required || false}, ${dealData.flight_required || false}, 
-        ${dealData.hotel_required || false}, ${dealData.travel_stipend || 0}, ${dealData.travel_notes || null}
+        ${dealData.travel_required || false}, ${dealData.flight_required || false},
+        ${dealData.hotel_required || false}, ${dealData.travel_stipend || 0}, ${dealData.travel_notes || null},
+        ${isDemo}
       )
       RETURNING *
     `
@@ -302,7 +305,7 @@ export async function deleteDeal(id: number): Promise<boolean> {
   }
 }
 
-export async function getDealsByStatus(status: string): Promise<Deal[]> {
+export async function getDealsByStatus(status: string, isDemo: boolean = false): Promise<Deal[]> {
   initializeDatabase()
   if (!databaseAvailable || !sql) {
     console.warn("getDealsByStatus: Database not available")
@@ -311,8 +314,8 @@ export async function getDealsByStatus(status: string): Promise<Deal[]> {
   try {
     console.log("Fetching deals by status:", status)
     const deals = await sql`
-      SELECT * FROM deals 
-      WHERE status = ${status}
+      SELECT * FROM deals
+      WHERE status = ${status} AND COALESCE(is_demo, false) = ${isDemo}
       ORDER BY created_at DESC
     `
     console.log(`Found ${deals.length} deals with status: ${status}`)
@@ -323,7 +326,7 @@ export async function getDealsByStatus(status: string): Promise<Deal[]> {
   }
 }
 
-export async function searchDeals(searchTerm: string): Promise<Deal[]> {
+export async function searchDeals(searchTerm: string, isDemo: boolean = false): Promise<Deal[]> {
   initializeDatabase()
   if (!databaseAvailable || !sql) {
     console.warn("searchDeals: Database not available")
@@ -332,11 +335,12 @@ export async function searchDeals(searchTerm: string): Promise<Deal[]> {
   try {
     console.log("Searching deals for term:", searchTerm)
     const deals = await sql`
-      SELECT * FROM deals 
-      WHERE 
+      SELECT * FROM deals
+      WHERE COALESCE(is_demo, false) = ${isDemo} AND (
         client_name ILIKE ${"%" + searchTerm + "%"} OR
         company ILIKE ${"%" + searchTerm + "%"} OR
         event_title ILIKE ${"%" + searchTerm + "%"}
+      )
       ORDER BY created_at DESC
     `
     console.log(`Found ${deals.length} deals matching search term: ${searchTerm}`)

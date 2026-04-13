@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getAllProjects, createProject, searchProjects, getProjectsByStatus, getActiveProjects, getProjectsByPriority, getOverdueProjects } from "@/lib/projects-db"
-import { requireAdminAuth } from "@/lib/auth-middleware"
+import { requireAdminAuth, getDemoFlag } from "@/lib/auth-middleware"
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     if (authError) {
       return authError
     }
+    const isDemo = getDemoFlag(request)
     const { searchParams } = new URL(request.url)
     const search = searchParams.get("search")
     const status = searchParams.get("status")
@@ -17,17 +18,17 @@ export async function GET(request: NextRequest) {
 
     let projects
     if (search) {
-      projects = await searchProjects(search)
+      projects = await searchProjects(search, isDemo)
     } else if (status) {
-      projects = await getProjectsByStatus(status)
+      projects = await getProjectsByStatus(status, isDemo)
     } else if (priority) {
-      projects = await getProjectsByPriority(priority)
+      projects = await getProjectsByPriority(priority, isDemo)
     } else if (filter === "active") {
-      projects = await getActiveProjects()
+      projects = await getActiveProjects(isDemo)
     } else if (filter === "overdue") {
-      projects = await getOverdueProjects()
+      projects = await getOverdueProjects(isDemo)
     } else {
-      projects = await getAllProjects()
+      projects = await getAllProjects(isDemo)
     }
 
     return NextResponse.json(projects)
@@ -63,7 +64,8 @@ export async function POST(request: NextRequest) {
     // Require admin authentication
     const authError = requireAdminAuth(request)
     if (authError) return authError
-    
+    const isDemo = getDemoFlag(request)
+
     const body = await request.json()
 
     // Validate required fields (matching what frontend sends)
@@ -107,7 +109,7 @@ export async function POST(request: NextRequest) {
       accommodation_required: body.accommodation_required || body.hotel_required || false
     }
 
-    const project = await createProject(projectData)
+    const project = await createProject(projectData, isDemo)
 
     if (!project) {
       return NextResponse.json({ error: "Failed to create project" }, { status: 500 })
