@@ -466,6 +466,8 @@ function EnhancedProjectManagementPage() {
   const [newTaskName, setNewTaskName] = useState("")
   const [editingNotesFor, setEditingNotesFor] = useState<number | null>(null)
   const [editNotesValue, setEditNotesValue] = useState("")
+  const [aiSummary, setAiSummary] = useState<Record<number, string>>({})
+  const [aiSummaryLoading, setAiSummaryLoading] = useState<number | null>(null)
   const [newProjectData, setNewProjectData] = useState({
     project_name: "",
     event_date: "",
@@ -1188,6 +1190,27 @@ function EnhancedProjectManagementPage() {
       }
     } catch (error) {
       toast({ title: "Error", description: "Failed to save notes", variant: "destructive" })
+    }
+  }
+
+  const handleAiSummary = async (projectId: number) => {
+    setAiSummaryLoading(projectId)
+    try {
+      const response = await fetch('/api/ai/summarize-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId })
+      })
+      const data = await response.json()
+      if (data.success) {
+        setAiSummary(prev => ({ ...prev, [projectId]: data.summary }))
+      } else {
+        toast({ title: "Error", description: data.error || "Failed to generate summary", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to generate AI summary", variant: "destructive" })
+    } finally {
+      setAiSummaryLoading(null)
     }
   }
 
@@ -4232,13 +4255,37 @@ function EnhancedProjectManagementPage() {
                 </div>
               </div>
 
-              {/* Notes */}
-              {calendarSelectedProject.notes && (
-                <div className="bg-yellow-50 p-4 rounded-lg space-y-2">
+              {/* Notes & AI Summary */}
+              <div className="bg-yellow-50 p-4 rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
                   <h4 className="font-semibold text-sm text-gray-700">Notes</h4>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{calendarSelectedProject.notes}</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => handleAiSummary(calendarSelectedProject.id)}
+                    disabled={aiSummaryLoading === calendarSelectedProject.id}
+                  >
+                    {aiSummaryLoading === calendarSelectedProject.id ? (
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3 w-3 mr-1" />
+                    )}
+                    AI Summary
+                  </Button>
                 </div>
-              )}
+                {aiSummary[calendarSelectedProject.id] && (
+                  <div className="bg-white border border-yellow-200 rounded-md p-3 text-sm text-gray-700 whitespace-pre-wrap">
+                    {aiSummary[calendarSelectedProject.id]}
+                  </div>
+                )}
+                {calendarSelectedProject.notes && (
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{calendarSelectedProject.notes}</p>
+                )}
+                {!calendarSelectedProject.notes && !aiSummary[calendarSelectedProject.id] && (
+                  <p className="text-sm text-gray-400 italic">No notes — click AI Summary to generate from emails</p>
+                )}
+              </div>
 
               {/* Email Activity */}
               <EmailActivity projectId={calendarSelectedProject.id} dealId={calendarSelectedProject.deal_id} />
@@ -4391,20 +4438,41 @@ function EnhancedProjectManagementPage() {
                       <FileText className="h-4 w-4" />
                       Notes
                     </CardTitle>
-                    {editingNotesFor !== selectedProject.id && (
+                    <div className="flex gap-1">
                       <Button
                         size="sm"
-                        variant="ghost"
+                        variant="outline"
                         className="h-7 text-xs"
-                        onClick={() => { setEditingNotesFor(selectedProject.id); setEditNotesValue(selectedProject.notes || "") }}
+                        onClick={() => handleAiSummary(selectedProject.id)}
+                        disabled={aiSummaryLoading === selectedProject.id}
                       >
-                        <Edit className="h-3 w-3 mr-1" />
-                        Edit
+                        {aiSummaryLoading === selectedProject.id ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-3 w-3 mr-1" />
+                        )}
+                        AI Summary
                       </Button>
-                    )}
+                      {editingNotesFor !== selectedProject.id && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 text-xs"
+                          onClick={() => { setEditingNotesFor(selectedProject.id); setEditNotesValue(selectedProject.notes || "") }}
+                        >
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-3">
+                  {aiSummary[selectedProject.id] && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm text-gray-700 whitespace-pre-wrap">
+                      {aiSummary[selectedProject.id]}
+                    </div>
+                  )}
                   {editingNotesFor === selectedProject.id ? (
                     <div className="space-y-2">
                       <Textarea
