@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useLayoutSidebar } from "@/lib/sidebar-context"
@@ -70,6 +70,7 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
   const [userRoleName, setUserRoleName] = useState<string | null>(null)
   const pathname = usePathname()
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -108,8 +109,17 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
   }
 
   // Check if a pathname matches an item's href (exact or sub-route with trailing slash)
+  const currentSearch = searchParams.toString()
   const isItemActive = (href: string): boolean => {
-    if (pathname === href) return true
+    // For hrefs with query params, match the full path + search string
+    if (href.includes("?")) {
+      const [hrefPath, hrefSearch] = href.split("?")
+      return pathname === hrefPath && currentSearch === hrefSearch
+    }
+    // For plain paths, require exact match (no query params on current URL)
+    if (pathname === href) {
+      return !currentSearch
+    }
     // Match sub-routes like /admin/contracts-hub/123 for href /admin/contracts-hub
     // Exclude /admin/manage to prevent false positives on other /admin/* routes
     if (href !== "/admin/manage" && pathname.startsWith(href + "/")) return true

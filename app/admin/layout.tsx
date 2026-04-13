@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { usePathname } from "next/navigation"
 import { AdminSessionMonitor } from "@/components/admin-session-monitor"
 import { AdminSidebar } from "@/components/admin-sidebar"
@@ -30,7 +31,9 @@ export default function AdminLayout({
       <AdminSessionMonitor />
       {/* Persistent sidebar — rendered once, survives page navigations */}
       <div className="fixed left-0 top-0 h-full z-[60]">
-        <AdminSidebar isLayoutInstance />
+        <Suspense>
+          <AdminSidebar isLayoutInstance />
+        </Suspense>
       </div>
       {/* Page content is rendered by children — each page keeps its own ml-72 wrapper */}
       {children}

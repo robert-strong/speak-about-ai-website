@@ -425,6 +425,13 @@ function EnhancedProjectManagementPage() {
   const searchParams = useSearchParams()
   const view = searchParams.get("view")
   const { toast } = useToast()
+
+  // Sync activeTab when URL view parameter changes
+  useEffect(() => {
+    if (view === "calendar") setActiveTab("calendar")
+    else if (view === "management") setActiveTab("dashboard")
+    else setActiveTab("projects")
+  }, [view])
   const [projects, setProjects] = useState<Project[]>([])
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [customTasks, setCustomTasks] = useState<any[]>([])
@@ -1459,79 +1466,94 @@ function EnhancedProjectManagementPage() {
       <div className="flex-1 lg:ml-72 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Project Management</h1>
-              <p className="mt-2 text-gray-600">Manage live projects, invoicing, and event logistics</p>
+          {view === "calendar" ? (
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
+                <p className="mt-2 text-gray-600">View and manage event schedule</p>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <Button onClick={() => setShowCreateProject(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                New Project
-              </Button>
-              <Button onClick={() => setShowCreateInvoice(true)} variant="outline">
-                <Plus className="mr-2 h-4 w-4" />
-                New Invoice
-              </Button>
-              <Button onClick={() => router.push('/admin/contracts-hub')} variant="outline">
-                <FileText className="mr-2 h-4 w-4" />
-                New Contract
-              </Button>
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    {view === "management" ? "Project Management" : "Projects"}
+                  </h1>
+                  <p className="mt-2 text-gray-600">
+                    {view === "management" ? "Dashboard, tasks, logistics, and event details" : "Manage live projects, invoicing, and event logistics"}
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <Button onClick={() => setShowCreateProject(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Project
+                  </Button>
+                  <Button onClick={() => setShowCreateInvoice(true)} variant="outline">
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Invoice
+                  </Button>
+                  <Button onClick={() => router.push('/admin/contracts-hub')} variant="outline">
+                    <FileText className="mr-2 h-4 w-4" />
+                    New Contract
+                  </Button>
+                </div>
+              </div>
 
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-                <CheckSquare className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{activeProjects.length}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completed</CardTitle>
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{completedProjects.length}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  ${new Intl.NumberFormat('en-US').format(totalRevenue)}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Revenue</CardTitle>
-                <Receipt className="h-4 w-4 text-yellow-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-yellow-600">
-                  ${new Intl.NumberFormat('en-US').format(pendingRevenue)}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Overdue Invoices</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">{overdueInvoices}</div>
-              </CardContent>
-            </Card>
-          </div>
+              {/* Stats Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+                    <CheckSquare className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{activeProjects.length}</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Completed</CardTitle>
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">{completedProjects.length}</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      ${new Intl.NumberFormat('en-US').format(totalRevenue)}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Pending Revenue</CardTitle>
+                    <Receipt className="h-4 w-4 text-yellow-500" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-yellow-600">
+                      ${new Intl.NumberFormat('en-US').format(pendingRevenue)}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Overdue Invoices</CardTitle>
+                    <AlertTriangle className="h-4 w-4 text-red-500" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-red-600">{overdueInvoices}</div>
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
 
           {/* Main Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
