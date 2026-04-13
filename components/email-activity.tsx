@@ -376,9 +376,12 @@ export function EmailActivity({ leadId, dealId, projectId, compact = false }: Em
                     )}
 
                     {isExpanded && (
-                      <div className="text-sm text-gray-700 mb-2 whitespace-pre-wrap max-h-96 overflow-y-auto bg-white p-3 rounded border">
-                        {decodeHtmlEntities(thread.body_full || thread.body_snippet)}
-                      </div>
+                      <div
+                        className="text-sm text-gray-700 mb-2 max-h-96 overflow-y-auto bg-white p-3 rounded border [&_blockquote]:border-l-2 [&_blockquote]:border-gray-300 [&_blockquote]:pl-3 [&_blockquote]:ml-2 [&_blockquote]:text-gray-600 [&_a]:text-blue-600 [&_a]:underline [&_img]:max-w-full [&_table]:border-collapse"
+                        dangerouslySetInnerHTML={{
+                          __html: thread.body_full || thread.body_snippet
+                        }}
+                      />
                     )}
 
                     <Button
