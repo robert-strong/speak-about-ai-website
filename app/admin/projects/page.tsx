@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -412,8 +412,18 @@ const WORKFLOW_STAGES = [
   }
 ]
 
-export default function EnhancedProjectManagementPage() {
+export default function EnhancedProjectManagementPageWrapper() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading...</div>}>
+      <EnhancedProjectManagementPage />
+    </Suspense>
+  )
+}
+
+function EnhancedProjectManagementPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const view = searchParams.get("view")
   const { toast } = useToast()
   const [projects, setProjects] = useState<Project[]>([])
   const [invoices, setInvoices] = useState<Invoice[]>([])
@@ -427,7 +437,11 @@ export default function EnhancedProjectManagementPage() {
   const [stageSearchTerms, setStageSearchTerms] = useState<Record<string, string>>({})
   const [expandedProjectId, setExpandedProjectId] = useState<number | null>(null)
   const [quickFilter, setQuickFilter] = useState<"all" | "this_week" | "urgent" | "overdue">("all")
-  const [activeTab, setActiveTab] = useState("projects")
+  const [activeTab, setActiveTab] = useState(() => {
+    if (view === "calendar") return "calendar"
+    if (view === "management") return "dashboard"
+    return "projects"
+  })
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [selectedProjectForDetails, setSelectedProjectForDetails] = useState<Project | null>(null)
   const [showCreateInvoice, setShowCreateInvoice] = useState(false)
@@ -1521,14 +1535,14 @@ export default function EnhancedProjectManagementPage() {
 
           {/* Main Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6 max-w-4xl">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="projects">Projects</TabsTrigger>
-              <TabsTrigger value="calendar">Calendar</TabsTrigger>
-              <TabsTrigger value="tasks">Tasks</TabsTrigger>
-              <TabsTrigger value="logistics">Logistics</TabsTrigger>
-              <TabsTrigger value="details">Details</TabsTrigger>
-            </TabsList>
+            {view === "management" && (
+              <TabsList className="grid w-full grid-cols-4 max-w-3xl">
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="tasks">Tasks</TabsTrigger>
+                <TabsTrigger value="logistics">Logistics</TabsTrigger>
+                <TabsTrigger value="details">Details</TabsTrigger>
+              </TabsList>
+            )}
 
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">

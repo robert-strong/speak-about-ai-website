@@ -199,10 +199,19 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
       bgColor: "bg-orange-50",
       items: [
         {
-          title: "Project Management",
+          title: "Projects",
           href: "/admin/projects",
           icon: CheckSquare,
           description: "Live Projects",
+          color: "text-orange-600",
+          bgColor: "bg-orange-50",
+          permissionKey: "projects"
+        },
+        {
+          title: "Calendar",
+          href: "/admin/projects?view=calendar",
+          icon: Calendar,
+          description: "Event Calendar",
           color: "text-orange-600",
           bgColor: "bg-orange-50",
           permissionKey: "projects"
@@ -450,6 +459,15 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
       bgColor: "bg-slate-100",
       permissionKey: "system",
       items: [
+        {
+          title: "Project Management",
+          href: "/admin/projects?view=management",
+          icon: CheckSquare,
+          description: "Dashboard, Tasks, Logistics, Details",
+          color: "text-orange-600",
+          bgColor: "bg-orange-50",
+          permissionKey: "projects"
+        },
         {
           title: "Client Portal",
           href: "/admin/clients",
