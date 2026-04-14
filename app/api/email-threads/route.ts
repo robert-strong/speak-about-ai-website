@@ -38,11 +38,12 @@ export async function GET(request: NextRequest) {
       searchedClientEmail = clientEmail || null
 
       // Build text search keywords from project fields
+      // Only include terms that are specific enough (>4 chars) to avoid false matches
       const searchTerms: string[] = []
-      if (project.project_name) searchTerms.push(project.project_name)
-      if (project.event_name && project.event_name !== project.project_name) searchTerms.push(project.event_name)
-      if (project.event_location) searchTerms.push(project.event_location)
-      if (project.venue_name) searchTerms.push(project.venue_name)
+      if (project.project_name && project.project_name.length > 4) searchTerms.push(project.project_name)
+      if (project.event_name && project.event_name !== project.project_name && project.event_name.length > 4) searchTerms.push(project.event_name)
+      if (project.venue_name && project.venue_name.length > 4) searchTerms.push(project.venue_name)
+      // Skip event_location — too generic (e.g. "LA", "NY", "Virtual")
 
       // Format event_date for text matching (e.g. "March 15" or "2026-03-15")
       let dateSearchTerms: string[] = []
@@ -98,21 +99,11 @@ export async function GET(request: NextRequest) {
           resultSets.push(r)
         }
 
-        // Match by text keywords (project name, event name, location, venue)
+        // Match by text keywords (project name, event name, venue) — subject only to reduce noise
         if (textPattern) {
           const r = await sql`
             SELECT id, gmail_message_id, gmail_thread_id, subject, from_email, to_email, cc_emails, body_snippet, body_full, direction, is_read, received_at, labels, created_at
-            FROM email_threads WHERE subject ~* ${textPattern} OR body_snippet ~* ${textPattern} OR body_full ~* ${textPattern}
-            ORDER BY received_at DESC LIMIT 50
-          `
-          resultSets.push(r)
-        }
-
-        // Match by date keywords
-        if (datePattern) {
-          const r = await sql`
-            SELECT id, gmail_message_id, gmail_thread_id, subject, from_email, to_email, cc_emails, body_snippet, body_full, direction, is_read, received_at, labels, created_at
-            FROM email_threads WHERE subject ~* ${datePattern} OR body_snippet ~* ${datePattern}
+            FROM email_threads WHERE subject ~* ${textPattern}
             ORDER BY received_at DESC LIMIT 50
           `
           resultSets.push(r)
