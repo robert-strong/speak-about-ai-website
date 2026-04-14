@@ -122,6 +122,7 @@ export async function PUT(
             follow_up: 'won',
             completed: 'won',
             cancelled: 'lost',
+            lost: 'lost',
           }
           const newDealStatus = projectToDealStatus[project.status]
           if (newDealStatus) {
@@ -150,7 +151,7 @@ export async function PUT(
           if (project.status === 'proposal') newProposalStatus = 'sent'
           else if (['contracts_signed', 'logistics_planning', 'pre_event', 'event_week', 'follow_up', 'completed'].includes(project.status)) {
             newProposalStatus = 'accepted'
-          } else if (project.status === 'cancelled') {
+          } else if (project.status === 'cancelled' || project.status === 'lost') {
             newProposalStatus = 'rejected'
           }
 
