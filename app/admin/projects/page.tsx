@@ -3270,9 +3270,9 @@ function EnhancedProjectManagementPage() {
                     const startPadding = firstDay.getDay()
                     const daysInMonth = lastDay.getDate()
 
-                    // Group all projects by date
+                    // Group all projects by date (exclude lost and cancelled)
                     const projectsByDate: Record<string, Project[]> = {}
-                    projects.forEach(project => {
+                    projects.filter(p => !["lost", "cancelled"].includes(p.status)).forEach(project => {
                       if (project.event_date) {
                         const eventDate = new Date(project.event_date.split('T')[0] + 'T00:00:00')
                         if (eventDate.getFullYear() === year && eventDate.getMonth() === month) {
