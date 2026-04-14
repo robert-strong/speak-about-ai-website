@@ -179,6 +179,8 @@ export default function AdminCRMPage() {
   const [pastDealsSearch, setPastDealsSearch] = useState("")
   const [pastDealsFilter, setPastDealsFilter] = useState<"all" | "won" | "lost">("all")
   const [pastDealsDateRange, setPastDealsDateRange] = useState<"all" | "30days" | "90days" | "1year">("all")
+  const [pastDealsSortField, setPastDealsSortField] = useState<"status" | "client_name" | "event_title" | "speaker_requested" | "event_date" | "">("")
+  const [pastDealsSortDir, setPastDealsSortDir] = useState<"asc" | "desc">("desc")
   const [sortField, setSortField] = useState<"client_name" | "event_title" | "event_date" | "status" | "speaker_requested" | "">("")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
   // Analytics state
@@ -1978,11 +1980,30 @@ d) An immediate family member is stricken by serious injury, illness, or death.
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-20">Status</TableHead>
-                        <TableHead className="w-36">Client</TableHead>
-                        <TableHead>Event</TableHead>
-                        <TableHead>Speaker</TableHead>
-                        <TableHead className="w-28">Event Date</TableHead>
+                        {[
+                          { key: "status", label: "Status", className: "w-20" },
+                          { key: "client_name", label: "Client", className: "w-36" },
+                          { key: "event_title", label: "Event", className: "" },
+                          { key: "speaker_requested", label: "Speaker", className: "" },
+                          { key: "event_date", label: "Event Date", className: "w-28" },
+                        ].map(col => (
+                          <TableHead key={col.key} className={col.className}>
+                            <button
+                              className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                              onClick={() => {
+                                if (pastDealsSortField === col.key) {
+                                  setPastDealsSortDir(pastDealsSortDir === "asc" ? "desc" : "asc")
+                                } else {
+                                  setPastDealsSortField(col.key as any)
+                                  setPastDealsSortDir(col.key === "event_date" ? "desc" : "asc")
+                                }
+                              }}
+                            >
+                              {col.label}
+                              <ArrowUpDown className={`h-3 w-3 ${pastDealsSortField === col.key ? "text-blue-600" : "text-gray-400"}`} />
+                            </button>
+                          </TableHead>
+                        ))}
                         <TableHead>Details</TableHead>
                         <TableHead className="w-24">Actions</TableHead>
                       </TableRow>
@@ -2041,8 +2062,20 @@ d) An immediate family member is stricken by serious injury, illness, or death.
                           })
                         }
 
-                        // Sort by most recent close date
+                        // Sort past deals
                         filteredPastDeals.sort((a, b) => {
+                          const dir = pastDealsSortDir === "asc" ? 1 : -1
+                          if (pastDealsSortField === "event_date") {
+                            const aDate = a.event_date ? new Date(a.event_date).getTime() : 0
+                            const bDate = b.event_date ? new Date(b.event_date).getTime() : 0
+                            return (aDate - bDate) * dir
+                          }
+                          if (pastDealsSortField === "client_name" || pastDealsSortField === "event_title" || pastDealsSortField === "speaker_requested" || pastDealsSortField === "status") {
+                            const aVal = (a[pastDealsSortField] || "").toString().toLowerCase()
+                            const bVal = (b[pastDealsSortField] || "").toString().toLowerCase()
+                            return aVal.localeCompare(bVal) * dir
+                          }
+                          // Default: most recent close date
                           const aDateStr = a.status === "won" ? a.won_date : a.lost_date
                           const bDateStr = b.status === "won" ? b.won_date : b.lost_date
                           const aDate = aDateStr ? new Date(aDateStr).getTime() : 0
