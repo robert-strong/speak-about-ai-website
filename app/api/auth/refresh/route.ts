@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
     // This prevents frequent logouts during active use
     const newToken = createToken({
       email: payload.email,
-      role: 'admin'
+      role: 'admin',
+      is_demo: (payload as any).is_demo || false,
     }, 8) // 8 hour expiration
 
     // Return the new token
