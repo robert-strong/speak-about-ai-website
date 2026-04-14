@@ -91,7 +91,7 @@ interface Project {
   event_type: string
   event_classification?: "virtual" | "local" | "travel"
   attendee_count?: number
-  status: "2plus_months" | "1to2_months" | "less_than_month" | "final_week" | "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled"
+  status: "2plus_months" | "1to2_months" | "less_than_month" | "final_week" | "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled" | "lost"
   priority: "low" | "medium" | "high" | "urgent"
   budget: string
   speaker_fee?: string
@@ -277,6 +277,11 @@ const PROJECT_STATUSES: Record<string, { label: string; color: string; descripti
     label: "Cancelled",
     color: "bg-red-500",
     description: "Project cancelled"
+  },
+  lost: {
+    label: "Lost",
+    color: "bg-gray-500",
+    description: "Event fell through or client went elsewhere"
   }
 }
 
@@ -1425,7 +1430,7 @@ function EnhancedProjectManagementPage() {
         const statusOrder: Record<string, number> = {
           "2plus_months": 1, "1to2_months": 2, "less_than_month": 3, "final_week": 4,
           contracts_signed: 5, invoicing: 6, logistics_planning: 7, pre_event: 8,
-          event_week: 9, follow_up: 10, completed: 11, cancelled: 12
+          event_week: 9, follow_up: 10, completed: 11, cancelled: 12, lost: 13
         }
         aVal = statusOrder[a.status] || 0
         bVal = statusOrder[b.status] || 0
@@ -1463,7 +1468,7 @@ function EnhancedProjectManagementPage() {
   }
 
   // Calculate statistics
-  const activeProjects = projects.filter(p => !["completed", "cancelled"].includes(p.status))
+  const activeProjects = projects.filter(p => !["completed", "cancelled", "lost"].includes(p.status))
   const completedProjects = projects.filter(p => p.status === "completed")
   const totalRevenue = projects.reduce((sum, p) => {
     // If payment_received is true, count the speaker_fee as revenue
@@ -1471,7 +1476,7 @@ function EnhancedProjectManagementPage() {
   }, 0)
   const pendingRevenue = projects.reduce((sum, p) => {
     // If payment not received and project is active (not completed/cancelled), it's pending revenue
-    if (!p.payment_received && !["completed", "cancelled"].includes(p.status)) {
+    if (!p.payment_received && !["completed", "cancelled", "lost"].includes(p.status)) {
       return sum + parseFloat(p.speaker_fee || p.budget || "0")
     }
     return sum
@@ -1689,6 +1694,7 @@ function EnhancedProjectManagementPage() {
                         <SelectItem value="follow_up">Follow-up</SelectItem>
                         <SelectItem value="completed">Completed</SelectItem>
                         <SelectItem value="cancelled">Cancelled</SelectItem>
+                        <SelectItem value="lost">Lost</SelectItem>
                       </SelectContent>
                     </Select>
                     <div className="flex gap-1 flex-wrap">
@@ -2032,7 +2038,7 @@ function EnhancedProjectManagementPage() {
                         </div>
                         <div className="space-y-2">
                           {(() => {
-                            const activeProjects = projects.filter(p => p.status !== 'completed' && p.status !== 'cancelled')
+                            const activeProjects = projects.filter(p => p.status !== 'completed' && p.status !== 'cancelled' && p.status !== 'lost')
                             const todayCount = activeProjects.filter(p => getTimeUntilEvent(p.event_date).urgency === 'today').length
                             const urgentCount = activeProjects.filter(p => getTimeUntilEvent(p.event_date).urgency === 'urgent').length
                             const soonCount = activeProjects.filter(p => getTimeUntilEvent(p.event_date).urgency === 'soon').length
@@ -2256,6 +2262,23 @@ function EnhancedProjectManagementPage() {
                                                 </DropdownMenuItem>
                                               ))}
                                               <DropdownMenuSeparator />
+                                              <DropdownMenuItem
+                                                className="text-gray-600 focus:text-gray-600"
+                                                onClick={async () => {
+                                                  try {
+                                                    const response = await authPut(`/api/projects/${project.id}`, { status: 'lost' })
+                                                    if (response.ok) {
+                                                      toast({ title: "Project marked as lost" })
+                                                      refreshData()
+                                                    }
+                                                  } catch (error) {
+                                                    toast({ title: "Error", description: "Failed to update status", variant: "destructive" })
+                                                  }
+                                                }}
+                                              >
+                                                <X className="h-4 w-4 mr-2" />
+                                                Mark as Lost
+                                              </DropdownMenuItem>
                                               <DropdownMenuItem
                                                 className="text-red-600 focus:text-red-600"
                                                 onClick={() => handleDeleteProject(project.id)}
@@ -2685,6 +2708,47 @@ function EnhancedProjectManagementPage() {
                       </Card>
                     )
                   })()}
+
+                  {/* Lost Projects Section */}
+                  {(() => {
+                    const lostProjects = filteredProjects.filter(p => p.status === "lost")
+                    if (lostProjects.length === 0) return null
+                    return (
+                      <Card className="border-l-4 border-gray-500 bg-gray-50/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg flex items-center gap-2 text-gray-600">
+                            <X className="h-5 w-5" />
+                            Lost
+                            <Badge variant="outline" className="ml-2 border-gray-300 text-gray-600">
+                              {lostProjects.length}
+                            </Badge>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid gap-2">
+                            {lostProjects.map((project) => (
+                              <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-white/50 border border-gray-200">
+                                <div>
+                                  <div className="font-medium text-gray-600 flex items-center gap-2">
+                                    {project.event_name || project.project_name}
+                                    {(project.requested_speaker_name || project.speaker_name) && (
+                                      <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">
+                                        {project.requested_speaker_name || project.speaker_name}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-sm text-gray-500">{project.client_name} • {formatEventDate(project.event_date)}</div>
+                                </div>
+                                <Button size="sm" variant="ghost" onClick={() => router.push(`/admin/projects/${project.id}/edit`)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })()}
                 </div>
               )}
 
@@ -2864,6 +2928,9 @@ function EnhancedProjectManagementPage() {
                                 </SelectItem>
                                 <SelectItem value="cancelled">
                                   <Badge className="bg-red-500 text-white">Cancelled</Badge>
+                                </SelectItem>
+                                <SelectItem value="lost">
+                                  <Badge className="bg-gray-500 text-white">Lost</Badge>
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -3360,7 +3427,7 @@ function EnhancedProjectManagementPage() {
                     customTasks.forEach(task => {
                       if (!task.completed) {
                         const project = projects.find(p => p.id === task.projectId)
-                        if (project && !["completed", "cancelled"].includes(project.status)) {
+                        if (project && !["completed", "cancelled", "lost"].includes(project.status)) {
                           const daysUntilEvent = project.event_date 
                             ? Math.ceil((new Date(project.event_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
                             : null
@@ -3406,7 +3473,7 @@ function EnhancedProjectManagementPage() {
                     
                     // Then add predefined tasks
                     projects.forEach(project => {
-                      if (["completed", "cancelled"].includes(project.status)) return
+                      if (["completed", "cancelled", "lost"].includes(project.status)) return
                       
                       const stageCompletion = project.stage_completion || {}
                       const currentStage = project.status
@@ -4298,6 +4365,27 @@ function EnhancedProjectManagementPage() {
 
               {/* Action Buttons */}
               <div className="flex justify-end gap-2 pt-4">
+                {calendarSelectedProject.status !== 'lost' && calendarSelectedProject.status !== 'completed' && (
+                  <Button
+                    variant="outline"
+                    className="text-gray-600 border-gray-300 hover:bg-gray-100"
+                    onClick={async () => {
+                      try {
+                        const response = await authPut(`/api/projects/${calendarSelectedProject.id}`, { status: 'lost' })
+                        if (response.ok) {
+                          toast({ title: "Project marked as lost" })
+                          setCalendarSelectedProject(null)
+                          refreshData()
+                        }
+                      } catch (error) {
+                        toast({ title: "Error", description: "Failed to update status", variant: "destructive" })
+                      }
+                    }}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Mark as Lost
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -4337,7 +4425,7 @@ function EnhancedProjectManagementPage() {
                   <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
                 <SelectContent>
-                  {projects.filter(p => p.status !== 'cancelled' && p.status !== 'completed').map(p => (
+                  {projects.filter(p => p.status !== 'cancelled' && p.status !== 'completed' && p.status !== 'lost').map(p => (
                     <SelectItem key={p.id} value={p.id.toString()}>
                       {p.project_name} - {p.client_name}
                     </SelectItem>

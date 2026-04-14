@@ -585,7 +585,7 @@ export async function getActiveProjects(isDemo: boolean = false): Promise<Projec
     const sql = getSQL()
     const projects = await sql`
       SELECT * FROM projects
-      WHERE status NOT IN ('completed', 'cancelled') AND COALESCE(is_demo, false) = ${isDemo}
+      WHERE status NOT IN ('completed', 'cancelled', 'lost') AND COALESCE(is_demo, false) = ${isDemo}
       ORDER BY deadline ASC, priority DESC
     `
     return projects as Project[]
@@ -616,7 +616,7 @@ export async function getOverdueProjects(isDemo: boolean = false): Promise<Proje
     const sql = getSQL()
     const projects = await sql`
       SELECT * FROM projects
-      WHERE deadline < CURRENT_DATE AND status NOT IN ('completed', 'cancelled') AND COALESCE(is_demo, false) = ${isDemo}
+      WHERE deadline < CURRENT_DATE AND status NOT IN ('completed', 'cancelled', 'lost') AND COALESCE(is_demo, false) = ${isDemo}
       ORDER BY deadline ASC
     `
     return projects as Project[]
