@@ -76,6 +76,55 @@ export async function PUT(
       console.error("Entity sync failed (non-blocking):", syncError)
     }
 
+    // Delete Google Calendar event when status changes to lost or cancelled
+    if (originalProject && originalProject.status !== project.status &&
+        (project.status === 'lost' || project.status === 'cancelled')) {
+      try {
+        const dbSql = neon(process.env.DATABASE_URL!)
+        const projectWithCalendar = await dbSql`
+          SELECT google_calendar_event_id FROM projects WHERE id = ${id}
+        `
+
+        if (projectWithCalendar[0]?.google_calendar_event_id) {
+          const { createGoogleCalendarClient } = await import('@/lib/google-calendar-client')
+          const calendarClient = createGoogleCalendarClient()
+
+          let calendarConfig: any = null
+          try {
+            const configResult = await dbSql`SELECT * FROM google_calendar_config LIMIT 1`
+            calendarConfig = configResult[0] || null
+          } catch {}
+
+          const email = calendarConfig?.user_email || process.env.ADMIN_EMAIL || 'noah@speakabout.ai'
+          const tokens = await calendarClient.loadTokens(email)
+
+          if (tokens) {
+            await calendarClient.setCredentials(tokens.access_token, tokens.refresh_token)
+            const targetCalendarId = calendarConfig?.calendar_id || 'primary'
+
+            await calendarClient.deleteEvent(
+              projectWithCalendar[0].google_calendar_event_id,
+              targetCalendarId
+            )
+
+            // Clear the calendar event ID from the project
+            await dbSql`
+              UPDATE projects
+              SET google_calendar_event_id = NULL, google_calendar_synced_at = NULL
+              WHERE id = ${id}
+            `
+
+            console.log(`Deleted Google Calendar event for project #${id} (status changed to ${project.status})`)
+          }
+        }
+      } catch (calendarError: any) {
+        // Log but don't block status update if calendar event removal fails
+        if (calendarError.code !== 404 && calendarError.code !== 410) {
+          console.error(`Failed to delete Google Calendar event for project #${id}:`, calendarError.message)
+        }
+      }
+    }
+
     // Send Slack notification for status changes
     if (originalProject && originalProject.status !== project.status) {
       try {
@@ -253,6 +302,50 @@ export async function DELETE(
     const id = parseInt(idString)
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid project ID" }, { status: 400 })
+    }
+
+    // Get project first to check for Google Calendar event
+    const project = await getProjectById(id)
+    if (project) {
+      // Delete Google Calendar event if it exists
+      const dbSql = neon(process.env.DATABASE_URL!)
+      const projectWithCalendar = await dbSql`
+        SELECT google_calendar_event_id FROM projects WHERE id = ${id}
+      `
+
+      if (projectWithCalendar[0]?.google_calendar_event_id) {
+        try {
+          const { createGoogleCalendarClient } = await import('@/lib/google-calendar-client')
+          const calendarClient = createGoogleCalendarClient()
+
+          // Load calendar config
+          let calendarConfig: any = null
+          try {
+            const configResult = await dbSql`SELECT * FROM google_calendar_config LIMIT 1`
+            calendarConfig = configResult[0] || null
+          } catch {}
+
+          const email = calendarConfig?.user_email || process.env.ADMIN_EMAIL || 'noah@speakabout.ai'
+          const tokens = await calendarClient.loadTokens(email)
+
+          if (tokens) {
+            await calendarClient.setCredentials(tokens.access_token, tokens.refresh_token)
+            const targetCalendarId = calendarConfig?.calendar_id || 'primary'
+
+            await calendarClient.deleteEvent(
+              projectWithCalendar[0].google_calendar_event_id,
+              targetCalendarId
+            )
+            console.log(`Deleted Google Calendar event for project #${id}`)
+          }
+        } catch (calendarError: any) {
+          // Log but don't block deletion if calendar event removal fails
+          // 404/410 means event was already deleted
+          if (calendarError.code !== 404 && calendarError.code !== 410) {
+            console.error(`Failed to delete Google Calendar event for project #${id}:`, calendarError.message)
+          }
+        }
+      }
     }
 
     const success = await deleteProject(id)

@@ -76,33 +76,39 @@ export async function POST(request: NextRequest) {
       const existing = projectsByEventId.get(gEvent.id)
 
       if (existing) {
-        // Event already linked to a project
-        if (existing.sync_source === 'app') {
-          // Pushed from our app — don't overwrite
-          skipped++
-          continue
-        }
-
-        // Previously pulled — check if Google event was updated
+        // Event already linked to a project — check if Google event was updated
         if (existing.google_calendar_event_updated === gEvent.updated) {
           skipped++
           continue
         }
 
-        // Update the pulled project with latest Google data
+        // Update the project with latest Google data
         try {
           const { eventDate, projectName, location, notes } = parseGoogleEvent(gEvent)
 
-          await sql`
-            UPDATE projects SET
-              project_name = ${projectName},
-              event_date = ${eventDate},
-              event_location = ${location},
-              notes = ${notes},
-              google_calendar_event_updated = ${gEvent.updated || null},
-              updated_at = NOW()
-            WHERE id = ${existing.id}
-          `
+          if (existing.sync_source === 'app') {
+            // For app-pushed projects, only sync date/time/location changes (preserve project name and notes)
+            await sql`
+              UPDATE projects SET
+                event_date = ${eventDate},
+                event_location = ${location},
+                google_calendar_event_updated = ${gEvent.updated || null},
+                google_calendar_synced_at = NOW()
+              WHERE id = ${existing.id}
+            `
+          } else {
+            // For google-pulled projects, sync all fields
+            await sql`
+              UPDATE projects SET
+                project_name = ${projectName},
+                event_date = ${eventDate},
+                event_location = ${location},
+                notes = ${notes},
+                google_calendar_event_updated = ${gEvent.updated || null},
+                updated_at = NOW()
+              WHERE id = ${existing.id}
+            `
+          }
           updated++
         } catch (err: any) {
           failed++

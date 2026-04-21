@@ -46,15 +46,58 @@ export async function POST(request: NextRequest) {
     await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS google_calendar_event_id VARCHAR(500)`
     await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS google_calendar_synced_at TIMESTAMP WITH TIME ZONE`
 
-    // Get only projects that need syncing:
-    // 1. New: has event_date but no google_calendar_event_id
-    // 2. Changed: updated_at is newer than google_calendar_synced_at
+    // STEP 1: Delete Google Calendar events for projects that should no longer have them
+    // - Status is 'lost' or 'cancelled'
+    // - event_date is NULL but google_calendar_event_id exists
+    const projectsToRemove = await sql`
+      SELECT id, project_name, google_calendar_event_id
+      FROM projects
+      WHERE google_calendar_event_id IS NOT NULL
+        AND (
+          status IN ('lost', 'cancelled')
+          OR event_date IS NULL
+        )
+    `
+
+    let removed = 0
+    let removeFailed = 0
+    const removeErrors: string[] = []
+
+    for (const project of projectsToRemove) {
+      try {
+        await calendarClient.deleteEvent(project.google_calendar_event_id, targetCalendarId)
+        removed++
+      } catch (err: any) {
+        // If event already deleted on Google's side, still clear our reference
+        if (err.code === 410 || err.code === 404) {
+          removed++
+        } else {
+          removeFailed++
+          removeErrors.push(`Remove ${project.project_name}: ${err.message || 'Unknown error'}`)
+        }
+      }
+
+      // Clear the event ID from our database regardless
+      await sql`
+        UPDATE projects
+        SET google_calendar_event_id = NULL, google_calendar_synced_at = NULL
+        WHERE id = ${project.id}
+      `
+
+      // Throttle
+      await new Promise(resolve => setTimeout(resolve, 200))
+    }
+
+    // STEP 2: Get projects that need syncing (create or update)
+    // - Has event_date and status is NOT lost/cancelled
+    // - Either new (no google_calendar_event_id) or changed (updated_at > synced_at)
     const projects = await sql`
       SELECT id, project_name, event_date, event_location, client_name,
              client_email, notes, event_type, google_calendar_event_id,
              updated_at, google_calendar_synced_at, project_details
       FROM projects
       WHERE event_date IS NOT NULL
+        AND status NOT IN ('lost', 'cancelled')
         AND (
           google_calendar_event_id IS NULL
           OR google_calendar_synced_at IS NULL
@@ -67,6 +110,7 @@ export async function POST(request: NextRequest) {
     const upToDateResult = await sql`
       SELECT COUNT(*) as count FROM projects
       WHERE event_date IS NOT NULL
+        AND status NOT IN ('lost', 'cancelled')
         AND google_calendar_event_id IS NOT NULL
         AND google_calendar_synced_at IS NOT NULL
         AND updated_at <= google_calendar_synced_at
@@ -143,17 +187,21 @@ export async function POST(request: NextRequest) {
     const parts = []
     if (created > 0) parts.push(`${created} created`)
     if (updated > 0) parts.push(`${updated} updated`)
+    if (removed > 0) parts.push(`${removed} removed`)
     if (skipped > 0) parts.push(`${skipped} unchanged`)
-    if (failed > 0) parts.push(`${failed} failed`)
+    if (failed > 0 || removeFailed > 0) parts.push(`${failed + removeFailed} failed`)
+
+    const allErrors = [...removeErrors, ...errors]
 
     return NextResponse.json({
       success: true,
       message: `Google Calendar sync: ${parts.join(', ') || 'everything up to date'}`,
       created,
       updated,
+      removed,
       skipped,
-      failed,
-      errors: errors.length > 0 ? errors : undefined,
+      failed: failed + removeFailed,
+      errors: allErrors.length > 0 ? allErrors : undefined,
     })
   } catch (error) {
     console.error('Error syncing all to calendar:', error)
