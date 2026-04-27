@@ -899,7 +899,7 @@ export default function GoogleAdsCampaignPage() {
             <h3 className="font-semibold mb-3">Landing Page Mapping</h3>
             <div className="grid gap-3">
               {[
-                { campaign: "AI Keynote Speakers — Core", page: "speakabout.ai (homepage) or /speakers", cta: "Book Speaker Today", notes: "Add trust badges, speaker count, and client logos above the fold" },
+                { campaign: "AI Keynote Speakers — Core", page: "speakabout.ai (homepage) or /speakers", cta: "Book A Speaker Today", notes: "Add trust badges, speaker count, and client logos above the fold" },
                 { campaign: "AI Conference Speakers — Events", page: "speakabout.ai/our-services", cta: "Get a Custom Proposal", notes: "Highlight format flexibility (keynotes, panels, workshops)" },
                 { campaign: "Named Speaker — Peter Norvig", page: "speakabout.ai/speakers/peter-norvig", cta: "Check Availability", notes: "Ensure each speaker page has strong CTA and social proof" },
                 { campaign: "Named Speaker — Adam Cheyer", page: "speakabout.ai/speakers/adam-cheyer", cta: "Check Availability", notes: "Feature video clips and past event testimonials" },
@@ -908,7 +908,7 @@ export default function GoogleAdsCampaignPage() {
                 { campaign: "AI Ethics & Policy", page: "speakabout.ai/ethics-speakers-in-ai", cta: "Book Ethics Speaker", notes: "Feature timely policy content" },
                 { campaign: "Technology AI Vertical", page: "speakabout.ai/industries/technology-keynote-speakers", cta: "Explore Tech Speakers", notes: "Emphasize Fortune 500 experience" },
                 { campaign: "Competitor Conquesting", page: "speakabout.ai/speakers (full roster)", cta: "Browse 81+ AI Speakers", notes: "Showcase breadth and exclusivity" },
-                { campaign: "Performance Max", page: "speakabout.ai (homepage)", cta: "Book Speaker Today", notes: "Ensure fast load speed and mobile optimization" },
+                { campaign: "Performance Max", page: "speakabout.ai (homepage)", cta: "Book A Speaker Today", notes: "Ensure fast load speed and mobile optimization" },
               ].map((lp, i) => (
                 <Card key={i} className="p-4">
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">

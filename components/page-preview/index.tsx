@@ -73,7 +73,7 @@ function HomeHeroPreview({
             {/* CTA Buttons (static preview) */}
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Button variant="gold" size="lg" className="pointer-events-none opacity-80">
-                Book Speaker Today
+                Book A Speaker Today
               </Button>
               <Button variant="default" size="lg" className="pointer-events-none opacity-80">
                 Browse Speakers
@@ -1389,7 +1389,7 @@ function ServicesContactPreview({
 }: Omit<PagePreviewProps, 'page'>) {
   const title = content['services.cta.title'] || 'Ready to Elevate Your Event?'
   const subtitle = content['services.cta.subtitle'] || 'Let us connect you with the perfect AI expert to inspire your audience and drive meaningful conversations about the future of artificial intelligence.'
-  const buttonText = content['services.cta.button_text'] || 'Book Speaker Today'
+  const buttonText = content['services.cta.button_text'] || 'Book A Speaker Today'
   const stat1Value = content['services.cta.stat1_value'] || '24 Hours'
   const stat1Label = content['services.cta.stat1_label'] || 'Average Response Time'
   const stat2Value = content['services.cta.stat2_value'] || '67+'

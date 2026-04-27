@@ -284,7 +284,7 @@ const SpeakerProfile: React.FC<SpeakerProfileProps> = ({ speaker }) => {
                         href={`/contact?source=speaker_profile&speakerName=${encodeURIComponent(speaker.name)}`}
                         className="!text-white !no-underline hover:!text-white"
                       >
-                        Book Speaker Today
+                        Book A Speaker Today
                       </Link>
                     </Button>
                   </div>
@@ -510,7 +510,7 @@ const SpeakerProfile: React.FC<SpeakerProfileProps> = ({ speaker }) => {
                   href={`/contact?source=speaker_profile_cta&speakerName=${encodeURIComponent(speaker.name)}`}
                   className="!text-white !no-underline hover:!text-white"
                 >
-                  Book Speaker Today
+                  Book A Speaker Today
                 </Link>
               </Button>
             </div>
