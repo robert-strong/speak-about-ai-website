@@ -34,13 +34,13 @@ export default function Header() {
               Speakers
             </Link>
             <Link href="/ai-workshops" className="font-semibold transition-colors hover:opacity-80" style={{ color: '#ffffff' }}>
-              AI Workshops
+              Workshops
             </Link>
             <Link href="/our-services" className="font-semibold transition-colors hover:opacity-80" style={{ color: '#ffffff' }}>
               Services
             </Link>
             <Link href="/our-team" className="font-semibold transition-colors hover:opacity-80" style={{ color: '#ffffff' }}>
-              About Us
+              About
             </Link>
             <Link href="/resources" className="font-semibold transition-colors hover:opacity-80" style={{ color: '#ffffff' }}>
               Resources
@@ -55,7 +55,7 @@ export default function Header() {
               size="sm"
               className="font-montserrat font-bold text-xs lg:text-sm whitespace-nowrap"
             >
-              <Link href="/contact">Book Speaker Today</Link>
+              <Link href="/contact">Book A Speaker Today</Link>
             </Button>
           </div>
 
@@ -91,7 +91,7 @@ export default function Header() {
                 style={{ color: '#ffffff' }}
                 onClick={() => setIsMenuOpen(false)}
               >
-                AI Workshops
+                Workshops
               </Link>
               <Link
                 href="/our-services"
@@ -107,7 +107,7 @@ export default function Header() {
                 style={{ color: '#ffffff' }}
                 onClick={() => setIsMenuOpen(false)}
               >
-                About Us
+                About
               </Link>
               <Link
                 href="/resources"
@@ -125,7 +125,7 @@ export default function Header() {
                   className="font-montserrat font-bold w-full"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <Link href="/contact">Book Speaker Today</Link>
+                  <Link href="/contact">Book A Speaker Today</Link>
                 </Button>
               </div>
             </nav>
