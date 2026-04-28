@@ -11,6 +11,10 @@ interface TeamMember {
   linkedin?: string
   twitter?: string
   website?: string
+  // Image positioning/cropping
+  imageZoom?: number        // Scale factor (default 1)
+  imagePositionX?: number   // X position percentage (default 50)
+  imagePositionY?: number   // Y position percentage (default 50)
 }
 
 // Default team members
@@ -65,7 +69,13 @@ export default async function TeamMembers() {
                       src={member.image || "/placeholder.svg"}
                       alt={member.name}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="group-hover:scale-105 transition-transform duration-300"
+                      style={{
+                        objectFit: 'cover',
+                        objectPosition: `${member.imagePositionX ?? 50}% ${member.imagePositionY ?? 50}%`,
+                        transform: `scale(${(member.imageZoom ?? 1) * 1})`,
+                        transformOrigin: `${member.imagePositionX ?? 50}% ${member.imagePositionY ?? 50}%`
+                      }}
                       sizes="(max-width: 768px) 160px, 192px"
                       priority
                     />

@@ -1726,11 +1726,17 @@ function TeamMembersPreview({
           {members.map((member) => (
             <div key={member.id} className="bg-gray-50 rounded-2xl p-6 shadow-lg">
               <div className="flex flex-col md:flex-row gap-6 items-start">
-                <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0 bg-gray-200">
+                <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0 bg-gray-200 relative">
                   <img
                     src={member.image || '/placeholder.svg'}
                     alt={member.name}
-                    className="w-full h-full object-cover"
+                    className="absolute w-full h-full"
+                    style={{
+                      objectFit: 'cover',
+                      objectPosition: `${member.imagePositionX ?? 50}% ${member.imagePositionY ?? 50}%`,
+                      transform: `scale(${member.imageZoom ?? 1})`,
+                      transformOrigin: `${member.imagePositionX ?? 50}% ${member.imagePositionY ?? 50}%`
+                    }}
                   />
                 </div>
                 <div className="flex-1">

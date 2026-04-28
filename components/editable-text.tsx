@@ -693,6 +693,213 @@ export interface TeamMember {
   linkedin?: string
   twitter?: string
   website?: string
+  // Image positioning/cropping
+  imageZoom?: number        // Scale factor (default 1)
+  imagePositionX?: number   // X position percentage (default 50)
+  imagePositionY?: number   // Y position percentage (default 50)
+}
+
+// Image Position Editor component for cropping/repositioning images
+interface ImagePositionEditorProps {
+  image: string
+  zoom: number
+  positionX: number
+  positionY: number
+  onZoomChange: (zoom: number) => void
+  onPositionChange: (x: number, y: number) => void
+  onClose: () => void
+  onSave: () => void
+  onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function ImagePositionEditor({
+  image,
+  zoom,
+  positionX,
+  positionY,
+  onZoomChange,
+  onPositionChange,
+  onClose,
+  onSave,
+  onFileUpload
+}: ImagePositionEditorProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const [startPosition, setStartPosition] = useState({ x: positionX, y: positionY })
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+    setDragStart({ x: e.clientX, y: e.clientY })
+    setStartPosition({ x: positionX, y: positionY })
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !containerRef.current) return
+
+    const containerRect = containerRef.current.getBoundingClientRect()
+    const deltaX = ((e.clientX - dragStart.x) / containerRect.width) * 100
+    const deltaY = ((e.clientY - dragStart.y) / containerRect.height) * 100
+
+    // Invert the delta because we're moving the image, not the viewport
+    const newX = Math.max(0, Math.min(100, startPosition.x - deltaX))
+    const newY = Math.max(0, Math.min(100, startPosition.y - deltaY))
+
+    onPositionChange(newX, newY)
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  const handleReset = () => {
+    onZoomChange(1)
+    onPositionChange(50, 50)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div
+        className="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-4 border-b flex items-center justify-between bg-gray-50">
+          <h3 className="text-lg font-semibold text-gray-900">Adjust Photo</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="p-6">
+          {/* Preview container */}
+          <div className="flex justify-center mb-6">
+            <div
+              ref={containerRef}
+              className="w-48 h-48 rounded-full overflow-hidden border-4 border-gray-200 cursor-move relative bg-gray-100"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+            >
+              <img
+                src={image || "/placeholder.svg"}
+                alt="Preview"
+                className="absolute w-full h-full select-none pointer-events-none"
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: `${positionX}% ${positionY}%`,
+                  transform: `scale(${zoom})`,
+                  transformOrigin: `${positionX}% ${positionY}%`
+                }}
+                draggable={false}
+              />
+              {isDragging && (
+                <div className="absolute inset-0 bg-blue-500/10 border-2 border-blue-500 rounded-full" />
+              )}
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-gray-500 mb-4">
+            Drag the image to reposition
+          </p>
+
+          {/* Zoom slider */}
+          <div className="mb-6">
+            <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-2">
+              <span>Zoom</span>
+              <span className="text-gray-500">{Math.round(zoom * 100)}%</span>
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="3"
+              step="0.05"
+              value={zoom}
+              onChange={(e) => onZoomChange(parseFloat(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>100%</span>
+              <span>300%</span>
+            </div>
+          </div>
+
+          {/* Position fine-tuning */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Horizontal Position
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={positionX}
+                onChange={(e) => onPositionChange(parseFloat(e.target.value), positionY)}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Vertical Position
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={positionY}
+                onChange={(e) => onPositionChange(positionX, parseFloat(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              />
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={onFileUpload}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+            >
+              Upload New Photo
+            </button>
+            <button
+              onClick={handleReset}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSave}
+            className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg text-sm font-medium"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 interface TeamMembersListEditorProps {
@@ -710,6 +917,12 @@ export function TeamMembersListEditor({
 }: TeamMembersListEditorProps) {
   const [showEditor, setShowEditor] = useState(false)
   const [localMembers, setLocalMembers] = useState<TeamMember[]>(members)
+  const [editingImageIndex, setEditingImageIndex] = useState<number | null>(null)
+  const [tempImageSettings, setTempImageSettings] = useState<{
+    zoom: number
+    positionX: number
+    positionY: number
+  } | null>(null)
 
   useEffect(() => {
     setLocalMembers(members)
@@ -731,12 +944,53 @@ export function TeamMembersListEditor({
       const result = await response.json()
       if (result.success) {
         const updated = [...localMembers]
-        updated[index] = { ...updated[index], image: result.path }
+        updated[index] = {
+          ...updated[index],
+          image: result.path,
+          // Reset positioning for new image
+          imageZoom: 1,
+          imagePositionX: 50,
+          imagePositionY: 50
+        }
         setLocalMembers(updated)
+        // Update temp settings if in image editor
+        if (editingImageIndex === index) {
+          setTempImageSettings({ zoom: 1, positionX: 50, positionY: 50 })
+        }
       }
     } catch (error) {
       console.error('Upload failed:', error)
     }
+  }
+
+  const handleOpenImageEditor = (index: number) => {
+    const member = localMembers[index]
+    setEditingImageIndex(index)
+    setTempImageSettings({
+      zoom: member.imageZoom ?? 1,
+      positionX: member.imagePositionX ?? 50,
+      positionY: member.imagePositionY ?? 50
+    })
+  }
+
+  const handleSaveImageSettings = () => {
+    if (editingImageIndex === null || !tempImageSettings) return
+
+    const updated = [...localMembers]
+    updated[editingImageIndex] = {
+      ...updated[editingImageIndex],
+      imageZoom: tempImageSettings.zoom,
+      imagePositionX: tempImageSettings.positionX,
+      imagePositionY: tempImageSettings.positionY
+    }
+    setLocalMembers(updated)
+    setEditingImageIndex(null)
+    setTempImageSettings(null)
+  }
+
+  const handleCloseImageEditor = () => {
+    setEditingImageIndex(null)
+    setTempImageSettings(null)
   }
 
   const handleAddMember = () => {
@@ -747,6 +1001,9 @@ export function TeamMembersListEditor({
       title: 'Title',
       image: '/team/placeholder.png',
       bio: 'Bio goes here...',
+      imageZoom: 1,
+      imagePositionX: 50,
+      imagePositionY: 50
     }
     setLocalMembers([...localMembers, newMember])
   }
@@ -826,29 +1083,28 @@ export function TeamMembersListEditor({
                 {localMembers.map((member, index) => (
                   <div key={member.id} className="border rounded-lg p-4 bg-gray-50">
                     <div className="flex items-start gap-4">
-                      {/* Image preview */}
-                      <div className="w-24 h-24 bg-white rounded-full border flex items-center justify-center overflow-hidden flex-shrink-0 relative group">
+                      {/* Image preview - clickable to open position editor */}
+                      <div
+                        className="w-24 h-24 bg-white rounded-full border-2 border-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0 relative group cursor-pointer hover:border-blue-400 transition-colors"
+                        onClick={() => handleOpenImageEditor(index)}
+                      >
                         <img
                           src={member.image}
                           alt={member.name}
-                          className="w-full h-full object-cover"
+                          className="absolute w-full h-full"
+                          style={{
+                            objectFit: 'cover',
+                            objectPosition: `${member.imagePositionX ?? 50}% ${member.imagePositionY ?? 50}%`,
+                            transform: `scale(${member.imageZoom ?? 1})`,
+                            transformOrigin: `${member.imagePositionX ?? 50}% ${member.imagePositionY ?? 50}%`
+                          }}
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = '/placeholder.svg'
                           }}
                         />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleFileUpload(e, index)}
-                          className="hidden"
-                          id={`member-upload-${index}`}
-                        />
-                        <label
-                          htmlFor={`member-upload-${index}`}
-                          className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer rounded-full"
-                        >
-                          <span className="text-white text-xs font-medium">Change</span>
-                        </label>
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
+                          <span className="text-white text-xs font-medium text-center px-2">Click to adjust</span>
+                        </div>
                       </div>
 
                       {/* Member details */}
@@ -955,6 +1211,21 @@ export function TeamMembersListEditor({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Image Position Editor Modal */}
+      {editingImageIndex !== null && tempImageSettings && (
+        <ImagePositionEditor
+          image={localMembers[editingImageIndex].image}
+          zoom={tempImageSettings.zoom}
+          positionX={tempImageSettings.positionX}
+          positionY={tempImageSettings.positionY}
+          onZoomChange={(zoom) => setTempImageSettings({ ...tempImageSettings, zoom })}
+          onPositionChange={(x, y) => setTempImageSettings({ ...tempImageSettings, positionX: x, positionY: y })}
+          onClose={handleCloseImageEditor}
+          onSave={handleSaveImageSettings}
+          onFileUpload={(e) => handleFileUpload(e, editingImageIndex)}
+        />
       )}
     </div>
   )
