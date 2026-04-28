@@ -3013,12 +3013,6 @@ export function PagePreview({ page, content, originalContent, onContentChange, e
           onContentChange={onContentChange}
           editorMode={editorMode}
         />
-        <HomeSEOContentPreview
-          content={content}
-          originalContent={originalContent}
-          onContentChange={onContentChange}
-          editorMode={editorMode}
-        />
         <HomeFAQPreview
           content={content}
           originalContent={originalContent}
