@@ -19,19 +19,19 @@ const DEFAULT_CONTENT = [
 
   // Home Page - Why Choose Us (from components/why-choose-us.tsx)
   { page: 'home', section: 'why-choose-us', content_key: 'section_title', content_value: 'Why Work with Speak About AI?' },
-  { page: 'home', section: 'why-choose-us', content_key: 'section_subtitle', content_value: "We book artificial intelligence keynote speakers for your organization's event who don't just talk about the future—they're the innovators building the tech." },
+  { page: 'home', section: 'why-choose-us', content_key: 'section_subtitle', content_value: "While other bureaus book professional speakers (generalist delivering hype-focused presentations), Speak About AI connects you with active practitioners who deliver strategy-focused, actionable implementation tailored to your specific industry." },
   { page: 'home', section: 'why-choose-us', content_key: 'feature1_title', content_value: 'Access to Exclusive AI Pioneers' },
   { page: 'home', section: 'why-choose-us', content_key: 'feature1_description', content_value: 'Direct connections to the architects of modern AI—Siri co-founders, former Shazam executives, and the researchers who literally authored the AI textbooks.' },
   { page: 'home', section: 'why-choose-us', content_key: 'feature2_title', content_value: '24-Hour Response Guarantee' },
-  { page: 'home', section: 'why-choose-us', content_key: 'feature2_description', content_value: 'Lightning-fast turnaround, guaranteed. From first inquiry to booking.' },
+  { page: 'home', section: 'why-choose-us', content_key: 'feature2_description', content_value: 'Lightning-fast turnaround, guaranteed. From first inquiry to booking:' },
   { page: 'home', section: 'why-choose-us', content_key: 'feature3_title', content_value: 'White-Glove Speaker Coordination' },
-  { page: 'home', section: 'why-choose-us', content_key: 'feature3_description', content_value: 'We ensure seamless execution from booking to showtime.' },
+  { page: 'home', section: 'why-choose-us', content_key: 'feature3_description', content_value: 'We ensure seamless execution from booking to showtime:' },
   { page: 'home', section: 'why-choose-us', content_key: 'feature4_title', content_value: 'We Help You Navigate The Noise' },
-  { page: 'home', section: 'why-choose-us', content_key: 'feature4_description', content_value: 'Cut through the AI hype with our deep industry expertise and transparent guidance.' },
+  { page: 'home', section: 'why-choose-us', content_key: 'feature4_description', content_value: 'Cut through the AI hype with our deep industry expertise and transparent guidance:' },
   { page: 'home', section: 'why-choose-us', content_key: 'feature5_title', content_value: 'Proven Stage Presence' },
-  { page: 'home', section: 'why-choose-us', content_key: 'feature5_description', content_value: 'Our speakers command every venue with authority and authenticity.' },
+  { page: 'home', section: 'why-choose-us', content_key: 'feature5_description', content_value: 'Our speakers command every venue with authority and authenticity:' },
   { page: 'home', section: 'why-choose-us', content_key: 'feature6_title', content_value: 'Actionable Industry Intelligence' },
-  { page: 'home', section: 'why-choose-us', content_key: 'feature6_description', content_value: 'Tailored AI insights for your sector with concrete next steps.' },
+  { page: 'home', section: 'why-choose-us', content_key: 'feature6_description', content_value: 'Tailored AI insights for your sector with concrete next steps:' },
 
   // Home Page - Navigate the Speaker Landscape (from components/navigate-the-noise.tsx)
   { page: 'home', section: 'navigate', content_key: 'section_title', content_value: 'Navigate the AI Speaker Landscape' },

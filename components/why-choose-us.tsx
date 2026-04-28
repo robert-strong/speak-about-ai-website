@@ -5,120 +5,88 @@ interface Feature {
   icon: any
   title: string
   description: string
-  highlights?: string[]
-}
-
-// Default features with icon mappings
-const defaultFeatures: Feature[] = [
-  {
-    icon: Users,
-    title: "Access to Exclusive AI Pioneers",
-    description:
-      "Direct connections to the architects of modern AI—Siri co-founders, former Shazam executives, and the researchers who literally authored the AI textbooks.",
-    highlights: [
-      "Innovators who built products used by billions",
-      "Stanford & MIT faculty and researchers",
-      "Former executives from OpenAI, Google, Meta, Amazon"
-    ]
-  },
-  {
-    icon: Shield,
-    title: "24-Hour Response Guarantee",
-    description:
-      "Lightning-fast turnaround, guaranteed. From first inquiry to booking:",
-    highlights: [
-      "Initial response: within 24 hours of inquiry",
-      "Custom recommendations matched to your event needs",
-      "Speaker availability check: we reach out to speakers immediately",
-      "Contract finalization: 3-5 business days after speaker confirmation",
-      "Typical booking timeline: 1-2 weeks for most engagements"
-    ]
-  },
-  {
-    icon: Headphones,
-    title: "White-Glove Speaker Coordination",
-    description:
-      "We ensure seamless execution from booking to showtime:",
-    highlights: [
-      "Pre-event briefings: coordinate speaker prep calls with your team",
-      "Technical checks: arrange and facilitate tech rehearsals",
-      "On-site support: we attend events in-person where possible",
-      "Multi-engagement coordination: ensure speaker availability for additional sessions",
-      "Direct liaison: single point of contact throughout the entire process"
-    ]
-  },
-  {
-    icon: Target,
-    title: "We Help You Navigate The Noise",
-    description:
-      "Cut through the AI hype with our deep industry expertise and transparent guidance:",
-    highlights: [
-      "Budget ranges: $5K-$20K (emerging experts) to $20K+ (industry leaders)",
-      "Audience types: executives, engineers, entrepreneurs, medical professionals, public sector, academic institutions",
-      "Global delivery: worldwide coverage + virtual/hybrid capabilities",
-      "Custom recommendations within 24 hours of inquiry",
-      "Our speakers tailor AI talk depth to your audience"
-    ]
-  },
-  {
-    icon: Globe,
-    title: "Proven Stage Presence",
-    description:
-      "Our speakers command every venue with authority and authenticity:",
-    highlights: [
-      "Delivery styles: visionary storytellers, pragmatic operators, data-led strategists",
-      "Venue experience: intimate boardrooms to 10,000+ stadium keynotes",
-      "Context-aware messaging aligned to your audience & objectives",
-      "Due diligence on sensitive topics (ethics, bias, job displacement)",
-      "We brief speakers thoroughly to ensure appropriate tone & depth"
-    ]
-  },
-  {
-    icon: Clock,
-    title: "Actionable Industry Intelligence",
-    description:
-      "Tailored AI insights for your sector with concrete next steps:",
-    highlights: [
-      "Proven frameworks & ROI-focused implementation strategies",
-      "Real-world case studies: documented metrics from Fortune 500 deployments",
-      "Immediate action: tactical roadmaps your team can execute Monday morning",
-      "Industry examples: productivity improvements, accelerated rollouts, cost optimization strategies",
-      "Post-event resources: slides, recordings, follow-up Q&A sessions"
-    ]
-  },
-]
-
-// Icon mapping for database-stored features
-const iconMap: { [key: string]: any } = {
-  Users,
-  Shield,
-  Headphones,
-  Target,
-  Globe,
-  Clock
+  highlights: string[]
 }
 
 export default async function WhyChooseUs() {
   // Fetch content from database
   const content = await getPageContent('home')
   const title = getFromContent(content, 'home', 'why-choose-us', 'section_title') || 'Why Work with Speak About AI?'
-  const subtitle = getFromContent(content, 'home', 'why-choose-us', 'section_subtitle') || "We book artificial intelligence keynote speakers for your organization's event who don't just talk about the future—they're the innovators building the tech."
+  const subtitle = getFromContent(content, 'home', 'why-choose-us', 'section_subtitle') || "While other bureaus book professional speakers (generalist delivering hype-focused presentations), Speak About AI connects you with active practitioners who deliver strategy-focused, actionable implementation tailored to your specific industry."
 
-  // Try to get features from database, otherwise use defaults
-  const featuresJson = getFromContent(content, 'home', 'why-choose-us', 'features')
-  let features = defaultFeatures
-  if (featuresJson) {
-    try {
-      const dbFeatures = JSON.parse(featuresJson)
-      // Map icon strings back to components
-      features = dbFeatures.map((f: any) => ({
-        ...f,
-        icon: iconMap[f.icon] || Users
-      }))
-    } catch (e) {
-      // Use defaults if JSON parsing fails
-    }
-  }
+  // Build features from individual database fields with bullet points
+  const features: Feature[] = [
+    {
+      icon: Users,
+      title: getFromContent(content, 'home', 'why-choose-us', 'feature1_title') || 'Access to Exclusive AI Pioneers',
+      description: getFromContent(content, 'home', 'why-choose-us', 'feature1_description') || 'Direct connections to the architects of modern AI—Siri co-founders, former Shazam executives, and the researchers who literally authored the AI textbooks.',
+      highlights: [
+        "Innovators who built products used by billions",
+        "Stanford & MIT faculty and researchers",
+        "Former executives from OpenAI, Google, Meta, Amazon"
+      ]
+    },
+    {
+      icon: Shield,
+      title: getFromContent(content, 'home', 'why-choose-us', 'feature2_title') || '24-Hour Response Guarantee',
+      description: getFromContent(content, 'home', 'why-choose-us', 'feature2_description') || 'Lightning-fast turnaround, guaranteed. From first inquiry to booking:',
+      highlights: [
+        "Initial response: within 24 hours of inquiry",
+        "Custom recommendations matched to your event needs",
+        "Speaker availability check: we reach out to speakers immediately",
+        "Contract finalization: 3-5 business days after speaker confirmation",
+        "Typical booking timeline: 1-2 weeks for most engagements"
+      ]
+    },
+    {
+      icon: Headphones,
+      title: getFromContent(content, 'home', 'why-choose-us', 'feature3_title') || 'White-Glove Speaker Coordination',
+      description: getFromContent(content, 'home', 'why-choose-us', 'feature3_description') || 'We ensure seamless execution from booking to showtime:',
+      highlights: [
+        "Pre-event briefings: coordinate speaker prep calls with your team",
+        "Technical checks: arrange and facilitate tech rehearsals",
+        "On-site support: we attend events in-person where possible",
+        "Multi-engagement coordination: ensure speaker availability for additional sessions",
+        "Direct liaison: single point of contact throughout the entire process"
+      ]
+    },
+    {
+      icon: Target,
+      title: getFromContent(content, 'home', 'why-choose-us', 'feature4_title') || 'We Help You Navigate The Noise',
+      description: getFromContent(content, 'home', 'why-choose-us', 'feature4_description') || 'Cut through the AI hype with our deep industry expertise and transparent guidance:',
+      highlights: [
+        "Budget ranges: $5K-$20K (emerging experts) to $20K+ (industry leaders)",
+        "Audience types: executives, engineers, entrepreneurs, medical professionals, public sector, academic institutions",
+        "Global delivery: worldwide coverage + virtual/hybrid capabilities",
+        "Custom recommendations within 24 hours of inquiry",
+        "Our speakers tailor AI talk depth to your audience"
+      ]
+    },
+    {
+      icon: Globe,
+      title: getFromContent(content, 'home', 'why-choose-us', 'feature5_title') || 'Proven Stage Presence',
+      description: getFromContent(content, 'home', 'why-choose-us', 'feature5_description') || 'Our speakers command every venue with authority and authenticity:',
+      highlights: [
+        "Delivery styles: visionary storytellers, pragmatic operators, data-led strategists",
+        "Venue experience: intimate boardrooms to 10,000+ stadium keynotes",
+        "Context-aware messaging aligned to your audience & objectives",
+        "Due diligence on sensitive topics (ethics, bias, job displacement)",
+        "We brief speakers thoroughly to ensure appropriate tone & depth"
+      ]
+    },
+    {
+      icon: Clock,
+      title: getFromContent(content, 'home', 'why-choose-us', 'feature6_title') || 'Actionable Industry Intelligence',
+      description: getFromContent(content, 'home', 'why-choose-us', 'feature6_description') || 'Tailored AI insights for your sector with concrete next steps:',
+      highlights: [
+        "Proven frameworks & ROI-focused implementation strategies",
+        "Real-world case studies: documented metrics from Fortune 500 deployments",
+        "Immediate action: tactical roadmaps your team can execute Monday morning",
+        "Industry examples: productivity improvements, accelerated rollouts, cost optimization strategies",
+        "Post-event resources: slides, recordings, follow-up Q&A sessions"
+      ]
+    },
+  ]
 
   return (
     <section className="py-20 bg-gray-50">

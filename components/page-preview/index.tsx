@@ -120,7 +120,7 @@ function HomeWhyChooseUsPreview({
   editorMode = true
 }: Omit<PagePreviewProps, 'page'>) {
   const sectionTitle = content['home.why-choose-us.section_title'] || 'Why Work with Speak About AI?'
-  const sectionSubtitle = content['home.why-choose-us.section_subtitle'] || 'We book artificial intelligence keynote speakers for your organization\'s event who don\'t just talk about the future—they\'re the innovators building the tech.'
+  const sectionSubtitle = content['home.why-choose-us.section_subtitle'] || 'While other bureaus book professional speakers (generalist delivering hype-focused presentations), Speak About AI connects you with active practitioners who deliver strategy-focused, actionable implementation tailored to your specific industry.'
 
   const features = [
     {
@@ -128,42 +128,82 @@ function HomeWhyChooseUsPreview({
       titleKey: 'feature1_title',
       descKey: 'feature1_description',
       defaultTitle: 'Access to Exclusive AI Pioneers',
-      defaultDesc: 'Direct connections to the architects of modern AI—Siri co-founders, former Shazam executives, and the researchers who literally authored the AI textbooks.'
+      defaultDesc: 'Direct connections to the architects of modern AI—Siri co-founders, former Shazam executives, and the researchers who literally authored the AI textbooks.',
+      highlights: [
+        "Innovators who built products used by billions",
+        "Stanford & MIT faculty and researchers",
+        "Former executives from OpenAI, Google, Meta, Amazon"
+      ]
     },
     {
       icon: Shield,
       titleKey: 'feature2_title',
       descKey: 'feature2_description',
       defaultTitle: '24-Hour Response Guarantee',
-      defaultDesc: 'Lightning-fast turnaround, guaranteed. From first inquiry to booking.'
+      defaultDesc: 'Lightning-fast turnaround, guaranteed. From first inquiry to booking:',
+      highlights: [
+        "Initial response: within 24 hours of inquiry",
+        "Custom recommendations matched to your event needs",
+        "Speaker availability check: we reach out to speakers immediately",
+        "Contract finalization: 3-5 business days after speaker confirmation",
+        "Typical booking timeline: 1-2 weeks for most engagements"
+      ]
     },
     {
       icon: Headphones,
       titleKey: 'feature3_title',
       descKey: 'feature3_description',
       defaultTitle: 'White-Glove Speaker Coordination',
-      defaultDesc: 'We ensure seamless execution from booking to showtime.'
+      defaultDesc: 'We ensure seamless execution from booking to showtime:',
+      highlights: [
+        "Pre-event briefings: coordinate speaker prep calls with your team",
+        "Technical checks: arrange and facilitate tech rehearsals",
+        "On-site support: we attend events in-person where possible",
+        "Multi-engagement coordination: ensure speaker availability for additional sessions",
+        "Direct liaison: single point of contact throughout the entire process"
+      ]
     },
     {
       icon: Target,
       titleKey: 'feature4_title',
       descKey: 'feature4_description',
       defaultTitle: 'We Help You Navigate The Noise',
-      defaultDesc: 'Cut through the AI hype with our deep industry expertise and transparent guidance.'
+      defaultDesc: 'Cut through the AI hype with our deep industry expertise and transparent guidance:',
+      highlights: [
+        "Budget ranges: $5K-$20K (emerging experts) to $20K+ (industry leaders)",
+        "Audience types: executives, engineers, entrepreneurs, medical professionals, public sector, academic institutions",
+        "Global delivery: worldwide coverage + virtual/hybrid capabilities",
+        "Custom recommendations within 24 hours of inquiry",
+        "Our speakers tailor AI talk depth to your audience"
+      ]
     },
     {
       icon: Globe,
       titleKey: 'feature5_title',
       descKey: 'feature5_description',
       defaultTitle: 'Proven Stage Presence',
-      defaultDesc: 'Our speakers command every venue with authority and authenticity.'
+      defaultDesc: 'Our speakers command every venue with authority and authenticity:',
+      highlights: [
+        "Delivery styles: visionary storytellers, pragmatic operators, data-led strategists",
+        "Venue experience: intimate boardrooms to 10,000+ stadium keynotes",
+        "Context-aware messaging aligned to your audience & objectives",
+        "Due diligence on sensitive topics (ethics, bias, job displacement)",
+        "We brief speakers thoroughly to ensure appropriate tone & depth"
+      ]
     },
     {
       icon: Clock,
       titleKey: 'feature6_title',
       descKey: 'feature6_description',
       defaultTitle: 'Actionable Industry Intelligence',
-      defaultDesc: 'Tailored AI insights for your sector with concrete next steps.'
+      defaultDesc: 'Tailored AI insights for your sector with concrete next steps:',
+      highlights: [
+        "Proven frameworks & ROI-focused implementation strategies",
+        "Real-world case studies: documented metrics from Fortune 500 deployments",
+        "Immediate action: tactical roadmaps your team can execute Monday morning",
+        "Industry examples: productivity improvements, accelerated rollouts, cost optimization strategies",
+        "Post-event resources: slides, recordings, follow-up Q&A sessions"
+      ]
     },
   ]
 
@@ -219,11 +259,35 @@ function HomeWhyChooseUsPreview({
                   value={description}
                   onChange={(v) => onContentChange(descKey, v)}
                   as="p"
-                  className="text-gray-700 leading-relaxed font-montserrat text-sm"
+                  className="text-gray-700 leading-relaxed font-montserrat text-sm mb-4"
                   multiline
                   isModified={isModified(descKey, content, originalContent)}
                   editorMode={editorMode}
                 />
+                {feature.highlights && feature.highlights.length > 0 && (
+                  <ul className="space-y-2">
+                    {feature.highlights.map((highlight: string, idx: number) => {
+                      const parts = highlight.split(':')
+                      if (parts.length > 1) {
+                        return (
+                          <li key={idx} className="flex items-start gap-2 text-xs text-gray-600 font-montserrat">
+                            <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#1E68C6] mt-1.5"></span>
+                            <span className="leading-relaxed">
+                              <strong className="font-bold text-gray-900">{parts[0]}:</strong>
+                              {parts.slice(1).join(':')}
+                            </span>
+                          </li>
+                        )
+                      }
+                      return (
+                        <li key={idx} className="flex items-start gap-2 text-xs text-gray-600 font-montserrat">
+                          <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#1E68C6] mt-1.5"></span>
+                          <span className="leading-relaxed">{highlight}</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
               </div>
             )
           })}
