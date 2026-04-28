@@ -359,7 +359,12 @@ const DEFAULT_CONTENT = [
   { page: 'footer', section: 'industries', content_key: 'title', content_value: 'Industries' },
   { page: 'footer', section: 'industries', content_key: 'links', content_value: JSON.stringify([
     { text: 'Healthcare AI', url: '/industries/healthcare-keynote-speakers' },
-    { text: 'Technology & Enterprise', url: '/industries/technology-keynote-speakers' }
+    { text: 'Technology & Enterprise', url: '/industries/technology-keynote-speakers' },
+    { text: 'Financial Services', url: '/industries/financial-services-keynote-speakers' },
+    { text: 'Leadership & Business', url: '/industries/leadership-business-keynote-speakers' },
+    { text: 'Sales, Marketing & Retail', url: '/industries/sales-marketing-keynote-speakers' },
+    { text: 'Industrial & Automotive', url: '/industries/industrial-automotive-keynote-speakers' },
+    { text: 'Government & Education', url: '/industries/government-education-keynote-speakers' }
   ]) },
 
   // Footer - For Speakers
