@@ -849,6 +849,39 @@ export async function getSpeakersByIndustry(industry: string): Promise<Speaker[]
             primaryIndustry.includes("retail")
           )
 
+        case "industrial":
+          return (
+            primaryIndustry === "industrial" ||
+            primaryIndustry === "automotive" ||
+            primaryIndustry === "manufacturing" ||
+            primaryIndustry === "logistics" ||
+            primaryIndustry === "supply chain" ||
+            primaryIndustry === "energy" ||
+            primaryIndustry === "utilities" ||
+            primaryIndustry.includes("industrial") ||
+            primaryIndustry.includes("automotive") ||
+            primaryIndustry.includes("manufacturing") ||
+            primaryIndustry.includes("logistics") ||
+            primaryIndustry.includes("supply chain") ||
+            primaryIndustry.includes("energy")
+          )
+
+        case "government":
+          return (
+            primaryIndustry === "government" ||
+            primaryIndustry === "education" ||
+            primaryIndustry === "public sector" ||
+            primaryIndustry === "nonprofit" ||
+            primaryIndustry === "academia" ||
+            primaryIndustry === "policy" ||
+            primaryIndustry.includes("government") ||
+            primaryIndustry.includes("education") ||
+            primaryIndustry.includes("public") ||
+            primaryIndustry.includes("nonprofit") ||
+            primaryIndustry.includes("academia") ||
+            primaryIndustry.includes("policy")
+          )
+
         default:
           // For other industries, use exact match or starts with
           return primaryIndustry === normalizedIndustry || primaryIndustry.startsWith(normalizedIndustry + " ")
