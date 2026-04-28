@@ -32,16 +32,56 @@ export const CONTENT_DEFAULTS = {
       section_subtitle: "While other bureaus book professional speakers (generalist delivering hype-focused presentations), Speak About AI connects you with active practitioners who deliver strategy-focused, actionable implementation tailored to your specific industry.",
       feature1_title: 'Access to Exclusive AI Pioneers',
       feature1_description: 'Direct connections to the architects of modern AI—Siri co-founders, former Shazam executives, and the researchers who literally authored the AI textbooks.',
+      feature1_highlights: JSON.stringify([
+        "Innovators who built products used by billions",
+        "Stanford & MIT faculty and researchers",
+        "Former executives from OpenAI, Google, Meta, Amazon"
+      ]),
       feature2_title: '24-Hour Response Guarantee',
       feature2_description: 'Lightning-fast turnaround, guaranteed. From first inquiry to booking:',
+      feature2_highlights: JSON.stringify([
+        "Initial response: within 24 hours of inquiry",
+        "Custom recommendations matched to your event needs",
+        "Speaker availability check: we reach out to speakers immediately",
+        "Contract finalization: 3-5 business days after speaker confirmation",
+        "Typical booking timeline: 1-2 weeks for most engagements"
+      ]),
       feature3_title: 'White-Glove Speaker Coordination',
       feature3_description: 'We ensure seamless execution from booking to showtime:',
+      feature3_highlights: JSON.stringify([
+        "Pre-event briefings: coordinate speaker prep calls with your team",
+        "Technical checks: arrange and facilitate tech rehearsals",
+        "On-site support: we attend events in-person where possible",
+        "Multi-engagement coordination: ensure speaker availability for additional sessions",
+        "Direct liaison: single point of contact throughout the entire process"
+      ]),
       feature4_title: 'We Help You Navigate The Noise',
       feature4_description: 'Cut through the AI hype with our deep industry expertise and transparent guidance:',
+      feature4_highlights: JSON.stringify([
+        "Budget ranges: $5K-$20K (emerging experts) to $20K+ (industry leaders)",
+        "Audience types: executives, engineers, entrepreneurs, medical professionals, public sector, academic institutions",
+        "Global delivery: worldwide coverage + virtual/hybrid capabilities",
+        "Custom recommendations within 24 hours of inquiry",
+        "Our speakers tailor AI talk depth to your audience"
+      ]),
       feature5_title: 'Proven Stage Presence',
       feature5_description: 'Our speakers command every venue with authority and authenticity:',
+      feature5_highlights: JSON.stringify([
+        "Delivery styles: visionary storytellers, pragmatic operators, data-led strategists",
+        "Venue experience: intimate boardrooms to 10,000+ stadium keynotes",
+        "Context-aware messaging aligned to your audience & objectives",
+        "Due diligence on sensitive topics (ethics, bias, job displacement)",
+        "We brief speakers thoroughly to ensure appropriate tone & depth"
+      ]),
       feature6_title: 'Actionable Industry Intelligence',
       feature6_description: 'Tailored AI insights for your sector with concrete next steps:',
+      feature6_highlights: JSON.stringify([
+        "Proven frameworks & ROI-focused implementation strategies",
+        "Real-world case studies: documented metrics from Fortune 500 deployments",
+        "Immediate action: tactical roadmaps your team can execute Monday morning",
+        "Industry examples: productivity improvements, accelerated rollouts, cost optimization strategies",
+        "Post-event resources: slides, recordings, follow-up Q&A sessions"
+      ]),
     },
     navigate: {
       section_title: 'Navigate the AI Speaker Landscape',

@@ -113,6 +113,17 @@ function HomeHeroPreview({
 }
 
 // Home Why Choose Us Preview
+// Helper to parse highlights from JSON string
+function parseHighlightsJson(json: string | undefined, defaultValue: string[]): string[] {
+  if (!json) return defaultValue
+  try {
+    const parsed = JSON.parse(json)
+    return Array.isArray(parsed) ? parsed : defaultValue
+  } catch {
+    return defaultValue
+  }
+}
+
 function HomeWhyChooseUsPreview({
   content,
   originalContent,
@@ -127,9 +138,10 @@ function HomeWhyChooseUsPreview({
       icon: Users,
       titleKey: 'feature1_title',
       descKey: 'feature1_description',
+      highlightsKey: 'feature1_highlights',
       defaultTitle: 'Access to Exclusive AI Pioneers',
       defaultDesc: 'Direct connections to the architects of modern AI—Siri co-founders, former Shazam executives, and the researchers who literally authored the AI textbooks.',
-      highlights: [
+      defaultHighlights: [
         "Innovators who built products used by billions",
         "Stanford & MIT faculty and researchers",
         "Former executives from OpenAI, Google, Meta, Amazon"
@@ -139,9 +151,10 @@ function HomeWhyChooseUsPreview({
       icon: Shield,
       titleKey: 'feature2_title',
       descKey: 'feature2_description',
+      highlightsKey: 'feature2_highlights',
       defaultTitle: '24-Hour Response Guarantee',
       defaultDesc: 'Lightning-fast turnaround, guaranteed. From first inquiry to booking:',
-      highlights: [
+      defaultHighlights: [
         "Initial response: within 24 hours of inquiry",
         "Custom recommendations matched to your event needs",
         "Speaker availability check: we reach out to speakers immediately",
@@ -153,9 +166,10 @@ function HomeWhyChooseUsPreview({
       icon: Headphones,
       titleKey: 'feature3_title',
       descKey: 'feature3_description',
+      highlightsKey: 'feature3_highlights',
       defaultTitle: 'White-Glove Speaker Coordination',
       defaultDesc: 'We ensure seamless execution from booking to showtime:',
-      highlights: [
+      defaultHighlights: [
         "Pre-event briefings: coordinate speaker prep calls with your team",
         "Technical checks: arrange and facilitate tech rehearsals",
         "On-site support: we attend events in-person where possible",
@@ -167,9 +181,10 @@ function HomeWhyChooseUsPreview({
       icon: Target,
       titleKey: 'feature4_title',
       descKey: 'feature4_description',
+      highlightsKey: 'feature4_highlights',
       defaultTitle: 'We Help You Navigate The Noise',
       defaultDesc: 'Cut through the AI hype with our deep industry expertise and transparent guidance:',
-      highlights: [
+      defaultHighlights: [
         "Budget ranges: $5K-$20K (emerging experts) to $20K+ (industry leaders)",
         "Audience types: executives, engineers, entrepreneurs, medical professionals, public sector, academic institutions",
         "Global delivery: worldwide coverage + virtual/hybrid capabilities",
@@ -181,9 +196,10 @@ function HomeWhyChooseUsPreview({
       icon: Globe,
       titleKey: 'feature5_title',
       descKey: 'feature5_description',
+      highlightsKey: 'feature5_highlights',
       defaultTitle: 'Proven Stage Presence',
       defaultDesc: 'Our speakers command every venue with authority and authenticity:',
-      highlights: [
+      defaultHighlights: [
         "Delivery styles: visionary storytellers, pragmatic operators, data-led strategists",
         "Venue experience: intimate boardrooms to 10,000+ stadium keynotes",
         "Context-aware messaging aligned to your audience & objectives",
@@ -195,9 +211,10 @@ function HomeWhyChooseUsPreview({
       icon: Clock,
       titleKey: 'feature6_title',
       descKey: 'feature6_description',
+      highlightsKey: 'feature6_highlights',
       defaultTitle: 'Actionable Industry Intelligence',
       defaultDesc: 'Tailored AI insights for your sector with concrete next steps:',
-      highlights: [
+      defaultHighlights: [
         "Proven frameworks & ROI-focused implementation strategies",
         "Real-world case studies: documented metrics from Fortune 500 deployments",
         "Immediate action: tactical roadmaps your team can execute Monday morning",
@@ -234,8 +251,10 @@ function HomeWhyChooseUsPreview({
           {features.map((feature, index) => {
             const titleKey = `home.why-choose-us.${feature.titleKey}`
             const descKey = `home.why-choose-us.${feature.descKey}`
+            const highlightsKey = `home.why-choose-us.${feature.highlightsKey}`
             const title = content[titleKey] || feature.defaultTitle
             const description = content[descKey] || feature.defaultDesc
+            const highlights = parseHighlightsJson(content[highlightsKey], feature.defaultHighlights)
 
             return (
               <div
@@ -264,29 +283,52 @@ function HomeWhyChooseUsPreview({
                   isModified={isModified(descKey, content, originalContent)}
                   editorMode={editorMode}
                 />
-                {feature.highlights && feature.highlights.length > 0 && (
-                  <ul className="space-y-2">
-                    {feature.highlights.map((highlight: string, idx: number) => {
-                      const parts = highlight.split(':')
-                      if (parts.length > 1) {
-                        return (
-                          <li key={idx} className="flex items-start gap-2 text-xs text-gray-600 font-montserrat">
-                            <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#1E68C6] mt-1.5"></span>
-                            <span className="leading-relaxed">
-                              <strong className="font-bold text-gray-900">{parts[0]}:</strong>
-                              {parts.slice(1).join(':')}
-                            </span>
-                          </li>
-                        )
+                {highlights && highlights.length > 0 && (
+                  <ul className="space-y-2 mb-3">
+                    {highlights.map((highlight: string, idx: number) => {
+                      // Support **bold** markdown and auto-bold text before colons
+                      const renderHighlight = (text: string) => {
+                        // First check for **bold** markdown
+                        if (text.includes('**')) {
+                          const parts = text.split(/(\*\*[^*]+\*\*)/g)
+                          return parts.map((part, i) => {
+                            if (part.startsWith('**') && part.endsWith('**')) {
+                              return <strong key={i} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>
+                            }
+                            return <span key={i}>{part}</span>
+                          })
+                        }
+                        // Fall back to auto-bold text before colons
+                        const colonParts = text.split(':')
+                        if (colonParts.length > 1) {
+                          return (
+                            <>
+                              <strong className="font-bold text-gray-900">{colonParts[0]}:</strong>
+                              {colonParts.slice(1).join(':')}
+                            </>
+                          )
+                        }
+                        return text
                       }
+
                       return (
                         <li key={idx} className="flex items-start gap-2 text-xs text-gray-600 font-montserrat">
                           <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#1E68C6] mt-1.5"></span>
-                          <span className="leading-relaxed">{highlight}</span>
+                          <span className="leading-relaxed">{renderHighlight(highlight)}</span>
                         </li>
                       )
                     })}
                   </ul>
+                )}
+                {editorMode && (
+                  <SimpleListEditor
+                    items={highlights}
+                    onChange={(newHighlights) => onContentChange(highlightsKey, JSON.stringify(newHighlights))}
+                    isModified={isModified(highlightsKey, content, originalContent)}
+                    editorMode={editorMode}
+                    title={`Edit ${title} Bullets`}
+                    buttonText={`Edit Bullets (${highlights.length})`}
+                  />
                 )}
               </div>
             )
