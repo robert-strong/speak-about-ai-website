@@ -4,7 +4,6 @@ import ClientLogos from "@/components/client-logos"
 import FeaturedSpeakers from "@/components/featured-speakers"
 import WhyChooseUs from "@/components/why-choose-us"
 import NavigateTheNoise from "@/components/navigate-the-noise"
-import SEOContent from "@/components/seo-content"
 import HomeFAQSection from "@/components/home-faq-section"
 import BookingCTA from "@/components/booking-cta"
 import { getFeaturedSpeakers, type Speaker } from "@/lib/speakers-data"
@@ -198,7 +197,6 @@ export default async function HomePage() {
         />
         <WhyChooseUs />
         <NavigateTheNoise />
-        <SEOContent />
         <HomeFAQSection />
         <BookingCTA />
       </main>
