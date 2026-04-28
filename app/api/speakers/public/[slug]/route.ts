@@ -55,7 +55,9 @@ export async function GET(
       title: speaker.one_liner || '',
       bio: speaker.bio || speaker.short_bio || '',
       image: speaker.headshot_url || '',
-      programs: Array.isArray(speaker.programs) ? speaker.programs : [],
+      programs: Array.isArray(speaker.programs) && speaker.programs.length > 0
+        ? speaker.programs
+        : (Array.isArray(speaker.topics) ? speaker.topics : []),
       industries: Array.isArray(speaker.industries) ? speaker.industries : [],
       fee: speaker.speaking_fee_range || '',
       feeRange: speaker.speaking_fee_range || '',

@@ -668,7 +668,9 @@ export async function getSpeakerBySlug(slug: string): Promise<Speaker | undefine
             image: dbSpeaker.headshot_url || '',
             imagePosition: dbSpeaker.image_position || 'center',
             imageOffsetY: dbSpeaker.image_offset || '0%',
-            programs: parseJsonField(dbSpeaker.programs),
+            programs: parseJsonField(dbSpeaker.programs).length > 0
+              ? parseJsonField(dbSpeaker.programs)
+              : parseJsonField(dbSpeaker.topics),
             industries: parseJsonField(dbSpeaker.industries),
             fee: dbSpeaker.speaking_fee_range || 'Please Inquire',
             feeRange: dbSpeaker.speaking_fee_range || '',
