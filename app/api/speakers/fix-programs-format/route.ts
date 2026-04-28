@@ -1,21 +1,121 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 
+export async function GET(request: NextRequest) {
+  // GET: Check for speakers with comma-separated programs (don't fix, just report)
+  try {
+    const sql = neon(process.env.DATABASE_URL!)
+
+    const speakers = await sql`
+      SELECT id, name, programs
+      FROM speakers
+      WHERE programs IS NOT NULL
+      AND programs != 'null'
+      AND programs != '[]'
+      ORDER BY name
+    `
+
+    const issues: any[] = []
+
+    for (const speaker of speakers) {
+      const programs = speaker.programs
+
+      if (Array.isArray(programs)) {
+        for (const program of programs) {
+          if (typeof program === 'string' && program.includes(',')) {
+            const parts = program.split(',').map((p: string) => p.trim()).filter((p: string) => p.length > 3)
+            if (parts.length >= 2) {
+              issues.push({
+                id: speaker.id,
+                name: speaker.name,
+                problematicProgram: program,
+                suggestedSplit: parts
+              })
+            }
+          }
+        }
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      totalSpeakersChecked: speakers.length,
+      issuesFound: issues.length,
+      issues
+    })
+
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json({
+      error: 'Failed',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const sql = neon(process.env.DATABASE_URL!)
-    
-    // Get all speakers with programs that aren't in proper JSON array format
+
+    // PART 1: Fix speakers with comma-separated strings inside valid arrays
+    const allSpeakers = await sql`
+      SELECT id, name, programs
+      FROM speakers
+      WHERE programs IS NOT NULL
+      AND programs != 'null'
+      AND programs != '[]'
+    `
+
+    const fixedComma: any[] = []
+
+    for (const speaker of allSpeakers) {
+      const programs = speaker.programs
+
+      if (Array.isArray(programs)) {
+        let needsFix = false
+        const newPrograms: string[] = []
+
+        for (const program of programs) {
+          if (typeof program === 'string' && program.includes(',')) {
+            const parts = program.split(',').map((p: string) => p.trim()).filter((p: string) => p.length > 3)
+            if (parts.length >= 2) {
+              needsFix = true
+              newPrograms.push(...parts)
+            } else {
+              newPrograms.push(program)
+            }
+          } else if (typeof program === 'string') {
+            newPrograms.push(program)
+          }
+        }
+
+        if (needsFix) {
+          await sql`
+            UPDATE speakers
+            SET programs = ${JSON.stringify(newPrograms)}::jsonb
+            WHERE id = ${speaker.id}
+          `
+          fixedComma.push({
+            id: speaker.id,
+            name: speaker.name,
+            before: programs,
+            after: newPrograms
+          })
+        }
+      }
+    }
+
+    // PART 2: Fix speakers with programs that aren't in proper JSON array format
     const speakersToFix = await sql`
-      SELECT id, name, programs 
-      FROM speakers 
-      WHERE programs IS NOT NULL 
+      SELECT id, name, programs
+      FROM speakers
+      WHERE programs IS NOT NULL
       AND programs != 'null'
       AND programs != '[]'
       AND programs::text NOT LIKE '[%]'
     `
-    
-    console.log(`Found ${speakersToFix.length} speakers to fix`)
+
+    console.log(`Found ${speakersToFix.length} speakers to fix (non-array format)`)
     
     const fixed = []
     const failed = []
@@ -90,10 +190,11 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      message: `Fixed ${fixed.length} speakers, failed ${failed.length}`,
-      fixed: fixed.slice(0, 10), // Show first 10 fixed
+      message: `Fixed ${fixedComma.length} comma-separated, ${fixed.length} non-array format, ${failed.length} failed`,
+      fixedCommaSeparated: fixedComma,
+      fixedNonArray: fixed.slice(0, 10),
       failed
     })
     
