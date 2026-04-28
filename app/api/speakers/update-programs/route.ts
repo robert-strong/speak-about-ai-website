@@ -28,14 +28,23 @@ export async function POST(request: NextRequest) {
       WHERE name = 'Gopi Kallayil'
       RETURNING name, programs
     `
-    
-    return NextResponse.json({ 
-      success: true, 
+
+    // Update Jonathan Brill - split his programs into separate items
+    const jonathan = await sql`
+      UPDATE speakers
+      SET programs = '["The Five-Year Future", "AI on Your Org Chart", "Architect Your Future"]'::jsonb
+      WHERE name = 'Jonathan Brill'
+      RETURNING name, programs
+    `
+
+    return NextResponse.json({
+      success: true,
       message: 'Programs updated successfully',
       updated: {
         adam: adam[0],
         peter: peter[0],
-        gopi: gopi[0]
+        gopi: gopi[0],
+        jonathan: jonathan[0]
       }
     })
     
