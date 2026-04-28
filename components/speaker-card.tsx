@@ -254,7 +254,7 @@ export function SpeakerCard({ speaker, contactSource, maxTopicsToShow = 2 }: Uni
               <Button asChild variant="gold" className={commonButtonClasses}>
                 <Link href={contactLink}>
                   <CalendarCheck size={16} />
-                  <span>Book A Speaker Today</span>
+                  <span>Book A Speaker</span>
                 </Link>
               </Button>
               <div className="flex gap-2">

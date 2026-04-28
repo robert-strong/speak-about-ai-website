@@ -218,7 +218,7 @@ export const CONTENT_DEFAULTS = {
     cta: {
       title: 'Ready to Elevate Your Event?',
       subtitle: 'Let us connect you with the perfect AI expert to inspire your audience and drive meaningful conversations about the future of artificial intelligence.',
-      button_text: 'Book A Speaker Today',
+      button_text: 'Book A Speaker',
       phone_number: '+1-415-665-2442',
       email: 'human@speakabout.ai',
       stat1_value: '24 Hours',

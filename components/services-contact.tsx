@@ -9,7 +9,7 @@ export default async function ServicesContact() {
 
   const title = getFromContent(content, 'services', 'cta', 'title') || 'Ready to Elevate Your Event?'
   const subtitle = getFromContent(content, 'services', 'cta', 'subtitle') || 'Let us connect you with the perfect AI expert to inspire your audience and drive meaningful conversations about the future of artificial intelligence.'
-  const buttonText = getFromContent(content, 'services', 'cta', 'button_text') || 'Book A Speaker Today'
+  const buttonText = getFromContent(content, 'services', 'cta', 'button_text') || 'Book A Speaker'
   const phoneNumber = getFromContent(content, 'services', 'cta', 'phone_number') || '+1-415-665-2442'
   const email = getFromContent(content, 'services', 'cta', 'email') || 'human@speakabout.ai'
 

@@ -162,7 +162,7 @@ const DEFAULT_CONTENT = [
   // Services Page - CTA (from components/services-contact.tsx)
   { page: 'services', section: 'cta', content_key: 'title', content_value: 'Ready to Elevate Your Event?' },
   { page: 'services', section: 'cta', content_key: 'subtitle', content_value: 'Let us connect you with the perfect AI expert to inspire your audience and drive meaningful conversations about the future of artificial intelligence.' },
-  { page: 'services', section: 'cta', content_key: 'button_text', content_value: 'Book A Speaker Today' },
+  { page: 'services', section: 'cta', content_key: 'button_text', content_value: 'Book A Speaker' },
   { page: 'services', section: 'cta', content_key: 'phone_number', content_value: '+1-415-665-2442' },
   { page: 'services', section: 'cta', content_key: 'email', content_value: 'human@speakabout.ai' },
   { page: 'services', section: 'cta', content_key: 'stat1_value', content_value: '24 Hours' },

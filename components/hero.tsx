@@ -52,7 +52,7 @@ export default async function Hero() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 mb-8">
-              {/* "Book A Speaker Today" button using the Button component with 'gold' variant */}
+              {/* "Book A Speaker" button using the Button component with 'gold' variant */}
               <Button
                 asChild // Use asChild to render the Link component as the button's child
                 variant="gold"
@@ -60,7 +60,7 @@ export default async function Hero() {
                 className="shadow-lg hover:shadow-xl transition-all duration-300 font-montserrat"
               >
                 <Link href="/contact" className="text-white no-underline">
-                  Book A Speaker Today
+                  Book A Speaker
                 </Link>
               </Button>
               {/* "Browse Speakers" button using the Button component with 'default' variant */}

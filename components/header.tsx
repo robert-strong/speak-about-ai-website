@@ -55,7 +55,7 @@ export default function Header() {
               size="sm"
               className="font-montserrat font-bold text-xs lg:text-sm whitespace-nowrap"
             >
-              <Link href="/contact">Book A Speaker Today</Link>
+              <Link href="/contact">Book A Speaker</Link>
             </Button>
           </div>
 
@@ -125,7 +125,7 @@ export default function Header() {
                   className="font-montserrat font-bold w-full"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <Link href="/contact">Book A Speaker Today</Link>
+                  <Link href="/contact">Book A Speaker</Link>
                 </Button>
               </div>
             </nav>
