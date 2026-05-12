@@ -8,8 +8,8 @@ import { useEffect, useState } from "react"
 
 export function AdminSessionMonitor() {
   const { showWarning, timeUntilLogout, extendSession, logout } = useAdminSession({
-    inactivityTimeout: 60 * 60 * 1000, // 1 hour
-    warningTime: 5 * 60 * 1000, // 5 minutes before timeout
+    inactivityTimeout: 8 * 60 * 60 * 1000, // 8 hours
+    warningTime: 10 * 60 * 1000, // 10 minutes before timeout
     checkInterval: 30 * 1000 // check every 30 seconds
   })
 
@@ -50,7 +50,7 @@ export function AdminSessionMonitor() {
           </DialogDescription>
           <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
             <p className="text-sm text-gray-700">
-              For security, you'll be automatically logged out after 1 hour of inactivity.
+              For security, you'll be automatically logged out after 8 hours of inactivity.
               Click <strong>"Stay Logged In"</strong> to extend your session.
             </p>
           </div>
