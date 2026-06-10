@@ -53,6 +53,7 @@ const IntegratedAnalyticsDashboard = dynamic(
 
 
 interface AnalyticsData {
+  _status?: number
   totalPageViews: number
   uniqueVisitors: number
   bounceRate: number
