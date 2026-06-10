@@ -195,7 +195,7 @@ export async function PATCH(
       RETURNING *
     `
 
-    const result = await sql(query, values)
+    const result = await sql.query(query, values)
 
     if (result.length === 0) {
       return NextResponse.json(

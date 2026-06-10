@@ -22,7 +22,7 @@ export interface Project {
   company?: string
   project_type: string
   description?: string
-  status: "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled" | "2plus_months" | "1to2_months" | "less_than_month" | "final_week"
+  status: "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled" | "lost" | "2plus_months" | "1to2_months" | "less_than_month" | "final_week"
   priority: "low" | "medium" | "high" | "urgent"
   start_date: string
   end_date?: string

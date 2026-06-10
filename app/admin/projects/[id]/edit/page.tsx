@@ -1695,7 +1695,7 @@ export default function ProjectEditPage() {
                         id="speaker_fee"
                         type="number"
                         step="0.01"
-                        value={formData.speaker_fee ?? ((formData.budget || 0) - (formData.commission_amount || ((formData.budget || 0) * (formData.commission_percentage || 20) / 100))) || ""}
+                        value={(formData.speaker_fee ?? ((formData.budget || 0) - (formData.commission_amount || ((formData.budget || 0) * (formData.commission_percentage || 20) / 100)))) || ""}
                         onChange={(e) => updateField("speaker_fee", parseFloat(e.target.value) || 0)}
                         placeholder="Speaker fee amount"
                       />

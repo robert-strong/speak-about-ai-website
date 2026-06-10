@@ -59,7 +59,7 @@ export async function GET(
     })
     
     // Try to find a matching deal for additional data
-    let dealData = null
+    let dealData: any = null
     if (project.client_email || project.company) {
       try {
         // Build query conditionally to handle null values

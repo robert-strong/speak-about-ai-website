@@ -96,6 +96,7 @@ interface Project {
   budget: string
   speaker_fee?: string
   spent?: string
+  travel_expenses_amount?: string
   invoice_sent?: boolean
   payment_received?: boolean
   description?: string
@@ -538,7 +539,7 @@ function EnhancedProjectManagementPage() {
           const allCustomTasks = allTasks
             .filter((task: any) => projectMap.has(task.project_id))
             .map((task: any) => {
-              const project = projectMap.get(task.project_id)
+              const project: any = projectMap.get(task.project_id)
               return {
                 ...task,
                 projectId: task.project_id,
@@ -3661,7 +3662,7 @@ function EnhancedProjectManagementPage() {
                   {/* Generate task list from all projects */}
                   {(() => {
                     // Collect all tasks from all projects
-                    const allTasks = []
+                    const allTasks: any[] = []
                     
                     // First, add custom generated tasks
                     customTasks.forEach(task => {
@@ -3939,7 +3940,7 @@ function EnhancedProjectManagementPage() {
                                     <div>
                                       <h5 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Requirements:</h5>
                                       <ul className="space-y-1">
-                                        {task.taskRequirements.map((req, idx) => (
+                                        {task.taskRequirements.map((req: any, idx: number) => (
                                           <li key={idx} className="text-xs text-gray-600 flex items-start">
                                             <CheckSquare className="h-3 w-3 mr-1 mt-0.5 text-gray-400" />
                                             {req}
@@ -3952,7 +3953,7 @@ function EnhancedProjectManagementPage() {
                                     <div>
                                       <h5 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Deliverables:</h5>
                                       <ul className="space-y-1">
-                                        {task.taskDeliverables.map((del, idx) => (
+                                        {task.taskDeliverables.map((del: any, idx: number) => (
                                           <li key={idx} className="text-xs text-gray-600 flex items-start">
                                             <Target className="h-3 w-3 mr-1 mt-0.5 text-gray-400" />
                                             {del}
