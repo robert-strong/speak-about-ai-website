@@ -42,6 +42,7 @@ interface ContractTemplate {
   name: string
   description?: string
   content: string
+  fileUrl?: string
   dynamicFields: DynamicField[]
   variables?: string[]
 }
@@ -64,9 +65,16 @@ interface ContractData extends ContractFormData {
   status?: string
 }
 
+interface ContractSavePayload {
+  deal_id?: number
+  template_id: string
+  data: ContractFormData
+  send_for_signature: boolean
+}
+
 interface ContractCreatorProps {
   dealId?: number
-  onSave?: (contractData: ContractData) => void
+  onSave?: (contractData: ContractSavePayload) => void
   onCancel?: () => void
 }
 
@@ -292,13 +300,13 @@ Date: _________________
     try {
       setSaving(true)
       
-      const contractData = {
+      const contractData: ContractSavePayload = {
         deal_id: dealId,
-        template_id: template.id,
+        template_id: template?.id ?? '',
         data: formData,
         send_for_signature: sendForSignature
       }
-      
+
       onSave?.(contractData)
     } catch (error) {
       console.error("Error saving contract:", error)

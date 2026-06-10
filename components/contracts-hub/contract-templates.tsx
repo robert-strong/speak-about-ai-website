@@ -57,7 +57,10 @@ export function ContractTemplates() {
     const newTemplate: ContractTemplate = {
       id: `custom-${Date.now()}`,
       name: newTemplateName,
+      type: 'custom',
+      category: 'external',
       description: newTemplateDescription || "Custom contract template",
+      variables: [],
       sections: [
         {
           id: "intro",

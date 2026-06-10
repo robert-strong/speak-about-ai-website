@@ -5,7 +5,7 @@ import type { Contract } from './contracts-db'
 const createTransporter = () => {
   // This should be configured with your SMTP settings
   // For now, using a basic configuration that should work with most email providers
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587'),
     secure: false, // true for 465, false for other ports
@@ -149,7 +149,7 @@ export function generateContractSigningEmail(
             </div>
             <div class="info-row">
                 <span class="label">Date:</span>
-                <span class="value">${new Date(contract.event_date).toLocaleDateString('en-US', { 
+                <span class="value">${new Date(contract.event_date ?? '').toLocaleDateString('en-US', { 
                   year: 'numeric', 
                   month: 'long', 
                   day: 'numeric' 
@@ -167,7 +167,7 @@ export function generateContractSigningEmail(
             ` : ''}
             <div class="info-row">
                 <span class="label">Contract Value:</span>
-                <span class="value">$${contract.total_amount.toLocaleString()}</span>
+                <span class="value">$${(contract.total_amount ?? 0).toLocaleString()}</span>
             </div>
         </div>
         
@@ -211,10 +211,10 @@ You have been requested to review and digitally sign a contract for the followin
 
 Contract: ${contract.contract_number}
 Event: ${contract.event_title}  
-Date: ${new Date(contract.event_date).toLocaleDateString()}
+Date: ${new Date(contract.event_date ?? '').toLocaleDateString()}
 Client: ${contract.client_name}
 ${contract.speaker_name ? `Speaker: ${contract.speaker_name}` : ''}
-Contract Value: $${contract.total_amount.toLocaleString()}
+Contract Value: $${(contract.total_amount ?? 0).toLocaleString()}
 
 Please click the following link to review and sign the contract:
 ${signingLink}
@@ -337,7 +337,7 @@ export function generateContractCompletionEmail(contract: Contract): EmailTempla
             </div>
             <div class="info-row">
                 <span class="label">Date:</span>
-                <span class="value">${new Date(contract.event_date).toLocaleDateString('en-US', { 
+                <span class="value">${new Date(contract.event_date ?? '').toLocaleDateString('en-US', { 
                   year: 'numeric', 
                   month: 'long', 
                   day: 'numeric' 
@@ -355,7 +355,7 @@ export function generateContractCompletionEmail(contract: Contract): EmailTempla
             ` : ''}
             <div class="info-row">
                 <span class="label">Contract Value:</span>
-                <span class="value">$${contract.total_amount.toLocaleString()}</span>
+                <span class="value">$${(contract.total_amount ?? 0).toLocaleString()}</span>
             </div>
             <div class="info-row">
                 <span class="label">Completed:</span>
@@ -389,10 +389,10 @@ Congratulations! The contract for ${contract.event_title} has been fully execute
 Contract Details:
 - Contract: ${contract.contract_number}
 - Event: ${contract.event_title}
-- Date: ${new Date(contract.event_date).toLocaleDateString()}
+- Date: ${new Date(contract.event_date ?? '').toLocaleDateString()}
 - Client: ${contract.client_name}
 ${contract.speaker_name ? `- Speaker: ${contract.speaker_name}` : ''}
-- Contract Value: $${contract.total_amount.toLocaleString()}
+- Contract Value: $${(contract.total_amount ?? 0).toLocaleString()}
 - Completed: ${contract.completed_at ? new Date(contract.completed_at).toLocaleDateString() : 'Just now'}
 
 Next Steps:

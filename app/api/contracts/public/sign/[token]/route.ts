@@ -120,7 +120,7 @@ export async function POST(
     }
 
     // Send notification
-    await sendContractSignedNotification(contract, signerType)
+    await sendContractSignedNotification({ contract, signerType })
 
     return NextResponse.json({
       success: true,

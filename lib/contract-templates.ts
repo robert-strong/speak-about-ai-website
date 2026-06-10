@@ -13,7 +13,8 @@ export interface ContractSection {
   title: string
   order: number
   content: string
-  isEditable: boolean
+  isEditable?: boolean
+  isRequired?: boolean
   variables?: string[]
 }
 
