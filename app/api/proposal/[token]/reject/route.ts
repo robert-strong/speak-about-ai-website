@@ -3,13 +3,13 @@ import { getProposalByToken, updateProposalStatus } from "@/lib/proposals-db"
 
 export async function POST(
   request: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
     const data = await request.json()
     
     // Get proposal by token
-    const proposal = await getProposalByToken(params.token)
+    const proposal = await getProposalByToken((await params).token)
     if (!proposal) {
       return NextResponse.json(
         { error: "Proposal not found" },

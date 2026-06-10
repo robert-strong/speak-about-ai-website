@@ -5,7 +5,7 @@ const sql = neon(process.env.DATABASE_URL!)
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check if admin request
@@ -18,7 +18,7 @@ export async function GET(
       )
     }
 
-    const applicationId = params.id
+    const applicationId = (await params).id
 
     // Fetch the application
     const applications = await sql`

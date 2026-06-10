@@ -3,10 +3,10 @@ import { getVendorBySlug } from "@/lib/vendors-db"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const vendor = await getVendorBySlug(params.slug)
+    const vendor = await getVendorBySlug((await params).slug)
     
     if (!vendor) {
       return NextResponse.json(

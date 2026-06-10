@@ -3,10 +3,10 @@ import { updateSpeakerStatus, getSpeakerById } from "@/lib/speakers-db"
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const speakerId = parseInt(params.id)
+    const speakerId = parseInt((await params).id)
     const data = await request.json()
     
     // Validate required fields

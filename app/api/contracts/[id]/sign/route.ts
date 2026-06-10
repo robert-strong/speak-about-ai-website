@@ -4,7 +4,7 @@ import { sendContractConfirmationEmail } from "@/lib/email-service"
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json()
@@ -17,7 +17,7 @@ export async function POST(
       )
     }
 
-    const contractId = parseInt(params.id)
+    const contractId = parseInt((await params).id)
     if (isNaN(contractId)) {
       return NextResponse.json(
         { error: "Invalid contract ID" },

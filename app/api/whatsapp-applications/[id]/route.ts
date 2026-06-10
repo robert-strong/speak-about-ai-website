@@ -6,7 +6,7 @@ const sql = neon(process.env.DATABASE_URL!)
 // Admin endpoint to update application status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check for admin auth
@@ -21,7 +21,7 @@ export async function PATCH(
     const body = await request.json()
     const { action, admin_notes, rejection_reason, whatsapp_invite_link } = body
 
-    const applicationId = parseInt(params.id)
+    const applicationId = parseInt((await params).id)
 
     if (!action || !['approve', 'reject', 'invite'].includes(action)) {
       return NextResponse.json(
@@ -93,7 +93,7 @@ export async function PATCH(
 // Admin endpoint to get single application
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check for admin auth
@@ -105,7 +105,7 @@ export async function GET(
       )
     }
 
-    const applicationId = parseInt(params.id)
+    const applicationId = parseInt((await params).id)
 
     const [application] = await sql`
       SELECT * FROM whatsapp_applications

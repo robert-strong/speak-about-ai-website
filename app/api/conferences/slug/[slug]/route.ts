@@ -3,10 +3,10 @@ import { getConferenceBySlug } from '@/lib/conferences-db'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const conference = await getConferenceBySlug(params.slug)
+    const conference = await getConferenceBySlug((await params).slug)
 
     if (!conference) {
       return NextResponse.json(

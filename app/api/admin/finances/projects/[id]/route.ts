@@ -3,10 +3,10 @@ import { neon } from '@neondatabase/serverless'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id
+    const projectId = (await params).id
     const body = await request.json()
     const sql = neon(process.env.DATABASE_URL!)
     
@@ -80,10 +80,10 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id
+    const projectId = (await params).id
     const sql = neon(process.env.DATABASE_URL!)
     
     const result = await sql`

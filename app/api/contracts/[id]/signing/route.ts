@@ -3,7 +3,7 @@ import { getContractByIdAndToken } from "@/lib/contracts-db"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { searchParams } = new URL(request.url)
@@ -16,7 +16,7 @@ export async function GET(
       )
     }
 
-    const contractId = parseInt(params.id)
+    const contractId = parseInt((await params).id)
     if (isNaN(contractId)) {
       return NextResponse.json(
         { error: "Invalid contract ID" },

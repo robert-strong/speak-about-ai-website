@@ -4,11 +4,11 @@ import { neon } from '@neondatabase/serverless'
 // GET /api/case-studies/[id] - Fetch a single case study
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const sql = neon(process.env.DATABASE_URL!)
-    const { id } = params
+    const { id } = await params
 
     const result = await sql`
       SELECT
@@ -49,11 +49,11 @@ export async function GET(
 // PUT /api/case-studies/[id] - Update a case study
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const sql = neon(process.env.DATABASE_URL!)
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const {
       company,
@@ -117,11 +117,11 @@ export async function PUT(
 // DELETE /api/case-studies/[id] - Delete a case study
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const sql = neon(process.env.DATABASE_URL!)
-    const { id } = params
+    const { id } = await params
 
     const result = await sql`DELETE FROM case_studies WHERE id = ${id} RETURNING *`
 

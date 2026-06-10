@@ -6,14 +6,14 @@ const sql = neon(process.env.DATABASE_URL!)
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Require admin authentication
     const authError = requireAdminAuth(request)
     if (authError) return authError
 
-    const id = parseInt(params.id)
+    const id = parseInt((await params).id)
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid wishlist ID" }, { status: 400 })
     }

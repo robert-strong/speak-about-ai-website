@@ -5,10 +5,10 @@ const sql = neon(process.env.DATABASE_URL!)
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = parseInt(params.id)
+    const projectId = parseInt((await params).id)
     
     const result = await sql`
       SELECT 
@@ -206,7 +206,7 @@ export async function GET(
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      projectId: params.id
+      projectId: (await params).id
     })
     return NextResponse.json(
       { 
@@ -220,10 +220,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = parseInt(params.id)
+    const projectId = parseInt((await params).id)
     const details = await request.json()
 
     // Calculate completion percentage
@@ -314,10 +314,10 @@ export async function PUT(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = parseInt(params.id)
+    const projectId = parseInt((await params).id)
     const { path, value } = await request.json()
 
     // Update a specific field in the project details

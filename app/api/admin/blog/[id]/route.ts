@@ -3,7 +3,7 @@ import { neon } from '@neondatabase/serverless'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify admin request
@@ -27,7 +27,7 @@ export async function PUT(
         tags = ${JSON.stringify(data.tags)}::jsonb,
         status = ${data.status},
         updated_at = NOW()
-      WHERE id = ${params.id}
+      WHERE id = ${(await params).id}
     `
     
     return NextResponse.json({ success: true })
@@ -42,7 +42,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify admin request
@@ -53,7 +53,7 @@ export async function DELETE(
 
     const sql = neon(process.env.DATABASE_URL!)
     
-    await sql`DELETE FROM blog_posts WHERE id = ${params.id}`
+    await sql`DELETE FROM blog_posts WHERE id = ${(await params).id}`
     
     return NextResponse.json({ success: true })
   } catch (error) {

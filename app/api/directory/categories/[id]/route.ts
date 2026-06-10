@@ -5,7 +5,7 @@ const sql = neon(process.env.DATABASE_URL!)
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const isAdmin = request.headers.get("x-admin-request") === "true"
@@ -30,7 +30,7 @@ export async function PUT(
         display_order = ${display_order || 0},
         is_active = ${is_active},
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = ${params.id}
+      WHERE id = ${(await params).id}
       RETURNING *
     `
     
@@ -56,7 +56,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const isAdmin = request.headers.get("x-admin-request") === "true"
@@ -70,7 +70,7 @@ export async function DELETE(
     
     // Check if category has vendors
     const vendorCheck = await sql`
-      SELECT COUNT(*) as count FROM vendors WHERE category_id = ${params.id}
+      SELECT COUNT(*) as count FROM vendors WHERE category_id = ${(await params).id}
     `
     
     if (vendorCheck[0].count > 0) {
@@ -82,7 +82,7 @@ export async function DELETE(
     
     const result = await sql`
       DELETE FROM vendor_categories
-      WHERE id = ${params.id}
+      WHERE id = ${(await params).id}
       RETURNING id
     `
     

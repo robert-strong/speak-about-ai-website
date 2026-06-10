@@ -3,7 +3,7 @@ import { neon } from '@neondatabase/serverless'
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const databaseUrl = process.env.DATABASE_URL
@@ -62,7 +62,7 @@ export async function PATCH(
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const databaseUrl = process.env.DATABASE_URL

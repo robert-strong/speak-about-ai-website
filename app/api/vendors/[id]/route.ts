@@ -7,10 +7,10 @@ import {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const vendor = await getVendorById(parseInt(params.id))
+    const vendor = await getVendorById(parseInt((await params).id))
     
     if (!vendor) {
       return NextResponse.json(
@@ -31,13 +31,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check for admin authentication
     const isAdmin = request.headers.get("x-admin-request") === "true"
     if (!isAdmin) {
-      console.error("Unauthorized PUT request to vendor:", params.id)
+      console.error("Unauthorized PUT request to vendor:", (await params).id)
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -45,7 +45,7 @@ export async function PUT(
     }
     
     const body = await request.json()
-    console.log("Updating vendor", params.id, "with data:", JSON.stringify(body, null, 2))
+    console.log("Updating vendor", (await params).id, "with data:", JSON.stringify(body, null, 2))
     
     // Generate slug if company name changed
     if (body.company_name && !body.slug) {
@@ -55,12 +55,12 @@ export async function PUT(
         .replace(/^-+|-+$/g, '')
     }
     
-    const vendor = await updateVendor(parseInt(params.id), body)
+    const vendor = await updateVendor(parseInt((await params).id), body)
     console.log("Vendor updated successfully:", vendor.id)
     
     return NextResponse.json({ vendor })
   } catch (error) {
-    console.error("Error updating vendor:", params.id, error)
+    console.error("Error updating vendor:", (await params).id, error)
     console.error("Error details:", error instanceof Error ? error.message : error)
     console.error("Stack trace:", error instanceof Error ? error.stack : "No stack trace")
     return NextResponse.json(
@@ -72,7 +72,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check for admin authentication
@@ -84,7 +84,7 @@ export async function DELETE(
       )
     }
     
-    await deleteVendor(parseInt(params.id))
+    await deleteVendor(parseInt((await params).id))
     
     return NextResponse.json({ success: true })
   } catch (error) {
