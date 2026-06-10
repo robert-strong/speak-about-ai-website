@@ -109,6 +109,13 @@ interface WebhookLog {
   response?: Record<string, unknown>
   error_message?: string
   created_at: string
+  response_status?: number
+  processing_time_ms?: number
+  request_body?: Record<string, any>
+  request_headers?: Record<string, any>
+  response_body?: Record<string, any>
+  ip_address?: string
+  user_agent?: string
 }
 
 export default function AdminBlogPage() {
