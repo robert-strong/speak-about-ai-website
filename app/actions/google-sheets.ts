@@ -70,7 +70,7 @@ function safeJsonParse(jsonString: string, speakerName: string, fieldName: strin
       return []
     }
   } catch (error) {
-    console.log(`❌ Strategy 1 failed: ${error.message}`)
+    console.log(`❌ Strategy 1 failed: ${error instanceof Error ? error.message : String(error)}`)
   }
 
   // Strategy 2: Try parsing original with minimal changes
@@ -90,7 +90,7 @@ function safeJsonParse(jsonString: string, speakerName: string, fieldName: strin
       return parsed
     }
   } catch (error) {
-    console.log(`❌ Strategy 2 failed: ${error.message}`)
+    console.log(`❌ Strategy 2 failed: ${error instanceof Error ? error.message : String(error)}`)
   }
 
   // Strategy 3: Extract array content and try to fix it
@@ -108,7 +108,7 @@ function safeJsonParse(jsonString: string, speakerName: string, fieldName: strin
       }
     }
   } catch (error) {
-    console.log(`❌ Strategy 3 failed: ${error.message}`)
+    console.log(`❌ Strategy 3 failed: ${error instanceof Error ? error.message : String(error)}`)
   }
 
   // Strategy 4: Try to manually parse as individual objects
@@ -127,7 +127,7 @@ function safeJsonParse(jsonString: string, speakerName: string, fieldName: strin
           const obj = JSON.parse(objStr)
           parsedObjects.push(obj)
         } catch (objError) {
-          console.log(`Failed to parse object ${i}: ${objError.message}`)
+          console.log(`Failed to parse object ${i}: ${objError instanceof Error ? objError.message : String(objError)}`)
         }
       }
 
@@ -137,7 +137,7 @@ function safeJsonParse(jsonString: string, speakerName: string, fieldName: strin
       }
     }
   } catch (error) {
-    console.log(`❌ Strategy 4 failed: ${error.message}`)
+    console.log(`❌ Strategy 4 failed: ${error instanceof Error ? error.message : String(error)}`)
   }
 
   // Strategy 5: Try to create a simple structure from key-value pairs
@@ -159,7 +159,7 @@ function safeJsonParse(jsonString: string, speakerName: string, fieldName: strin
       return [simpleTestimonial]
     }
   } catch (error) {
-    console.log(`❌ Strategy 5 failed: ${error.message}`)
+    console.log(`❌ Strategy 5 failed: ${error instanceof Error ? error.message : String(error)}`)
   }
 
   // All strategies failed
@@ -225,8 +225,8 @@ export async function fetchSpeakersFromSheet(): Promise<Speaker[]> {
     const speakers: Speaker[] = rows
       .map((row: string[], rowIndex: number) => {
         try {
-          const speaker: Partial<Speaker> = {}
-          const nameIndex = headers.findIndex((header) => header.replace(/\s/g, "").toLowerCase() === "name")
+          const speaker: Record<string, any> = {}
+          const nameIndex = headers.findIndex((header: string) => header.replace(/\s/g, "").toLowerCase() === "name")
           const speakerName = row[nameIndex] || `Row ${rowIndex + 2}`
 
           headers.forEach((header: string, index: number) => {
@@ -320,9 +320,9 @@ export async function fetchSpeakersFromSheet(): Promise<Speaker[]> {
           return null
         }
       })
-      .filter((speaker): speaker is Speaker => speaker !== null)
+      .filter((speaker: Speaker | null): speaker is Speaker => speaker !== null)
 
-    const sortedSpeakers = speakers.sort((a, b) => b.ranking - a.ranking)
+    const sortedSpeakers = speakers.sort((a, b) => (b.ranking || 0) - (a.ranking || 0))
     console.log(`Successfully processed ${sortedSpeakers.length} speakers`)
 
     return sortedSpeakers
