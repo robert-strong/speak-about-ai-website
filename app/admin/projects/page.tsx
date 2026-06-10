@@ -68,7 +68,7 @@ import { AdminSidebar } from "@/components/admin-sidebar"
 import { useToast } from "@/hooks/use-toast"
 import { InvoicePDFDialog } from "@/components/invoice-pdf-viewer"
 import { InvoiceEditorModal } from "@/components/invoice-editor-modal"
-import { TASK_DEFINITIONS, calculateTaskUrgency, getTaskOwnerLabel, getPriorityColor, type EventClassification, type TaskDefinition } from "@/lib/task-definitions"
+import { TASK_DEFINITIONS, SHOW_DEFAULT_TASKS, calculateTaskUrgency, getTaskOwnerLabel, getPriorityColor, type EventClassification, type TaskDefinition } from "@/lib/task-definitions"
 import { ProjectDetailsManager } from "@/components/project-details-manager"
 import { ProjectDetails } from "@/lib/project-details-schema"
 import { authGet, authPost, authPut, authDelete, authFetch } from "@/lib/auth-fetch"
@@ -694,6 +694,8 @@ function EnhancedProjectManagementPage() {
 
   // Filter tasks based on event classification
   const getFilteredTasks = (stageId: string, classification?: EventClassification) => {
+    // Default checklist tasks are disabled — projects use custom + AI-suggested tasks only
+    if (!SHOW_DEFAULT_TASKS) return [] as [string, TaskDefinition][]
     const stageTasks = TASK_DEFINITIONS[stageId] || {}
     return Object.entries(stageTasks).filter(([_, task]) => {
       // If task has no classifications specified, it applies to all
@@ -2389,9 +2391,11 @@ function EnhancedProjectManagementPage() {
                                               </span>
                                             )}
                                           </h4>
-                                          <div className="text-sm text-gray-500">
-                                            {completedCount} of {totalTasks} complete
-                                          </div>
+                                          {totalTasks > 0 && (
+                                            <div className="text-sm text-gray-500">
+                                              {completedCount} of {totalTasks} complete
+                                            </div>
+                                          )}
                                         </div>
 
                                         {/* Progress bar */}
@@ -2506,14 +2510,14 @@ function EnhancedProjectManagementPage() {
                                               )
                                             })}
                                           </div>
-                                        ) : (
+                                        ) : SHOW_DEFAULT_TASKS ? (
                                           <div className="text-center py-4 text-gray-500">
                                             <p className="text-sm">No predefined tasks for this stage</p>
                                           </div>
-                                        )}
+                                        ) : null}
 
                                         {/* Invoicing Track (cross-stage, shown from contracts_signed onward) */}
-                                        {["contracts_signed", "logistics_planning", "pre_event", "event_week", "follow_up", "completed"].includes(stage.id) && (() => {
+                                        {SHOW_DEFAULT_TASKS && ["contracts_signed", "logistics_planning", "pre_event", "event_week", "follow_up", "completed"].includes(stage.id) && (() => {
                                           const invoicingTasks = TASK_DEFINITIONS["invoicing_track"] || {}
                                           const invoicingCompletion = project.stage_completion?.invoicing_track || {}
                                           const invoicingEntries = Object.entries(invoicingTasks)
@@ -3707,10 +3711,10 @@ function EnhancedProjectManagementPage() {
                       }
                     })
                     
-                    // Then add predefined tasks
-                    projects.forEach(project => {
+                    // Then add predefined tasks (disabled — default checklist tasks are turned off)
+                    if (SHOW_DEFAULT_TASKS) projects.forEach(project => {
                       if (["completed", "cancelled", "lost"].includes(project.status)) return
-                      
+
                       const stageCompletion = project.stage_completion || {}
                       const currentStage = project.status
                       
@@ -4834,9 +4838,16 @@ function EnhancedProjectManagementPage() {
                 const stageConfig = PROJECT_STATUSES[stage]
                 const isCurrentStage = selectedProject.status === stage
                 const stageCompletion = selectedProject.stage_completion?.[stage] || {}
-                const completedCount = Object.values(stageCompletion).filter(Boolean).length
-                const totalCount = Object.keys(tasks).length
                 const stageCustomTasks = customTasks.filter(t => t.projectId === selectedProject.id && t.stage === stage)
+                const isAddingHere = addingTaskFor?.projectId === selectedProject.id && addingTaskFor?.stageId === stage
+                // Default checklist tasks are disabled — base counts on custom tasks instead
+                const completedCount = SHOW_DEFAULT_TASKS
+                  ? Object.values(stageCompletion).filter(Boolean).length
+                  : stageCustomTasks.filter(t => t.completed).length
+                const totalCount = SHOW_DEFAULT_TASKS ? Object.keys(tasks).length : stageCustomTasks.length
+
+                // With defaults hidden, only render stages that have custom tasks (or are being added to)
+                if (!SHOW_DEFAULT_TASKS && stageCustomTasks.length === 0 && !isAddingHere) return null
 
                 return (
                   <Card key={stage} className={isCurrentStage ? "border-blue-500 shadow-md" : ""}>
@@ -4858,7 +4869,7 @@ function EnhancedProjectManagementPage() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                      {Object.entries(tasks).map(([taskKey, taskDef]) => {
+                      {SHOW_DEFAULT_TASKS && Object.entries(tasks).map(([taskKey, taskDef]) => {
                         const isCompleted = stageCompletion[taskKey] || false
                         const daysUntilEvent = selectedProject.event_date
                           ? Math.ceil((new Date(selectedProject.event_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))

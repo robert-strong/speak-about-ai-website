@@ -20,6 +20,12 @@ export interface StageTaskDefinitions {
   }
 }
 
+// Master switch for the built-in per-stage checklist ("default") tasks.
+// These are not stored per project — they're defined here and shown for every
+// project. Set to `false` to hide them everywhere (projects then show only
+// custom and AI-suggested tasks). Flip back to `true` to restore the checklists.
+export const SHOW_DEFAULT_TASKS = false
+
 export const TASK_DEFINITIONS: StageTaskDefinitions = {
   qualified: {
     prioritized_reach_outs: {
