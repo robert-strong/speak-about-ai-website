@@ -6,17 +6,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { InvoicePDFDialog } from "@/components/invoice-pdf-viewer"
-import { 
-import { authGet, authPost, authPut, authPatch, authDelete, authFetch } from "@/lib/auth-fetch"
-  FileText, 
-  DollarSign, 
-  Calendar, 
-  CheckCircle, 
+import {
+  FileText,
+  DollarSign,
+  Calendar,
+  CheckCircle,
   Clock,
   Download,
   Send,
   Plus
 } from "lucide-react"
+import { authGet, authPost, authPut, authPatch, authDelete, authFetch } from "@/lib/auth-fetch"
 
 interface Invoice {
   id: number
