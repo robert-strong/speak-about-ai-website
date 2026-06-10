@@ -98,6 +98,7 @@ export async function POST(
           stage,
           created_from,
           status,
+          due_date,
           notes
         ) VALUES (
           ${projectId},
@@ -108,6 +109,7 @@ export async function POST(
           ${task.stage || 'logistics_planning'},
           'generated',
           'pending',
+          ${task.due_date || null},
           ${JSON.stringify(taskDetails)}
         )
         RETURNING *
@@ -140,7 +142,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { taskId, completed, status } = await request.json()
+    const { taskId, completed, status, due_date } = await request.json()
 
     if (!taskId) {
       return NextResponse.json(
@@ -157,7 +159,7 @@ export async function PATCH(
       updates.push(`completed = $${paramCount}`)
       values.push(completed)
       paramCount++
-      
+
       if (completed) {
         updates.push(`completed_at = $${paramCount}`)
         values.push(new Date())
@@ -169,6 +171,19 @@ export async function PATCH(
       updates.push(`status = $${paramCount}`)
       values.push(status)
       paramCount++
+    }
+
+    if (due_date !== undefined) {
+      updates.push(`due_date = $${paramCount}`)
+      values.push(due_date || null)
+      paramCount++
+    }
+
+    if (updates.length === 0) {
+      return NextResponse.json(
+        { error: 'No fields to update' },
+        { status: 400 }
+      )
     }
 
     values.push(taskId)

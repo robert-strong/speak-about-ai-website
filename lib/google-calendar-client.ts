@@ -8,11 +8,13 @@ export interface CalendarEvent {
   description?: string
   location?: string
   start: {
-    dateTime: string // ISO 8601 format: '2024-10-21T10:00:00-07:00'
+    dateTime?: string // ISO 8601 format: '2024-10-21T10:00:00-07:00'
+    date?: string // YYYY-MM-DD for all-day events
     timeZone?: string // e.g., 'America/Los_Angeles'
   }
   end: {
-    dateTime: string
+    dateTime?: string
+    date?: string // YYYY-MM-DD (exclusive) for all-day events
     timeZone?: string
   }
   attendees?: Array<{
@@ -290,6 +292,86 @@ export function createEventFromProject(project: {
       overrides: [
         { method: 'email', minutes: 24 * 60 }, // 1 day before
         { method: 'popup', minutes: 60 }, // 1 hour before
+      ],
+    },
+  }
+}
+
+/**
+ * Helper to create an all-day calendar event for a project task on its due date.
+ * The event carries the task as the title and the full pertinent project info
+ * in the description.
+ */
+export function createEventFromTask(
+  task: {
+    task_name: string
+    description?: string
+    priority?: string
+    stage?: string
+    due_date: string
+  },
+  project: {
+    project_name: string
+    event_date?: string
+    event_location?: string
+    client_name: string
+    client_email?: string
+    notes?: string
+    event_type?: string
+    requested_speaker_name?: string
+    project_details?: any
+  }
+): CalendarEvent {
+  // Extract YYYY-MM-DD from the due date (avoid UTC shift)
+  const rawDue = task.due_date instanceof Date
+    ? task.due_date.toISOString()
+    : String(task.due_date)
+  const dueStr = rawDue.split('T')[0] // e.g. "2024-10-21"
+
+  // All-day events use start.date (inclusive) and end.date (exclusive next day)
+  const endDate = new Date(`${dueStr}T00:00:00Z`)
+  endDate.setUTCDate(endDate.getUTCDate() + 1)
+  const endStr = endDate.toISOString().split('T')[0]
+
+  // Build description: task info first, then pertinent project info
+  const taskLines: string[] = []
+  taskLines.push(`Task: ${task.task_name}`)
+  if (task.priority) taskLines.push(`Priority: ${task.priority}`)
+  if (task.description) taskLines.push(`Details: ${task.description}`)
+  taskLines.push(`Due: ${dueStr}`)
+
+  const projectLines: string[] = []
+  projectLines.push(`Project: ${project.project_name}`)
+  projectLines.push(`Client: ${project.client_name}`)
+  if (project.event_date) {
+    const ed = String(project.event_date).split('T')[0]
+    projectLines.push(`Event Date: ${ed}`)
+  }
+  if (project.requested_speaker_name) projectLines.push(`Speaker: ${project.requested_speaker_name}`)
+  if (project.event_location) projectLines.push(`Location: ${project.event_location}`)
+  if (project.event_type) projectLines.push(`Event Type: ${project.event_type}`)
+  if (project.client_email) projectLines.push(`Client Email: ${project.client_email}`)
+
+  const sections: string[] = [
+    `── TASK ──\n${taskLines.join('\n')}`,
+    `── PROJECT ──\n${projectLines.join('\n')}`,
+  ]
+
+  // Append the rich project details (schedule, program, itinerary, notes)
+  const projectDetails = buildEventDescription(project)
+  if (projectDetails) sections.push(projectDetails)
+
+  return {
+    summary: `📋 ${task.task_name} — ${project.project_name}`,
+    description: sections.join('\n\n'),
+    location: project.event_location,
+    start: { date: dueStr },
+    end: { date: endStr },
+    reminders: {
+      useDefault: false,
+      overrides: [
+        { method: 'email', minutes: 24 * 60 }, // 1 day before
+        { method: 'popup', minutes: 9 * 60 },  // morning-of
       ],
     },
   }

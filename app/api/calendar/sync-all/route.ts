@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createGoogleCalendarClient, createEventFromProject, CalendarEvent } from '@/lib/google-calendar-client'
+import { createGoogleCalendarClient, createEventFromProject, createEventFromTask, CalendarEvent } from '@/lib/google-calendar-client'
 import { requireAdminAuth } from '@/lib/auth-middleware'
 import { neon } from '@neondatabase/serverless'
 
@@ -184,6 +184,94 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // STEP 3: Sync project TASKS that have a due date (all-day reminder events)
+    await sql`ALTER TABLE project_tasks ADD COLUMN IF NOT EXISTS google_calendar_event_id VARCHAR(500)`
+    await sql`ALTER TABLE project_tasks ADD COLUMN IF NOT EXISTS google_calendar_synced_at TIMESTAMP WITH TIME ZONE`
+
+    // 3a: Remove task events that should no longer exist
+    // (due_date cleared, task completed, or parent project lost/cancelled)
+    const taskEventsToRemove = await sql`
+      SELECT t.id, t.google_calendar_event_id
+      FROM project_tasks t
+      JOIN projects p ON p.id = t.project_id
+      WHERE t.google_calendar_event_id IS NOT NULL
+        AND (
+          t.due_date IS NULL
+          OR t.completed = true
+          OR p.status IN ('lost', 'cancelled')
+        )
+    `
+    for (const task of taskEventsToRemove) {
+      try {
+        await calendarClient.deleteEvent(task.google_calendar_event_id, targetCalendarId)
+        removed++
+      } catch (err: any) {
+        if (err.code === 410 || err.code === 404) {
+          removed++
+        } else {
+          removeFailed++
+          removeErrors.push(`Remove task event: ${err.message || 'Unknown error'}`)
+        }
+      }
+      await sql`
+        UPDATE project_tasks
+        SET google_calendar_event_id = NULL, google_calendar_synced_at = NULL
+        WHERE id = ${task.id}
+      `
+      await new Promise(resolve => setTimeout(resolve, 200))
+    }
+
+    // 3b: Create/update task events that need syncing
+    const tasks = await sql`
+      SELECT t.*, p.project_name, p.event_date, p.event_location, p.client_name,
+             p.client_email, p.notes, p.event_type, p.requested_speaker_name,
+             p.project_details
+      FROM project_tasks t
+      JOIN projects p ON p.id = t.project_id
+      WHERE t.due_date IS NOT NULL
+        AND t.completed = false
+        AND p.status NOT IN ('lost', 'cancelled')
+        AND (
+          t.google_calendar_event_id IS NULL
+          OR t.google_calendar_synced_at IS NULL
+          OR t.updated_at > t.google_calendar_synced_at
+        )
+      ORDER BY t.due_date ASC
+    `
+
+    for (const task of tasks) {
+      await new Promise(resolve => setTimeout(resolve, 350))
+      const alreadySynced = !!task.google_calendar_event_id
+      try {
+        const taskEvent = applyConfigDefaults(createEventFromTask(task, task), calendarConfig)
+        if (alreadySynced) {
+          try {
+            await calendarClient.updateEvent(task.google_calendar_event_id, taskEvent, targetCalendarId)
+            await sql`UPDATE project_tasks SET google_calendar_synced_at = NOW() WHERE id = ${task.id}`
+            updated++
+          } catch (err: any) {
+            if (err.code === 404 || err.code === 410) {
+              const event = await calendarClient.createEvent(taskEvent, targetCalendarId)
+              await sql`UPDATE project_tasks SET google_calendar_event_id = ${event.id}, google_calendar_synced_at = NOW() WHERE id = ${task.id}`
+              created++
+            } else {
+              throw err
+            }
+          }
+        } else {
+          const event = await calendarClient.createEvent(taskEvent, targetCalendarId)
+          if (event.id) {
+            await sql`UPDATE project_tasks SET google_calendar_event_id = ${event.id}, google_calendar_synced_at = NOW() WHERE id = ${task.id}`
+          }
+          created++
+        }
+      } catch (err: any) {
+        failed++
+        const errMsg = err?.response?.data?.error?.message || err?.errors?.[0]?.message || err?.message || JSON.stringify(err)
+        errors.push(`Task "${task.task_name}": ${errMsg}`)
+      }
+    }
+
     const parts = []
     if (created > 0) parts.push(`${created} created`)
     if (updated > 0) parts.push(`${updated} updated`)
@@ -269,6 +357,33 @@ export async function DELETE(request: NextRequest) {
       await sql`
         UPDATE projects SET google_calendar_event_id = NULL, google_calendar_synced_at = NULL WHERE id = ${project.id}
       `
+    }
+
+    // Also remove any synced task events
+    try {
+      await sql`ALTER TABLE project_tasks ADD COLUMN IF NOT EXISTS google_calendar_event_id VARCHAR(500)`
+      await sql`ALTER TABLE project_tasks ADD COLUMN IF NOT EXISTS google_calendar_synced_at TIMESTAMP WITH TIME ZONE`
+      const syncedTasks = await sql`
+        SELECT id, task_name, google_calendar_event_id
+        FROM project_tasks
+        WHERE google_calendar_event_id IS NOT NULL
+      `
+      for (const task of syncedTasks) {
+        try {
+          await calendarClient.deleteEvent(task.google_calendar_event_id, targetCalendarId)
+          deleted++
+        } catch (err: any) {
+          if (err.code === 410 || err.code === 404) {
+            deleted++
+          } else {
+            failed++
+            errors.push(`Task "${task.task_name}": ${err.message || 'Unknown error'}`)
+          }
+        }
+        await sql`UPDATE project_tasks SET google_calendar_event_id = NULL, google_calendar_synced_at = NULL WHERE id = ${task.id}`
+      }
+    } catch (err) {
+      // project_tasks table may not exist — ignore
     }
 
     return NextResponse.json({

@@ -469,6 +469,7 @@ function EnhancedProjectManagementPage() {
   const [pullingFromGoogle, setPullingFromGoogle] = useState(false)
   const [addingTaskFor, setAddingTaskFor] = useState<{ projectId: number; stageId: string } | null>(null)
   const [newTaskName, setNewTaskName] = useState("")
+  const [newTaskDueDate, setNewTaskDueDate] = useState("")
   const [editingNotesFor, setEditingNotesFor] = useState<number | null>(null)
   const [editNotesValue, setEditNotesValue] = useState("")
   const [aiSummary, setAiSummary] = useState<Record<number, string>>({})
@@ -1162,7 +1163,7 @@ function EnhancedProjectManagementPage() {
     }
   }
 
-  const handleAddCustomTask = async (projectId: number, stageId: string, taskName: string) => {
+  const handleAddCustomTask = async (projectId: number, stageId: string, taskName: string, dueDate?: string) => {
     if (!taskName.trim()) return
     try {
       const response = await authPost(`/api/projects/${projectId}/tasks`, {
@@ -1172,16 +1173,48 @@ function EnhancedProjectManagementPage() {
           category: 'custom',
           priority: 'medium',
           stage: stageId,
+          due_date: dueDate || null,
         }]
       })
       if (response.ok) {
-        toast({ title: "Task added", description: taskName.trim() })
+        const data = await response.json().catch(() => null)
+        const createdTask = data?.tasks?.[0]
+
+        // If a due date was set, push the task to Google Calendar (best-effort)
+        if (dueDate && createdTask?.id) {
+          syncTaskToCalendar(createdTask.id, taskName.trim())
+        }
+
+        toast({
+          title: "Task added",
+          description: dueDate ? `${taskName.trim()} — due ${dueDate}` : taskName.trim(),
+        })
         setNewTaskName("")
+        setNewTaskDueDate("")
         setAddingTaskFor(null)
         refreshData()
       }
     } catch (error) {
       toast({ title: "Error", description: "Failed to add task", variant: "destructive" })
+    }
+  }
+
+  // Push a single task to the connected Google Calendar (best-effort, non-blocking)
+  const syncTaskToCalendar = async (taskId: number, taskName: string) => {
+    try {
+      const res = await authPost('/api/calendar/sync-task', { taskId })
+      if (res.ok) {
+        toast({ title: "Added to Google Calendar", description: taskName })
+      } else {
+        const err = await res.json().catch(() => null)
+        // Calendar not connected/enabled is expected — surface gently, don't block
+        toast({
+          title: "Saved (not synced to Google)",
+          description: err?.message || err?.error || "Connect Google Calendar in System settings to sync tasks.",
+        })
+      }
+    } catch {
+      // Network error — task is still saved locally
     }
   }
 
@@ -2520,9 +2553,18 @@ function EnhancedProjectManagementPage() {
                                                     >
                                                       {task.completed && <Check className="h-2.5 w-2.5" />}
                                                     </button>
-                                                    <span className={`text-sm ${task.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>
+                                                    <span className={`text-sm flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>
                                                       {task.task_name}
                                                     </span>
+                                                    {task.due_date && (
+                                                      <span
+                                                        className="inline-flex items-center gap-1 text-xs text-gray-500 flex-shrink-0"
+                                                        title={task.google_calendar_event_id ? 'Synced to Google Calendar' : 'On calendar'}
+                                                      >
+                                                        <CalendarDays className="h-3 w-3" />
+                                                        {formatEventDate(task.due_date)}
+                                                      </span>
+                                                    )}
                                                   </div>
                                                 ))}
                                               </div>
@@ -2532,24 +2574,41 @@ function EnhancedProjectManagementPage() {
 
                                         {/* Add Task Form */}
                                         {addingTaskFor?.projectId === project.id && addingTaskFor?.stageId === stage.id ? (
-                                          <div className="mt-3 flex items-center gap-2">
-                                            <Input
-                                              placeholder="Task name..."
-                                              value={newTaskName}
-                                              onChange={(e) => setNewTaskName(e.target.value)}
-                                              onKeyDown={(e) => {
-                                                if (e.key === 'Enter') handleAddCustomTask(project.id, stage.id, newTaskName)
-                                                if (e.key === 'Escape') { setAddingTaskFor(null); setNewTaskName("") }
-                                              }}
-                                              className="h-8 text-sm"
-                                              autoFocus
-                                            />
-                                            <Button size="sm" className="h-8" onClick={() => handleAddCustomTask(project.id, stage.id, newTaskName)}>
-                                              Add
-                                            </Button>
-                                            <Button size="sm" variant="ghost" className="h-8" onClick={() => { setAddingTaskFor(null); setNewTaskName("") }}>
-                                              <X className="h-4 w-4" />
-                                            </Button>
+                                          <div className="mt-3 space-y-2">
+                                            <div className="flex items-center gap-2">
+                                              <Input
+                                                placeholder="Task name..."
+                                                value={newTaskName}
+                                                onChange={(e) => setNewTaskName(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                  if (e.key === 'Enter') handleAddCustomTask(project.id, stage.id, newTaskName, newTaskDueDate)
+                                                  if (e.key === 'Escape') { setAddingTaskFor(null); setNewTaskName(""); setNewTaskDueDate("") }
+                                                }}
+                                                className="h-8 text-sm flex-1"
+                                                autoFocus
+                                              />
+                                              <Input
+                                                type="date"
+                                                value={newTaskDueDate}
+                                                onChange={(e) => setNewTaskDueDate(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                  if (e.key === 'Enter') handleAddCustomTask(project.id, stage.id, newTaskName, newTaskDueDate)
+                                                  if (e.key === 'Escape') { setAddingTaskFor(null); setNewTaskName(""); setNewTaskDueDate("") }
+                                                }}
+                                                className="h-8 text-sm w-36"
+                                                title="Due date (added to calendar)"
+                                              />
+                                              <Button size="sm" className="h-8" onClick={() => handleAddCustomTask(project.id, stage.id, newTaskName, newTaskDueDate)}>
+                                                Add
+                                              </Button>
+                                              <Button size="sm" variant="ghost" className="h-8" onClick={() => { setAddingTaskFor(null); setNewTaskName(""); setNewTaskDueDate("") }}>
+                                                <X className="h-4 w-4" />
+                                              </Button>
+                                            </div>
+                                            <p className="text-xs text-gray-400 flex items-center gap-1">
+                                              <CalendarDays className="h-3 w-3" />
+                                              Set a due date to add this task to the calendar and Google Calendar.
+                                            </p>
                                           </div>
                                         ) : (
                                           <div className="mt-3">
@@ -2557,7 +2616,7 @@ function EnhancedProjectManagementPage() {
                                               size="sm"
                                               variant="ghost"
                                               className="text-gray-500 h-7 text-xs"
-                                              onClick={() => { setAddingTaskFor({ projectId: project.id, stageId: stage.id }); setNewTaskName("") }}
+                                              onClick={() => { setAddingTaskFor({ projectId: project.id, stageId: stage.id }); setNewTaskName(""); setNewTaskDueDate("") }}
                                             >
                                               <Plus className="h-3 w-3 mr-1" />
                                               Add Task
@@ -3283,6 +3342,21 @@ function EnhancedProjectManagementPage() {
                       }
                     })
 
+                    // Group dated custom tasks by their due date (this month)
+                    const projectById = new Map(projects.map(p => [p.id, p]))
+                    const tasksByDate: Record<string, any[]> = {}
+                    customTasks.forEach(task => {
+                      if (!task.due_date) return
+                      const proj = projectById.get(task.projectId)
+                      if (!proj || ["lost", "cancelled"].includes(proj.status)) return
+                      const dueDate = new Date(String(task.due_date).split('T')[0] + 'T00:00:00')
+                      if (dueDate.getFullYear() === year && dueDate.getMonth() === month) {
+                        const dayKey = dueDate.getDate().toString()
+                        if (!tasksByDate[dayKey]) tasksByDate[dayKey] = []
+                        tasksByDate[dayKey].push(task)
+                      }
+                    })
+
                     const monthNames = ["January", "February", "March", "April", "May", "June",
                                        "July", "August", "September", "October", "November", "December"]
                     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
@@ -3317,6 +3391,7 @@ function EnhancedProjectManagementPage() {
                           {Array.from({ length: daysInMonth }).map((_, i) => {
                             const day = i + 1
                             const dayProjects = projectsByDate[day.toString()] || []
+                            const dayTasks = tasksByDate[day.toString()] || []
 
                             return (
                               <div
@@ -3357,6 +3432,31 @@ function EnhancedProjectManagementPage() {
                                       +{dayProjects.length - 3} more
                                     </div>
                                   )}
+                                  {/* Dated tasks */}
+                                  {dayTasks.slice(0, 3).map(task => {
+                                    const proj = projectById.get(task.projectId)
+                                    return (
+                                      <div
+                                        key={`task-${task.id}`}
+                                        className={`text-sm p-1.5 rounded cursor-pointer hover:opacity-80 border-l-3 border-purple-500 ${
+                                          task.completed ? 'bg-gray-100 text-gray-500 line-through' : 'bg-purple-100 text-purple-800'
+                                        }`}
+                                        title={`Task: ${task.task_name} — ${task.projectName || ''}${task.google_calendar_event_id ? ' (synced to Google)' : ''}`}
+                                        onClick={() => { if (proj) setCalendarSelectedProject(proj) }}
+                                      >
+                                        <div className="font-medium truncate flex items-center gap-1">
+                                          <Check className="h-3 w-3 flex-shrink-0" />
+                                          {task.task_name}
+                                        </div>
+                                        <div className="text-xs opacity-75 truncate">{task.projectName}</div>
+                                      </div>
+                                    )
+                                  })}
+                                  {dayTasks.length > 3 && (
+                                    <div className="text-sm text-purple-500 text-center font-medium">
+                                      +{dayTasks.length - 3} more task{dayTasks.length - 3 !== 1 ? 's' : ''}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             )
@@ -3384,6 +3484,10 @@ function EnhancedProjectManagementPage() {
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 bg-blue-100 border-l-3 border-blue-500 rounded" />
                             <span>Low</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-purple-100 border-l-3 border-purple-500 rounded" />
+                            <span>Task Due</span>
                           </div>
                         </div>
                       </div>
