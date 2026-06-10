@@ -474,6 +474,9 @@ function EnhancedProjectManagementPage() {
   const [editNotesValue, setEditNotesValue] = useState("")
   const [aiSummary, setAiSummary] = useState<Record<number, string>>({})
   const [aiSummaryLoading, setAiSummaryLoading] = useState<number | null>(null)
+  const [taskSuggestions, setTaskSuggestions] = useState<Record<number, any[]>>({})
+  const [taskSuggestionsLoading, setTaskSuggestionsLoading] = useState<number | null>(null)
+  const [taskSuggestionsMsg, setTaskSuggestionsMsg] = useState<Record<number, string>>({})
   const [newProjectData, setNewProjectData] = useState({
     project_name: "",
     event_date: "",
@@ -1250,6 +1253,45 @@ function EnhancedProjectManagementPage() {
     } finally {
       setAiSummaryLoading(null)
     }
+  }
+
+  // Ask the AI to suggest tasks for a project based on its matched email correspondence
+  const handleSuggestTasks = async (projectId: number) => {
+    setTaskSuggestionsLoading(projectId)
+    setTaskSuggestionsMsg(prev => ({ ...prev, [projectId]: "" }))
+    try {
+      const response = await fetch('/api/ai/suggest-tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId })
+      })
+      const data = await response.json()
+      if (data.success) {
+        setTaskSuggestions(prev => ({ ...prev, [projectId]: data.suggestions || [] }))
+        if (!data.suggestions || data.suggestions.length === 0) {
+          setTaskSuggestionsMsg(prev => ({
+            ...prev,
+            [projectId]: data.message || "No new task suggestions from recent emails.",
+          }))
+        }
+      } else {
+        toast({ title: "Error", description: data.error || "Failed to suggest tasks", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to suggest tasks from emails", variant: "destructive" })
+    } finally {
+      setTaskSuggestionsLoading(null)
+    }
+  }
+
+  // Accept one AI-suggested task into a stage (creates it + syncs date to calendar)
+  const handleAcceptSuggestion = async (projectId: number, stageId: string, suggestion: any) => {
+    await handleAddCustomTask(projectId, stageId, suggestion.name, suggestion.due_date || undefined)
+    // Remove the accepted suggestion from the list
+    setTaskSuggestions(prev => ({
+      ...prev,
+      [projectId]: (prev[projectId] || []).filter(s => s !== suggestion),
+    }))
   }
 
   const handleCreateCalendarEvent = async (project: Project) => {
@@ -2571,6 +2613,96 @@ function EnhancedProjectManagementPage() {
                                             </div>
                                           )
                                         })()}
+
+                                        {/* AI Task Suggestions (from matched email correspondence) */}
+                                        <div className="mt-4 pt-3 border-t border-dashed border-purple-200">
+                                          <div className="flex items-center justify-between mb-2">
+                                            <h4 className="font-medium text-purple-700 text-sm flex items-center gap-2">
+                                              <Sparkles className="h-3.5 w-3.5" />
+                                              AI Suggested Tasks
+                                              <span className="text-xs font-normal text-gray-400">from emails</span>
+                                            </h4>
+                                            <Button
+                                              size="sm"
+                                              variant="ghost"
+                                              className="h-7 text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                                              onClick={() => handleSuggestTasks(project.id)}
+                                              disabled={taskSuggestionsLoading === project.id}
+                                            >
+                                              {taskSuggestionsLoading === project.id ? (
+                                                <>
+                                                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                                  Reading emails…
+                                                </>
+                                              ) : (
+                                                <>
+                                                  <Sparkles className="h-3 w-3 mr-1" />
+                                                  {taskSuggestions[project.id]?.length ? 'Refresh' : 'Suggest from emails'}
+                                                </>
+                                              )}
+                                            </Button>
+                                          </div>
+
+                                          {taskSuggestionsMsg[project.id] && (
+                                            <p className="text-xs text-gray-500 italic mb-2">{taskSuggestionsMsg[project.id]}</p>
+                                          )}
+
+                                          {(taskSuggestions[project.id] || []).length > 0 && (
+                                            <div className="space-y-2">
+                                              {taskSuggestions[project.id].map((suggestion, idx) => (
+                                                <div
+                                                  key={`suggestion-${project.id}-${idx}`}
+                                                  className="flex items-start gap-2 p-2.5 rounded-lg border border-purple-200 bg-purple-50/50"
+                                                >
+                                                  <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                      <span className="text-sm font-medium text-gray-800">{suggestion.name}</span>
+                                                      <span className={`text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded ${
+                                                        suggestion.priority === 'high' ? 'bg-red-100 text-red-700' :
+                                                        suggestion.priority === 'low' ? 'bg-gray-100 text-gray-600' :
+                                                        'bg-yellow-100 text-yellow-700'
+                                                      }`}>
+                                                        {suggestion.priority}
+                                                      </span>
+                                                      {suggestion.due_date && (
+                                                        <span className="inline-flex items-center gap-1 text-xs text-purple-600">
+                                                          <CalendarDays className="h-3 w-3" />
+                                                          {formatEventDate(suggestion.due_date)}
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                    {suggestion.rationale && (
+                                                      <p className="text-xs text-gray-500 mt-0.5">{suggestion.rationale}</p>
+                                                    )}
+                                                  </div>
+                                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                                    <Button
+                                                      size="sm"
+                                                      className="h-7 text-xs"
+                                                      onClick={() => handleAcceptSuggestion(project.id, stage.id, suggestion)}
+                                                      title={suggestion.due_date ? 'Add task and put it on the calendar' : 'Add task'}
+                                                    >
+                                                      <Plus className="h-3 w-3 mr-1" />
+                                                      Add
+                                                    </Button>
+                                                    <Button
+                                                      size="sm"
+                                                      variant="ghost"
+                                                      className="h-7 w-7 p-0 text-gray-400"
+                                                      onClick={() => setTaskSuggestions(prev => ({
+                                                        ...prev,
+                                                        [project.id]: (prev[project.id] || []).filter(s => s !== suggestion),
+                                                      }))}
+                                                      title="Dismiss"
+                                                    >
+                                                      <X className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
 
                                         {/* Add Task Form */}
                                         {addingTaskFor?.projectId === project.id && addingTaskFor?.stageId === stage.id ? (
