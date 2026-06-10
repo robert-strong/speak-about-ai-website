@@ -97,7 +97,7 @@ export async function POST(
 
     // Determine signer type
     const signerType = isClientToken ? 'client' : 'speaker'
-    const signerEmail = isClientToken ? contract.client_email : contract.speaker_email || ""
+    const signerEmail = (isClientToken ? contract.client_email : contract.speaker_email) || ""
 
     // Get client IP and user agent
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'

@@ -31,15 +31,26 @@ export interface Contract {
   contract_number: string
   title: string
   type: string
-  status: "draft" | "sent" | "partially_signed" | "fully_executed" | "cancelled"
-  
+  status:
+    | "draft"
+    | "sent"
+    | "sent_for_signature"
+    | "partially_signed"
+    | "client_signed"
+    | "speaker_signed"
+    | "fully_executed"
+    | "cancelled"
+  template_id?: number
+
   // Contract content
   terms?: string
   description?: string
   special_requirements?: string
-  
+
   // Financial terms
   fee_amount?: number
+  total_amount?: number
+  deal_value?: number
   payment_terms?: string
   currency?: string
   
@@ -64,12 +75,38 @@ export interface Contract {
   sent_at?: string
   expires_at?: string
   signed_at?: string
-  
+  completed_at?: string
+
+  // Signing tokens & expiry
+  access_token?: string
+  client_signing_token?: string
+  speaker_signing_token?: string
+  tokens_expire_at?: string
+
+  // Signature tracking — client
+  client_signature_status?: string
+  client_signed_at?: string
+  client_signer_name?: string
+  client_signer_email?: string
+  client_ip_address?: string
+
+  // Signature tracking — speaker
+  speaker_signature_status?: string
+  speaker_signed_at?: string
+  speaker_signer_name?: string
+  speaker_signer_email?: string
+  speaker_ip_address?: string
+
   // Audit
   created_by?: string
   created_at?: string
   updated_at?: string
-  
+  is_demo?: boolean
+
+  // Joined fields (from deals)
+  deal_client_name?: string
+  deal_event_title?: string
+
   // Additional data
   template_settings?: any
   contract_data?: any

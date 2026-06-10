@@ -234,10 +234,10 @@ export async function POST(request: NextRequest) {
           speakerEmail: contract.speaker_email,
           speakerName: contract.speaker_name || 'Speaker',
           contractNumber: contract.contract_number,
-          eventTitle: contract.event_title,
-          eventDate: contract.event_date,
-          eventLocation: contract.event_location,
-          speakerFee: contract.speaker_fee || contract.total_amount,
+          eventTitle: contract.event_title || '',
+          eventDate: contract.event_date || '',
+          eventLocation: contract.event_location || '',
+          speakerFee: contract.speaker_fee || contract.total_amount || 0,
           contractId: contract.id,
           signingToken: contract.speaker_signing_token
         })
@@ -245,18 +245,18 @@ export async function POST(request: NextRequest) {
       
       // Send to client
       if (contract.client_signer_email && contract.client_signing_token) {
-        const ccEmails = contract.client_signer_email !== contract.client_email ? [contract.client_email] : []
-        
+        const ccEmails: string[] = contract.client_signer_email !== contract.client_email && contract.client_email ? [contract.client_email] : []
+
         await sendClientContractEmail({
           signerEmail: contract.client_signer_email,
-          signerName: contract.client_signer_name || contract.client_name,
+          signerName: contract.client_signer_name || contract.client_name || '',
           clientCompany: contract.client_company || '',
           speakerName: contract.speaker_name || 'Speaker',
           contractNumber: contract.contract_number,
-          eventTitle: contract.event_title,
-          eventDate: contract.event_date,
-          eventLocation: contract.event_location,
-          totalAmount: contract.total_amount,
+          eventTitle: contract.event_title || '',
+          eventDate: contract.event_date || '',
+          eventLocation: contract.event_location || '',
+          totalAmount: contract.total_amount || 0,
           contractId: contract.id,
           signingToken: contract.client_signing_token,
           ccEmails

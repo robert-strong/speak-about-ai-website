@@ -47,6 +47,7 @@ interface Contract {
   status: "draft" | "sent" | "partially_signed" | "fully_executed" | "cancelled"
   fee_amount: number
   total_amount?: number
+  deal_value?: number
   event_title: string
   event_date: string
   client_name: string

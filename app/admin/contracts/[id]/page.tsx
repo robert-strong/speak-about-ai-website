@@ -228,7 +228,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
               <CardContent>
                 <div className="space-y-2">
                   <p className="font-medium">{contract.event_title}</p>
-                  <p className="text-sm text-gray-600">{formatDate(contract.event_date)}</p>
+                  <p className="text-sm text-gray-600">{formatDate(contract.event_date || "")}</p>
                   <p className="text-sm text-gray-600">{contract.event_location}</p>
                   <Badge variant="outline" className="text-xs">
                     {contract.event_type === "virtual" ? "Virtual" : "In-Person"}

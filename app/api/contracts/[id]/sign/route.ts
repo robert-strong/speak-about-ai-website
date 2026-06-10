@@ -81,7 +81,7 @@ export async function POST(
       contractId,
       signerType,
       signerName,
-      signerEmail: signerType === "client" ? contract.client_signer_email : contract.speaker_email,
+      signerEmail: (signerType === "client" ? contract.client_signer_email : contract.speaker_email) || '',
       signerTitle: signerTitle || undefined,
       ipAddress: ip,
       userAgent
@@ -94,11 +94,11 @@ export async function POST(
     // Send confirmation email
     try {
       await sendContractConfirmationEmail({
-        recipientEmail: signerType === "client" ? contract.client_signer_email : contract.speaker_email,
+        recipientEmail: (signerType === "client" ? contract.client_signer_email : contract.speaker_email) || '',
         recipientName: signerName,
         contractNumber: contract.contract_number,
-        eventTitle: contract.event_title,
-        eventDate: contract.event_date,
+        eventTitle: contract.event_title || '',
+        eventDate: contract.event_date || '',
         isFullyExecuted: signature.contractFullyExecuted
       })
     } catch (emailError) {
