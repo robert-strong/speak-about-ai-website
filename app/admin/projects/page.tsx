@@ -3738,7 +3738,7 @@ function EnhancedProjectManagementPage() {
                       // Add tasks from current stage
                       if (stageTasks[currentStage]) {
                         Object.entries(stageTasks[currentStage]).forEach(([taskKey, taskDefinition]) => {
-                          const isCompleted = stageCompletion[currentStage]?.[taskKey] || false
+                          const isCompleted = (stageCompletion as Record<string, Record<string, boolean>>)[currentStage]?.[taskKey] || false
                           if (!isCompleted) {
                             const urgency = calculateTaskUrgency(currentStage, daysUntilEvent, taskKey)
                             allTasks.push({
@@ -3767,13 +3767,13 @@ function EnhancedProjectManagementPage() {
                     // Sort tasks by urgency, priority, and days until event
                     allTasks.sort((a, b) => {
                       // First sort by urgency
-                      const urgencyOrder = { critical: 4, high: 3, medium: 2, low: 1 }
+                      const urgencyOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 }
                       if (urgencyOrder[a.urgency] !== urgencyOrder[b.urgency]) {
                         return urgencyOrder[b.urgency] - urgencyOrder[a.urgency]
                       }
                       
                       // Then by priority
-                      const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
+                      const priorityOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 }
                       if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
                         return priorityOrder[b.priority] - priorityOrder[a.priority]
                       }
@@ -4837,7 +4837,7 @@ function EnhancedProjectManagementPage() {
               {Object.entries(TASK_DEFINITIONS).map(([stage, tasks]) => {
                 const stageConfig = PROJECT_STATUSES[stage]
                 const isCurrentStage = selectedProject.status === stage
-                const stageCompletion = selectedProject.stage_completion?.[stage] || {}
+                const stageCompletion = (selectedProject.stage_completion as Record<string, Record<string, boolean>> | undefined)?.[stage] || {}
                 const stageCustomTasks = customTasks.filter(t => t.projectId === selectedProject.id && t.stage === stage)
                 const isAddingHere = addingTaskFor?.projectId === selectedProject.id && addingTaskFor?.stageId === stage
                 // Default checklist tasks are disabled — base counts on custom tasks instead
