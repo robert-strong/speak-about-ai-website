@@ -17,6 +17,28 @@ interface BriefsPromptEditorProps {
   defaultPrompt: string
 }
 
+// Default body prompt for article drafts
+const DEFAULT_BODY_PROMPT = `You are a senior content writer for Speak About AI, a premier AI keynote speakers bureau.
+Write a complete blog post in markdown format based on the title and brief below.
+
+Title: {title}
+
+Brief:
+{brief}
+
+Requirements:
+- Length: ~{article_length_min}-{article_length_max} words
+- Use markdown ## for major sections (and ### for sub-sections if needed)
+- Do NOT include the title as an H1 — start with an opening paragraph that hooks the reader
+- Conversational but professional tone, like a knowledgeable colleague writing for event planners and business leaders
+- Include concrete examples and specific actionable advice; avoid generic AI-thought-leadership filler
+- No "In this article we will..." or "In conclusion..." style filler — just substantive content from the first sentence
+- Use bold (**text**) sparingly to emphasize the most important takeaways
+- Output the markdown body only — no preamble, no closing remarks, no meta-commentary
+
+{formatting_rules}
+`
+
 // Default values for all settings
 const DEFAULTS: Record<string, string> = {
   cta_ratio: '0.6',
@@ -30,7 +52,19 @@ const DEFAULTS: Record<string, string> = {
   enable_web_search: 'true',
   max_web_searches: '5',
   image_style_reference: '',
-  image_style_description: ''
+  image_style_description: '',
+  // Draft settings
+  draft_body_prompt: '',
+  draft_formatting_rules: `Do NOT use horizontal rules (---) to separate sections. Use headings (## or ###) instead for visual breaks.
+Do NOT use em-dashes (—) or en-dashes (–) in sentences. Restructure sentences to flow naturally without dashes.
+Prefer commas, periods, or restructured clauses over parenthetical dash constructions.
+Hyphenated compound words are fine (e.g., "decision-makers", "real-world", "AI-powered").`,
+  draft_tone: 'Conversational but professional, like a knowledgeable colleague writing for event planners and business leaders',
+  draft_avoid_phrases: `"In this article we will..."
+"In conclusion..."
+"Let's dive in..."
+"Without further ado..."
+Generic AI-thought-leadership filler`
 }
 
 export function BriefsPromptEditor({
@@ -83,7 +117,7 @@ export function BriefsPromptEditor({
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sliders className="h-5 w-5" />
-            <span>Brief Generation Settings</span>
+            <span>Brief & Draft Generation Settings</span>
           </div>
           {hasChanges && (
             <span className="text-sm font-normal text-orange-600">
@@ -92,14 +126,15 @@ export function BriefsPromptEditor({
           )}
         </CardTitle>
         <CardDescription>
-          Configure all parameters used when generating blog briefs with Claude
+          Configure parameters for generating briefs and drafting full articles with Claude
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="parameters">Parameters</TabsTrigger>
-            <TabsTrigger value="prompt">Prompt Template</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsTrigger value="parameters">Briefs</TabsTrigger>
+            <TabsTrigger value="drafts">Drafts</TabsTrigger>
+            <TabsTrigger value="prompt">Brief Prompt</TabsTrigger>
             <TabsTrigger value="image">Image Style</TabsTrigger>
             <TabsTrigger value="advanced">Advanced</TabsTrigger>
           </TabsList>
@@ -246,6 +281,116 @@ Overplayed framings (e.g., not "ChatGPT for business" but "Why ChatGPT-only depl
               />
               <p className="text-xs text-gray-500 mt-1">
                 Topics and patterns to avoid when generating briefs
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="drafts" className="space-y-6">
+            {/* Draft Article Settings */}
+            <div className="space-y-2">
+              <Label className="font-medium">Article Draft Settings</Label>
+              <p className="text-sm text-gray-500">
+                Configure how full articles are drafted from briefs. These settings control the tone, formatting, and structure of generated articles.
+              </p>
+            </div>
+
+            {/* Article Length */}
+            <div className="space-y-4">
+              <Label>Target Article Length (words)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="500"
+                  max="5000"
+                  value={currentSettings.article_length_min || '1500'}
+                  onChange={(e) => updateSetting('article_length_min', e.target.value)}
+                  className="w-24"
+                  placeholder="Min"
+                />
+                <span className="text-gray-400">to</span>
+                <Input
+                  type="number"
+                  min="500"
+                  max="5000"
+                  value={currentSettings.article_length_max || '1800'}
+                  onChange={(e) => updateSetting('article_length_max', e.target.value)}
+                  className="w-24"
+                  placeholder="Max"
+                />
+                <span className="text-sm text-gray-500">words per article</span>
+              </div>
+            </div>
+
+            {/* Tone */}
+            <div className="border-t pt-6 space-y-2">
+              <Label htmlFor="draft_tone">Writing Tone</Label>
+              <Textarea
+                id="draft_tone"
+                value={currentSettings.draft_tone || 'Conversational but professional, like a knowledgeable colleague writing for event planners and business leaders'}
+                onChange={(e) => updateSetting('draft_tone', e.target.value)}
+                rows={2}
+                className="font-mono text-sm"
+                placeholder="Describe the desired writing tone..."
+              />
+              <p className="text-xs text-gray-500">
+                Describe the voice and tone for article drafts
+              </p>
+            </div>
+
+            {/* Formatting Rules */}
+            <div className="border-t pt-6 space-y-2">
+              <Label htmlFor="draft_formatting_rules">Formatting Rules</Label>
+              <Textarea
+                id="draft_formatting_rules"
+                value={currentSettings.draft_formatting_rules || `Do NOT use horizontal rules (---) to separate sections. Use headings (## or ###) instead for visual breaks.
+Do NOT use em-dashes (—) or en-dashes (–) in sentences. Restructure sentences to flow naturally without dashes.
+Prefer commas, periods, or restructured clauses over parenthetical dash constructions.
+Hyphenated compound words are fine (e.g., "decision-makers", "real-world", "AI-powered").`}
+                onChange={(e) => updateSetting('draft_formatting_rules', e.target.value)}
+                rows={6}
+                className="font-mono text-sm"
+                placeholder="Formatting rules for article structure..."
+              />
+              <p className="text-xs text-gray-500">
+                Rules for markdown formatting, punctuation, and structure. One rule per line.
+              </p>
+            </div>
+
+            {/* Phrases to Avoid */}
+            <div className="border-t pt-6 space-y-2">
+              <Label htmlFor="draft_avoid_phrases">Phrases to Avoid</Label>
+              <Textarea
+                id="draft_avoid_phrases"
+                value={currentSettings.draft_avoid_phrases || `"In this article we will..."
+"In conclusion..."
+"Let's dive in..."
+"Without further ado..."
+Generic AI-thought-leadership filler`}
+                onChange={(e) => updateSetting('draft_avoid_phrases', e.target.value)}
+                rows={5}
+                className="font-mono text-sm"
+                placeholder="Phrases and patterns to avoid in articles..."
+              />
+              <p className="text-xs text-gray-500">
+                Common filler phrases and patterns the AI should avoid. One per line.
+              </p>
+            </div>
+
+            {/* Custom Body Prompt */}
+            <div className="border-t pt-6 space-y-2">
+              <Label htmlFor="draft_body_prompt">Custom Draft Prompt (Advanced)</Label>
+              <Textarea
+                id="draft_body_prompt"
+                value={currentSettings.draft_body_prompt || ''}
+                onChange={(e) => updateSetting('draft_body_prompt', e.target.value)}
+                rows={12}
+                className="font-mono text-sm"
+                placeholder="Leave empty to use the default prompt with the above settings. Only fill this in if you want to completely override the draft generation prompt.
+
+Available variables: {title}, {brief}, {article_length_min}, {article_length_max}, {formatting_rules}, {tone}, {avoid_phrases}"
+              />
+              <p className="text-xs text-gray-500">
+                Leave empty to use the default prompt with settings above. Fill in to completely override.
               </p>
             </div>
           </TabsContent>
