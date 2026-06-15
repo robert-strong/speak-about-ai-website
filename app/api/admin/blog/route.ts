@@ -13,34 +13,28 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
 
     const sql = neon(process.env.DATABASE_URL!)
-    
-    let query = `
-      SELECT 
-        id,
-        title,
-        slug,
-        content,
-        meta_description,
-        featured_image_url,
-        published_date,
-        tags,
-        status,
-        created_at,
-        updated_at,
-        outrank_id,
-        source
-      FROM blog_posts
-    `
-    
-    const params: any[] = []
+
+    let posts
     if (status && status !== 'all') {
-      query += ' WHERE status = $1'
-      params.push(status)
+      posts = await sql`
+        SELECT
+          id, title, slug, content, meta_description,
+          featured_image_url, published_date, tags, status,
+          created_at, updated_at, outrank_id, source
+        FROM blog_posts
+        WHERE status = ${status}
+        ORDER BY created_at DESC
+      `
+    } else {
+      posts = await sql`
+        SELECT
+          id, title, slug, content, meta_description,
+          featured_image_url, published_date, tags, status,
+          created_at, updated_at, outrank_id, source
+        FROM blog_posts
+        ORDER BY created_at DESC
+      `
     }
-    
-    query += ' ORDER BY created_at DESC'
-    
-    const posts = await sql(query, params)
     
     return NextResponse.json({ posts })
   } catch (error) {
