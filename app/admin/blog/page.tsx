@@ -150,15 +150,6 @@ export default function AdminBlogPage() {
   const [logsStatusFilter, setLogsStatusFilter] = useState('all')
   const [selectedLog, setSelectedLog] = useState<WebhookLog | null>(null)
 
-  // Stats
-  const [stats, setStats] = useState({
-    total: 0,
-    published: 0,
-    draft: 0,
-    archived: 0,
-    views: 0,
-    engagement: 0
-  })
 
   useEffect(() => {
     // Check if logged in
@@ -172,7 +163,6 @@ export default function AdminBlogPage() {
     
     fetchBlogPosts()
     fetchOutrankConfig()
-    fetchStats()
   }, [statusFilter, router])
 
   const fetchBlogPosts = async () => {
@@ -220,22 +210,6 @@ export default function AdminBlogPage() {
     }
   }
 
-  const fetchStats = async () => {
-    try {
-      const response = await fetch('/api/admin/blog/stats', {
-        headers: {
-          'x-admin-request': 'true'
-        }
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setStats(data)
-      }
-    } catch (error) {
-      console.error('Error fetching blog stats:', error)
-    }
-  }
 
   const handleSavePost = async () => {
     if (!editingPost) return
@@ -505,80 +479,6 @@ export default function AdminBlogPage() {
               </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mt-6">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Total Posts</p>
-                      <p className="text-2xl font-bold">{stats.total}</p>
-                    </div>
-                    <FileText className="h-8 w-8 text-gray-400" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Published</p>
-                      <p className="text-2xl font-bold text-green-600">{stats.published}</p>
-                    </div>
-                    <CheckCircle className="h-8 w-8 text-green-400" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Drafts</p>
-                      <p className="text-2xl font-bold text-yellow-600">{stats.draft}</p>
-                    </div>
-                    <Clock className="h-8 w-8 text-yellow-400" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Archived</p>
-                      <p className="text-2xl font-bold text-gray-600">{stats.archived}</p>
-                    </div>
-                    <FileText className="h-8 w-8 text-gray-400" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Total Views</p>
-                      <p className="text-2xl font-bold">{stats.views.toLocaleString()}</p>
-                    </div>
-                    <Eye className="h-8 w-8 text-blue-400" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Engagement</p>
-                      <p className="text-2xl font-bold">{stats.engagement}%</p>
-                    </div>
-                    <TrendingUp className="h-8 w-8 text-purple-400" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </div>
 
           {/* Tabs */}
