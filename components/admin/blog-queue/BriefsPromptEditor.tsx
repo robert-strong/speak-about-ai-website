@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Save, RotateCcw, Info, ChevronDown, ChevronUp, Sliders } from 'lucide-react'
+import { Loader2, Save, RotateCcw, Info, ChevronDown, ChevronUp, Sliders, Search } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
 
 interface BriefsPromptEditorProps {
   settings: Record<string, string>
@@ -25,7 +26,9 @@ const DEFAULTS: Record<string, string> = {
   article_length_min: '1500',
   article_length_max: '1800',
   github_repo: '',
-  briefs_prompt: ''
+  briefs_prompt: '',
+  enable_web_search: 'true',
+  max_web_searches: '5'
 }
 
 export function BriefsPromptEditor({
@@ -304,8 +307,52 @@ Overplayed framings (e.g., not "ChatGPT for business" but "Why ChatGPT-only depl
           </TabsContent>
 
           <TabsContent value="advanced" className="space-y-6">
+            {/* Web Search Settings */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4" />
+                <Label className="font-medium">Web Search Settings</Label>
+              </div>
+              <p className="text-sm text-gray-500">
+                Claude can search the web to ground briefs in recent news and developments.
+              </p>
+              <div className="flex items-center justify-between max-w-md">
+                <div className="space-y-0.5">
+                  <Label htmlFor="enable_web_search">Enable Web Search</Label>
+                  <p className="text-xs text-gray-500">
+                    Allow Claude to search for recent AI news when generating briefs
+                  </p>
+                </div>
+                <Switch
+                  id="enable_web_search"
+                  checked={(currentSettings.enable_web_search || 'true') === 'true'}
+                  onCheckedChange={(checked) => updateSetting('enable_web_search', checked ? 'true' : 'false')}
+                />
+              </div>
+              {(currentSettings.enable_web_search || 'true') === 'true' && (
+                <div className="space-y-2">
+                  <Label htmlFor="max_web_searches">Max Web Searches</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="max_web_searches"
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={currentSettings.max_web_searches || '5'}
+                      onChange={(e) => updateSetting('max_web_searches', e.target.value)}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-gray-500">searches per generation</span>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Maximum number of web searches Claude can perform (1-10)
+                  </p>
+                </div>
+              )}
+            </div>
+
             {/* GitHub Repository */}
-            <div className="space-y-2">
+            <div className="border-t pt-6 space-y-2">
               <Label htmlFor="github_repo">GitHub Repository</Label>
               <Input
                 id="github_repo"
