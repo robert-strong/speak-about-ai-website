@@ -429,8 +429,7 @@ export function BlogQueueTab() {
 
       {showSettings && (
         <BriefsPromptEditor
-          prompt={settings.briefs_prompt || DEFAULT_BRIEFS_PROMPT}
-          ctaRatio={settings.cta_ratio || '0.6'}
+          settings={settings}
           onSave={handleSaveSettings}
           defaultPrompt={DEFAULT_BRIEFS_PROMPT}
         />

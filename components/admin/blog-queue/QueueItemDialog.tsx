@@ -156,14 +156,14 @@ export function QueueItemDialog({
             <div>
               <Label htmlFor="category">Category</Label>
               <Select
-                value={formData.category || ''}
-                onValueChange={(value) => updateField('category', value || null)}
+                value={formData.category || '_none'}
+                onValueChange={(value) => updateField('category', value === '_none' ? null : value)}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="_none">None</SelectItem>
                   {categoryOptions.map(cat => (
                     <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                   ))}
