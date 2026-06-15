@@ -38,7 +38,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { 
+import {
   FileText,
   Plus,
   Edit,
@@ -71,10 +71,12 @@ import {
   Square,
   Send,
   Globe,
-  Database
+  Database,
+  ListOrdered
 } from 'lucide-react'
 import { formatDateTimePST, getPSTTimezoneLabel } from '@/lib/date-utils'
 import { useToast } from '@/hooks/use-toast'
+import { BlogQueueTab } from '@/components/admin/blog-queue'
 
 interface BlogPost {
   id: number
@@ -128,7 +130,7 @@ export default function AdminBlogPage() {
   const [selectedPosts, setSelectedPosts] = useState<number[]>([])
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
   const [isNewPost, setIsNewPost] = useState(false)
-  const [activeTab, setActiveTab] = useState('posts')
+  const [activeTab, setActiveTab] = useState('queue')
   
   // Outrank configuration state
   const [outrank, setOutrank] = useState<OutrankConfig>({
@@ -581,7 +583,11 @@ export default function AdminBlogPage() {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="queue">
+                <ListOrdered className="h-4 w-4 mr-2" />
+                Queue
+              </TabsTrigger>
               <TabsTrigger value="posts">
                 <Globe className="h-4 w-4 mr-2" />
                 Contentful Posts
@@ -599,6 +605,11 @@ export default function AdminBlogPage() {
                 Analytics
               </TabsTrigger>
             </TabsList>
+
+            {/* Queue Tab */}
+            <TabsContent value="queue" className="mt-6">
+              <BlogQueueTab />
+            </TabsContent>
 
             {/* Posts Tab */}
             <TabsContent value="posts" className="mt-6">
