@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getQueuedItems, getQueueItemById, updateQueueItem } from '@/lib/blog-queue-db'
+import { getQueuedItems, getQueueItemById, updateQueueItem, getQueueItems, QueueStatus } from '@/lib/blog-queue-db'
 
 // Verify API key authentication
 function verifyApiKey(request: NextRequest): boolean {
@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams
     const id = searchParams.get('id')
+    const status = searchParams.get('status') as QueueStatus | null
 
     if (id) {
       // Get specific item
@@ -34,7 +35,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ item })
     }
 
-    // Get all queued items
+    // Get items by status (default to 'queued' for backward compatibility)
+    if (status) {
+      const items = await getQueueItems({ status })
+      return NextResponse.json({ items })
+    }
+
+    // Default: get all queued items
     const items = await getQueuedItems()
     return NextResponse.json({ items })
   } catch (error) {
