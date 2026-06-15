@@ -96,33 +96,46 @@ export async function getQueueItems(filters?: {
 }): Promise<BlogQueueItem[]> {
   const db = getSQL()
   try {
-    let query = `SELECT * FROM blog_queue WHERE 1=1`
-    const params: any[] = []
-
-    if (filters?.status) {
-      params.push(filters.status)
-      query += ` AND status = $${params.length}`
+    // Build query based on filters
+    if (filters?.status && filters?.search) {
+      const searchPattern = `%${filters.search}%`
+      const result = await db`
+        SELECT * FROM blog_queue
+        WHERE status = ${filters.status}
+        AND (brief ILIKE ${searchPattern} OR title ILIKE ${searchPattern})
+        ORDER BY created_at DESC
+        LIMIT ${filters.limit || 100}
+        OFFSET ${filters.offset || 0}
+      `
+      return result as BlogQueueItem[]
+    } else if (filters?.status) {
+      const result = await db`
+        SELECT * FROM blog_queue
+        WHERE status = ${filters.status}
+        ORDER BY created_at DESC
+        LIMIT ${filters.limit || 100}
+        OFFSET ${filters.offset || 0}
+      `
+      return result as BlogQueueItem[]
+    } else if (filters?.search) {
+      const searchPattern = `%${filters.search}%`
+      const result = await db`
+        SELECT * FROM blog_queue
+        WHERE brief ILIKE ${searchPattern} OR title ILIKE ${searchPattern}
+        ORDER BY created_at DESC
+        LIMIT ${filters.limit || 100}
+        OFFSET ${filters.offset || 0}
+      `
+      return result as BlogQueueItem[]
+    } else {
+      const result = await db`
+        SELECT * FROM blog_queue
+        ORDER BY created_at DESC
+        LIMIT ${filters?.limit || 100}
+        OFFSET ${filters?.offset || 0}
+      `
+      return result as BlogQueueItem[]
     }
-
-    if (filters?.search) {
-      params.push(`%${filters.search}%`)
-      query += ` AND (brief ILIKE $${params.length} OR title ILIKE $${params.length})`
-    }
-
-    query += ` ORDER BY created_at DESC`
-
-    if (filters?.limit) {
-      params.push(filters.limit)
-      query += ` LIMIT $${params.length}`
-    }
-
-    if (filters?.offset) {
-      params.push(filters.offset)
-      query += ` OFFSET $${params.length}`
-    }
-
-    const result = await db(query, params)
-    return result as BlogQueueItem[]
   } catch (error) {
     console.error("Error fetching queue items:", error)
     throw error
