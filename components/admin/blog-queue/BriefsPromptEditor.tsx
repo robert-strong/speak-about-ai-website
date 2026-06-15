@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Save, RotateCcw, Info, ChevronDown, ChevronUp, Sliders, Search } from 'lucide-react'
+import { Loader2, Save, RotateCcw, Info, ChevronDown, ChevronUp, Sliders, Search, Image } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 
 interface BriefsPromptEditorProps {
@@ -28,7 +28,9 @@ const DEFAULTS: Record<string, string> = {
   github_repo: '',
   briefs_prompt: '',
   enable_web_search: 'true',
-  max_web_searches: '5'
+  max_web_searches: '5',
+  image_style_reference: '',
+  image_style_description: ''
 }
 
 export function BriefsPromptEditor({
@@ -95,9 +97,10 @@ export function BriefsPromptEditor({
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="parameters">Parameters</TabsTrigger>
             <TabsTrigger value="prompt">Prompt Template</TabsTrigger>
+            <TabsTrigger value="image">Image Style</TabsTrigger>
             <TabsTrigger value="advanced">Advanced</TabsTrigger>
           </TabsList>
 
@@ -303,6 +306,66 @@ Overplayed framings (e.g., not "ChatGPT for business" but "Why ChatGPT-only depl
                   Reset to Default
                 </Button>
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="image" className="space-y-6">
+            {/* Image Style Settings */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Image className="h-4 w-4" />
+                <Label className="font-medium">Hero Image Generation</Label>
+              </div>
+              <p className="text-sm text-gray-500">
+                Configure the style and look of generated blog hero images. Uses Gemini 3.1 Flash for image generation.
+              </p>
+            </div>
+
+            {/* Style Reference Image */}
+            <div className="space-y-2">
+              <Label htmlFor="image_style_reference">Style Reference Image URL</Label>
+              <Input
+                id="image_style_reference"
+                value={currentSettings.image_style_reference || ''}
+                onChange={(e) => updateSetting('image_style_reference', e.target.value)}
+                placeholder="https://example.com/style-reference.png"
+                className="max-w-lg"
+              />
+              <p className="text-xs text-gray-500">
+                URL to an image that represents the desired visual style. The AI will use this as a reference when generating hero images.
+              </p>
+              {currentSettings.image_style_reference && (
+                <div className="mt-2">
+                  <p className="text-xs text-gray-500 mb-2">Preview:</p>
+                  <img
+                    src={currentSettings.image_style_reference}
+                    alt="Style reference preview"
+                    className="max-w-xs max-h-32 rounded border object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Style Description */}
+            <div className="border-t pt-6 space-y-2">
+              <Label htmlFor="image_style_description">Image Style Description</Label>
+              <Textarea
+                id="image_style_description"
+                value={currentSettings.image_style_description || ''}
+                onChange={(e) => updateSetting('image_style_description', e.target.value)}
+                rows={6}
+                className="font-mono text-sm"
+                placeholder="Describe the visual style you want for blog hero images...
+
+Example:
+Modern, professional corporate style with clean lines. Use a navy blue and white color palette. Include subtle tech/AI visual elements like circuit patterns or neural network nodes. The overall feel should be sophisticated and trustworthy, suitable for a B2B audience of event planners and executives."
+              />
+              <p className="text-xs text-gray-500">
+                Additional description to guide the AI when generating images. This is combined with each article's specific image prompt.
+              </p>
             </div>
           </TabsContent>
 
