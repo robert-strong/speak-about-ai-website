@@ -2,7 +2,7 @@
  * Authenticated fetch utility for admin API calls
  * Automatically includes JWT token from localStorage in Authorization header
  * Automatically refreshes expired tokens and retries on 401
- * Automatically logs out and redirects on unrecoverable 401
+ * Only logs out on a DEFINITIVE auth rejection — never on transient/network failures
  */
 
 interface AuthFetchOptions extends RequestInit {
@@ -10,7 +10,22 @@ interface AuthFetchOptions extends RequestInit {
   _isRetry?: boolean // internal flag to prevent infinite retry loops
 }
 
+// Result of a refresh attempt:
+// - { token }        -> got a fresh token, safe to retry
+// - { unauthorized } -> server says the session is genuinely invalid/expired -> logout
+// - { transient }    -> network error / 5xx / cold start -> DO NOT logout, just fail soft
+type RefreshResult =
+  | { token: string }
+  | { unauthorized: true }
+  | { transient: true }
+
 let isLoggingOut = false
+
+// Single-flight guard: collapse concurrent refreshes into ONE request.
+// The speakers page fires ~5 authGet calls on mount; without this they would
+// each fire /api/auth/refresh in parallel, and a single transient failure among
+// them would log the user out even though the token was recoverable.
+let refreshPromise: Promise<RefreshResult> | null = null
 
 function forceLogout() {
   if (isLoggingOut || typeof window === 'undefined') return
@@ -25,10 +40,10 @@ function forceLogout() {
   window.location.href = '/admin'
 }
 
-async function tryRefreshToken(): Promise<string | null> {
+async function doRefresh(): Promise<RefreshResult> {
   try {
     const token = typeof window !== 'undefined' ? localStorage.getItem('adminSessionToken') : null
-    if (!token) return null
+    if (!token) return { unauthorized: true }
 
     const response = await fetch('/api/auth/refresh', {
       method: 'POST',
@@ -42,13 +57,33 @@ async function tryRefreshToken(): Promise<string | null> {
       const data = await response.json()
       if (data.sessionToken) {
         localStorage.setItem('adminSessionToken', data.sessionToken)
-        return data.sessionToken
+        return { token: data.sessionToken }
       }
+      // 200 but no token in body — treat as transient rather than logging out
+      return { transient: true }
     }
-    return null
+
+    // 401/403 => the refresh endpoint says the session is genuinely invalid
+    // (token expired beyond the 7-day grace, bad signature, etc.)
+    if (response.status === 401 || response.status === 403) {
+      return { unauthorized: true }
+    }
+
+    // 5xx and anything else => transient server issue, don't punish the user
+    return { transient: true }
   } catch {
-    return null
+    // Network error / cold start => transient, never logout
+    return { transient: true }
   }
+}
+
+function tryRefreshToken(): Promise<RefreshResult> {
+  if (!refreshPromise) {
+    refreshPromise = doRefresh().finally(() => {
+      refreshPromise = null
+    })
+  }
+  return refreshPromise
 }
 
 export async function authFetch(url: string, options: AuthFetchOptions = {}): Promise<Response> {
@@ -77,16 +112,26 @@ export async function authFetch(url: string, options: AuthFetchOptions = {}): Pr
 
   // If we get a 401 and this isn't already a retry, try refreshing the token
   if (response.status === 401 && !_isRetry) {
-    const newToken = await tryRefreshToken()
-    if (newToken) {
-      // Retry the original request with the new token
+    const result = await tryRefreshToken()
+
+    if ('token' in result) {
+      // Got a fresh token — retry the original request once
       return authFetch(url, { ...options, _isRetry: true })
     }
-    // Refresh failed — token is unrecoverable, force logout
-    forceLogout()
+
+    if ('unauthorized' in result) {
+      // Refresh was definitively rejected — session is unrecoverable
+      forceLogout()
+      return response
+    }
+
+    // Transient failure (network blip, cold start, 5xx): do NOT logout.
+    // Return the original 401 so the caller can fail soft, exactly like the
+    // cookie-based admin pages do. The next user activity will retry.
+    return response
   }
 
-  // If this was a retry and still got 401, token is invalid — force logout
+  // If this was a retry and STILL got 401, the token is truly invalid — logout
   if (response.status === 401 && _isRetry) {
     forceLogout()
   }
