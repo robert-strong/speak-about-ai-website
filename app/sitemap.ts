@@ -105,8 +105,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.85,
     },
+    {
+      url: `${BASE_URL}/industries/technology-ai-keynote-speakers`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/industries/financial-services-keynote-speakers`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/industries/government-education-keynote-speakers`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
   ]
-  
+
   // Individual speaker pages - VERY IMPORTANT FOR SEO
   const speakerPages: MetadataRoute.Sitemap = speakers.map((speaker) => ({
     url: `${BASE_URL}/speakers/${speaker.slug}`,
