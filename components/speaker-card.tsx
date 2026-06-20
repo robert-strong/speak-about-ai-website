@@ -14,7 +14,7 @@ interface UnifiedSpeakerCardProps {
   maxTopicsToShow?: number
 }
 
-export function SpeakerCard({ speaker, contactSource, maxTopicsToShow = 2 }: UnifiedSpeakerCardProps) {
+export function SpeakerCard({ speaker, contactSource, maxTopicsToShow = 3 }: UnifiedSpeakerCardProps) {
   const [imageState, setImageState] = useState<"loading" | "loaded" | "error">("loading")
   const [currentImageUrl, setCurrentImageUrl] = useState<string>("")
   const isInitialMount = useRef(true)
@@ -111,6 +111,11 @@ export function SpeakerCard({ speaker, contactSource, maxTopicsToShow = 2 }: Uni
     }
   }
   
+  // Cap the number of keynote topics shown so cards stay a consistent height.
+  // Speakers with many topics (4+) would otherwise stretch the tile taller than
+  // the ideal (e.g. Vishal Sharma / Peter Norvig / Mo Tiwari, who show 3).
+  const visiblePrograms = safePrograms.slice(0, maxTopicsToShow)
+
   const safeIndustries = Array.isArray(industries) ? industries : []
 
   return (
@@ -178,9 +183,9 @@ export function SpeakerCard({ speaker, contactSource, maxTopicsToShow = 2 }: Uni
               <Lightbulb className="w-3.5 h-3.5" />
               Keynote Topics
             </div>
-            {safePrograms.length > 0 ? (
+            {visiblePrograms.length > 0 ? (
               <div className="space-y-1.5">
-                {safePrograms.map((program, index) => (
+                {visiblePrograms.map((program, index) => (
                   <div key={`${slug}-program-${index}`} className="text-sm text-gray-700 font-montserrat break-words">
                     • {String(program).trim()}
                   </div>
