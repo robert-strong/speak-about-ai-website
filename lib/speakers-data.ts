@@ -515,7 +515,11 @@ async function fetchAllSpeakersFromDatabase(): Promise<Speaker[]> {
             image: speaker.headshot_url || '',
             imagePosition: speaker.image_position || 'center',
             imageOffsetY: speaker.image_offset || '0%',
-            programs: parseJsonField(speaker.programs),
+            // Match getSpeakerBySlug: fall back to topics when programs is empty
+            // so the card's "Keynote Topics" matches what the profile shows.
+            programs: parseJsonField(speaker.programs).length > 0
+              ? parseJsonField(speaker.programs)
+              : parseJsonField(speaker.topics),
             industries: parseJsonField(speaker.industries),
             fee: speaker.speaking_fee_range || 'Please Inquire',
             feeRange: speaker.speaking_fee_range || '',
@@ -571,7 +575,11 @@ async function fetchAllSpeakersFromDatabase(): Promise<Speaker[]> {
       image: speaker.image || speaker.headshot_url || '',
       imagePosition: speaker.imagePosition || 'center',
       imageOffsetY: speaker.imageOffsetY || '0%',
-      programs: Array.isArray(speaker.programs) ? speaker.programs : [],
+      // Match getSpeakerBySlug: fall back to topics when programs is empty
+      // so the card's "Keynote Topics" matches what the profile shows.
+      programs: (Array.isArray(speaker.programs) && speaker.programs.length > 0)
+        ? speaker.programs
+        : (Array.isArray(speaker.topics) ? speaker.topics : []),
       industries: Array.isArray(speaker.industries) ? speaker.industries : [],
       fee: speaker.fee || speaker.feeRange || speaker.speakingFeeRange || 'Please Inquire',
       feeRange: speaker.feeRange || speaker.speakingFeeRange || '',
