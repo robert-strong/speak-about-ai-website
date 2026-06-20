@@ -48,9 +48,13 @@ export async function GET(request: NextRequest) {
 
       if (!eventsResponse.ok) {
         console.error('Umami API error:', eventsResponse.status, eventsResponse.statusText)
+        // Never echo the upstream status verbatim: a 401/403 from Umami (e.g. a
+        // bad/expired UMAMI_API_KEY) is NOT a problem with the admin's session,
+        // but auth-fetch would interpret a 401 here as an expired session and
+        // force a logout. Surface it as a gateway error instead.
         return NextResponse.json(
-          { error: `Umami API error: ${eventsResponse.statusText}` },
-          { status: eventsResponse.status }
+          { error: `Umami API error: ${eventsResponse.statusText}`, upstreamStatus: eventsResponse.status },
+          { status: 502 }
         )
       }
 

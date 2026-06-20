@@ -89,6 +89,20 @@ function tryRefreshToken(): Promise<RefreshResult> {
   return refreshPromise
 }
 
+// A 401 should only be treated as "your session is invalid" when it actually
+// came from our admin-auth middleware, which tags every 401 with an auth code.
+// Any other 401 (upstream dependency, a route checking the wrong cookie, etc.)
+// must NOT trigger a logout. We peek at a clone so the caller can still read the body.
+async function isAdminAuthRejection(response: Response): Promise<boolean> {
+  try {
+    const data = await response.clone().json()
+    return data?.code === 'NO_TOKEN' || data?.code === 'INVALID_TOKEN'
+  } catch {
+    // No JSON body / unexpected shape => not our auth layer => do not logout.
+    return false
+  }
+}
+
 export async function authFetch(url: string, options: AuthFetchOptions = {}): Promise<Response> {
   const { _isRetry, ...fetchOptions } = options
 
@@ -113,32 +127,43 @@ export async function authFetch(url: string, options: AuthFetchOptions = {}): Pr
     credentials: 'include',
   })
 
-  // If we get a 401 and this isn't already a retry, try refreshing the token
-  if (response.status === 401 && !_isRetry) {
-    const hadToken = !!token
-    const result = await tryRefreshToken()
-
-    if ('token' in result) {
-      // Got a fresh token — retry the original request once
-      return authFetch(url, { ...options, _isRetry: true })
-    }
-
-    if ('unauthorized' in result) {
-      // Refresh was definitively rejected — session is unrecoverable
-      forceLogout(`401 on ${url}; refresh rejected (unauthorized). Had localStorage token: ${hadToken}`)
+  if (response.status === 401) {
+    // CRITICAL: only treat a 401 as a session problem if it actually came from
+    // our admin-auth layer. requireAdminAuth always tags its 401s with
+    // code: 'NO_TOKEN' | 'INVALID_TOKEN'. A 401 WITHOUT that code came from
+    // somewhere else (e.g. an upstream dependency like Umami returning 401, or a
+    // route checking the wrong cookie). Logging the user out for those is the bug
+    // that kept booting people off the speaker management page.
+    if (!(await isAdminAuthRejection(response))) {
+      console.warn(`[auth-fetch] 401 on ${url} is not an admin-auth rejection — NOT logging out`)
       return response
     }
 
-    // Transient failure (network blip, cold start, 5xx): do NOT logout.
-    // Return the original 401 so the caller can fail soft, exactly like the
-    // cookie-based admin pages do. The next user activity will retry.
-    console.warn(`[auth-fetch] 401 on ${url}; refresh was transient — NOT logging out`)
-    return response
-  }
+    const hadToken = !!token
 
-  // If this was a retry and STILL got 401, the token is truly invalid — logout
-  if (response.status === 401 && _isRetry) {
-    forceLogout(`401 on ${url} even after a successful token refresh + retry`)
+    if (!_isRetry) {
+      const result = await tryRefreshToken()
+
+      if ('token' in result) {
+        // Got a fresh token — retry the original request once
+        return authFetch(url, { ...options, _isRetry: true })
+      }
+
+      if ('unauthorized' in result) {
+        // Refresh was definitively rejected — session is unrecoverable
+        forceLogout(`admin-auth 401 on ${url}; refresh rejected. Had localStorage token: ${hadToken}`)
+        return response
+      }
+
+      // Transient failure (network blip, cold start, 5xx): do NOT logout.
+      // Return the original 401 so the caller can fail soft. Next activity retries.
+      console.warn(`[auth-fetch] admin-auth 401 on ${url}; refresh was transient — NOT logging out`)
+      return response
+    }
+
+    // This was already a retry with a fresh token and we STILL got an admin-auth
+    // 401 — the session is genuinely invalid.
+    forceLogout(`admin-auth 401 on ${url} even after a successful token refresh + retry`)
   }
 
   return response
