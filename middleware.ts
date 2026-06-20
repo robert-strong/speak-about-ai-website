@@ -25,8 +25,29 @@ export async function middleware(request: NextRequest) {
     /bot|crawler|spider|scraper|headless/i.test(userAgent)
   )
 
-  // Allow legitimate bots like Google, Bing, Slack
-  const isLegitimateBot = /Googlebot|Bingbot|Slurp|DuckDuckBot|facebookexternalhit|Twitterbot|LinkedInBot|Slackbot/i.test(userAgent)
+  // Allow legitimate search, social, and AI crawlers. Without this, the generic
+  // /bot|crawler|spider/ rule above 403s them — which silently removes the site
+  // from Google's secondary crawlers, Apple/Siri, and (critically for an AI
+  // speakers bureau) AI search engines like ChatGPT, Perplexity and Claude.
+  const isLegitimateBot = new RegExp([
+    // Google (search, ads, inspection, AI training opt-in, structured data)
+    'Googlebot', 'AdsBot-Google', 'Mediapartners-Google', 'APIs-Google',
+    'Google-InspectionTool', 'Storebot-Google', 'Google-Extended', 'GoogleOther',
+    // Microsoft / Bing (incl. Copilot)
+    'Bingbot', 'BingPreview', 'msnbot', 'adidxbot',
+    // Other major search engines
+    'Slurp', 'DuckDuckBot', 'DuckDuckGo', 'Baiduspider', 'YandexBot', 'Yandex',
+    // Apple (Siri, Spotlight, Safari suggestions)
+    'Applebot',
+    // AI search & assistants
+    'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ChatGPT',
+    'ClaudeBot', 'Claude-Web', 'Claude-User', 'anthropic-ai',
+    'PerplexityBot', 'Perplexity-User', 'Amazonbot', 'Meta-ExternalAgent',
+    'cohere-ai', 'YouBot',
+    // Social link unfurlers (Open Graph previews)
+    'facebookexternalhit', 'Twitterbot', 'LinkedInBot', 'Slackbot',
+    'WhatsApp', 'TelegramBot', 'Discordbot', 'Pinterest', 'redditbot',
+  ].join('|'), 'i').test(userAgent)
 
   if (isSuspiciousBot && !isLegitimateBot) {
     // Return a 403 Forbidden for suspicious bots
