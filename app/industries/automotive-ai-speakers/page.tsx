@@ -6,6 +6,12 @@ export const metadata: Metadata = {
     "Book automotive AI keynote speakers for auto industry events. Experts in autonomous vehicles and smart manufacturing.", // 119 chars
   keywords:
     "automotive AI speakers, auto industry keynote speakers, autonomous vehicle speakers, automotive technology experts",
+  alternates: {
+    canonical: "https://speakabout.ai/industries/automotive-ai-speakers",
+  },
+  // Placeholder page ("coming soon") — keep it out of the index until it has
+  // real content so it doesn't drag on site-wide quality. Remove once built.
+  robots: { index: false, follow: true },
 }
 
 export default function AutomotiveAISpeakersPage() {

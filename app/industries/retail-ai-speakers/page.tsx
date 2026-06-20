@@ -5,6 +5,12 @@ export const metadata: Metadata = {
   description:
     "Book retail & e-commerce AI keynote speakers for retail events. Experts in customer experience, personalization, and retail technology innovation.",
   keywords: "retail AI speakers, e-commerce keynote speakers, retail technology experts, customer experience speakers",
+  alternates: {
+    canonical: "https://speakabout.ai/industries/retail-ai-speakers",
+  },
+  // Placeholder page ("coming soon") — keep it out of the index until it has
+  // real content so it doesn't drag on site-wide quality. Remove once built.
+  robots: { index: false, follow: true },
 }
 
 export default function RetailAISpeakersPage() {

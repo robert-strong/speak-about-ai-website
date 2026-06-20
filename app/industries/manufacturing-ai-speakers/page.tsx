@@ -6,6 +6,12 @@ export const metadata: Metadata = {
     "Book manufacturing AI keynote speakers for industrial events. Experts in smart manufacturing and automation.", // 113 chars
   keywords:
     "manufacturing AI speakers, Industry 4.0 speakers, smart manufacturing experts, industrial automation speakers",
+  alternates: {
+    canonical: "https://speakabout.ai/industries/manufacturing-ai-speakers",
+  },
+  // Placeholder page ("coming soon") — keep it out of the index until it has
+  // real content so it doesn't drag on site-wide quality. Remove once built.
+  robots: { index: false, follow: true },
 }
 
 export default function ManufacturingAISpeakersPage() {

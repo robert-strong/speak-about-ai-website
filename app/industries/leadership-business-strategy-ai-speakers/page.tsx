@@ -14,6 +14,9 @@ export const metadata: Metadata = {
       "Book leadership & business strategy AI keynote speakers. Experts on AI transformation, digital leadership, and strategic innovation for your events.",
     type: "website",
   },
+  alternates: {
+    canonical: "https://speakabout.ai/industries/leadership-business-strategy-ai-speakers",
+  },
 }
 
 export default async function LeadershipBusinessStrategyPage() {

@@ -17,6 +17,9 @@ export const metadata: Metadata = {
       "Book sales & marketing AI keynote speakers who've driven billions in revenue. Experts for sales conferences, marketing events & corporate training.",
     type: "website",
   },
+  alternates: {
+    canonical: "https://speakabout.ai/industries/sales-marketing-ai-speakers",
+  },
 }
 
 export default async function SalesMarketingAISpeakersPage() {

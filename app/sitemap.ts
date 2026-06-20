@@ -82,29 +82,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     {
-      url: `${BASE_URL}/industries/retail-ai-speakers`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.85,
-    },
-    {
-      url: `${BASE_URL}/industries/manufacturing-ai-speakers`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.85,
-    },
-    {
       url: `${BASE_URL}/industries/sales-marketing-ai-speakers`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.85,
     },
-    {
-      url: `${BASE_URL}/industries/automotive-ai-speakers`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.85,
-    },
+    // NOTE: retail-ai-speakers, manufacturing-ai-speakers and automotive-ai-speakers
+    // are "coming soon" placeholders and are currently noindex'd, so they are
+    // intentionally excluded from the sitemap. Re-add them once they have real content.
   ]
   
   // Individual speaker pages - VERY IMPORTANT FOR SEO
