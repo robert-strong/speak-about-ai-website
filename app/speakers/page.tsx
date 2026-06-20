@@ -120,21 +120,38 @@ export default async function SpeakersPage() {
     "name": "AI Keynote Speakers Directory",
     "description": "Browse our comprehensive directory of AI keynote speakers and artificial intelligence experts available for booking.",
     "numberOfItems": allSpeakers.length,
-    "itemListElement": allSpeakers.slice(0, 10).map((speaker, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "item": {
-        "@type": "Person",
-        "name": speaker.name,
-        "jobTitle": speaker.title || "AI Keynote Speaker",
-        "url": `https://speakabout.ai/speakers/${speaker.slug}`,
-        "image": speaker.image?.startsWith('http')
-          ? speaker.image
-          : `https://speakabout.ai${speaker.image || '/placeholder.jpg'}`,
-        "description": speaker.short_bio || speaker.bio || "",
-      }
-    }))
+    // Cover EVERY speaker (was capped at 10). Per-item fields are kept lean so
+    // ~85 entries don't bloat the page; richer Person schema lives on each profile.
+    "itemListElement": allSpeakers
+      .filter((speaker) => speaker.slug && speaker.name)
+      .map((speaker, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Person",
+          "name": speaker.name,
+          "jobTitle": speaker.title || "AI Keynote Speaker",
+          "url": `https://speakabout.ai/speakers/${speaker.slug}`,
+          "image": speaker.image?.startsWith('http')
+            ? speaker.image
+            : `https://speakabout.ai${speaker.image || '/placeholder.jpg'}`,
+        }
+      }))
   }
+
+  // Build an A–Z index of all speakers for a crawlable, server-rendered directory.
+  const sortedSpeakers = [...allSpeakers]
+    .filter((s) => s.slug && s.name)
+    .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+
+  const speakerGroups = sortedSpeakers.reduce<Record<string, Speaker[]>>((acc, s) => {
+    const first = (s.name || "").trim().charAt(0).toUpperCase()
+    const letter = /[A-Z]/.test(first) ? first : "#"
+    ;(acc[letter] ||= []).push(s)
+    return acc
+  }, {})
+
+  const indexLetters = Object.keys(speakerGroups).sort()
 
   return (
     <>
@@ -151,25 +168,43 @@ export default async function SpeakersPage() {
         crawlable internal link from this page. This list is in the initial HTML,
         spreading crawl + ranking signal to every profile.
       */}
-      {allSpeakers.length > 0 && (
-        <section aria-label="All AI speakers" className="bg-white border-t border-gray-100">
+      {sortedSpeakers.length > 0 && (
+        <section aria-label="All AI speakers A to Z" className="bg-white border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Browse all AI speakers</h2>
-            <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-2">
-              {[...allSpeakers]
-                .filter((s) => s.slug && s.name)
-                .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
-                .map((s) => (
-                  <li key={s.slug}>
-                    <a
-                      href={`/speakers/${s.slug}`}
-                      className="text-sm text-gray-600 hover:text-[#1E68C6] hover:underline"
-                    >
-                      {s.name}
-                    </a>
-                  </li>
-                ))}
-            </ul>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Browse all AI speakers A–Z</h2>
+
+            {/* Letter jump navigation */}
+            <nav aria-label="Jump to letter" className="flex flex-wrap gap-1.5 mb-8">
+              {indexLetters.map((letter) => (
+                <a
+                  key={letter}
+                  href={`#speakers-${letter}`}
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-sm font-semibold text-[#1E68C6] bg-blue-50 hover:bg-[#1E68C6] hover:text-white transition-colors"
+                >
+                  {letter}
+                </a>
+              ))}
+            </nav>
+
+            {indexLetters.map((letter) => (
+              <div key={letter} id={`speakers-${letter}`} className="mb-8 scroll-mt-24">
+                <h3 className="text-lg font-bold text-[#1E68C6] border-b border-gray-200 pb-1 mb-3">
+                  {letter}
+                </h3>
+                <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-2">
+                  {speakerGroups[letter].map((s) => (
+                    <li key={s.slug}>
+                      <a
+                        href={`/speakers/${s.slug}`}
+                        className="text-sm text-gray-600 hover:text-[#1E68C6] hover:underline"
+                      >
+                        {s.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </section>
       )}
