@@ -27,9 +27,12 @@ let isLoggingOut = false
 // them would log the user out even though the token was recoverable.
 let refreshPromise: Promise<RefreshResult> | null = null
 
-function forceLogout() {
+function forceLogout(reason: string) {
   if (isLoggingOut || typeof window === 'undefined') return
   isLoggingOut = true
+
+  // Visible breadcrumb so we can see exactly what triggered the logout.
+  console.warn(`[auth-fetch] Forcing logout — ${reason}`)
 
   localStorage.removeItem('adminLoggedIn')
   localStorage.removeItem('adminSessionToken')
@@ -112,6 +115,7 @@ export async function authFetch(url: string, options: AuthFetchOptions = {}): Pr
 
   // If we get a 401 and this isn't already a retry, try refreshing the token
   if (response.status === 401 && !_isRetry) {
+    const hadToken = !!token
     const result = await tryRefreshToken()
 
     if ('token' in result) {
@@ -121,19 +125,20 @@ export async function authFetch(url: string, options: AuthFetchOptions = {}): Pr
 
     if ('unauthorized' in result) {
       // Refresh was definitively rejected — session is unrecoverable
-      forceLogout()
+      forceLogout(`401 on ${url}; refresh rejected (unauthorized). Had localStorage token: ${hadToken}`)
       return response
     }
 
     // Transient failure (network blip, cold start, 5xx): do NOT logout.
     // Return the original 401 so the caller can fail soft, exactly like the
     // cookie-based admin pages do. The next user activity will retry.
+    console.warn(`[auth-fetch] 401 on ${url}; refresh was transient — NOT logging out`)
     return response
   }
 
   // If this was a retry and STILL got 401, the token is truly invalid — logout
   if (response.status === 401 && _isRetry) {
-    forceLogout()
+    forceLogout(`401 on ${url} even after a successful token refresh + retry`)
   }
 
   return response
