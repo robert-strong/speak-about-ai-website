@@ -143,6 +143,36 @@ export default async function SpeakersPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <SpeakerDirectory initialSpeakers={allSpeakers} content={directoryContent} />
+
+      {/*
+        SEO: server-rendered links to EVERY speaker profile. The interactive
+        directory above only renders 12 cards at a time (client-side "load more"),
+        which Googlebot won't trigger — so without this, most profiles had no
+        crawlable internal link from this page. This list is in the initial HTML,
+        spreading crawl + ranking signal to every profile.
+      */}
+      {allSpeakers.length > 0 && (
+        <section aria-label="All AI speakers" className="bg-white border-t border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Browse all AI speakers</h2>
+            <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-2">
+              {[...allSpeakers]
+                .filter((s) => s.slug && s.name)
+                .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+                .map((s) => (
+                  <li key={s.slug}>
+                    <a
+                      href={`/speakers/${s.slug}`}
+                      className="text-sm text-gray-600 hover:text-[#1E68C6] hover:underline"
+                    >
+                      {s.name}
+                    </a>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        </section>
+      )}
     </>
   )
 }
