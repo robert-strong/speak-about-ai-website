@@ -902,3 +902,30 @@ export async function getSpeakersByIndustry(industry: string): Promise<Speaker[]
     return []
   }
 }
+
+/**
+ * Speakers for an industry landing page, guaranteed non-empty.
+ * Starts with industry-matched speakers; if there are fewer than `minCount`
+ * (common for emerging verticals where AI experts are cross-industry), tops up
+ * with featured speakers so the page always shows a relevant, populated grid.
+ */
+export async function getSpeakersForIndustryPage(industryKey: string, minCount = 8): Promise<Speaker[]> {
+  try {
+    const primary = await getSpeakersByIndustry(industryKey)
+    if (primary.length >= minCount) return primary
+
+    const featured = await getFeaturedSpeakers(12)
+    const seen = new Set(primary.map((s) => s.slug))
+    const merged = [...primary]
+    for (const s of featured) {
+      if (!seen.has(s.slug)) {
+        merged.push(s)
+        seen.add(s.slug)
+      }
+    }
+    return merged.slice(0, Math.max(minCount, 12))
+  } catch (error) {
+    console.error(`Error in getSpeakersForIndustryPage for "${industryKey}":`, error)
+    return []
+  }
+}
