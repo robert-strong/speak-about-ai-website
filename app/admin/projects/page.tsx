@@ -1225,6 +1225,17 @@ function EnhancedProjectManagementPage() {
     }
   }
 
+  // When a dated task's completion changes, reflect it on Google Calendar:
+  // completed -> remove the event (so it stops appearing); reopened -> recreate it.
+  // Best-effort and non-blocking — the task state is already saved either way.
+  const syncTaskCompletionToCalendar = (taskId: number, completed: boolean) => {
+    if (completed) {
+      authDelete(`/api/calendar/sync-task`, { body: JSON.stringify({ taskId }) }).catch(() => {})
+    } else {
+      authPost('/api/calendar/sync-task', { taskId }).catch(() => {})
+    }
+  }
+
   // Convert a stored due_date (YYYY-MM-DD or ISO) into a value for <input type="date">
   const toDateInputValue = (dateString: string | null | undefined): string => {
     if (!dateString) return ""
@@ -2643,6 +2654,8 @@ function EnhancedProjectManagementPage() {
                                                         setCustomTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: newValue } : t))
                                                         try {
                                                           await authPut(`/api/projects/${project.id}/tasks`, { taskId: task.id, completed: newValue })
+                                                          // Keep Google Calendar in sync: dated tasks drop off the calendar when done
+                                                          if (task.due_date) syncTaskCompletionToCalendar(task.id, newValue)
                                                         } catch (e) {
                                                           setCustomTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: !newValue } : t))
                                                         }
@@ -5057,6 +5070,8 @@ function EnhancedProjectManagementPage() {
                                     setCustomTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: newValue } : t))
                                     try {
                                       await authPut(`/api/projects/${selectedProject.id}/tasks`, { taskId: task.id, completed: newValue })
+                                      // Keep Google Calendar in sync: dated tasks drop off the calendar when done
+                                      if (task.due_date) syncTaskCompletionToCalendar(task.id, newValue)
                                     } catch (e) {
                                       setCustomTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: !newValue } : t))
                                     }
