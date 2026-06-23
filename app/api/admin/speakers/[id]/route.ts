@@ -18,6 +18,27 @@ const getSqlClient = () => {
   }
 }
 
+// The Experience tab persists these JSONB columns. `publications` already exists
+// (see migrations/add_speaker_profile_columns.sql); the other three were never
+// created, so saves silently dropped them. Ensure they exist (idempotent), and
+// cache the result so the ALTERs run at most once per server instance.
+let experienceColumnsEnsured: Promise<void> | null = null
+const ensureExperienceColumns = (sql: any) => {
+  if (!experienceColumnsEnsured) {
+    experienceColumnsEnsured = (async () => {
+      await sql`ALTER TABLE speakers ADD COLUMN IF NOT EXISTS past_events JSONB DEFAULT '[]'::jsonb`
+      await sql`ALTER TABLE speakers ADD COLUMN IF NOT EXISTS awards JSONB DEFAULT '[]'::jsonb`
+      await sql`ALTER TABLE speakers ADD COLUMN IF NOT EXISTS publications JSONB DEFAULT '[]'::jsonb`
+      await sql`ALTER TABLE speakers ADD COLUMN IF NOT EXISTS client_logos JSONB DEFAULT '[]'::jsonb`
+    })().catch((err) => {
+      // Reset so a later request can retry if the ALTER failed transiently
+      experienceColumnsEnsured = null
+      throw err
+    })
+  }
+  return experienceColumnsEnsured
+}
+
 export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     // Await params as required in Next.js 15
@@ -194,6 +215,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       }, { status: 500 })
     }
 
+    // Make sure the Experience tab columns exist before selecting them
+    await ensureExperienceColumns(sql)
+
     // Get speaker data
     console.log(`Admin speaker detail: Querying speaker ${speakerId}...`)
     const speakers = await sql`
@@ -201,6 +225,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
         id, name, email, slug,
         bio, short_bio, one_liner, headshot_url, website,
         location, programs, topics, industries, videos, testimonials,
+        past_events, awards, publications, client_logos,
         speaking_fee_range, travel_preferences, technical_requirements,
         dietary_restrictions, featured, active, listed, ranking,
         created_at, updated_at, email_verified,
@@ -243,6 +268,12 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     speaker.industries = parseFieldAsArray(speaker.industries, 'industries')
     speaker.videos = parseFieldAsArray(speaker.videos, 'videos')
     speaker.testimonials = parseFieldAsArray(speaker.testimonials, 'testimonials')
+
+    // Experience tab fields — expose as camelCase to match the edit form's state
+    speaker.pastEvents = parseFieldAsArray(speaker.past_events, 'past_events')
+    speaker.awards = parseFieldAsArray(speaker.awards, 'awards')
+    speaker.publications = parseFieldAsArray(speaker.publications, 'publications')
+    speaker.clientLogos = parseFieldAsArray(speaker.client_logos, 'client_logos')
 
     // Parse social media links from social_media JSONB field
     const socialMedia = speaker.social_media || {}
@@ -341,6 +372,9 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     }
     console.log('Database client obtained')
 
+    // Make sure the Experience tab columns exist before writing to them
+    await ensureExperienceColumns(sql)
+
     // Prepare social_media JSONB from individual social fields
     const currentSpeakerData = await sql`SELECT social_media FROM speakers WHERE id = ${parseInt(speakerId)}`
     const currentSocialMedia = currentSpeakerData[0]?.social_media || {}
@@ -370,6 +404,10 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         industries = COALESCE(${JSON.stringify(updateData.industries) || null}, industries),
         videos = COALESCE(${JSON.stringify(updateData.videos) || null}, videos),
         testimonials = COALESCE(${JSON.stringify(updateData.testimonials) || null}, testimonials),
+        past_events = COALESCE(${JSON.stringify(updateData.pastEvents) || null}, past_events),
+        awards = COALESCE(${JSON.stringify(updateData.awards) || null}, awards),
+        publications = COALESCE(${JSON.stringify(updateData.publications) || null}, publications),
+        client_logos = COALESCE(${JSON.stringify(updateData.clientLogos) || null}, client_logos),
         speaking_fee_range = COALESCE(${updateData.speaking_fee_range || null}, speaking_fee_range),
         travel_preferences = COALESCE(${updateData.travel_preferences || null}, travel_preferences),
         technical_requirements = COALESCE(${updateData.technical_requirements || null}, technical_requirements),
@@ -384,6 +422,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         id, name, email, slug, bio, short_bio, one_liner,
         headshot_url, website, social_media,
         location, programs, topics, industries, videos, testimonials,
+        past_events, awards, publications, client_logos,
         speaking_fee_range, travel_preferences, technical_requirements,
         dietary_restrictions, featured, active, listed, ranking, created_at, updated_at
     `
@@ -436,6 +475,10 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         industries: updatedSpeaker.industries || [],
         videos: updatedSpeaker.videos || [],
         testimonials: updatedSpeaker.testimonials || [],
+        pastEvents: updatedSpeaker.past_events || [],
+        awards: updatedSpeaker.awards || [],
+        publications: updatedSpeaker.publications || [],
+        clientLogos: updatedSpeaker.client_logos || [],
         speaking_fee_range: updatedSpeaker.speaking_fee_range,
         travel_preferences: updatedSpeaker.travel_preferences,
         technical_requirements: updatedSpeaker.technical_requirements,
