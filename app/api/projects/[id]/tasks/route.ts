@@ -213,3 +213,39 @@ export async function PATCH(
     )
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    // taskId comes from the query string (authDelete sends no body)
+    const { searchParams } = new URL(request.url)
+    const taskId = parseInt(searchParams.get('taskId') || '')
+
+    if (!taskId || Number.isNaN(taskId)) {
+      return NextResponse.json(
+        { error: 'Task ID required' },
+        { status: 400 }
+      )
+    }
+
+    const result = await sql`
+      DELETE FROM project_tasks
+      WHERE id = ${taskId}
+      RETURNING *
+    `
+
+    if (result.length === 0) {
+      return NextResponse.json(
+        { error: 'Task not found' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({ success: true, task: result[0] })
+  } catch (error) {
+    console.error('Error deleting task:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete task' },
+      { status: 500 }
+    )
+  }
+}

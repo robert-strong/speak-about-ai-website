@@ -471,6 +471,7 @@ function EnhancedProjectManagementPage() {
   const [addingTaskFor, setAddingTaskFor] = useState<{ projectId: number; stageId: string } | null>(null)
   const [newTaskName, setNewTaskName] = useState("")
   const [newTaskDueDate, setNewTaskDueDate] = useState("")
+  const [editingDateFor, setEditingDateFor] = useState<number | null>(null)
   const [editingNotesFor, setEditingNotesFor] = useState<number | null>(null)
   const [editNotesValue, setEditNotesValue] = useState("")
   const [aiSummary, setAiSummary] = useState<Record<number, string>>({})
@@ -1221,6 +1222,58 @@ function EnhancedProjectManagementPage() {
       }
     } catch {
       // Network error — task is still saved locally
+    }
+  }
+
+  // Convert a stored due_date (YYYY-MM-DD or ISO) into a value for <input type="date">
+  const toDateInputValue = (dateString: string | null | undefined): string => {
+    if (!dateString) return ""
+    const datePart = String(dateString).split('T')[0]
+    return /^\d{4}-\d{2}-\d{2}$/.test(datePart) ? datePart : ""
+  }
+
+  // Update a custom task's due date, then re-sync its calendar event (best-effort)
+  const handleUpdateTaskDueDate = async (projectId: number, taskId: number, dueDate: string) => {
+    const newValue = dueDate || null
+    const previous = customTasks.find(t => t.id === taskId)?.due_date ?? null
+    // Optimistic update
+    setCustomTasks(prev => prev.map(t => t.id === taskId ? { ...t, due_date: newValue } : t))
+    setEditingDateFor(null)
+    try {
+      const response = await authPut(`/api/projects/${projectId}/tasks`, { taskId, due_date: newValue })
+      if (!response.ok) throw new Error('Failed')
+      if (newValue) {
+        // Push the new/changed date to Google Calendar (best-effort)
+        syncTaskToCalendar(taskId, customTasks.find(t => t.id === taskId)?.task_name || 'Task')
+        toast({ title: "Due date updated" })
+      } else {
+        // Cleared — remove any linked Google Calendar event (best-effort)
+        authDelete(`/api/calendar/sync-task`, { body: JSON.stringify({ taskId }) }).catch(() => {})
+        toast({ title: "Due date cleared" })
+      }
+    } catch (e) {
+      // Revert on failure
+      setCustomTasks(prev => prev.map(t => t.id === taskId ? { ...t, due_date: previous } : t))
+      toast({ title: "Error", description: "Failed to update due date", variant: "destructive" })
+    }
+  }
+
+  // Delete a custom task (removes its calendar event first, best-effort)
+  const handleDeleteTask = async (projectId: number, taskId: number, taskName: string) => {
+    if (!confirm(`Delete task "${taskName}"? This can't be undone.`)) return
+    const previous = customTasks
+    // Optimistic removal
+    setCustomTasks(prev => prev.filter(t => t.id !== taskId))
+    try {
+      // Best-effort: remove the linked Google Calendar event before deleting the task
+      await authDelete(`/api/calendar/sync-task`, { body: JSON.stringify({ taskId }) }).catch(() => {})
+      const response = await authDelete(`/api/projects/${projectId}/tasks?taskId=${taskId}`)
+      if (!response.ok) throw new Error('Failed')
+      toast({ title: "Task deleted", description: taskName })
+    } catch (e) {
+      // Revert on failure
+      setCustomTasks(previous)
+      toast({ title: "Error", description: "Failed to delete task", variant: "destructive" })
     }
   }
 
@@ -2603,15 +2656,35 @@ function EnhancedProjectManagementPage() {
                                                     <span className={`text-sm flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>
                                                       {task.task_name}
                                                     </span>
-                                                    {task.due_date && (
-                                                      <span
-                                                        className="inline-flex items-center gap-1 text-xs text-gray-500 flex-shrink-0"
-                                                        title={task.google_calendar_event_id ? 'Synced to Google Calendar' : 'On calendar'}
+                                                    {editingDateFor === task.id ? (
+                                                      <Input
+                                                        type="date"
+                                                        defaultValue={toDateInputValue(task.due_date)}
+                                                        autoFocus
+                                                        onBlur={(e) => handleUpdateTaskDueDate(project.id, task.id, e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                          if (e.key === 'Enter') handleUpdateTaskDueDate(project.id, task.id, (e.target as HTMLInputElement).value)
+                                                          if (e.key === 'Escape') setEditingDateFor(null)
+                                                        }}
+                                                        className="h-7 text-xs w-36 flex-shrink-0"
+                                                      />
+                                                    ) : (
+                                                      <button
+                                                        onClick={() => setEditingDateFor(task.id)}
+                                                        className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 flex-shrink-0"
+                                                        title={task.due_date ? (task.google_calendar_event_id ? 'Synced to Google Calendar — click to edit' : 'Click to edit due date') : 'Set a due date'}
                                                       >
                                                         <CalendarDays className="h-3 w-3" />
-                                                        {formatEventDate(task.due_date)}
-                                                      </span>
+                                                        {task.due_date ? formatEventDate(task.due_date) : 'Set date'}
+                                                      </button>
                                                     )}
+                                                    <button
+                                                      onClick={() => handleDeleteTask(project.id, task.id, task.task_name)}
+                                                      className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0"
+                                                      title="Delete task"
+                                                    >
+                                                      <Trash2 className="h-3.5 w-3.5" />
+                                                    </button>
                                                   </div>
                                                 ))}
                                               </div>
@@ -4994,9 +5067,38 @@ function EnhancedProjectManagementPage() {
                                 >
                                   {task.completed && <Check className="h-3 w-3" />}
                                 </button>
-                                <span className={`font-medium ${task.completed ? 'line-through text-gray-500' : ''}`}>
+                                <span className={`font-medium flex-1 ${task.completed ? 'line-through text-gray-500' : ''}`}>
                                   {task.task_name}
                                 </span>
+                                {editingDateFor === task.id ? (
+                                  <Input
+                                    type="date"
+                                    defaultValue={toDateInputValue(task.due_date)}
+                                    autoFocus
+                                    onBlur={(e) => handleUpdateTaskDueDate(selectedProject.id, task.id, e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') handleUpdateTaskDueDate(selectedProject.id, task.id, (e.target as HTMLInputElement).value)
+                                      if (e.key === 'Escape') setEditingDateFor(null)
+                                    }}
+                                    className="h-7 text-xs w-36 flex-shrink-0"
+                                  />
+                                ) : (
+                                  <button
+                                    onClick={() => setEditingDateFor(task.id)}
+                                    className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 flex-shrink-0"
+                                    title={task.due_date ? 'Click to edit due date' : 'Set a due date'}
+                                  >
+                                    <CalendarDays className="h-3 w-3" />
+                                    {task.due_date ? formatEventDate(task.due_date) : 'Set date'}
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDeleteTask(selectedProject.id, task.id, task.task_name)}
+                                  className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0"
+                                  title="Delete task"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
                               </div>
                             </div>
                           ))}
