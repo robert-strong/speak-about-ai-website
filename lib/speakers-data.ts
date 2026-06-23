@@ -692,7 +692,12 @@ export async function getSpeakerBySlug(slug: string): Promise<Speaker | undefine
             topics: parseJsonField(dbSpeaker.topics),
             listed: dbSpeaker.listed !== false,
             expertise: parseJsonField(dbSpeaker.expertise || dbSpeaker.topics),
-            ranking: dbSpeaker.ranking || 0
+            ranking: dbSpeaker.ranking || 0,
+            // Experience tab fields (admin-managed) for the public profile
+            publications: parseJsonField(dbSpeaker.publications),
+            awards: parseJsonField(dbSpeaker.awards),
+            pastEvents: parseJsonField(dbSpeaker.past_events),
+            clientLogos: parseJsonField(dbSpeaker.client_logos)
           }
           
           // Cache the result
