@@ -142,25 +142,49 @@ export async function PUT(request: NextRequest) {
   try {
     const sql = neon(process.env.DATABASE_URL!)
     const body = await request.json()
-    const { id, title, description, due_date, status, priority, notes } = body
+    const { id, title, description, status, priority, notes } = body
+
+    // Check if due_date was explicitly provided (even if null)
+    const hasDueDate = 'due_date' in body
+    const due_date = body.due_date
 
     // If marking as completed, set completed_at
     const completedAt = status === 'completed' ? new Date() : null
 
-    const result = await sql`
-      UPDATE tasks
-      SET
-        title = COALESCE(${title}, title),
-        description = COALESCE(${description}, description),
-        due_date = COALESCE(${due_date}, due_date),
-        status = COALESCE(${status}, status),
-        priority = COALESCE(${priority}, priority),
-        notes = COALESCE(${notes}, notes),
-        completed_at = COALESCE(${completedAt}, completed_at),
-        updated_at = NOW()
-      WHERE id = ${id}
-      RETURNING *
-    `
+    // Build update based on what fields were provided
+    let result
+    if (hasDueDate) {
+      // due_date was explicitly provided, update it (even if null to clear it)
+      result = await sql`
+        UPDATE tasks
+        SET
+          title = COALESCE(${title}, title),
+          description = COALESCE(${description}, description),
+          due_date = ${due_date},
+          status = COALESCE(${status}, status),
+          priority = COALESCE(${priority}, priority),
+          notes = COALESCE(${notes}, notes),
+          completed_at = COALESCE(${completedAt}, completed_at),
+          updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING *
+      `
+    } else {
+      // due_date not provided, keep existing value
+      result = await sql`
+        UPDATE tasks
+        SET
+          title = COALESCE(${title}, title),
+          description = COALESCE(${description}, description),
+          status = COALESCE(${status}, status),
+          priority = COALESCE(${priority}, priority),
+          notes = COALESCE(${notes}, notes),
+          completed_at = COALESCE(${completedAt}, completed_at),
+          updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING *
+      `
+    }
 
     return NextResponse.json({ task: result[0], success: true })
   } catch (error) {

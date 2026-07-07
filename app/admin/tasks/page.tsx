@@ -22,7 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { CheckSquare, RefreshCw, Calendar, AlertCircle, Plus, Check, X, User, Briefcase, Sparkles } from "lucide-react"
+import { CheckSquare, RefreshCw, Calendar, AlertCircle, Plus, Check, X, User, Briefcase, Sparkles, Pencil } from "lucide-react"
 import { AdminSidebar } from "@/components/admin-sidebar"
 
 interface Task {
@@ -63,6 +63,8 @@ export default function TasksPage() {
     priority: "medium",
     notes: ""
   })
+  const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [editDueDate, setEditDueDate] = useState("")
 
   const loadTasks = async () => {
     setLoading(true)
@@ -133,6 +135,37 @@ export default function TasksPage() {
       loadTasks()
     } catch (error) {
       console.error('Error deleting task:', error)
+    }
+  }
+
+  const updateTaskDueDate = async () => {
+    if (!editingTask) return
+
+    try {
+      await fetch('/api/tasks', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editingTask.id, due_date: editDueDate || null })
+      })
+      setEditingTask(null)
+      setEditDueDate("")
+      loadTasks()
+    } catch (error) {
+      console.error('Error updating task date:', error)
+    }
+  }
+
+  const openEditDateDialog = (task: Task) => {
+    setEditingTask(task)
+    // Convert ISO date to datetime-local format
+    if (task.due_date) {
+      const date = new Date(task.due_date)
+      const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16)
+      setEditDueDate(localDateTime)
+    } else {
+      setEditDueDate("")
     }
   }
 
@@ -324,6 +357,46 @@ export default function TasksPage() {
                   </div>
                 </DialogContent>
               </Dialog>
+              {/* Edit Date Dialog */}
+              <Dialog open={!!editingTask} onOpenChange={(open) => !open && setEditingTask(null)}>
+                <DialogContent className="sm:max-w-[400px]">
+                  <DialogHeader>
+                    <DialogTitle>Edit Due Date</DialogTitle>
+                    <DialogDescription>
+                      {editingTask?.title}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div>
+                      <Label htmlFor="edit_due_date">Due Date</Label>
+                      <Input
+                        id="edit_due_date"
+                        type="datetime-local"
+                        value={editDueDate}
+                        onChange={(e) => setEditDueDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-between">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setEditDueDate("")
+                      }}
+                    >
+                      Clear Date
+                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={() => setEditingTask(null)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={updateTaskDueDate}>
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Button onClick={loadTasks} disabled={loading} variant="outline">
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
@@ -503,13 +576,25 @@ export default function TasksPage() {
 
                           {/* Timeline */}
                           <div className="flex gap-4 text-sm text-gray-600">
-                            {task.due_date && (
-                              <div className={`flex items-center gap-2 ${taskIsOverdue ? 'text-red-600 font-semibold' : ''}`}>
-                                <Calendar className="w-4 h-4" />
-                                Due: {new Date(task.due_date).toLocaleString()}
-                                {taskIsOverdue && ' (OVERDUE)'}
-                              </div>
-                            )}
+                            <div className={`flex items-center gap-2 ${taskIsOverdue ? 'text-red-600 font-semibold' : ''}`}>
+                              <Calendar className="w-4 h-4" />
+                              {task.due_date ? (
+                                <>
+                                  Due: {new Date(task.due_date).toLocaleString()}
+                                  {taskIsOverdue && ' (OVERDUE)'}
+                                </>
+                              ) : (
+                                <span className="text-gray-400">No due date</span>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => openEditDateDialog(task)}
+                                className="h-6 w-6 p-0 ml-1"
+                              >
+                                <Pencil className="w-3 h-3" />
+                              </Button>
+                            </div>
                             {task.completed_at && (
                               <div className="flex items-center gap-2 text-green-600">
                                 <Check className="w-4 h-4" />
