@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSetting } from '@/lib/blog-queue-db'
+import { getSetting, getSettings } from '@/lib/blog-queue-db'
 
 // Verify API key authentication
 function verifyApiKey(request: NextRequest): boolean {
@@ -24,15 +24,31 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams
     const key = searchParams.get('key')
+    const keys = searchParams.get('keys') // Comma-separated list of keys
 
-    if (!key) {
-      return NextResponse.json(
-        { error: 'Setting key is required' },
-        { status: 400 }
-      )
+    // If no key specified, return all settings
+    if (!key && !keys) {
+      const allSettings = await getSettings()
+      // Convert array of {key, value} to object
+      const settingsObject: Record<string, string> = {}
+      for (const setting of allSettings) {
+        settingsObject[setting.key] = setting.value
+      }
+      return NextResponse.json({ settings: settingsObject })
     }
 
-    const value = await getSetting(key)
+    // If multiple keys requested
+    if (keys) {
+      const keyList = keys.split(',').map(k => k.trim())
+      const result: Record<string, string | null> = {}
+      for (const k of keyList) {
+        result[k] = await getSetting(k)
+      }
+      return NextResponse.json({ settings: result })
+    }
+
+    // Single key lookup (original behavior)
+    const value = await getSetting(key!)
 
     if (value === null) {
       return NextResponse.json(
