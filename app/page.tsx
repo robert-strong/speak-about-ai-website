@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Hero from "@/components/hero"
 import ClientLogos from "@/components/client-logos"
 import FeaturedSpeakers from "@/components/featured-speakers"
+import ResourcesHighlight from "@/components/resources-highlight"
 import WhyChooseUs from "@/components/why-choose-us"
 import NavigateTheNoise from "@/components/navigate-the-noise"
 import HomeFAQSection from "@/components/home-faq-section"
@@ -195,6 +196,7 @@ export default async function HomePage() {
           subtitle={featuredSubtitle}
           ctaText={featuredCtaText}
         />
+        <ResourcesHighlight />
         <WhyChooseUs />
         <NavigateTheNoise />
         <HomeFAQSection />
