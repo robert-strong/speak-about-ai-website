@@ -118,6 +118,15 @@ export default function RootLayout({
         )}
       </head>
       <body className={inter.className}>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-KN7GJRQ5"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
         <ScrollToTopProvider>
           <div className="flex min-h-screen flex-col">
             <Header />

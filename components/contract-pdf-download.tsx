@@ -38,7 +38,7 @@ export function ContractPDFDownload({ contractId, contractNumber }: ContractPDFD
       }
 
       // Dynamically import jsPDF
-      const jsPDF = (await import("jspdf")).default
+      const { jsPDF } = await import("jspdf")
 
       // Create temp iframe
       const iframe = document.createElement("iframe")

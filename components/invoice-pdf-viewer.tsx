@@ -58,7 +58,7 @@ export function InvoicePDFViewer({ invoiceId, invoiceNumber, onClose }: InvoiceP
   const handleDownloadPDF = async () => {
     try {
       // Dynamically import jsPDF to avoid SSR issues
-      const jsPDF = (await import('jspdf')).default
+      const { jsPDF } = await import('jspdf')
       
       // Create a temporary iframe to render the HTML
       const iframe = document.createElement('iframe')

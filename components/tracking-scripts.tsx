@@ -1,6 +1,7 @@
 "use client"
 
 import Script from "next/script"
+import { GoogleTagManager } from "@next/third-parties/google"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -32,6 +33,9 @@ export default function TrackingScripts({ trackingCodes }: TrackingScriptsProps)
 
   return (
     <>
+      {/* Google Tag Manager */}
+      <GoogleTagManager gtmId="GTM-KN7GJRQ5" />
+
       {/* Google Ads conversion tracking */}
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=AW-18085504698"
