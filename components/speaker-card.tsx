@@ -146,7 +146,7 @@ export function SpeakerCard({ speaker, contactSource, maxTopicsToShow = 3 }: Uni
             className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out ${
               imageState === "loaded" ? "opacity-100" : "opacity-0"
             }`}
-            style={{ objectPosition: imagePosition === "top" ? `center ${imageOffsetY}` : "center" }}
+            style={{ objectPosition: imagePosition === "top" ? `center ${imageOffsetY}` : imagePosition || "center" }}
             onLoad={handleImageLoad}
             onError={handleImageError}
             loading="eager"

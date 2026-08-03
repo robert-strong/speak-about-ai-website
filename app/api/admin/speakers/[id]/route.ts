@@ -396,6 +396,8 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         short_bio = COALESCE(${updateData.short_bio || null}, short_bio),
         one_liner = COALESCE(${updateData.one_liner || null}, one_liner),
         headshot_url = COALESCE(${updateData.headshot_url || null}, headshot_url),
+        image_position = COALESCE(${updateData.image_position || null}, image_position),
+        image_offset = COALESCE(${updateData.image_offset || null}, image_offset),
         website = COALESCE(${updateData.website || null}, website),
         location = COALESCE(${updateData.location || null}, location),
         social_media = ${JSON.stringify(socialMedia)},
@@ -420,7 +422,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       WHERE id = ${parseInt(speakerId)}
       RETURNING
         id, name, email, slug, bio, short_bio, one_liner,
-        headshot_url, website, social_media,
+        headshot_url, image_position, image_offset, website, social_media,
         location, programs, topics, industries, videos, testimonials,
         past_events, awards, publications, client_logos,
         speaking_fee_range, travel_preferences, technical_requirements,
@@ -463,6 +465,8 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         short_bio: updatedSpeaker.short_bio,
         one_liner: updatedSpeaker.one_liner,
         headshot_url: updatedSpeaker.headshot_url,
+        image_position: updatedSpeaker.image_position,
+        image_offset: updatedSpeaker.image_offset,
         website: updatedSpeaker.website,
         linkedin_url: updatedSpeaker.social_media?.linkedin_url || '',
         twitter_url: updatedSpeaker.social_media?.twitter_url || '',

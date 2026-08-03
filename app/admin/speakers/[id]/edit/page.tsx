@@ -146,6 +146,8 @@ export default function AdminSpeakerEditPage() {
     short_bio: "",
     one_liner: "",
     headshot_url: "",
+    image_position: "center",
+    image_offset: "0%",
     website: "",
     linkedin_url: "",
     twitter_url: "",
@@ -269,6 +271,8 @@ export default function AdminSpeakerEditPage() {
           short_bio: speakerData.short_bio || "",
           one_liner: speakerData.one_liner || "",
           headshot_url: speakerData.headshot_url || "",
+          image_position: speakerData.image_position || "center",
+          image_offset: speakerData.image_offset || "0%",
           website: speakerData.website || "",
           linkedin_url: speakerData.linkedin_url || "",
           twitter_url: speakerData.twitter_url || "",
@@ -777,6 +781,64 @@ export default function AdminSpeakerEditPage() {
                       className="hidden"
                       onChange={handleImageUpload}
                     />
+                    {/* Headshot Focal Point Selector */}
+                    {formData.headshot_url && (
+                      <div className="mt-4 border rounded-lg p-4 bg-gray-50">
+                        <Label className="text-base font-medium">Headshot Focal Point</Label>
+                        <p className="text-sm text-gray-600 mb-4">
+                          Recenter how the headshot is cropped on speaker cards and the profile page
+                        </p>
+
+                        <div className="flex flex-col md:flex-row gap-6">
+                          {/* Preview matches the square crop used on the public profile */}
+                          <div className="relative w-40 h-40 flex-shrink-0 rounded-lg overflow-hidden border bg-gray-200">
+                            <img
+                              src={formData.headshot_url}
+                              alt="Headshot crop preview"
+                              className="w-full h-full object-cover"
+                              style={{
+                                objectPosition:
+                                  formData.image_position === "top"
+                                    ? `center ${formData.image_offset || "0%"}`
+                                    : formData.image_position || "center",
+                              }}
+                            />
+                          </div>
+
+                          {/* Position Grid */}
+                          <div className="flex-1">
+                            <div className="grid grid-cols-3 gap-2 max-w-[200px]">
+                              {[
+                                { label: "↖", value: "top left" },
+                                { label: "↑", value: "top center" },
+                                { label: "↗", value: "top right" },
+                                { label: "←", value: "center left" },
+                                { label: "●", value: "center" },
+                                { label: "→", value: "center right" },
+                                { label: "↙", value: "bottom left" },
+                                { label: "↓", value: "bottom center" },
+                                { label: "↘", value: "bottom right" },
+                              ].map((pos) => (
+                                <button
+                                  key={pos.value}
+                                  type="button"
+                                  onClick={() => setFormData(prev => ({ ...prev, image_position: pos.value }))}
+                                  className={`p-2 text-sm rounded border transition-colors ${
+                                    formData.image_position === pos.value
+                                      ? "bg-blue-600 text-white border-blue-600"
+                                      : "bg-white hover:bg-gray-100 border-gray-300"
+                                  }`}
+                                  title={pos.value}
+                                >
+                                  {pos.label}
+                                </button>
+                              ))}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">Current: {formData.image_position || "center"}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="website">Personal Website</Label>

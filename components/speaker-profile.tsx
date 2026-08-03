@@ -206,7 +206,9 @@ const SpeakerProfile: React.FC<SpeakerProfileProps> = ({ speaker }) => {
                       style={{
                         objectFit: "cover",
                         objectPosition:
-                          speaker.imagePosition === "top" ? `center ${speaker.imageOffsetY || "0%"}` : "center",
+                          speaker.imagePosition === "top"
+                            ? `center ${speaker.imageOffsetY || "0%"}`
+                            : speaker.imagePosition || "center",
                         display: imageState === "error" && speaker.image ? "none" : "block",
                       }}
                     />

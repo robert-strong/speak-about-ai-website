@@ -93,6 +93,12 @@ const OptimizedSpeakerProfile: React.FC<OptimizedSpeakerProfileProps> = ({ speak
                         alt={`${speaker.name} - AI Keynote Speaker`}
                         fill
                         className="object-cover"
+                        style={{
+                          objectPosition:
+                            speaker.imagePosition === "top"
+                              ? `center ${speaker.imageOffsetY || "0%"}`
+                              : speaker.imagePosition || "center",
+                        }}
                         priority
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px"
                       />
