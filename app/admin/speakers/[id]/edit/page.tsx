@@ -26,11 +26,13 @@ import {
   Settings,
   Briefcase,
   Camera,
-  Upload
+  Upload,
+  Crop
 } from "lucide-react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { authGet, authPut } from "@/lib/auth-fetch"
+import { HeadshotCropDialog } from "@/components/headshot-crop-dialog"
 
 interface Program {
   title: string
@@ -132,6 +134,8 @@ export default function AdminSpeakerEditPage() {
   const [saving, setSaving] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [cropDialogOpen, setCropDialogOpen] = useState(false)
+  const [applyingCrop, setApplyingCrop] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Form state
@@ -247,6 +251,36 @@ export default function AdminSpeakerEditPage() {
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
+    }
+  }
+
+  const handleCropApply = async (cropped: Blob) => {
+    try {
+      setApplyingCrop(true)
+
+      const file = new File([cropped], `speaker-${params.id}-headshot-${Date.now()}.jpg`, { type: "image/jpeg" })
+      const blob = await upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/admin/speakers/upload",
+      })
+
+      // The crop already frames the subject, so reset the focal point
+      setFormData(prev => ({ ...prev, headshot_url: blob.url, image_position: "center", image_offset: "0%" }))
+      setCropDialogOpen(false)
+
+      toast({
+        title: "Success",
+        description: "Headshot cropped — click Save Changes to keep it",
+      })
+    } catch (error) {
+      console.error("Crop upload error:", error)
+      toast({
+        title: "Upload Failed",
+        description: error instanceof Error ? error.message : "Failed to upload cropped image. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setApplyingCrop(false)
     }
   }
 
@@ -755,6 +789,16 @@ export default function AdminSpeakerEditPage() {
                             type="button"
                             variant="outline"
                             size="sm"
+                            onClick={() => setCropDialogOpen(true)}
+                            disabled={!formData.headshot_url || uploadingImage}
+                          >
+                            <Crop className="mr-2 h-4 w-4" />
+                            Adjust Crop
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
                             onClick={() => setFormData(prev => ({ ...prev, headshot_url: '' }))}
                             disabled={!formData.headshot_url || uploadingImage}
                           >
@@ -780,6 +824,13 @@ export default function AdminSpeakerEditPage() {
                       accept="image/jpeg,image/png,image/webp,image/gif"
                       className="hidden"
                       onChange={handleImageUpload}
+                    />
+                    <HeadshotCropDialog
+                      open={cropDialogOpen}
+                      onOpenChange={setCropDialogOpen}
+                      imageUrl={formData.headshot_url}
+                      applying={applyingCrop}
+                      onApply={handleCropApply}
                     />
                     {/* Headshot Focal Point Selector */}
                     {formData.headshot_url && (
