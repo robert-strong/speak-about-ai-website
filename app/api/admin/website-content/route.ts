@@ -361,9 +361,9 @@ const DEFAULT_CONTENT = [
     { text: 'Healthcare AI', url: '/industries/healthcare-keynote-speakers' },
     { text: 'Technology & Enterprise', url: '/industries/technology-keynote-speakers' },
     { text: 'Financial Services', url: '/industries/financial-services-keynote-speakers' },
-    { text: 'Leadership & Business', url: '/industries/leadership-business-keynote-speakers' },
-    { text: 'Sales, Marketing & Retail', url: '/industries/sales-marketing-keynote-speakers' },
-    { text: 'Industrial & Automotive', url: '/industries/industrial-automotive-keynote-speakers' },
+    { text: 'Leadership & Business', url: '/industries/leadership-business-strategy-ai-speakers' },
+    { text: 'Sales, Marketing & Retail', url: '/industries/sales-marketing-ai-speakers' },
+    { text: 'Industrial & Automotive', url: '/industries/automotive-ai-speakers' },
     { text: 'Government & Education', url: '/industries/government-education-keynote-speakers' }
   ]) },
 

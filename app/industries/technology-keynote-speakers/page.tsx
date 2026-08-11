@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { getSpeakersByIndustry } from "@/lib/speakers-data"
-import TechnologyAISpeakersClientPage from "../technology-ai-keynote-speakers/TechnologyAISpeakersClientPage"
+import TechnologyAISpeakersClientPage from "./TechnologyAISpeakersClientPage"
 import Script from "next/script"
 
 export const metadata: Metadata = {
