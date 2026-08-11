@@ -38,6 +38,7 @@ Key facts:
 ## Main pages
 
 - [AI Speaker Directory](${BASE_URL}/speakers): All bookable AI keynote speakers with filters
+- [Top AI Keynote Speakers of 2026](${BASE_URL}/top-ai-speakers): Ranked list, updated from live booking data
 - [Our Services](${BASE_URL}/our-services): How the bureau works for event organizers
 - [Contact / Check Availability](${BASE_URL}/contact): Request a quote for any speaker
 - [Blog & Resources](${BASE_URL}/resources): Articles on AI speakers, trends, and event planning

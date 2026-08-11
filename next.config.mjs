@@ -102,6 +102,12 @@ const nextConfig = {
         destination: '/ai-workshops/:slug',
         permanent: true,
       },
+      // Old year-stamped list -> evergreen ranked list
+      {
+        source: '/top-ai-speakers-2025',
+        destination: '/top-ai-speakers',
+        permanent: true,
+      },
       // Consolidate duplicate industry pages (same speaker sets, competing URLs)
       {
         source: '/industries/technology-ai-keynote-speakers',

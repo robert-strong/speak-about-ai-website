@@ -138,13 +138,9 @@ const serviceSchema = {
       { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Generative AI Speakers" }},
       { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "AI Healthcare Speakers" }},
     ]
-  },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "5",
-    reviewCount: "127",
-    bestRating: "5"
   }
+  // No aggregateRating here: review markup must be backed by real, visible
+  // reviews on the page per Google's structured-data guidelines
 }
 
 export default async function HomePage() {
