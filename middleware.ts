@@ -78,6 +78,12 @@ export async function middleware(request: NextRequest) {
     '/terms',
     '/client-portal',
     '/contracts',
+    '/top-ai-speakers',
+    '/ai-keynote-speakers',
+    '/case-studies',
+    '/topics',
+    '/industries',
+    '/portal',
   ]
 
   // Check if this is a root-level path (no nested paths)
