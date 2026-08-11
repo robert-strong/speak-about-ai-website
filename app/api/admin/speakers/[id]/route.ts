@@ -225,7 +225,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
         id, name, email, slug,
         bio, short_bio, one_liner, headshot_url, website,
         location, programs, topics, industries, videos, testimonials,
-        past_events, awards, publications, client_logos,
+        past_events, awards, publications, client_logos, best_for, custom_faqs,
         speaking_fee_range, travel_preferences, technical_requirements,
         dietary_restrictions, featured, active, listed, ranking,
         created_at, updated_at, email_verified,
@@ -274,6 +274,10 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     speaker.awards = parseFieldAsArray(speaker.awards, 'awards')
     speaker.publications = parseFieldAsArray(speaker.publications, 'publications')
     speaker.clientLogos = parseFieldAsArray(speaker.client_logos, 'client_logos')
+
+    // Answer-page content fields (Content tab)
+    speaker.best_for = parseFieldAsArray(speaker.best_for, 'best_for')
+    speaker.custom_faqs = parseFieldAsArray(speaker.custom_faqs, 'custom_faqs')
 
     // Parse social media links from social_media JSONB field
     const socialMedia = speaker.social_media || {}
@@ -378,7 +382,10 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Prepare social_media JSONB from individual social fields
     const currentSpeakerData = await sql`SELECT social_media FROM speakers WHERE id = ${parseInt(speakerId)}`
     const currentSocialMedia = currentSpeakerData[0]?.social_media || {}
+    // Spread current values first so keys this form doesn't manage
+    // (wikipedia_url, google_scholar_url, other_urls) survive the save
     const socialMedia = {
+      ...currentSocialMedia,
       linkedin_url: updateData.linkedin_url !== undefined ? updateData.linkedin_url : currentSocialMedia.linkedin_url,
       twitter_url: updateData.twitter_url !== undefined ? updateData.twitter_url : currentSocialMedia.twitter_url,
       youtube_url: updateData.youtube_url !== undefined ? updateData.youtube_url : currentSocialMedia.youtube_url,
@@ -410,6 +417,8 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         awards = COALESCE(${JSON.stringify(updateData.awards) || null}, awards),
         publications = COALESCE(${JSON.stringify(updateData.publications) || null}, publications),
         client_logos = COALESCE(${JSON.stringify(updateData.clientLogos) || null}, client_logos),
+        best_for = COALESCE(${JSON.stringify(updateData.best_for) || null}, best_for),
+        custom_faqs = COALESCE(${JSON.stringify(updateData.custom_faqs) || null}, custom_faqs),
         speaking_fee_range = COALESCE(${updateData.speaking_fee_range || null}, speaking_fee_range),
         travel_preferences = COALESCE(${updateData.travel_preferences || null}, travel_preferences),
         technical_requirements = COALESCE(${updateData.technical_requirements || null}, technical_requirements),
@@ -424,7 +433,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         id, name, email, slug, bio, short_bio, one_liner,
         headshot_url, image_position, image_offset, website, social_media,
         location, programs, topics, industries, videos, testimonials,
-        past_events, awards, publications, client_logos,
+        past_events, awards, publications, client_logos, best_for, custom_faqs,
         speaking_fee_range, travel_preferences, technical_requirements,
         dietary_restrictions, featured, active, listed, ranking, created_at, updated_at
     `
@@ -483,6 +492,8 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         awards: updatedSpeaker.awards || [],
         publications: updatedSpeaker.publications || [],
         clientLogos: updatedSpeaker.client_logos || [],
+        best_for: updatedSpeaker.best_for || [],
+        custom_faqs: updatedSpeaker.custom_faqs || [],
         speaking_fee_range: updatedSpeaker.speaking_fee_range,
         travel_preferences: updatedSpeaker.travel_preferences,
         technical_requirements: updatedSpeaker.technical_requirements,

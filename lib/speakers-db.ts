@@ -60,6 +60,10 @@ export interface Speaker {
     other_urls?: string[]
   }
   
+  // Hand-authored answer-page content (JSONB)
+  best_for?: string[]
+  custom_faqs?: { question: string; answer: string }[]
+
   // Topics and expertise
   topics?: any[] // Legacy JSONB field
   primary_topics?: string[]

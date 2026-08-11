@@ -51,6 +51,8 @@ export interface Speaker {
   listed?: boolean
   expertise?: string[]
   ranking?: number
+  bestFor?: string[] // hand-authored audience/event fits, e.g. "Non-technical executive audiences"
+  customFaqs?: { question: string; answer: string }[] // hand-authored FAQs, rendered ahead of generated ones
   
   // New fields for enhanced speaker profiles
   pastEvents?: {
@@ -699,6 +701,8 @@ export async function getSpeakerBySlug(slug: string): Promise<Speaker | undefine
             listed: dbSpeaker.listed !== false,
             expertise: parseJsonField(dbSpeaker.expertise || dbSpeaker.topics),
             ranking: dbSpeaker.ranking || 0,
+            bestFor: parseJsonField(dbSpeaker.best_for),
+            customFaqs: parseJsonField(dbSpeaker.custom_faqs),
             // Experience tab fields (admin-managed) for the public profile
             publications: parseJsonField(dbSpeaker.publications),
             awards: parseJsonField(dbSpeaker.awards),
@@ -797,10 +801,13 @@ export async function getSpeakersByIndustry(industry: string): Promise<Speaker[]
     const filteredSpeakers = allListedSpeakers.filter((speaker) => {
       if (!speaker.industries || speaker.industries.length === 0) return false
 
-      // Get the primary industry (first tag) - this is what shows in the top-left badge
-      const primaryIndustry = speaker.industries[0].toLowerCase().trim()
+      // Match against ALL of the speaker's industry tags — previously only the
+      // first tag was checked, which dropped cross-industry speakers from pages
+      return speaker.industries.some((tag) => {
+        if (typeof tag !== "string") return false
+        const primaryIndustry = tag.toLowerCase().trim()
 
-      switch (normalizedIndustry) {
+        switch (normalizedIndustry) {
         case "technology":
           return (
             primaryIndustry === "technology" ||
@@ -904,7 +911,8 @@ export async function getSpeakersByIndustry(industry: string): Promise<Speaker[]
         default:
           // For other industries, use exact match or starts with
           return primaryIndustry === normalizedIndustry || primaryIndustry.startsWith(normalizedIndustry + " ")
-      }
+        }
+      })
     })
 
     return filteredSpeakers

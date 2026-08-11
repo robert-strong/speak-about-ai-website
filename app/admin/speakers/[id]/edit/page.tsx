@@ -167,6 +167,8 @@ export default function AdminSpeakerEditPage() {
     awards: [] as Award[],
     publications: [] as Publication[],
     clientLogos: [] as ClientLogo[],
+    best_for: [] as string[],
+    custom_faqs: [] as { question: string; answer: string }[],
     speaking_fee_range: "",
     travel_preferences: "",
     technical_requirements: "",
@@ -180,6 +182,8 @@ export default function AdminSpeakerEditPage() {
   // Form inputs for adding new items
   const [newTopic, setNewTopic] = useState("")
   const [newIndustry, setNewIndustry] = useState("")
+  const [newBestFor, setNewBestFor] = useState("")
+  const [newFaq, setNewFaq] = useState({ question: "", answer: "" })
   const [newProgram, setNewProgram] = useState("")
   const [newVideo, setNewVideo] = useState<Video>({ id: "", title: "", url: "", thumbnail: "" })
   const [newTestimonial, setNewTestimonial] = useState<Testimonial>({ quote: "", author: "" })
@@ -322,6 +326,8 @@ export default function AdminSpeakerEditPage() {
           awards: speakerData.awards || [],
           publications: speakerData.publications || [],
           clientLogos: speakerData.clientLogos || [],
+          best_for: speakerData.best_for || [],
+          custom_faqs: speakerData.custom_faqs || [],
           speaking_fee_range: speakerData.speaking_fee_range || "",
           travel_preferences: speakerData.travel_preferences || "",
           technical_requirements: speakerData.technical_requirements || "",
@@ -418,6 +424,40 @@ export default function AdminSpeakerEditPage() {
     setFormData(prev => ({
       ...prev,
       topics: prev.topics.filter((_, i) => i !== index)
+    }))
+  }
+
+  const addBestFor = () => {
+    if (newBestFor.trim() && !formData.best_for.includes(newBestFor.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        best_for: [...prev.best_for, newBestFor.trim()]
+      }))
+      setNewBestFor("")
+    }
+  }
+
+  const removeBestFor = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      best_for: prev.best_for.filter((_, i) => i !== index)
+    }))
+  }
+
+  const addFaq = () => {
+    if (newFaq.question.trim() && newFaq.answer.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        custom_faqs: [...prev.custom_faqs, { question: newFaq.question.trim(), answer: newFaq.answer.trim() }]
+      }))
+      setNewFaq({ question: "", answer: "" })
+    }
+  }
+
+  const removeFaq = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      custom_faqs: prev.custom_faqs.filter((_, i) => i !== index)
     }))
   }
 
@@ -1069,6 +1109,89 @@ export default function AdminSpeakerEditPage() {
                   />
                   <Button onClick={addIndustry} size="sm">
                     <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Best For */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Best For</CardTitle>
+                <CardDescription>
+                  Audience and event fits shown on the public profile, e.g. "Non-technical executive audiences" or "Fortune 500 leadership offsites"
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  {formData.best_for.map((fit, index) => (
+                    <Badge key={index} variant="outline" className="flex items-center gap-2">
+                      {fit}
+                      <button
+                        onClick={() => removeBestFor(index)}
+                        className="ml-1 hover:text-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={newBestFor}
+                    onChange={(e) => setNewBestFor(e.target.value)}
+                    placeholder='Add an audience/event fit'
+                    onKeyPress={(e) => e.key === 'Enter' && addBestFor()}
+                  />
+                  <Button onClick={addBestFor} size="sm">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Custom FAQs */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Custom FAQs</CardTitle>
+                <CardDescription>
+                  Hand-written questions and answers shown ahead of the auto-generated FAQs on the public profile (and in its FAQ schema)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {formData.custom_faqs.map((faq, index) => (
+                    <div key={index} className="border rounded p-3">
+                      <div className="flex justify-between items-start gap-2">
+                        <div>
+                          <p className="font-medium">{faq.question}</p>
+                          <p className="text-sm text-gray-600 mt-1">{faq.answer}</p>
+                        </div>
+                        <Button
+                          onClick={() => removeFaq(index)}
+                          size="sm"
+                          variant="ghost"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-2 border-t pt-4">
+                  <Input
+                    value={newFaq.question}
+                    onChange={(e) => setNewFaq(prev => ({ ...prev, question: e.target.value }))}
+                    placeholder='Question, e.g. "Is this speaker a good fit for healthcare executives?"'
+                  />
+                  <Textarea
+                    value={newFaq.answer}
+                    onChange={(e) => setNewFaq(prev => ({ ...prev, answer: e.target.value }))}
+                    placeholder="Answer (2-3 factual sentences)"
+                    rows={3}
+                  />
+                  <Button onClick={addFaq} size="sm" disabled={!newFaq.question.trim() || !newFaq.answer.trim()}>
+                    <Plus className="h-4 w-4 mr-1" /> Add FAQ
                   </Button>
                 </div>
               </CardContent>

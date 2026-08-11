@@ -21,8 +21,28 @@ function joinNaturally(items: string[]): string {
 
 // Single source of truth for per-speaker FAQs: rendered as visible HTML on the
 // profile page AND emitted as FAQPage JSON-LD, so the two can never drift apart.
-// Every answer is built only from data we actually have on the speaker record.
+// Hand-authored FAQs (speaker.customFaqs) come first; generated ones fill in
+// behind them, skipping any topic a custom FAQ already covers.
 export function getSpeakerFaqs(speaker: Speaker): SpeakerFaq[] {
+  const custom: SpeakerFaq[] = (speaker.customFaqs || []).filter(
+    (f) => f && typeof f.question === "string" && f.question.trim() && typeof f.answer === "string" && f.answer.trim()
+  )
+  const generated = getGeneratedFaqs(speaker)
+
+  // A generated FAQ is redundant if a custom question shares its key noun
+  // (fee, topic, virtual, based/travel, book, audience/industr).
+  const covers = (customQ: string, generatedQ: string) => {
+    const keys = ["fee", "cost", "topic", "virtual", "based", "travel", "book", "audience", "industr"]
+    const cq = customQ.toLowerCase()
+    const gq = generatedQ.toLowerCase()
+    return keys.some((k) => cq.includes(k) && gq.includes(k))
+  }
+  const filler = generated.filter((g) => !custom.some((c) => covers(c.question, g.question)))
+
+  return [...custom, ...filler].slice(0, 8)
+}
+
+function getGeneratedFaqs(speaker: Speaker): SpeakerFaq[] {
   const faqs: SpeakerFaq[] = []
   const firstName = speaker.name.split(" ")[0]
   const hasFee = speaker.fee && speaker.fee.toLowerCase() !== "please inquire"

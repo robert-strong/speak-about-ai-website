@@ -102,6 +102,27 @@ const nextConfig = {
         destination: '/ai-workshops/:slug',
         permanent: true,
       },
+      // Consolidate duplicate industry pages (same speaker sets, competing URLs)
+      {
+        source: '/industries/technology-ai-keynote-speakers',
+        destination: '/industries/technology-keynote-speakers',
+        permanent: true,
+      },
+      {
+        source: '/industries/leadership-business-keynote-speakers',
+        destination: '/industries/leadership-business-strategy-ai-speakers',
+        permanent: true,
+      },
+      {
+        source: '/industries/sales-marketing-keynote-speakers',
+        destination: '/industries/sales-marketing-ai-speakers',
+        permanent: true,
+      },
+      {
+        source: '/industries/industrial-automotive-keynote-speakers',
+        destination: '/industries/automotive-ai-speakers',
+        permanent: true,
+      },
     ]
   },
 }

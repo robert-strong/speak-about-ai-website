@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next"
 import { getAllSpeakers } from "@/lib/speakers-data"
 import { getBlogPosts } from "@/lib/blog-data"
 import { getAllLandingPages } from "@/lib/landing-page-data"
+import { TOPIC_PAGES } from "@/lib/topic-pages"
 
 const BASE_URL = "https://speakabout.ai"
 
@@ -124,12 +125,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     {
-      url: `${BASE_URL}/industries/technology-ai-keynote-speakers`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.85,
-    },
-    {
       url: `${BASE_URL}/industries/financial-services-keynote-speakers`,
       lastModified: now,
       changeFrequency: "weekly",
@@ -142,6 +137,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
   ]
+
+  // Buyer-intent topic pages (config-driven, lib/topic-pages.ts)
+  const topicPages: MetadataRoute.Sitemap = TOPIC_PAGES.map((topic) => ({
+    url: `${BASE_URL}/topics/${topic.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.85,
+  }))
 
   // Individual speaker pages - VERY IMPORTANT FOR SEO
   const speakerPages: MetadataRoute.Sitemap = speakers.map((speaker) => ({
@@ -169,5 +172,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
   
-  return [...mainPages, ...industryPages, ...speakerPages, ...blogPages, ...toolPages]
+  return [...mainPages, ...industryPages, ...topicPages, ...speakerPages, ...blogPages, ...toolPages]
 }

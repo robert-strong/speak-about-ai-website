@@ -42,6 +42,12 @@ Key facts:
 - [Contact / Check Availability](${BASE_URL}/contact): Request a quote for any speaker
 - [Blog & Resources](${BASE_URL}/resources): Articles on AI speakers, trends, and event planning
 
+## Speakers by topic and budget
+
+- [Generative AI Keynote Speakers](${BASE_URL}/topics/generative-ai-speakers)
+- [AI Ethics & Responsible AI Speakers](${BASE_URL}/topics/ai-ethics-speakers)
+- [AI Keynote Speakers Under $30,000](${BASE_URL}/topics/ai-speakers-under-30k)
+
 ## Speakers by industry
 
 - [Technology AI Keynote Speakers](${BASE_URL}/industries/technology-keynote-speakers)

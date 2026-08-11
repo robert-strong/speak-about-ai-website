@@ -26,6 +26,7 @@ export async function GET(
         headshot_url, website, social_media,
         topics, industries, programs, videos, testimonials,
         publications, awards, past_events, client_logos,
+        best_for, custom_faqs,
         speaking_fee_range,
         travel_preferences, technical_requirements, dietary_restrictions,
         location,
@@ -79,6 +80,8 @@ export async function GET(
       topics: Array.isArray(speaker.topics) ? speaker.topics : [],
       listed: speaker.listed !== false,
       ranking: speaker.ranking || 0,
+      bestFor: Array.isArray(speaker.best_for) ? speaker.best_for : [],
+      customFaqs: Array.isArray(speaker.custom_faqs) ? speaker.custom_faqs : [],
       // Additional fields from social_media
       youtube: speaker.social_media?.youtube_url || '',
       instagram: speaker.social_media?.instagram_url || ''

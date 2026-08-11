@@ -1,0 +1,2168 @@
+{
+  "stats": {
+    "total": 86,
+    "covered": 86,
+    "totalBestFor": 355,
+    "totalFaqs": 257
+  },
+  "problems": [],
+  "results": [
+    {
+      "slug": "peter-norvig",
+      "name": "Peter Norvig",
+      "title": "Former Director of Research at Google, AI Pioneer",
+      "best_for": [
+        "University and academic conferences",
+        "AI research and computer science audiences",
+        "Education technology events",
+        "Corporate technology leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Peter Norvig best known for?",
+          "answer": "Peter Norvig is best known for co-authoring \"Artificial Intelligence: A Modern Approach,\" the most widely used AI textbook, used in over 1,500 universities worldwide. He also served as Director of Research at Google and led the Computational Sciences Division at NASA Ames Research Center."
+        },
+        {
+          "question": "Is Peter Norvig a good fit for academic or university audiences?",
+          "answer": "Yes. Norvig is a Distinguished Education Fellow at the Stanford Institute for Human-Centered AI and has held academic positions at USC and Berkeley. He also co-developed an online AI course with Sebastian Thrun that attracted over 160,000 students, reflecting his focus on accessible AI education."
+        },
+        {
+          "question": "What makes Peter Norvig different from other AI speakers?",
+          "answer": "Norvig combines deep technical research experience, including leading AI research at Google and NASA Ames, with a strong record in AI education as co-author of the field's leading textbook. This gives him credibility with both technical and academic audiences."
+        }
+      ]
+    },
+    {
+      "slug": "adam-cheyer",
+      "name": "Adam Cheyer",
+      "title": "VP of AI Experience at Airbnb, Co-Founder of Siri",
+      "best_for": [
+        "Entrepreneurship and startup audiences",
+        "Conversational AI and voice technology audiences",
+        "Product development and innovation teams",
+        "Entertainment-forward keynote audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Adam Cheyer best known for?",
+          "answer": "Adam Cheyer is best known as a co-founder of Siri, which was acquired by Apple, and for creating core technology behind both Siri and Samsung's Bixby voice assistants, now used in over 1.5 billion devices. He currently serves as VP of AI Experience at Airbnb."
+        },
+        {
+          "question": "What makes Adam Cheyer different from other AI speakers?",
+          "answer": "Cheyer pairs deep technical and entrepreneurial credentials, including co-founding Siri, Viv Labs, and Sentient Technologies, with a background as an award-winning magician, and he often incorporates a magic trick into his keynotes to engage audiences."
+        },
+        {
+          "question": "Is Adam Cheyer a good fit for entrepreneurship-focused events?",
+          "answer": "Yes. He has founded and exited multiple companies, including Siri (acquired by Apple) and Viv Labs (acquired by Samsung), and speaks directly to entrepreneurship, product strategy, and scaling AI-driven startups."
+        }
+      ]
+    },
+    {
+      "slug": "vishal-sharma",
+      "name": "Vishal Sharma",
+      "title": "Vice President, Amazon AGI",
+      "best_for": [
+        "Voice technology and AI assistants audiences",
+        "Technology leadership and executive audiences",
+        "Product strategy teams",
+        "Consumer technology conferences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Vishal Sharma best known for?",
+          "answer": "Vishal Sharma is best known for his leadership in voice AI and large language models, currently serving as Vice President of Amazon's Artificial General Intelligence organization, where he leads development of Amazon's large language model efforts and the Alexa experience."
+        },
+        {
+          "question": "What makes Vishal Sharma different from other AI speakers?",
+          "answer": "Sharma has held senior AI and product leadership roles at three major technology companies, Amazon, Google, and Microsoft, including leading the Google Assistant team and founding Wand Labs, which was acquired by Microsoft. This gives him a cross-company perspective on building and scaling voice and AI assistant products."
+        },
+        {
+          "question": "Is Vishal Sharma a good fit for product strategy audiences?",
+          "answer": "Yes. His career has centered on AI product strategy and leadership, including VP of Products at Google and his current role guiding Amazon's LLM and Alexa strategy, making him well suited for audiences focused on building and scaling AI products."
+        }
+      ]
+    },
+    {
+      "slug": "maya-ackerman",
+      "name": "Maya Ackerman",
+      "title": "CEO/Co-founder of WaveAI, Santa Clara University Professor",
+      "best_for": [
+        "Generative AI and creativity-focused audiences",
+        "Academic and research conferences",
+        "Music and entertainment technology events",
+        "Non-technical audiences new to AI"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Maya Ackerman best known for?",
+          "answer": "Maya Ackerman is best known as the CEO and co-founder of WaveAI, a generative AI company focused on music creation, and for her academic research on generative AI applied to text, music, and art since 2014. She has authored more than 50 peer-reviewed publications on the topic."
+        },
+        {
+          "question": "Is Maya Ackerman a good fit for audiences new to AI?",
+          "answer": "Yes. According to a past attendee, her talks combine reassurance for those wary of AI with practical guidance on how to work with it, making her approach accessible to audiences without a technical background."
+        },
+        {
+          "question": "What makes Maya Ackerman different from other AI speakers?",
+          "answer": "Ackerman blends hands-on entrepreneurial experience building a generative AI company with a substantial academic research record, over 50 peer-reviewed publications cited more than 1,200 times, giving her both practitioner and scholarly credibility on AI and creativity."
+        }
+      ]
+    },
+    {
+      "slug": "daniel-kraft",
+      "name": "Daniel Kraft",
+      "title": "Stanford and Harvard Trained Physician, Scientist, Entrepreneur, and Inventor",
+      "best_for": [
+        "Healthcare innovation and future-of-medicine conferences",
+        "Digital health investment and venture audiences",
+        "Large-scale keynote and general session audiences",
+        "Biotech and life sciences leadership events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Daniel Kraft best known for?",
+          "answer": "Dr. Daniel Kraft is a Stanford- and Harvard-trained physician-scientist known for chairing the Medicine faculty at Singularity University, founding NextMed Health, and developing the FDA-approved MarrowMiner medical device. He has delivered TED and TEDMED talks on the convergence of technology and medicine."
+        },
+        {
+          "question": "Is Daniel Kraft a good fit for large keynote audiences?",
+          "answer": "Yes. One event organizer described his session as standing-room-only with an audience of roughly 3,000 people who were \"hanging on every word,\" and another noted attendees continued discussing his remarks throughout the rest of the conference."
+        },
+        {
+          "question": "Does Daniel Kraft speak about digital health investment?",
+          "answer": "Yes. He is a partner at Continuum Health Ventures, focusing on early-stage digital health investments, and he also chairs the XPRIZE Pandemic & Health Alliance in addition to his clinical and research background."
+        }
+      ]
+    },
+    {
+      "slug": "gopi-kallayil",
+      "name": "Gopi Kallayil",
+      "title": "Chief Business Strategist for AI at Google",
+      "best_for": [
+        "Enterprise marketing and brand strategy audiences",
+        "Financial services and large enterprise AI adoption events",
+        "Business strategy and AI transformation audiences",
+        "Personal growth and well-being focused leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Gopi Kallayil best known for?",
+          "answer": "Gopi Kallayil is the Chief Business Strategist for AI at Google, where he partners with Google's largest customers to apply AI to their business operations and customer experiences. He previously served as Google's Chief Evangelist for Brand Marketing and led its AdWords and AdSense marketing teams."
+        },
+        {
+          "question": "What makes Gopi Kallayil different from other AI speakers?",
+          "answer": "Kallayil combines enterprise AI strategy experience at Google with a background in management consulting at McKinsey & Co. and a personal focus on well-being, having authored two books, including \"The Happy Human,\" on personal growth alongside his technology career."
+        },
+        {
+          "question": "Is Gopi Kallayil a good fit for enterprise marketing or business strategy events?",
+          "answer": "Yes. His current role involves helping Google's largest customers use AI to transform business operations and customer experience, building on his prior leadership of Google's AdWords and AdSense marketing teams and consulting work at McKinsey."
+        }
+      ]
+    },
+    {
+      "slug": "chris-yeh",
+      "name": "Chris Yeh",
+      "title": "Co-Founder of BlitzScaling Ventures",
+      "best_for": [
+        "Venture capital and startup founder audiences",
+        "Corporate leadership and talent management events",
+        "Business scaling and growth strategy conferences",
+        "Cross-level organizational audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Chris Yeh best known for?",
+          "answer": "Chris Yeh is best known for co-authoring \"Blitzscaling\" with Reid Hoffman, a book detailing the rapid growth strategies used by companies like Amazon, Alibaba, and Airbnb. He has been an active voice in the startup and venture capital ecosystem since 1995."
+        },
+        {
+          "question": "Is Chris Yeh a good fit for talent management or leadership events?",
+          "answer": "Yes. A past client from LinkedIn noted he combined an entertaining, high-energy presentation with an interactive, customized discussion of talent management issues, and an attendee from Providence described him as able to distill complex business cases for audiences at multiple levels of an organization."
+        },
+        {
+          "question": "What makes Chris Yeh different from other AI speakers?",
+          "answer": "Yeh brings a scaling and venture capital lens rather than a purely technical one, drawing on his co-authored framework in \"Blitzscaling\" and experience working with organizations ranging from early-stage startups to Fortune 50 corporations."
+        }
+      ]
+    },
+    {
+      "slug": "lucien-engelen",
+      "name": "Lucien Engelen",
+      "title": "TransformHealth CEO and Healthcare Visionary",
+      "best_for": [
+        "Healthcare executive and government policy audiences",
+        "Digital health innovation conferences",
+        "Patient engagement and advocacy focused events",
+        "Global health leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Lucien Engelen best known for?",
+          "answer": "Lucien Engelen is best known as a pioneer in digital patient empowerment, having launched the #patientsincluded initiative, and for founding and leading Transform.Health, where he advises executive boards, governments, and corporations on global health transformation."
+        },
+        {
+          "question": "Is Lucien Engelen a good fit for healthcare policy or government audiences?",
+          "answer": "Yes. He has advised executive boards, governments, and corporations on navigating the global health landscape and has been a vocal advocate for policy and legislative changes to support healthcare innovation."
+        },
+        {
+          "question": "What makes Lucien Engelen different from other AI speakers?",
+          "answer": "Engelen combines over three decades of hands-on healthcare innovation experience, including a 12-year tenure running an academic innovation center in the Netherlands, with ongoing roles advising global organizations and teaching at Singularity University's Next Med Health program."
+        }
+      ]
+    },
+    {
+      "slug": "mo-tiwari",
+      "name": "Mo Tiwari",
+      "title": "Staff Research Scientist at Google, former OpenAI Technical Staff",
+      "best_for": [
+        "AI research and technical audiences",
+        "Cybersecurity and data science conferences",
+        "Corporate AI adoption and innovation audiences",
+        "Scientific research communities"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Mo Tiwari best known for?",
+          "answer": "Mo Tiwari is a Staff Research Scientist at Google who previously worked on the technical staff at OpenAI. He holds a PhD in Computer Science from Stanford, where his research focused on AI, machine learning, statistics, and applications to healthcare."
+        },
+        {
+          "question": "What makes Mo Tiwari different from other AI speakers?",
+          "answer": "Tiwari has direct hands-on experience across both leading AI labs, OpenAI and Google, and applied technology roles, including as a technical lead on Facebook's ThreatExchange cybersecurity product and as an early employee at Expanse before its $800 million acquisition by Palo Alto Networks."
+        },
+        {
+          "question": "Is Mo Tiwari a good fit for technical or research-focused audiences?",
+          "answer": "Yes. His talks focus on the current state of AI research and how organizations can build AI capabilities, grounded in his experience as a research scientist at both OpenAI and Google."
+        }
+      ]
+    },
+    {
+      "slug": "nancy-xu",
+      "name": "Nancy Xu",
+      "title": "CEO of Moonhub.ai & Early Stage Startup Mentor/Investor",
+      "best_for": [
+        "HR and talent acquisition audiences",
+        "AI in recruiting and workforce technology conferences",
+        "Startup founder and early-stage investor audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Nancy Xu best known for?",
+          "answer": "Nancy Xu is the founder and CEO of Moonhub, an AI-powered recruiting platform that connects companies with talent. Since launching in June 2022, Moonhub has been used by over 100 companies globally and raised a $4.4 million seed round."
+        },
+        {
+          "question": "Is Nancy Xu a good fit for HR or talent acquisition audiences?",
+          "answer": "Yes. Her work through Moonhub directly addresses AI in recruiting, including efforts to counter bias in automated hiring systems, making her well suited to HR, talent acquisition, and workforce technology audiences."
+        },
+        {
+          "question": "What makes Nancy Xu different from other AI speakers?",
+          "answer": "Xu pairs a PhD in Computer Science from Stanford's AI Lab with direct startup leadership experience building Moonhub from launch to over 100 client companies and more than $1 million in first-year revenue, giving her both technical and entrepreneurial credibility."
+        }
+      ]
+    },
+    {
+      "slug": "rana-el-kaliouby",
+      "name": "Rana el Kaliouby",
+      "title": "Co-Founder and General Partner of Blue Tulip Ventures, Former Deputy CEO of Smart Eye, Co-Founder of Affectiva, and Author",
+      "best_for": [
+        "Emotion AI, computer vision, and AI ethics audiences",
+        "Automotive and media/entertainment technology conferences",
+        "Women in leadership and diversity & inclusion audiences",
+        "Entrepreneurship and technology leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Rana el Kaliouby best known for?",
+          "answer": "Rana el Kaliouby is best known for pioneering emotion AI, having co-founded Affectiva, a company that uses facial and vocal recognition to read human emotion, growing its facial emotion repository to nearly 6 million faces analyzed across 75 countries. Her work began at the MIT Media Lab, where she helped develop the \"emotional hearing aid,\" named one of the New York Times' Top 100 Innovations of 2006."
+        },
+        {
+          "question": "Is Rana el Kaliouby a good fit for women's leadership or diversity-focused audiences?",
+          "answer": "Yes. Her memoir \"Girl Decoded\" chronicles her journey from Cairo, Egypt to becoming a scientist and entrepreneur, and past reviewers have noted it resonates with women navigating ambition and self-doubt in their careers."
+        },
+        {
+          "question": "What makes Rana el Kaliouby different from other AI speakers?",
+          "answer": "El Kaliouby's work centers specifically on emotion AI and humanizing technology, an area she helped establish through her research at the MIT Media Lab and her company Affectiva, giving her a distinct focus compared to speakers covering AI more broadly."
+        }
+      ]
+    },
+    {
+      "slug": "julie-holmes",
+      "name": "Julie Holmes",
+      "title": "AI Keynote Speaker & Tech Founder",
+      "best_for": [
+        "Sales teams and sales leadership audiences",
+        "Association conferences seeking AI strategy programming",
+        "Executive AI strategy sessions",
+        "Opening keynote / high-energy morning sessions",
+        "Entrepreneurship and startup audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What makes Julie Holmes different from other AI speakers?",
+          "answer": "Julie combines 25+ years of enterprise technology and startup experience with a background as a 7-figure founder of two innovation companies whose tools have helped businesses grow in over 60 countries. She is known for translating AI strategy into practical, actionable guidance for executives, teams, and sales professionals, delivered with high energy and humor."
+        },
+        {
+          "question": "Is Julie Holmes a good fit for sales-focused events?",
+          "answer": "Yes. Her topics include Sales AI and AI Business Strategy, and her bio highlights showing sales professionals how to sell smarter with top AI tools alongside broader guidance on building tech-ready teams."
+        },
+        {
+          "question": "What is Julie Holmes best known for?",
+          "answer": "Julie is described as an award-winning, hall-of-fame speaker who has guided tens of thousands of people on why, what, when, and how to leverage AI and technology effectively, with an engaging, humor-driven presentation style."
+        }
+      ]
+    },
+    {
+      "slug": "divya-chander",
+      "name": "Divya Chander",
+      "title": "Neuroscientist Applying AI to Cognitive Longevity",
+      "best_for": [
+        "Healthcare and medtech executive audiences",
+        "Neurotechnology and brain-computer interface audiences",
+        "AI ethics, governance, and policy forums",
+        "Women's leadership summits",
+        "Futurist and innovation conference audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Divya Chander a good fit for healthcare industry events?",
+          "answer": "Yes. She is an MD, PhD, and anesthesiologist who founded a company applying AI algorithms within brain-computer interfaces for early detection and treatment of brain failure, and her topics include Digital Health, Health Innovation, and Medical Technology."
+        },
+        {
+          "question": "What makes Divya Chander different from other AI speakers?",
+          "answer": "She combines a clinical medical background (trained at Harvard, Stanford, UCSF, UCSD, and the Salk Institute) with entrepreneurship and policy work, having pioneered research on tracking consciousness states at Stanford and advised organizations including the UN, XRSI, and the Australian Human Rights Commission on data and biometric rights."
+        },
+        {
+          "question": "What is Divya Chander best known for?",
+          "answer": "She is known for her work at the intersection of neuroscience, AI, and cognitive longevity, including founding a company that uses AI-based brain-computer interface algorithms to help prevent dementia, and for presenting on consciousness and human augmentation at venues like TED-NYC and the UN."
+        }
+      ]
+    },
+    {
+      "slug": "luc-julia",
+      "name": "Dr. Luc Julia",
+      "title": "Chief Scientific Officer for Renault",
+      "best_for": [
+        "Automotive and mobility industry events",
+        "Voice technology and speech recognition audiences",
+        "AI philosophy and critical-thinking discussions",
+        "Corporate communications masterclasses",
+        "Technology innovation leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Luc Julia a good fit for automotive industry events?",
+          "answer": "Yes. He currently serves as Chief Scientific Officer for Renault and his topics include Automotive AI and Technology Innovation, building on prior executive roles at Samsung and HP."
+        },
+        {
+          "question": "What makes Luc Julia different from other AI speakers?",
+          "answer": "He was part of the team that developed Apple's Siri and was involved in the creation of Nuance Communications, the speech recognition leader, giving him firsthand experience building foundational AI voice technology. He is also the bestselling author of \"There is no such thing as Artificial Intelligence,\" offering a distinct perspective on AI."
+        },
+        {
+          "question": "What is Luc Julia best known for?",
+          "answer": "He is best known for his role in developing Apple's Siri voice assistant and for his book challenging common assumptions about artificial intelligence, alongside recognition including France's Légion d'Honneur and membership in its National Academy of Technologies."
+        }
+      ]
+    },
+    {
+      "slug": "jeremiah-owyang",
+      "name": "Jeremiah Owyang",
+      "title": "General Partner, Blitzscaling Ventures. Llama Lounge, AI Event Founder",
+      "best_for": [
+        "Venture capital and startup investor audiences",
+        "AI startup ecosystem events",
+        "Business leadership audiences seeking market trend analysis",
+        "Technology conference keynotes"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Jeremiah Owyang a good fit for venture capital or startup audiences?",
+          "answer": "Yes. He is General Partner at Blitzscaling Ventures, where he invests in AI agents, educational AI startups, and global commerce AI ventures, and he leads Llama Lounge, a gathering of hundreds of AI startups and investors in Silicon Valley."
+        },
+        {
+          "question": "What makes Jeremiah Owyang different from other AI speakers?",
+          "answer": "He brings a 20-year Silicon Valley track record spanning analyst research at Forrester, venture investing, and organizing large AI industry events, and has presented at major conferences including TED AI, Web Summit, and TechCrunch Disrupt."
+        },
+        {
+          "question": "What is Jeremiah Owyang best known for?",
+          "answer": "He is known as the founder of Llama Lounge, a premier gathering of AI startups and investors, and as General Partner at Blitzscaling Ventures, with commentary featured in outlets such as The Wall Street Journal, The New York Times, and Reuters."
+        }
+      ]
+    },
+    {
+      "slug": "lital-marom",
+      "name": "Lital Marom",
+      "title": "Founder of UNFOLD, The Academy of Tomorrow, Entrepreneur & Keynote Speaker",
+      "best_for": [
+        "Financial services conferences",
+        "HR and people-management conferences",
+        "Large-scale international business and technology summits",
+        "Digital transformation and innovation strategy audiences",
+        "Telecom and mobile industry events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Lital Marom a good fit for financial services audiences?",
+          "answer": "Yes. Her industries include Financial Services, and she has spoken at leading financial institutions such as RBC, HSBC, and ING on integrating AI into business strategy."
+        },
+        {
+          "question": "What makes Lital Marom different from other AI speakers?",
+          "answer": "She developed the UNFOLD innovation framework and The Academy of Tomorrow, an evidence-based approach to helping leaders build the mindsets and skills needed for AI-driven change, and has delivered it at organizations including Google, IBM, McKinsey, and TED."
+        },
+        {
+          "question": "What is Lital Marom best known for?",
+          "answer": "She is known for delivering practical frameworks that integrate AI into business strategy to drive transformation and growth, having spoken to large international audiences such as 1,500 business and technology leaders at ST Engineering's Innotech.AI 2024 in Singapore."
+        }
+      ]
+    },
+    {
+      "slug": "ryan-pamplin",
+      "name": "Ryan Pamplin",
+      "title": "CEO of BlendJet, EMMY-Nominated Advertiser, Former VP Evangelist at Meta (now Campfire)",
+      "best_for": [
+        "E-commerce and consumer products companies",
+        "Marketing and advertising audiences",
+        "Entrepreneurship and startup growth audiences",
+        "AR and emerging technology audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Ryan Pamplin a good fit for e-commerce or consumer brand audiences?",
+          "answer": "Yes. He is CEO and co-founder of BlendJet, which grew from a 7,000-unit preorder in 2017 to millions of customers across 30,000 retail doors in 38 countries, and he is now applying AI to BlendJet's marketing, product development, and customer experience."
+        },
+        {
+          "question": "What makes Ryan Pamplin different from other AI speakers?",
+          "answer": "He combines entrepreneurial experience scaling BlendJet with a background in advertising and augmented reality, including creating Super Bowl ads, holding over 40 patents, and serving as VP Evangelist at Meta (now Campfire), where he helped raise over $100M to build the first holographic computer."
+        },
+        {
+          "question": "What is Ryan Pamplin best known for?",
+          "answer": "He is best known as the co-founder and CEO of BlendJet, and for his advertising work, which includes an EMMY nomination and a Cannes Film Festival award."
+        }
+      ]
+    },
+    {
+      "slug": "dag-kittlaus",
+      "name": "Dag Kittlaus",
+      "title": "Former Co-Founder of Siri and Viv Labs, Co-founder/CEO of Riva Health",
+      "best_for": [
+        "Voice technology and AI assistant audiences",
+        "Digital health and med-tech audiences",
+        "Startup founder and entrepreneurship events",
+        "Technology innovation history audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Dag Kittlaus a good fit for digital health events?",
+          "answer": "Yes. He is co-founder and CEO of Riva, a med-tech company using mobile technology and AI to improve hypertension management, in addition to his background in voice technology."
+        },
+        {
+          "question": "What makes Dag Kittlaus different from other AI speakers?",
+          "answer": "He co-founded both Siri, acquired by Apple in 2010, and Viv, acquired by Samsung in 2016, giving him a firsthand perspective on building and selling foundational AI assistant technology. He also has over a decade of experience in consumer wireless internet at companies including Telenor Mobile and Motorola."
+        },
+        {
+          "question": "What is Dag Kittlaus best known for?",
+          "answer": "He is best known as the co-founder and CEO of Siri, the world's first virtual personal assistant, and later of Viv, an AI platform acquired by Samsung."
+        }
+      ]
+    },
+    {
+      "slug": "jamie-metzl",
+      "name": "Jamie Metzl",
+      "title": "Technology Futurist, Geopolitics Expert, Entrepreneur, Sci-Fi Novelist, Keynote Speaker",
+      "best_for": [
+        "Medical and healthcare conferences",
+        "Biotechnology and genetic engineering audiences",
+        "Geopolitics and policy forums",
+        "University and academic audiences",
+        "Future of humanity and bioethics discussions"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Jamie Metzl a good fit for medical conferences?",
+          "answer": "Yes. He has delivered a keynote to 500 doctors at a major medical convention on where medicine is heading, and he served on the World Health Organization's expert advisory committee on human genome editing. His bestseller \"Hacking Darwin\" focuses on genetic engineering and the future of humanity."
+        },
+        {
+          "question": "What makes Jamie Metzl different from other AI speakers?",
+          "answer": "He combines a background in government and international affairs, including roles on the U.S. National Security Council and State Department, with expertise in biotechnology and genetics, and is known for his advocacy around investigating COVID-19's origins, including testimony at March 2023 congressional hearings."
+        },
+        {
+          "question": "What is Jamie Metzl best known for?",
+          "answer": "He is best known for his bestselling book \"Hacking Darwin: Genetic Engineering and the Future of Humanity\" and for his work at the intersection of biotechnology, geopolitics, and policy."
+        }
+      ]
+    },
+    {
+      "slug": "shama-hyder",
+      "name": "Shama Hyder",
+      "title": "AI, Business Growth & Innovation Speaker | Strategic Urgency Expert",
+      "best_for": [
+        "Executive leadership audiences on AI adoption",
+        "Sales and B2B marketing conferences",
+        "Women in industry and women's leadership events",
+        "Fortune 500 corporate closing keynotes",
+        "Digital marketing and brand strategy audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Shama Hyder a good fit for closing keynote slots?",
+          "answer": "Yes, based on client feedback. A past client (PIMA) described her as \"THE BEST Closing Speaker,\" and another client noted her session was engaging, interactive, and delivered tangible takeaways for attendees."
+        },
+        {
+          "question": "What makes Shama Hyder different from other AI speakers?",
+          "answer": "She is a working CEO, not just a consultant, having founded and scaled Zen Media, a global B2B consultancy serving Fortune 500 brands, and she was named one of the \"Top 100 Entrepreneurs in North America\" by the White House and United Nations. Her keynotes use her own Strategic Urgency framework to translate AI trends into actionable business strategy."
+        },
+        {
+          "question": "What is Shama Hyder best known for?",
+          "answer": "She is known for helping CEOs and leaders turn AI and digital innovation into real business growth, having delivered keynotes to organizations such as NASA, Yale, Microsoft, Chase, Toyota, Mastercard, and Disney across 26 countries."
+        }
+      ]
+    },
+    {
+      "slug": "max-sills",
+      "name": "Max Sills",
+      "title": "General Counsel of Midjourney",
+      "best_for": [
+        "Legal and compliance professional audiences",
+        "Generative AI industry and policy events",
+        "Technology regulation and IP-focused conferences",
+        "In-house counsel and corporate legal audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Max Sills a good fit for legal or compliance-focused events?",
+          "answer": "Yes. He is General Counsel of Midjourney and has built his career around intellectual property, open-source law, and technology regulation, including prior roles at Google, Leap Motion, and Block."
+        },
+        {
+          "question": "What makes Max Sills different from other AI speakers?",
+          "answer": "He combines legal and technical expertise, having worked as both a software engineer and attorney at Leap Motion, and brings direct experience advising a leading generative AI company as General Counsel of Midjourney, alongside earlier roles at the World Intellectual Property Organization, the UN, and the SEC."
+        },
+        {
+          "question": "What is Max Sills best known for?",
+          "answer": "He is known for his work at the intersection of law and emerging technology, including his current role as General Counsel of Midjourney and his experience leading open patent and IP licensing initiatives in the crypto space."
+        }
+      ]
+    },
+    {
+      "slug": "robin-farmanfarmaian",
+      "name": "Robin Farmanfarmaian",
+      "title": "Serial Healthcare Entrepreneur",
+      "best_for": [
+        "Healthcare payer and provider conferences",
+        "Pharmaceutical and life sciences audiences",
+        "Patient advocacy events",
+        "Digital health innovation and startup audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Robin Farmanfarmaian a good fit for healthcare industry conferences?",
+          "answer": "Yes. She has delivered more than 250 keynotes in 16 countries to major healthcare stakeholders including UnitedHealthcare, Harvard's Mass General Hospital, Stanford Hospital, Roche, Kaiser, Humana, and Boston Scientific."
+        },
+        {
+          "question": "What makes Robin Farmanfarmaian different from other AI speakers?",
+          "answer": "She is a serial healthcare entrepreneur actively involved in multiple early-stage AI health companies, including a generative AI medical scribe (ChiroScript AI) and a portable AI-driven ultrasound for breast cancer detection (iSono Health), and she is the author of four books including \"How AI Can Democratize Healthcare.\""
+        },
+        {
+          "question": "What is Robin Farmanfarmaian best known for?",
+          "answer": "She is known for making complex healthcare technology understandable and actionable for stakeholders across the healthcare ecosystem, and for her book \"The Patient as CEO.\""
+        }
+      ]
+    },
+    {
+      "slug": "simon-pierro",
+      "name": "Simon Pierro",
+      "title": "World Renowned AI Magician",
+      "best_for": [
+        "Corporate entertainment and event openers/closers",
+        "Technology and innovation-themed conferences",
+        "Marketing and advertising audiences seeking memorable entertainment",
+        "Product launches and trade show entertainment"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What makes Simon Pierro different from other AI/tech speakers?",
+          "answer": "Simon Pierro is a magician who blends traditional sleight-of-hand with technology, particularly iPad-based illusions, creating a genre-defining act rather than a traditional business keynote. Over two decades he has drawn more than 80 million viewers to his online videos and YouTube channel."
+        },
+        {
+          "question": "What is Simon Pierro best known for?",
+          "answer": "He is known as a pioneer of iPad magic, integrating tablets into illusions to create a new performance genre. He has also been a regular presence on German television, including \"Verstehen Sie Spaß?\" and his breakthrough appearance on \"Menschen der Woche.\""
+        },
+        {
+          "question": "Is Simon Pierro a good fit for a technology-themed corporate event?",
+          "answer": "Yes. His act sits at the intersection of digital magic and technology entertainment, making him suited to corporate events, product launches, and technology conferences looking for a memorable entertainment element rather than a traditional educational keynote."
+        }
+      ]
+    },
+    {
+      "slug": "brittany-hodak",
+      "name": "Brittany Hodak",
+      "title": "Expert on Customer Success and Creating Superfans",
+      "best_for": [
+        "Customer experience and loyalty-focused conferences",
+        "Retail, e-commerce, and franchise/hospitality audiences",
+        "Marketing and brand advocacy teams",
+        "Entrepreneurship and business growth audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Brittany Hodak a good fit for a franchise or hospitality conference?",
+          "answer": "Yes. She has spoken at franchise conventions such as Mathnasium's and worked with hospitality groups like Eat'n Park Hospitality Group, both of which highlighted her research and storytelling. Her core topics of customer loyalty and experience strategy translate well to franchise and hospitality audiences focused on customer advocacy."
+        },
+        {
+          "question": "What makes Brittany Hodak different from other customer experience speakers?",
+          "answer": "She created the SUPER Model™ framework for turning customers into \"superfans,\" detailed in her book Creating Superfans, which Forbes said any business with customers needs to read. She also built and scaled her own entertainment agency to eight figures, working with clients such as KISS, Taylor Swift, and Dolly Parton, and Fortune 100 brands including Walmart, Disney, Amazon, and Johnson & Johnson."
+        },
+        {
+          "question": "What is Brittany Hodak best known for?",
+          "answer": "She is best known as the author of Creating Superfans and creator of the SUPER Model framework for customer experience. She is also known for founding and scaling an entertainment agency that created 250 collectibles selling more than 10 million copies worldwide, and for appearing on Shark Tank, where she received four investment offers."
+        }
+      ]
+    },
+    {
+      "slug": "cassie-kozyrkov",
+      "name": "Cassie Kozyrkov",
+      "title": "CEO of Kozyr, AI Luminary, Former Chief Decision Scientist at Google, and Pioneer of Decision Intelligence",
+      "best_for": [
+        "Executive and C-suite leadership audiences",
+        "AI strategy and data-driven decision-making conferences",
+        "Financial services, healthcare, and consumer goods industry events",
+        "Large international conferences and general business audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Cassie Kozyrkov a good fit for a non-technical executive audience?",
+          "answer": "Yes. She is known for making complex AI and decision-making concepts accessible for both executive and general audiences, combining deep technical knowledge with theater-trained charisma. As Google's first Chief Decision Scientist, she personally trained over 20,000 Googlers across technical and non-technical roles."
+        },
+        {
+          "question": "What makes Cassie Kozyrkov different from other AI speakers?",
+          "answer": "She founded the field of Decision Intelligence and helped lead Google's AI-first transformation as its first Chief Decision Scientist. She has since advised organizations including Gucci, NASA, Spotify, Meta, and GSK on AI strategy, and sits on the Innovation Advisory Council of the Federal Reserve Bank of New York."
+        },
+        {
+          "question": "What is Cassie Kozyrkov best known for?",
+          "answer": "She is best known for pioneering Decision Intelligence and for her tenure as Google's first Chief Decision Scientist, where her live workshops were so in demand that Google used lotteries to manage attendance. She has spoken in more than 40 countries on all seven continents, including at the United Nations, World Economic Forum, Web Summit, and SXSW."
+        }
+      ]
+    },
+    {
+      "slug": "dan-russell",
+      "name": "Dan Russell",
+      "title": "Former Principal UX Researcher at Google, Author of “The Joy of Search”, and Research Scientist",
+      "best_for": [
+        "Academic and research-oriented audiences",
+        "Search technology and information science conferences",
+        "UX and human-computer interaction communities",
+        "Education technology audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Dan Russell a good fit for an academic or research-focused audience?",
+          "answer": "Yes. He spent his career in information science research roles at Xerox, PARC, and Apple's Advanced Technology Group, and has also worked as an adjunct lecturer in academia, giving him a strong fit for university and research-oriented audiences."
+        },
+        {
+          "question": "What is Dan Russell best known for?",
+          "answer": "He is known for decades of research on how people search for and make sense of complex information, and for authoring \"The Joy of Search.\" His technical career spans research on human-computer interfaces, sensemaking, and intelligent agents at organizations including Xerox, PARC, and Apple."
+        },
+        {
+          "question": "What makes Dan Russell different from other AI/tech speakers?",
+          "answer": "His background is in information science and search research rather than business strategy, with a Ph.D. from the University of Rochester and decades spent studying how people use large, complex information collections. This gives his talks a research-grounded perspective on search, HCI, and AI ethics."
+        }
+      ]
+    },
+    {
+      "slug": "joan-bajorek",
+      "name": "Dr. Joan Palmiter Bajorek",
+      "title": "CEO of Clarity AI, AI Expert, Keynote Speaker",
+      "best_for": [
+        "Voice AI and conversational AI industry events",
+        "Enterprise software and Fortune 500 audiences",
+        "Financial services and marketing/advertising conferences",
+        "Virtual conferences and large-scale event formats"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Joan Bajorek a good fit for a virtual conference?",
+          "answer": "Yes. She has experience delivering virtual sessions, including speaking for Deutsche Telekom's virtual Mobile World Congress session, where she was noted for immediately captivating the audience with a lively, engaging style."
+        },
+        {
+          "question": "What makes Joan Bajorek different from other AI speakers?",
+          "answer": "She combines deep technical AI experience, including 10+ years building data and AI solutions for Fortune 500 clients and senior roles at Nuance and OneReach, with recognition as the #4 Influencer in Voice AI by Voicebot.ai. She is also the author of the Amazon bestselling book \"Your AI Roadmap\" and host of a companion podcast featuring AI builders from companies like Google, Amazon, and Microsoft."
+        },
+        {
+          "question": "What is Joan Bajorek best known for?",
+          "answer": "She is best known for her expertise in conversational and voice AI, holding a PhD in Conversational AI from the University of Arizona and having held senior roles at Nuance and OneReach. She currently serves as CEO of Clarity AI and is the author of the bestselling book \"Your AI Roadmap.\""
+        }
+      ]
+    },
+    {
+      "slug": "gary-bolles",
+      "name": "Gary Bolles",
+      "title": "Catalytic Speaker on The Future of Work, Learning, and Leading",
+      "best_for": [
+        "Board and executive leadership audiences on AI strategy",
+        "HR and organizational development conferences",
+        "Future of work and workforce transformation events",
+        "Learning and development (L&D) audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Gary Bolles a good fit for a board or executive session on AI?",
+          "answer": "Yes. One of his signature topics is \"What Your Board Needs to Know About AI,\" and he also speaks on leading in the age of AI and building adaptive organizations, making him suited to board-level and executive leadership audiences."
+        },
+        {
+          "question": "What makes Gary Bolles different from other future-of-work speakers?",
+          "answer": "He is the author of \"The Next Rules of Work\" and serves as adjunct Chair for the Future of Work at Singularity University, giving him both a research and applied consulting foundation through his firm Charrette LLC. His talks combine AI, organizational adaptability, and HR/learning transformation rather than focusing on AI technology alone."
+        },
+        {
+          "question": "What is Gary Bolles best known for?",
+          "answer": "He is best known for his work on the future of work, learning, and organizational leadership, including his book \"The Next Rules of Work.\" A client from CoachHub also noted his effectiveness moderating a client roundtable in addition to keynoting."
+        }
+      ]
+    },
+    {
+      "slug": "katie-mcmahon",
+      "name": "Katie McMahon",
+      "title": "Former VP at Shazam, President & COO at Native Voice",
+      "best_for": [
+        "Voice technology and audio AI audiences",
+        "Music and consumer tech industry events",
+        "Startup and early-stage tech leadership audiences",
+        "Responsible and ethical AI discussions",
+        "Mobile technology and product strategy conferences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What makes Katie McMahon different from other AI speakers?",
+          "answer": "Katie McMahon brings direct operating experience building voice and sound-recognition technology, including her role at SoundHound launching the Hound app and Houndify platform, and as Vice President of Business Development at Shazam, where the app grew to 2 billion installs and 70 billion queries before its acquisition by Apple. She also serves on the Berryville Institute of Machine Learning, which focuses on safe and ethical AI development."
+        },
+        {
+          "question": "Is Katie McMahon a good fit for startup or venture audiences?",
+          "answer": "Yes. She currently advises and consults for multiple early-stage tech companies, including Neosensory, Native Voice, Valence Vibrations, NatureQuant, Wia, and Brainbaby Inc., helping them reach product-market fit and mass-market adoption."
+        },
+        {
+          "question": "What is Katie McMahon best known for?",
+          "answer": "She is best known for pioneering work in sound recognition and natural language understanding, including her roles at SoundHound and at Shazam through its rise to 2 billion installs and its acquisition by Apple."
+        }
+      ]
+    },
+    {
+      "slug": "tee-ganbold",
+      "name": "Tee Ganbold",
+      "title": "Global tech leader and former ConsenSys and Cambridge Analytica executive, now building cyber-secure sovereign AI infrastructure for frontier markets.",
+      "best_for": [
+        "Government and public sector technology audiences",
+        "Geopolitics and AI policy conferences",
+        "Financial services and government finance events",
+        "Web3/blockchain and emerging markets technology audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Tee Ganbold a good fit for a government or public sector audience?",
+          "answer": "Yes. She is Co-Founder and CEO of FrontierOne AI, which builds sovereign AI infrastructure for governments in frontier markets, and has roughly a decade of experience working directly with government officials and decision makers on technology deployment."
+        },
+        {
+          "question": "What makes Tee Ganbold different from other AI speakers?",
+          "answer": "Her background spans two major technology shifts: she held a senior commercial role at Cambridge Analytica during the period around the 2016 US election, and was later recruited by Ethereum co-founder Joe Lubin to lead global business development at ConsenSys, deploying Ethereum across government and enterprise. She now applies that experience to building sovereign AI infrastructure for national governments."
+        },
+        {
+          "question": "What is Tee Ganbold best known for?",
+          "answer": "She is best known for her work at the intersection of AI, government policy, and infrastructure as Co-Founder and CEO of FrontierOne AI. Earlier in her career she held key commercial roles at Cambridge Analytica and ConsenSys, companies central to the adoption of data science in politics and web3/blockchain technology, respectively."
+        }
+      ]
+    },
+    {
+      "slug": "ben-parr",
+      "name": "Ben Parr",
+      "title": "AI Founder, Investor, Columnist, and Co-Founder of Octane AI",
+      "best_for": [
+        "E-commerce and retail technology conferences",
+        "Startup, venture capital, and entrepreneurship audiences",
+        "Marketing psychology and brand engagement events",
+        "AI product and technology investment audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Ben Parr a good fit for an entrepreneurship or venture capital audience?",
+          "answer": "Yes. He is Co-Founder and President of Octane AI, an AI ecommerce platform backed by General Catalyst and Bullpen, and Managing Partner of Theory Forge Ventures, a venture fund investing in AI-native startups, giving him direct founder and investor experience to draw on."
+        },
+        {
+          "question": "What makes Ben Parr different from other AI speakers?",
+          "answer": "He combines an active operating role as an AI startup founder with a media and research background, having written over 2,400 articles as Editor-at-Large of Mashable and authored \"Captivology,\" named the top marketing book of 2015 by Strategy+Business Magazine. Clients have noted his engaging delivery and ability to make attention and engagement feel like an approachable science."
+        },
+        {
+          "question": "What is Ben Parr best known for?",
+          "answer": "He is best known as the author of \"Captivology: The Science of Capturing People's Attention\" and as Co-Founder of Octane AI, an ecommerce AI platform. He is also an AI columnist for The Information and writes the newsletter The AI Analyst."
+        }
+      ]
+    },
+    {
+      "slug": "chris-duffey",
+      "name": "Chris Duffey",
+      "title": "Growth Marketer, Tech Futurist, & Best Selling Author",
+      "best_for": [
+        "Marketing and advertising industry conferences",
+        "Creative technology and digital transformation audiences",
+        "Brand strategy and CMO-level audiences",
+        "Emerging technology (AI, AR/VR, metaverse) themed events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Chris Duffey a good fit for a marketing or advertising audience?",
+          "answer": "Yes. He serves on the Board of Directors for the Association of National Advertisers NY and works at Adobe on Creative Cloud strategic development partnerships, with topics centered on AI in marketing, brand strategy, and digital transformation."
+        },
+        {
+          "question": "What makes Chris Duffey different from other tech futurist speakers?",
+          "answer": "He is the author of \"Superhuman Innovation,\" described as the first book co-authored by AI, and \"Decoding the Metaverse.\" His expertise spans a broad range of emerging technologies including AI, AR, VR, XR, the metaverse, and blockchain, rather than a single specialty."
+        },
+        {
+          "question": "What is Chris Duffey best known for?",
+          "answer": "He is known as Adobe's spearhead for Creative Cloud strategic development partnerships and for his books \"Superhuman Innovation\" and \"Decoding the Metaverse.\" His work has been featured in over 200 media outlets, including the Wall Street Journal, The Economist, and Inc."
+        }
+      ]
+    },
+    {
+      "slug": "sonal-gupta",
+      "name": "Sonal Gupta",
+      "title": "Principal Engineer (Director) at Google,  Former Senior Engineering Manager at Meta",
+      "best_for": [
+        "Technical, product, and engineering audiences",
+        "Generative AI and large language model conferences",
+        "AR/VR and consumer electronics industry events",
+        "AI research and technical leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Sonal Gupta a good fit for a technical, engineering-heavy audience?",
+          "answer": "Yes. She is a Principal Engineer (Director) at Google and former Senior Engineering Manager at Meta with a Ph.D. in NLP from Stanford, and her talks draw on hands-on experience building generative AI and large language model products, making her well suited to technical and product/engineering audiences."
+        },
+        {
+          "question": "What makes Sonal Gupta different from other generative AI speakers?",
+          "answer": "She has built GenAI products at both Meta and Google, including directing a text-to-video generation milestone at Meta's FAIR research group and leading the team behind Meta's first GenAI media product. She was also a founding member of the Facebook Assistant team for AR/VR devices and is currently working on Google Gemini."
+        },
+        {
+          "question": "What is Sonal Gupta best known for?",
+          "answer": "She is best known for her work building generative AI and large language model products at Meta and Google, including Meta's first GenAI media product and her current role on Google Gemini. She earned an Outstanding Paper award at ACL for her NLP research."
+        }
+      ]
+    },
+    {
+      "slug": "tatyana-mamut",
+      "name": "Tatyana Mamut",
+      "title": "CEO and Founder of Wayfound, Former Chief Product Officer at Nextdoor, General Manager at Amazon, and VP of Product Experience at Salesforce",
+      "best_for": [
+        "Product and technology executive audiences",
+        "AI agent strategy and adoption events",
+        "Customer experience and product leadership summits",
+        "Innovation leadership conferences",
+        "Social media and platform business audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Tatyana Mamut best known for?",
+          "answer": "Tatyana Mamut is best known for her product leadership roles at major tech companies including Amazon, Salesforce, and Nextdoor, and for currently serving as CEO of Wayfound, a company that helps businesses build, test, and launch AI agents. At Nextdoor, she led a product and brand transformation that increased engagement by 60% and reduced toxic content on the platform."
+        },
+        {
+          "question": "What makes Tatyana Mamut different from other AI speakers?",
+          "answer": "Tatyana Mamut combines hands-on AI agent building experience as CEO of Wayfound with a background in cultural anthropology, holding a PhD from UC Berkeley, which gives her talks a human-centered, empathetic-leadership angle. She also draws on senior product roles at Amazon, Salesforce, and IDEO to speak to both innovation strategy and organizational design."
+        },
+        {
+          "question": "Is Tatyana Mamut a good fit for product and customer experience audiences?",
+          "answer": "Yes. Her career includes VP of Product Experience at Salesforce's IoT Cloud, Chief Product Officer at Nextdoor, and General Manager at Amazon Web Services, giving her direct experience leading product and customer experience functions at scale."
+        }
+      ]
+    },
+    {
+      "slug": "dan-lohrmann",
+      "name": "Dan Lohrmann",
+      "title": "Field Chief information Security Officer for Public Sector at Presidio",
+      "best_for": [
+        "Government and public sector technology audiences",
+        "Cybersecurity leadership conferences",
+        "State and local government IT events",
+        "Higher education technology and security programs"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Dan Lohrmann a good fit for government or public sector audiences?",
+          "answer": "Yes. He spent over a decade in Michigan state government as CSO, CTO, and CISO, and currently serves as Field CISO for the Public Sector at Presidio advising government clients. A university testimonial notes his \"Smart Cities, IoT, and Security\" talk drew a large crowd at an Equity Project event."
+        },
+        {
+          "question": "What makes Dan Lohrmann different from other cybersecurity speakers?",
+          "answer": "He combines over three decades of hands-on cybersecurity leadership in both government and industry with an active publishing career, including co-authoring the Amazon best-seller \"Cyber Mayday and the Day After.\" He also mentors junior security executives and serves as adjunct faculty at multiple universities."
+        },
+        {
+          "question": "What is Dan Lohrmann best known for?",
+          "answer": "Dan Lohrmann is best known for his cybersecurity leadership in Michigan state government and his current role as Field CISO for the Public Sector at Presidio, as well as for authoring multiple books on cybersecurity and technology, including the Amazon best-seller \"Cyber Mayday and the Day After.\""
+        }
+      ]
+    },
+    {
+      "slug": "charlene-li",
+      "name": "Charlene Li",
+      "title": "Author, Advisor, and Executive Coach",
+      "best_for": [
+        "Executive audiences on digital transformation",
+        "Financial services and retail strategy conferences",
+        "Fortune 100 corporate strategy events",
+        "Generative AI strategy audiences",
+        "Change management and leadership development programs"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Charlene Li best known for?",
+          "answer": "Charlene Li is best known as the author of six books, including the New York Times bestseller \"Open Leadership\" and the bestseller \"The Disruption Mindset,\" and for founding Altimeter, a disruptive analyst firm acquired in 2015. She has advised hundreds of companies, including Adobe and Southwest Airlines, and provided insights to 49 of the Fortune 100."
+        },
+        {
+          "question": "Is Charlene Li a good fit for financial services or retail audiences?",
+          "answer": "Yes. Her industry experience spans financial services and retail among other sectors, and she has advised companies across a broad range of industries on digital transformation and business strategy."
+        },
+        {
+          "question": "What makes Charlene Li different from other AI strategy speakers?",
+          "answer": "Charlene Li brings two decades of experience advising major corporations on digital transformation and disruption, backed by a track record of bestselling books. She is currently working on a new book, \"Winning with Generative AI,\" reflecting her ongoing focus on generative AI strategy."
+        }
+      ]
+    },
+    {
+      "slug": "allie-k-miller",
+      "name": "Allie Miller",
+      "title": "Former Global Head of Machine Learning For Startups and Venture Capital at Amazon (AWS)",
+      "best_for": [
+        "Venture capital and startup ecosystem audiences",
+        "Enterprise AI strategy conferences",
+        "Women in tech and diversity-focused programs",
+        "Machine learning business leadership events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Allie Miller best known for?",
+          "answer": "Allie Miller is best known for her role as Global Head of Machine Learning Business Development for Startups and Venture Capital at Amazon (AWS), where she grew her division into a 100-person, 10-figure organization, and for being the youngest-ever woman at IBM to lead the development of an AI product."
+        },
+        {
+          "question": "Is Allie Miller a good fit for venture capital or startup audiences?",
+          "answer": "Yes. She led machine learning business development for startups and venture capital at Amazon (AWS), advised ML researchers and founders, and is an active angel investor in machine learning startups."
+        },
+        {
+          "question": "What makes Allie Miller different from other AI speakers?",
+          "answer": "Allie Miller combines corporate AI leadership at Amazon and IBM with an active public voice in the field, having authored more than 10 guidebooks on AI, addressed the European Commission, and been named LinkedIn Top Voice for Technology and AI for five consecutive years. She also founded The AI Pipeline and co-founded Girls of the Future to promote diversity and education in AI."
+        }
+      ]
+    },
+    {
+      "slug": "david-ewing-duncan",
+      "name": "David Ewing Duncan",
+      "title": "Award-Winning Journalist, Entrepreneur & Author",
+      "best_for": [
+        "Healthcare and life sciences innovation conferences",
+        "Digital health and biotechnology audiences",
+        "Media and journalism industry events",
+        "Future of medicine executive summits"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is David Ewing Duncan best known for?",
+          "answer": "David Ewing Duncan is best known as an award-winning journalist and author of 12 books who has written for publications such as Vanity Fair, Wired, and The New York Times, focusing on life sciences, biotechnology, and AI. He was also among the first people to be genetically sequenced, an experience that led to his book \"Experimental Man.\""
+        },
+        {
+          "question": "Is David Ewing Duncan a good fit for healthcare and life sciences audiences?",
+          "answer": "Yes. He is CEO and co-founder of Arc Fusion, where he curates global events at the intersection of health, biomedicine, and technology, and he has served as a health strategist-in-residence at IDEO focused on healthcare innovation."
+        },
+        {
+          "question": "What makes David Ewing Duncan different from other health technology speakers?",
+          "answer": "He brings a journalist's storytelling background, having produced and reported for programs like Nightline and Morning Edition and written 12 books, combined with firsthand experience as one of the first people to have his genome sequenced."
+        }
+      ]
+    },
+    {
+      "slug": "sounil-yu",
+      "name": "Sounil Yu",
+      "title": "Author, CISO, and Former CSS at Bank of America",
+      "best_for": [
+        "Financial services cybersecurity conferences",
+        "Enterprise security leadership summits",
+        "AI security and risk management audiences",
+        "Cybersecurity practitioner and information-sharing events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Sounil Yu best known for?",
+          "answer": "Sounil Yu is best known for creating the Cyber Defense Matrix and the DIE Resiliency Framework, two widely referenced cybersecurity models, and for his three-decade career including roles as Chief Security Scientist at Bank of America and CISO and Head of Research at JupiterOne. He also holds 22 granted patents."
+        },
+        {
+          "question": "Is Sounil Yu a good fit for financial services audiences?",
+          "answer": "Yes. He served as Chief Security Scientist at Bank of America, and a testimonial notes his presentations were consistently \"must-see\" at FS-ISAC, the financial services information sharing and analysis center's events."
+        },
+        {
+          "question": "What makes Sounil Yu different from other cybersecurity speakers?",
+          "answer": "Sounil Yu combines deep practitioner experience, including CISO roles at JupiterOne and YL Ventures and Chief Security Scientist at Bank of America, with original framework development, having created the Cyber Defense Matrix and DIE Resiliency Framework used across the industry."
+        }
+      ]
+    },
+    {
+      "slug": "zac-cramer-",
+      "name": "Zac Cramer",
+      "title": "IT Business Owner, Certified EOS Implementer, & AI Practitioner",
+      "best_for": [
+        "Small business owner and entrepreneur audiences",
+        "AI adoption and ROI-focused business events",
+        "Leadership accountability and EOS-focused programs",
+        "IT and technology business leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Zac Cramer best known for?",
+          "answer": "Zac Cramer is best known for growing his company, IT Assurance, from $6K to $830K in monthly revenue, and for his direct, no-nonsense approach to leadership and accountability as a Certified EOS Implementer. His talks focus on why most AI projects fail and how businesses can get practical ROI from AI."
+        },
+        {
+          "question": "Is Zac Cramer a good fit for small business or entrepreneur audiences?",
+          "answer": "Yes. As an IT business owner who grew his own company and has been a Certified EOS Implementer since 2019, he speaks from firsthand experience guiding leadership teams through the practical challenges business owners face, including AI adoption."
+        },
+        {
+          "question": "What makes Zac Cramer different from other AI speakers?",
+          "answer": "Zac Cramer speaks candidly and directly about entrepreneurship and leadership mistakes, drawing on his own experience building IT Assurance and changing his conflict-avoidant leadership habits, rather than presenting AI purely as an abstract or technical topic."
+        }
+      ]
+    },
+    {
+      "slug": "roman-yampolskiy",
+      "name": "Roman Yampolskiy",
+      "title": "AI Safety Researcher & Professor, University of Louisville",
+      "best_for": [
+        "AI safety and risk-focused conferences",
+        "Academic and research audiences",
+        "Technology ethics panels",
+        "Mixed public audiences on the future of AI"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Roman Yampolskiy best known for?",
+          "answer": "Dr. Roman Yampolskiy is best known for his research on AI safety and the risks associated with superintelligent systems, including his work on the limits of AI control. He is a faculty member at the University of Louisville and has authored numerous publications on AI and AGI safety."
+        },
+        {
+          "question": "Is Roman Yampolskiy a good fit for academic or general audiences?",
+          "answer": "Yes. His bio notes he addresses academic audiences, industry professionals, and the general public alike, and he is known for explaining complex AI safety and cybersecurity concepts in an accessible, thought-provoking, and humorous way."
+        },
+        {
+          "question": "What makes Roman Yampolskiy different from other AI speakers?",
+          "answer": "Roman Yampolskiy focuses specifically on AI safety and control, an area he has researched extensively as a computer science professor, rather than general AI strategy or business applications. He has also been featured on podcasts such as The AI Safety Expert, Future of Humanity, and Tech Ethics Today."
+        }
+      ]
+    },
+    {
+      "slug": "brad-templeton",
+      "name": "Brad Templeton",
+      "title": "Speaker & Consultant on Robocars and Exponential Technology",
+      "best_for": [
+        "Automotive and transportation technology conferences",
+        "Autonomous vehicle industry events",
+        "Internet history and technology policy audiences",
+        "Exponential technology and futurist conferences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Brad Templeton best known for?",
+          "answer": "Brad Templeton is best known as the founder of ClariNet Communications Corp., recognized as the first ever \".com\" company, and for his later work as a consultant on self-driving cars, including with Google's autonomous vehicle team."
+        },
+        {
+          "question": "Is Brad Templeton a good fit for automotive or transportation technology audiences?",
+          "answer": "Yes. He has consulted on robotic cars, including with Google's self-driving car team, covered transportation at Forbes.com, and has written extensively on self-driving cars through essays and a dedicated blog."
+        },
+        {
+          "question": "What makes Brad Templeton different from other technology speakers?",
+          "answer": "Brad Templeton pairs early internet pioneer credentials, having founded the first \".com\" company and served as Chairman Emeritus of the Electronic Frontier Foundation, with deep specialization in autonomous vehicles and robocars, giving him perspective spanning multiple technology eras."
+        }
+      ]
+    },
+    {
+      "slug": "shawna-pandya",
+      "name": "Dr. Shawna Pandya",
+      "title": "Physician, Astronaut, Aquanaut, & Explorer",
+      "best_for": [
+        "Healthcare and medical innovation conferences",
+        "Resilience and inspiration-focused keynotes",
+        "Space and aerospace industry events",
+        "Conference closing keynotes"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Dr. Shawna Pandya best known for?",
+          "answer": "Dr. Shawna Pandya is best known as a physician and Canada's first named female commercial astronaut, with a career spanning space medicine, aquanaut missions, and extreme environment research. She has completed 17 parabolic flight campaigns and logged over 235 hours underwater during aquanaut missions."
+        },
+        {
+          "question": "Is Dr. Shawna Pandya a good fit for a conference closing keynote?",
+          "answer": "Yes. One event organizer noted her talk was \"the perfect way to close out the conference\" after a day of education, describing it as inspirational and highly engaging for the audience."
+        },
+        {
+          "question": "What makes Dr. Shawna Pandya different from other healthcare speakers?",
+          "answer": "She combines a medical career with firsthand extreme-environment experience as an astronaut and aquanaut, including testing a commercial spacesuit in zero-gravity and serving as Director of the IIAS Space Medicine Group, giving her talks on resilience and innovation a first-person, experiential grounding."
+        }
+      ]
+    },
+    {
+      "slug": "vicki-reyzelman",
+      "name": "Vicki Reyzelman",
+      "title": "Generative AI and Architecture Lead for UKG, Founder of Chat About AI Videocast",
+      "best_for": [
+        "Enterprise AI architecture and cloud computing audiences",
+        "Generative AI strategy conferences",
+        "Product management and technology leadership events",
+        "Enterprise software and SaaS industry audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Vicki Reyzelman best known for?",
+          "answer": "Vicki Reyzelman is best known for leading the Architecture Advisory Team at UKG, where she applies generative AI, including Vertex AI, to solve enterprise challenges through product planning and architecture best practices. She also developed an AI-powered grant application system that led to a 40% increase in grant applications, and holds a patent for search assistant technology from her time at Yahoo!."
+        },
+        {
+          "question": "Is Vicki Reyzelman a good fit for enterprise software and cloud computing audiences?",
+          "answer": "Yes. Her career spans enterprise architecture and cloud roles at UKG, MuleSoft (Salesforce), Salesloft, and Akamai Technologies, giving her direct experience with enterprise software, APIs, and cloud infrastructure."
+        },
+        {
+          "question": "What makes Vicki Reyzelman different from other generative AI speakers?",
+          "answer": "Vicki Reyzelman combines current hands-on generative AI architecture work at UKG with a track record of measurable business outcomes, such as a 40% increase in grant applications from an AI-powered system she developed, and a patent in search assistant technology from Yahoo!."
+        }
+      ]
+    },
+    {
+      "slug": "rafael-grossmann",
+      "name": "Rafael Grossmann",
+      "title": "Surgeon, Digital Health Innovator, & Educator",
+      "best_for": [
+        "Healthcare and hospital leadership audiences",
+        "Medical technology and digital health conferences",
+        "Surgical and clinical education events",
+        "Telemedicine and healthcare AI audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Rafael Grossmann best known for?",
+          "answer": "Dr. Grossmann is known for performing the first surgery using Google Glass in 2013, a milestone in surgical innovation. He remains a full-time general and trauma surgeon and has become a global healthtech speaker, consultant, and multi-time TEDx participant."
+        },
+        {
+          "question": "Is Rafael Grossmann a good fit for a healthcare innovation event?",
+          "answer": "Yes. His talks cover AI, medical extended reality, robotics, telehealth, and remote presence, and are aimed at clinicians, patients, industry, regulators, and administrators alike."
+        },
+        {
+          "question": "What makes Rafael Grossmann different from other AI speakers?",
+          "answer": "Unlike many AI speakers, he remains a full-time practicing surgeon, giving his talks on healthcare AI and digital surgery a hands-on clinical perspective drawn from his own operating room experience."
+        }
+      ]
+    },
+    {
+      "slug": "stefano-bini",
+      "name": "Stefano Bini",
+      "title": "Academic Surgeon, AI Researcher, Digital Orthopaedics Advocate, and Technology Advisor",
+      "best_for": [
+        "Orthopedic and surgical specialty conferences",
+        "Healthcare technology and digital health leadership audiences",
+        "Medical device and surgical robotics events",
+        "Academic medicine and research audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Stefano Bini best known for?",
+          "answer": "Dr. Bini is a Professor of Orthopedic Surgery at UCSF known for pioneering personalized arthroplasty techniques in joint replacement and co-founding the Personalized Arthroplasty Society, which spans 30 countries. He also founded the Digital Orthopaedics Conference San Francisco (DOC SF)."
+        },
+        {
+          "question": "Is Stefano Bini a good fit for a digital health or medtech conference?",
+          "answer": "Yes. As UCSF's Orthopaedic Department Chief Technology Officer and Principal Investigator of the Digital Orthopaedics Lab, he has led research with Google applying machine learning to predict joint biomechanics from sensor data, and he chaired the Digital Health Committee for the American Association of Hip and Knee Surgeons."
+        },
+        {
+          "question": "What makes Stefano Bini different from other AI speakers?",
+          "answer": "He combines an active academic surgical practice with digital health leadership, holding roles as UCSF's Orthopaedic Department CTO, founder of a digital orthopaedics conference series, and recipient of the AAHKS Presidential Award."
+        }
+      ]
+    },
+    {
+      "slug": "chris-barton",
+      "name": "Chris Barton",
+      "title": "Founder and Creator of Shazam, Entrepreneur, Inventor, and Tech Investor",
+      "best_for": [
+        "Entrepreneurship and startup conferences",
+        "Innovation and technology keynotes",
+        "Consumer tech and mobile app industry events",
+        "Music and entertainment industry audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Chris Barton best known for?",
+          "answer": "Chris Barton is best known as the founder and creator of Shazam, the app that changed how the world discovers music and helped lay the groundwork for today's consumer AI industry. He also held early roles at Google and Dropbox and holds twelve patents."
+        },
+        {
+          "question": "Is Chris Barton a good fit for an entrepreneurship or innovation event?",
+          "answer": "Yes. His keynotes focus on innovation, eliminating friction, and creative persistence, using his own story of inventing Shazam to inspire audiences to pursue big ideas in the face of obstacles."
+        },
+        {
+          "question": "What makes Chris Barton different from other AI speakers?",
+          "answer": "Beyond his Shazam origin story, he is currently building Guard, a new venture applying AI to detect drowning in swimming pools, giving audiences a current example of applying AI to an overlooked problem."
+        }
+      ]
+    },
+    {
+      "slug": "jonathan-brill",
+      "name": "Jonathan Brill",
+      "title": "Jonathan Brill, ranked the world’s #1 futurist by Forbes, helps leaders anticipate disruption and invent What Happens Next™.",
+      "best_for": [
+        "Executive leadership and strategy summits",
+        "Futurism and innovation keynotes",
+        "Business transformation conferences",
+        "C-suite and board-level strategic planning events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Jonathan Brill best known for?",
+          "answer": "Jonathan Brill was ranked the world's #1 Futurist by Forbes and named \"the world's leading transformation architect\" by Harvard Business Review. He is the author of \"Rogue Waves,\" which examines how technological, geopolitical, economic and societal trends will transform industries."
+        },
+        {
+          "question": "Is Jonathan Brill a good fit for an executive strategy event?",
+          "answer": "Yes. His talks, including \"The Five-Year Future\" and \"AI on Your Org Chart,\" help leaders anticipate disruption over a five-year horizon, drawing on his experience as Global Futurist at HP and as Lab Chief of invention firms that created over 325 products generating more than $27 billion for customers."
+        },
+        {
+          "question": "What makes Jonathan Brill different from other AI speakers?",
+          "answer": "He pairs futurist credentials with hands-on invention experience, having served as a board member at one of the world's largest private intelligence agencies and as the only Western Senior Fellow at the HBR China New Growth Institute."
+        }
+      ]
+    },
+    {
+      "slug": "matthew-blakemore",
+      "name": "Matthew Blakemore",
+      "title": "CEO/Founder of AI Caramba! and Former Head of Product at BBFC (British Board of Film Classification)",
+      "best_for": [
+        "AI policy and regulation conferences",
+        "Media and entertainment industry events",
+        "Panel moderation and MC roles for AI-focused forums",
+        "Creative AI and digital innovation audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Matthew Blakemore best known for?",
+          "answer": "Matthew Blakemore is known for his work at the intersection of AI strategy and regulation, including his role on the Advisory Committee of the Innovate UK Bridge AI Program and as sub-editor of the ISO/IEC 8183 AI Data Lifecycle Standard. He was also honored with the U.K. Business Award for \"Tech Visionary.\""
+        },
+        {
+          "question": "Is Matthew Blakemore a good fit as a moderator or emcee for an AI event?",
+          "answer": "Yes. He has served as Master of Ceremonies for events such as the Swedish Chamber of Commerce's UK Tech Forum on \"Towards an AI enabled future,\" and a reviewer from Adobe specifically praised his moderating."
+        },
+        {
+          "question": "What makes Matthew Blakemore different from other AI speakers?",
+          "answer": "He combines a media and creative industries background, including using AI tools to produce short films shown at venues like the European Broadcasting Union, with formal standards-setting work through the ISO and British Standards Institution."
+        }
+      ]
+    },
+    {
+      "slug": "simone-bianco",
+      "name": "Simone Bianco",
+      "title": "Vice President of Computation at Altos Labs",
+      "best_for": [
+        "Biotechnology and pharmaceutical conferences",
+        "Life sciences and research audiences",
+        "Longevity and healthcare innovation events",
+        "Academic and scientific research symposiums"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Simone Bianco best known for?",
+          "answer": "Dr. Bianco is Vice President of Computation at Altos Labs and a computational biologist known for applying computer-driven design to biological systems, contributing to the development of vaccines, antivirals, antimicrobials and immunotherapies. He is also a TED speaker whose talk has drawn over 1 million views."
+        },
+        {
+          "question": "Is Simone Bianco a good fit for a biotech or life sciences audience?",
+          "answer": "Yes. He previously led the Department of Functional Genomics and Cellular Engineering at IBM Almaden Research Center and is the founding Principal Investigator of the NSF Center for Cellular Construction, a collaboration between UCSF, UC Berkeley and Stanford focused on engineering cells for specific functions."
+        },
+        {
+          "question": "What makes Simone Bianco different from other AI speakers?",
+          "answer": "His background spans theoretical physics, epidemiology, systems biology and financial mathematics in addition to computational biology, giving him an interdisciplinary perspective on applying computation to life sciences."
+        }
+      ]
+    },
+    {
+      "slug": "peter-small",
+      "name": "Peter Small",
+      "title": "Acoustic Epidemiologist & Chief Medical Officer at Hyfe",
+      "best_for": [
+        "Global health conferences",
+        "Digital health and health tech innovation events",
+        "Infectious disease and public health audiences",
+        "Healthcare startup and investor audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Peter Small best known for?",
+          "answer": "Peter Small is Chief Medical Officer at Hyfe, where since 2021 he has helped develop acoustic AI tools for respiratory diagnostics and cough monitoring using the world's largest cough dataset. He also spent years at the Gates Foundation, Global Good/GH Labs, and as Founding Director of the Global Health Institute at Stony Brook University."
+        },
+        {
+          "question": "Is Peter Small a good fit for a global health conference?",
+          "answer": "Yes. His career spans clinical medicine, academic research at UCSF and Stanford, and product development at the Gates Foundation, with specific expertise in infectious diseases and improving health delivery in low- and middle-income countries."
+        },
+        {
+          "question": "What makes Peter Small different from other AI speakers?",
+          "answer": "He brings direct experience applying acoustic AI and machine learning to a real diagnostic product at Hyfe, combined with decades of on-the-ground global health and infectious disease work."
+        }
+      ]
+    },
+    {
+      "slug": "zach-rattner",
+      "name": "Zach Rattner",
+      "title": "CTO & Co-Founder at Yembo | Bringing AI to the home services industry | Author of Grow Up Fast: Lessons from an AI Startup",
+      "best_for": [
+        "Startup and tech leadership audiences",
+        "AI product development and computer vision conferences",
+        "Home services and insurance industry events",
+        "Founder and entrepreneurship audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Zach Rattner best known for?",
+          "answer": "Zach Rattner is the CTO and co-founder of Yembo, which built AI-powered virtual survey technology that changed how the home services and insurance industries operate. Yembo now serves customers in over 20 countries and processes millions of videos per year."
+        },
+        {
+          "question": "Is Zach Rattner a good fit for a startup or founder audience?",
+          "answer": "Yes. He wrote \"Grow Up Fast: Lessons from an AI Startup,\" sharing what he learned about handling uncertainty, building strong teams, and adapting to rapid change while growing Yembo from a startup into a 70-person, multi-million dollar company."
+        },
+        {
+          "question": "What makes Zach Rattner different from other AI speakers?",
+          "answer": "He pairs deep technical credentials, including over 20 granted U.S. patents and a top 2% Stack Overflow ranking, with hands-on experience building and scaling an AI startup from the ground up as CTO and co-founder of Yembo."
+        }
+      ]
+    },
+    {
+      "slug": "lee-sanders",
+      "name": "Lee Sanders",
+      "title": "Physician Scientist, Policy Analyst, and AI-Solutions Designer",
+      "best_for": [
+        "Healthcare policy and health equity audiences",
+        "Pediatric medicine and child health conferences",
+        "AI in healthcare and medical AI policy events",
+        "Academic medicine and public health leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Dr. Lee Sanders a good fit for healthcare policy audiences?",
+          "answer": "Yes. He is Professor of Pediatrics and Health Policy at Stanford University and has advised organizations including the NIH, CDC, FDA, and the American Academy of Pediatrics, and he leads research that provides analytic guidance to policymakers on care for children with medical complexity."
+        },
+        {
+          "question": "What is Dr. Lee Sanders best known for?",
+          "answer": "He is known as a national expert in health literacy and for directing the Stanford Health Literacy Lab, as well as for his research applying AI-driven behavioral interventions to child health, including the Greenlight Study Team's AI-driven platform aimed at early childhood health."
+        },
+        {
+          "question": "Does Dr. Lee Sanders speak specifically to AI in healthcare?",
+          "answer": "Yes. As Principal Investigator on multiple federally funded studies, he explores the efficacy of AI-driven behavioral interventions in pediatric care, and his areas of focus include AI in healthcare, pediatric AI, and medical AI policy."
+        }
+      ]
+    },
+    {
+      "slug": "adam-gazzaley",
+      "name": "Adam Gazzaley",
+      "title": "Pioneering neuroscientist redefining medicine through AI-powered experiential technologies.",
+      "best_for": [
+        "Neuroscience and brain health conferences",
+        "Digital therapeutics and health tech audiences",
+        "Mixed public and scientific/academic audiences",
+        "Gaming and immersive technology events",
+        "Venture capital and innovation investor audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Adam Gazzaley best known for?",
+          "answer": "Dr. Gazzaley is the David Dolby Distinguished Professor of Neurology, Physiology and Psychiatry at UCSF and Founder & Executive Director of Neuroscape, where he develops closed-loop video games combined with VR/AR and brain stimulation technologies to study and improve cognition. He also co-founded Akili, a therapeutic video game company named to Fast Company's 2022 list of the World's Most Innovative Companies."
+        },
+        {
+          "question": "Is Adam Gazzaley a good fit for both public and scientific audiences?",
+          "answer": "Yes. A testimonial from Sara N. Burke of the University of Florida McKnight Brain Institute describes him as \"a brilliant and captivating speaker... compelling for both public and scientific audiences,\" and another reviewer noted his research on the distracted brain enthralled a general audience."
+        },
+        {
+          "question": "What makes Adam Gazzaley different from other AI speakers?",
+          "answer": "He is both an academic neuroscientist and an entrepreneur, validating his technology through placebo-controlled research using fMRI, EEG and TMS while also co-founding Akili and JAZZ Venture Partners, a venture capital firm investing in experiential technology."
+        }
+      ]
+    },
+    {
+      "slug": "alison-mccauley",
+      "name": "Alison McCauley",
+      "title": "Pioneer in human-centered tech adoption and bestselling author of How to Think with AI, helping global leaders harness AI to unlock human potential.",
+      "best_for": [
+        "Leadership audiences navigating AI adoption",
+        "Corporate change management and digital transformation events",
+        "Future of work conferences",
+        "Professional services and consulting audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Alison McCauley best known for?",
+          "answer": "Alison McCauley is the bestselling author of \"How to Think with AI,\" which grew out of a year of research studying hundreds of generative AI early adopters. She has spent three decades working in change management and human-centered technology adoption, and is recognized as a LinkedIn Top Voice in Artificial Intelligence."
+        },
+        {
+          "question": "Is Alison McCauley a good fit for a leadership audience navigating AI adoption?",
+          "answer": "Yes. As Chief Advocacy Officer of Think with AI and founder of the strategy firm Unblocked Future, she focuses on helping leaders and teams adopt AI effectively, and her insights have appeared in Harvard Business Review and Forbes."
+        },
+        {
+          "question": "What makes Alison McCauley different from other AI speakers?",
+          "answer": "Her perspective is grounded in three decades of change management experience predating the AI era, and her latest book is based on original research into hundreds of real generative AI early adopters rather than general commentary."
+        }
+      ]
+    },
+    {
+      "slug": "aviv-ovadya",
+      "name": "Aviv Ovadya",
+      "title": "Research Fellow at newDemocracy & founder of the Thoughtful Technology Project",
+      "best_for": [
+        "AI governance and policy conferences",
+        "Civil society and democratic institution forums",
+        "Technology platform governance panels",
+        "Academic and think tank audiences on AI policy"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Aviv Ovadya a good fit for a government or policy audience?",
+          "answer": "Yes. He is a research fellow at newDemocracy and an affiliate at Harvard's Berkman Klein Center and the Centre for the Governance of AI, and he has advised organizations including Twitter and OpenAI on building and piloting infrastructure for deliberative governance."
+        },
+        {
+          "question": "What is Aviv Ovadya best known for?",
+          "answer": "He is known for his work on AI governance and applied deliberative democracy, including advising on deliberative governance infrastructure and advocating for improvements to red teaming and social media ranking systems."
+        },
+        {
+          "question": "What makes Aviv Ovadya different from other AI speakers?",
+          "answer": "Rather than focusing on business applications of AI, he specializes in AI's intersection with platforms and democratic governance, drawing on consulting work with organizations such as the Partnership on AI, the Civic Health Project, Meedan, and Cohere."
+        }
+      ]
+    },
+    {
+      "slug": "darian-heyman",
+      "name": "Darian Rodriguez Heyman",
+      "title": "Speaker, Author & Consultant",
+      "best_for": [
+        "Nonprofit and philanthropy sector conferences",
+        "Impact investing and mission-led business events",
+        "Environmental and green economy summits",
+        "Conference emcee and program-design engagements",
+        "Youth leadership and civil society summits"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Darian Heyman best known for?",
+          "answer": "Darian Rodriguez Heyman is known for connecting nonprofit, philanthropy, and impact investing leaders, including his tenure as Executive Director of the Craigslist Foundation, where he created the Nonprofit Boot Camp that grew into the largest social impact gathering in San Francisco Bay Area history within a year."
+        },
+        {
+          "question": "Is Darian Heyman a good fit for nonprofit or social impact conferences?",
+          "answer": "Yes. He has led youth leadership, civil society, and green economy summits for the United Nations Environmental Programme, and has keynoted events in Kenya, Mexico, Argentina, Brazil, India, Australia, New Zealand, and across the US."
+        },
+        {
+          "question": "Can Darian Heyman serve as an event emcee, not just a keynote speaker?",
+          "answer": "Yes. He co-hosted both TEDxSoMa and TEDxPresidio and regularly works with conference organizers to MC programs, connect speakers to topics, and improve session interactivity and outcomes."
+        }
+      ]
+    },
+    {
+      "slug": "drue-kataoka",
+      "name": "Drue Kataoka",
+      "title": "Empowering leaders to thrive in the AI era through visual intelligence and innovation.",
+      "best_for": [
+        "Business leadership summits on AI and innovation",
+        "Creative economy and art/design audiences",
+        "Global executive forums (Davos/Milken-style)",
+        "Education audiences on visual AI and creativity"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Drue Kataoka a good fit for a business leadership summit?",
+          "answer": "Yes. Her keynotes focus on how Visual AI is reshaping leadership, communication, and strategic decision-making, and she has spoken at venues including Davos, Milken, and the Crown Prince Court of Abu Dhabi."
+        },
+        {
+          "question": "What makes Drue Kataoka different from other AI speakers?",
+          "answer": "She combines a background as a serial entrepreneur and technology artist with AI expertise, using visual generative AI, VR, EEG, and art-science collaborations to help audiences think visually about AI's impact on leadership and strategy."
+        },
+        {
+          "question": "What is Drue Kataoka best known for?",
+          "answer": "She is known as an award-winning authority on visual generative AI, including recognition as a Young Global Leader and Cultural Leader of the World Economic Forum and the 2025 Innovator Award from the National Council of Women in GenAI."
+        }
+      ]
+    },
+    {
+      "slug": "elizabeth-bieniek",
+      "name": "Elizabeth Bieniek",
+      "title": "Helping organizations unlock exponential results through human-centered AI and systems thinking",
+      "best_for": [
+        "Enterprise AI adoption and transformation conferences",
+        "Leadership development audiences navigating AI-driven change",
+        "Fortune 500 executive and advisory audiences",
+        "Technology summits on human-AI collaboration"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Elizabeth Bieniek a good fit for leadership audiences navigating AI adoption?",
+          "answer": "Yes. Her keynotes address why AI results vary across organizations and how leaders can help teams adapt, collaborate, and execute at the pace AI demands, drawing on more than two decades at the intersection of technology and human systems."
+        },
+        {
+          "question": "What is Elizabeth Bieniek best known for?",
+          "answer": "She is known as co-founder of Cisco's Webex Hologram, the world's first enterprise-grade holographic collaboration platform, which was adopted by organizations including McLaren Racing, and for leading global operations for Cisco's $3B Collaboration division."
+        },
+        {
+          "question": "What makes Elizabeth Bieniek different from other AI speakers?",
+          "answer": "She speaks from direct experience building and scaling enterprise technology as a Webex Hologram co-founder and Cisco operations leader, and now advises Fortune 500 companies and scale-ups on AI adoption and organizational change through her advisory practice."
+        }
+      ]
+    },
+    {
+      "slug": "john-hagel",
+      "name": "John Hagel",
+      "title": "Founder, Beyond Our Edge, LLC",
+      "best_for": [
+        "Management consulting and business strategy conferences",
+        "Corporate innovation and organizational transformation audiences",
+        "Executive audiences on AI and the future of work",
+        "Thought leadership and strategic foresight forums"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is John Hagel a good fit for a strategy or innovation conference?",
+          "answer": "Yes. He spent over 40 years in Silicon Valley as a management consultant, author, and entrepreneur, including as a partner at Deloitte, where he founded and chaired the Center for the Edge research center, and as a Principal at McKinsey, where he helped open its Silicon Valley office."
+        },
+        {
+          "question": "What is John Hagel best known for?",
+          "answer": "He is known for his work on business strategy, innovation, and the implications of AI and exponential technologies for organizations and individuals, and he has published 8 books, most recently The Journey Beyond Fear."
+        },
+        {
+          "question": "What makes John Hagel different from other AI speakers?",
+          "answer": "He pairs decades of strategy consulting experience at McKinsey and Deloitte with academic grounding as a faculty member at Singularity University and a trustee of the Santa Fe Institute, which researches complex adaptive systems."
+        }
+      ]
+    },
+    {
+      "slug": "mark-chamness",
+      "name": "Mark Chamness",
+      "title": "Partner & Head of Data Science at Invictus Growth Partners",
+      "best_for": [
+        "Investor and venture capital audiences evaluating AI",
+        "Enterprise AI adoption strategy conferences",
+        "Technology executives assessing AI ROI",
+        "Data science and ML leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Mark Chamness a good fit for an audience evaluating AI investments?",
+          "answer": "Yes. As Partner & Head of Data Science at Invictus Growth Partners, he supports the firm's investment team on AI-related due diligence and speaks directly to how buyers can tell if an AI investment will pay off."
+        },
+        {
+          "question": "What is Mark Chamness best known for?",
+          "answer": "He is known for three decades of experience in machine learning and large-scale AI systems, including leading data science teams at Coursera and Nutanix and developing forecasting algorithms at Data Domain that generated over $100 million in annual revenue."
+        },
+        {
+          "question": "What makes Mark Chamness different from other AI speakers?",
+          "answer": "He speaks from both sides of the AI investment equation, having shipped applied AI products as a data science leader at Nutanix and Coursera and now evaluating AI investments as a venture partner at Invictus Growth Partners."
+        }
+      ]
+    },
+    {
+      "slug": "nolan-gasser",
+      "name": "Nolan Gasser",
+      "title": "Co-Creator of Pandora Radio, Best-Selling Author",
+      "best_for": [
+        "Media and entertainment industry conferences",
+        "Creativity, innovation, and performance-focused corporate events",
+        "Technology audiences interested in AI-driven recommendation engines",
+        "Arts and culture audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Nolan Gasser a good fit for a technology or innovation conference?",
+          "answer": "Yes. He co-created Pandora Radio and architected the Music Genome Project, and his innovations in genomic data have shaped the recommendation engines behind platforms including Netflix, Spotify, and TikTok."
+        },
+        {
+          "question": "What is Nolan Gasser best known for?",
+          "answer": "He is best known for co-creating Pandora Radio and for his bestselling book Why You Like It: The Science, Music & Culture of Musical Taste, which was adapted into a PBS special that has aired more than 1,500 times nationally."
+        },
+        {
+          "question": "What makes Nolan Gasser different from other AI speakers?",
+          "answer": "He pairs an AI and data background, including current work with Google DeepMind and Meta, with a career as an acclaimed composer and pianist, giving his talks on data, taste, and creativity both scientific and artistic credibility."
+        }
+      ]
+    },
+    {
+      "slug": "robert-strong",
+      "name": "Robert Strong",
+      "title": "Magician, Author, and Speaker",
+      "best_for": [
+        "Corporate entertainment and conference closers",
+        "Tech company culture and team-building events",
+        "Innovation leadership and executive presence sessions",
+        "Trade show and conference emcee engagements"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Robert Strong a good fit for a corporate entertainment event?",
+          "answer": "Yes. He has been voted San Francisco's \"Best Comedian\" twice and \"Best Magician\" three times by the Bay Guardian, and his clients include Bay Area tech companies such as Meta, Apple, AWS, Microsoft, Adobe, Cisco, Salesforce, LinkedIn, Lenovo, Samsung, HPE, and Dell EMC."
+        },
+        {
+          "question": "What is Robert Strong best known for?",
+          "answer": "He is known as Google's unofficial Chief Magic Officer, having performed and taught magic there since 2014, and as the bestselling author of Amaze & Delight: Secrets to Creating Magic in Business. He has also given a TED talk on magic and AI."
+        },
+        {
+          "question": "What makes Robert Strong different from other AI speakers?",
+          "answer": "He blends magic performance with talks on AI communication and innovation leadership, drawing on his background as a performing member of the Magic Castle and as founder and CEO of Speak About AI to make technical concepts memorable."
+        }
+      ]
+    },
+    {
+      "slug": "mike-cassidy",
+      "name": "Mike Cassidy",
+      "title": "CEO of Apollo Fusion, Project Leader of Project Loon, former VP at Google",
+      "best_for": [
+        "Startup and entrepreneurship conferences",
+        "Space technology and deep tech audiences",
+        "Innovation speed and rapid execution focused events",
+        "Venture and technology executive audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Mike Cassidy a good fit for a startup or entrepreneurship conference?",
+          "answer": "Yes. He co-founded and served as CEO of five start-ups, all of which were successfully acquired, including Apollo Fusion (acquired by Astra for $145 million) and Xfire (acquired by MTV for $110 million)."
+        },
+        {
+          "question": "What is Mike Cassidy best known for?",
+          "answer": "He is known for leading GoogleX's Project Loon, an effort to deliver balloon-powered internet access, and for his track record as a serial entrepreneur who built and sold multiple technology companies."
+        },
+        {
+          "question": "What makes Mike Cassidy different from other AI speakers?",
+          "answer": "He brings direct operating experience as a former Google Vice President and CEO of Apollo Fusion, a space technology company that designs ion thrusters for satellites, combining startup strategy with deep technical and space industry expertise."
+        }
+      ]
+    },
+    {
+      "slug": "shafi-ahmed",
+      "name": "Shafi Ahmed",
+      "title": "Award Winning Surgeon, Futurist, and Entrepreneur",
+      "best_for": [
+        "Healthcare executive summits",
+        "Global health and telemedicine forums",
+        "Medical education and VR/AR technology audiences",
+        "Digital health innovation conferences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Shafi Ahmed a good fit for a healthcare executive summit?",
+          "answer": "Yes. He is a globally acclaimed cancer surgeon at The Royal London Hospital and CEO and co-founder of Medical Realities, where he uses virtual reality technology to revolutionize surgical training and education."
+        },
+        {
+          "question": "What is Shafi Ahmed best known for?",
+          "answer": "He is known as the world's most-watched surgeon for streaming live operations using Google Glass and VR, and he has been nominated for a BAFTA and the Nobel Peace Prize for his work in digital health education."
+        },
+        {
+          "question": "What makes Shafi Ahmed different from other AI speakers?",
+          "answer": "He speaks as a practicing surgeon and academic, with faculty roles at Harvard Medical School and Imperial College London, who has personally pioneered VR-based surgical training rather than discussing healthcare technology from outside the field."
+        }
+      ]
+    },
+    {
+      "slug": "murray-newlands",
+      "name": "Murray Newlands",
+      "title": "Partner, IA Seed Ventures & Founder, Open Future Forum",
+      "best_for": [
+        "Venture capital and startup investing conferences",
+        "Family office and wealth management audiences",
+        "Fintech and enterprise AI conferences",
+        "Executive community and CxO-focused events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Murray Newlands a good fit for a venture capital or fintech audience?",
+          "answer": "Yes. He is a Partner at IA Seed Ventures and Tilden Capital, and his speaking topics include venture capital and early-stage investing as well as fintech and enterprise AI."
+        },
+        {
+          "question": "What is Murray Newlands best known for?",
+          "answer": "He is known for founding Open Future Forum, a private executive community that has hosted 100+ invite-only dinners and events for CFOs, CISOs, CTOs, CROs, and CEOs, and for publishing Murray's Newsletter to over 50,000 Substack subscribers on AI, venture, and enterprise strategy."
+        },
+        {
+          "question": "What makes Murray Newlands different from other AI speakers?",
+          "answer": "He combines active venture capital and family office investing experience with a media platform, having contributed to Forbes, Inc., The Guardian, Time, and Business Insider, and authored Online Marketing: A User's Manual."
+        }
+      ]
+    },
+    {
+      "slug": "paolo-privitera",
+      "name": "Paolo Privitera",
+      "title": "Investor, 1521 Ventures",
+      "best_for": [
+        "Venture capital and investor audiences",
+        "Startup founder and entrepreneurship events",
+        "Events and conference industry audiences",
+        "Global expansion and M&A focused business audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Paolo Privitera a good fit for startup founder audiences?",
+          "answer": "Yes. He has founded six companies himself, invested in more than 100 others, and actively mentors founders through programs like 500 Startups, Google Launchpad, and Alchemist, giving him direct experience on both the founding and investing sides."
+        },
+        {
+          "question": "What is Paolo Privitera best known for?",
+          "answer": "He is best known for founding Evensi, which grew into the world's largest events platform with over 200 million events and 60 million users before being acquired by Events.com, and for now serving as founding General Partner at 1521 Ventures."
+        },
+        {
+          "question": "What makes Paolo Privitera different from other investor speakers?",
+          "answer": "His background spans founding six companies (four with exits), acting as an LP in eight funds, and raising over $300 million across startups and funds, giving him a rare combined founder-and-investor perspective."
+        }
+      ]
+    },
+    {
+      "slug": "ashley-tarver",
+      "name": "Ashley Tarver",
+      "title": "Data & AI Cloud Evangelist at Microsoft",
+      "best_for": [
+        "Fortune 500 executive audiences",
+        "Enterprise technology and cloud conferences",
+        "VC, PE, and M&A audiences",
+        "Corporate growth and business development events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Ashley Tarver a good fit for Fortune 500 executive audiences?",
+          "answer": "Yes. He works directly with Microsoft's largest Silicon Valley customers and serves as a trusted advisor to senior executives at Fortune 500 companies deploying AI and machine learning solutions."
+        },
+        {
+          "question": "What is Ashley Tarver best known for?",
+          "answer": "He is known for translating complex AI concepts into actionable business strategy, and for his role as Board President of the Association for Corporate Growth's Silicon Valley chapter, where he advises startups, VCs, and PE firms on using AI in M&A activities."
+        },
+        {
+          "question": "What makes Ashley Tarver different from other enterprise AI speakers?",
+          "answer": "He combines a technical background (a BS in Aerospace Engineering and prior service as a US Army combat engineering officer) with entrepreneurial experience founding and exiting three startups."
+        }
+      ]
+    },
+    {
+      "slug": "larry-magid",
+      "name": "Larry Magid",
+      "title": "CEO at ConnectSafely.org & Tech Journalist",
+      "best_for": [
+        "Internet and child online safety audiences",
+        "Parent and educator groups",
+        "Technology policy and digital literacy conferences",
+        "Media and journalism panels on tech ethics"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Larry Magid a good fit for parent and educator audiences?",
+          "answer": "Yes. As CEO and co-founder of ConnectSafely.org, he has spent decades developing safety resources for parents and educators, and he founded SafeKids.com and SafeTeens.com."
+        },
+        {
+          "question": "What is Larry Magid best known for?",
+          "answer": "He is best known for his internet and child online safety advocacy, including 20 years on the board of the National Center for Missing & Exploited Children, alongside a long career as a technology journalist for CBS News and the Los Angeles Times."
+        },
+        {
+          "question": "What makes Larry Magid different from other technology speakers?",
+          "answer": "He pairs two decades as a mainstream technology analyst for CBS News and 19 years as a syndicated Los Angeles Times columnist with hands-on internet safety advocacy work dating back to 1993."
+        }
+      ]
+    },
+    {
+      "slug": "sagar-savla",
+      "name": "Sagar Savla",
+      "title": "Product Management Lead at Google & Author",
+      "best_for": [
+        "Product management audiences",
+        "Consumer tech and mobile product teams",
+        "UX and design-focused audiences",
+        "AI research and computer vision conferences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Sagar Savla a good fit for product management audiences?",
+          "answer": "Yes. As Group Product Lead at Google, he has shipped AI-driven features across products like Pixel camera, Nest, YouTube, and Android, and he co-authored a book on UX for engineers."
+        },
+        {
+          "question": "What is Sagar Savla best known for?",
+          "answer": "He is known for integrating machine learning into Google flagship products, including computer vision and audio features like ASR, Live Transcribe, and Sound Notifications, and for speaking on AI topics in more than 20 countries."
+        },
+        {
+          "question": "What makes Sagar Savla different from other AI product speakers?",
+          "answer": "He holds dual Master's degrees from Georgia Tech in Machine Learning and User Experience, giving him a combined technical and design perspective backed by product leadership roles at both Google and Facebook."
+        }
+      ]
+    },
+    {
+      "slug": "joanna-bryson",
+      "name": "Prof. Joanna Bryson, PhD",
+      "title": "Professor of Ethics & Technology at Hertie School, in Berlin",
+      "best_for": [
+        "Government and policy audiences",
+        "AI ethics and governance conferences",
+        "Academic and research institution audiences",
+        "International organization and regulatory audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Joanna Bryson a good fit for government and policy audiences?",
+          "answer": "Yes. She advises governments, corporations, and international bodies including the OECD, EU, UN, OSCE, and Red Cross on AI policy, and she co-authored the UK's 2011 Principles of Robotics."
+        },
+        {
+          "question": "What is Joanna Bryson best known for?",
+          "answer": "She is known as a leading AI ethics academic, recognized for coauthoring one of the first national-level AI ethics policies and for being one of nine experts nominated by Germany to the founding cohort of the Global Partnership for AI in 2020."
+        },
+        {
+          "question": "What makes Joanna Bryson different from other AI ethics speakers?",
+          "answer": "She holds two degrees each in psychology and AI and combines that academic training with direct advisory experience across multiple governments and international organizations."
+        }
+      ]
+    },
+    {
+      "slug": "alex-salkever",
+      "name": "Alex Salkever",
+      "title": "Award-Winning AI Author & Editor",
+      "best_for": [
+        "Business strategy and digital transformation audiences",
+        "Automotive and autonomous vehicle industry events",
+        "Media and publishing conferences",
+        "Corporate marketing and product leadership audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Alex Salkever a good fit for autonomous vehicle industry events?",
+          "answer": "Yes. He authored \"The Driver in the Driverless Car,\" a finalist for the McKinsey/Financial Times Business Book of the Year, and has over 20 years of experience covering emerging technology including autonomous vehicles."
+        },
+        {
+          "question": "What is Alex Salkever best known for?",
+          "answer": "He is known as a former editor of BusinessWeek and as the author of multiple books on technology's impact on society, including \"The Driver in the Driverless Car\" and \"Your Happiness Was Hacked.\""
+        },
+        {
+          "question": "What makes Alex Salkever different from other technology speakers?",
+          "answer": "He combines journalism experience writing for Fortune, Marketwatch, and CNBC with hands-on Silicon Valley marketing and product strategy work as a C-level consultant."
+        }
+      ]
+    },
+    {
+      "slug": "mark-kelly",
+      "name": "Mark Kelly",
+      "title": "Founder of AI Ireland & Speaker",
+      "best_for": [
+        "Enterprise AI deployment audiences",
+        "FTSE 100 and Fortune 500 leadership audiences",
+        "AI strategy and monetization conferences",
+        "Tech recruitment and future of work audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Mark Kelly a good fit for enterprise audiences focused on AI ROI?",
+          "answer": "Yes. As President of AI Ireland, he has personally evaluated more than 750 live enterprise AI projects, giving him direct insight into what drives ROI and what causes costly failures."
+        },
+        {
+          "question": "What is Mark Kelly best known for?",
+          "answer": "He is known for his Discovery to Deploy to Scale methodology for AI implementation, detailed in his AI Unleashed book series, and for co-founding Alldus International, which has placed over 1,500 data science and machine learning professionals at FTSE 100 and Fortune 500 organizations."
+        },
+        {
+          "question": "What makes Mark Kelly different from other AI strategy speakers?",
+          "answer": "His material is grounded in evaluating hundreds of live enterprise AI projects and interviewing over 700 innovators from companies like Amazon, Google, and NASA on his podcast, AI in Action."
+        }
+      ]
+    },
+    {
+      "slug": "chris-ategeka",
+      "name": "Christopher Helms Ategeka",
+      "title": "Author, Speaker, and Engineer",
+      "best_for": [
+        "Social impact and international development audiences",
+        "Responsible technology and AI ethics conferences",
+        "Nonprofit and global health audiences",
+        "Resilience and personal journey keynote audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Chris Ategeka a good fit for social impact and nonprofit audiences?",
+          "answer": "Yes. He founded Rides for Lives, which created bicycle ambulances and mobile clinics in Uganda, and Health Access Corps, a nonprofit supporting healthcare professionals in underserved African communities, and he has spoken at the United Nations."
+        },
+        {
+          "question": "What is Chris Ategeka best known for?",
+          "answer": "He is known for founding UCOT Inc., described as the world's first center addressing the unintended consequences of technology, and for his recognition as a World Economic Forum Young Global Leader, TED Fellow, and Forbes 30 Under 30."
+        },
+        {
+          "question": "What makes Chris Ategeka different from other responsible technology speakers?",
+          "answer": "His perspective is shaped by his personal journey from an orphanage in rural Uganda to earning Bachelor's and Master's degrees in Mechanical Engineering at UC Berkeley, combined with founding multiple social-impact organizations."
+        }
+      ]
+    },
+    {
+      "slug": "ted-selker",
+      "name": "Ted Selker",
+      "title": "AI Visionary, Inventor, Scientist, Professor, and Entrepreneur",
+      "best_for": [
+        "Human-computer interaction and UX design audiences",
+        "Academic and research institution audiences",
+        "Healthcare technology and accessibility conferences",
+        "Security technology audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Ted Selker a good fit for accessibility-focused audiences?",
+          "answer": "Yes. His work spans usable security at institutions like RIT, UMBC, and CNRS, accessible voting technology research at UC Berkeley, and human-computer interaction research focused on recognizing human intentions."
+        },
+        {
+          "question": "What is Ted Selker best known for?",
+          "answer": "He is known for his academic leadership, including heading the Context Aware Computing group at the MIT Media Lab, leading the Considerate Systems research program at CMU Silicon Valley, and co-directing the Caltech/MIT Voting Technology Project."
+        },
+        {
+          "question": "What makes Ted Selker different from other AI speakers?",
+          "answer": "He combines a decade at the MIT Media Lab with ongoing ventures in generative AI (Transformermodelling.com) and healthcare technology (Peep-Alert.com), plus regular hands-on mentoring of startups."
+        }
+      ]
+    },
+    {
+      "slug": "vandi-verma",
+      "name": "Vandi Verma",
+      "title": "Deputy Manager for Mobility and Robotics Systems Section at NASA",
+      "best_for": [
+        "Aerospace and robotics industry audiences",
+        "STEM and women-in-STEM audiences",
+        "Government and defense technology conferences",
+        "Autonomous systems and AI engineering audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Vandi Verma a good fit for STEM and women-in-STEM audiences?",
+          "answer": "Yes. She is recognized as a role model, especially for girls in STEM, and has contributed to documentaries and educational content that make Mars exploration accessible to global audiences."
+        },
+        {
+          "question": "What is Vandi Verma best known for?",
+          "answer": "She is best known for operating NASA's Curiosity and Perseverance Mars rovers, developing PLEXIL autonomy programming technology, and leading the Autonomous Systems, Mobility, and Robotic Systems group at JPL."
+        },
+        {
+          "question": "What makes Vandi Verma different from other robotics and AI speakers?",
+          "answer": "Her expertise comes from direct engineering leadership on active NASA Mars missions, including receiving the 2014 NASA Software of the Year Award as part of the Mars Science Laboratory Flight Software Team."
+        }
+      ]
+    },
+    {
+      "slug": "alfred-poor",
+      "name": "Alfred Poor",
+      "title": "Journalist, Author, & Health Tech Futurist",
+      "best_for": [
+        "Healthcare and digital health conferences",
+        "Medical technology and wearable device audiences",
+        "Virtual and hybrid event audiences",
+        "Health tech journalism and media panels"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Alfred Poor a good fit for healthcare and digital health conferences?",
+          "answer": "Yes. As Editor of Health Tech Insider and author of 15 books, he specializes in wearable and mobile health technologies, including AI-enhanced glucose meters, Apple Watches, and connected home monitors."
+        },
+        {
+          "question": "What is Alfred Poor best known for?",
+          "answer": "Known as the Health Tech Futurist, he is recognized for demystifying complex health technologies for diverse audiences and for his view that technology, particularly AI-enhanced devices, is essential to making healthcare more efficient and accessible."
+        },
+        {
+          "question": "What makes Alfred Poor different from other health tech speakers?",
+          "answer": "He pairs deep health tech journalism experience with virtual event expertise, having served as a Video Meeting Advisor since June 2021."
+        }
+      ]
+    },
+    {
+      "slug": "shawn-flynn",
+      "name": "Shawn Flynn",
+      "title": "Investment Banker, M&A Expert, and Podcast Host",
+      "best_for": [
+        "Venture capital and investment banking audiences",
+        "AI startup founder and incubator events",
+        "Angel investor and early-stage funding conferences",
+        "International business audiences (US-China)",
+        "M&A and growth capital focused events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What makes Shawn Flynn different from other AI speakers?",
+          "answer": "Shawn Flynn combines active investment banking experience with hands-on involvement in the AI startup ecosystem, working as a Principal at Global Capital Markets on M&A, growth capital raising, and secondaries with AI companies. He also hosts the award-winning \"The Silicon Valley Podcast\" and brings an international perspective from founding a business in Beijing and speaking Mandarin and Spanish."
+        },
+        {
+          "question": "Is Shawn Flynn a good fit for venture capital or startup investment events?",
+          "answer": "Yes. He has served as Head of Incubation for an AI-focused incubator and as President of a Silicon Valley Angel group, in addition to his investment banking work in M&A and growth capital raising for AI companies."
+        },
+        {
+          "question": "What is Shawn Flynn best known for?",
+          "answer": "He is known for his investment banking work with AI companies at Global Capital Markets and for hosting \"The Silicon Valley Podcast,\" where he shares insights from the tech world."
+        }
+      ]
+    },
+    {
+      "slug": "rene-caissie",
+      "name": "Rene Caissie",
+      "title": "CEO and Co-Founder at Medeloop.ai and Stanford University Adjunct Professor",
+      "best_for": [
+        "Healthcare and digital health executive audiences",
+        "Clinical AI and medical innovation conferences",
+        "Academic medical audiences (Stanford/UCSF affiliated)",
+        "Healthcare venture capital and startup events"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Rene Caissie a good fit for healthcare industry conferences?",
+          "answer": "Yes. He is a former surgeon and current CEO/Co-Founder of Medeloop.ai, a company applying AI to clinical research and trials, and he teaches digital health entrepreneurship at Stanford University School of Medicine."
+        },
+        {
+          "question": "What makes Rene Caissie different from other AI speakers?",
+          "answer": "He combines clinical experience as a former surgeon with entrepreneurial success, including founding Medesync EMR, which was acquired by Telus, and current work as a Venture Partner at OVO Fund alongside teaching roles at Stanford and UCSF."
+        },
+        {
+          "question": "What is Rene Caissie best known for?",
+          "answer": "He is best known for founding Medeloop.ai, an AI platform for clinical research and trials, and for his teaching roles in digital health and AI entrepreneurship at Stanford University School of Medicine."
+        }
+      ]
+    },
+    {
+      "slug": "reza-zadeh",
+      "name": "Reza Zadeh",
+      "title": "CEO of Matroid & Stanford Professor",
+      "best_for": [
+        "Technical machine learning and computer vision audiences",
+        "Academic and university audiences",
+        "AI product development and engineering teams",
+        "Enterprise data science and analytics conferences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Reza Zadeh a good fit for technical audiences?",
+          "answer": "Yes. As CEO of Matroid and an Adjunct Professor at Stanford, he has deep technical credentials, including co-authoring Apache Spark's MLlib, developing machine learning algorithms at Twitter and Google, and teaching Distributed Algorithms and Optimization at Stanford."
+        },
+        {
+          "question": "What makes Reza Zadeh different from other AI speakers?",
+          "answer": "He bridges academia and industry, holding a Stanford PhD that earned the Gene Golub Outstanding Thesis Award and a Best Instructor Award for teaching, while also leading Matroid, a computer vision company that won the Princeton University ModelNet challenge."
+        },
+        {
+          "question": "What is Reza Zadeh best known for?",
+          "answer": "He is known for his contributions to Apache Spark's MLlib, his machine learning work at Google and Twitter (including Twitter's \"Who to Follow\" feature), and his leadership of the computer vision company Matroid."
+        }
+      ]
+    },
+    {
+      "slug": "-nikhil-gowda",
+      "name": "Nikhil Gowda",
+      "title": "",
+      "best_for": [
+        "Robotics and autonomous systems audiences",
+        "Product strategy and R&D-to-market leadership teams",
+        "Regulated-industry and public-sector innovation audiences",
+        "AI trust and adoption discussions"
+      ],
+      "custom_faqs": [
+        {
+          "question": "What is Nikhil Gowda's area of expertise?",
+          "answer": "Nikhil Gowda focuses on bringing robotics and autonomy out of the lab and into real-world public environments, with emphasis on human factors, building trust and adoption, and managing regulatory-aligned rollouts across diverse regions."
+        },
+        {
+          "question": "Is Nikhil Gowda a good fit for audiences focused on AI and robotics trust?",
+          "answer": "Yes. He speaks on building trust in AI and the future of public-space autonomy, drawing on experience guiding CEO-level investment decisions and translating robotics research into product strategy."
+        }
+      ]
+    },
+    {
+      "slug": "nicky-verd",
+      "name": "Nicky Verd",
+      "title": "Digital Futurist Nicky Verd helps people and organizations redefine their relevance and thrive in an AI economy where culture, not tech, is the true catalyst for change.",
+      "best_for": [
+        "Non-technical leadership and executive audiences",
+        "Financial services and finance leadership conferences",
+        "Organizational culture and digital transformation events",
+        "Workforce development and change management audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Nicky Verd a good fit for non-technical leadership audiences?",
+          "answer": "Yes. Her keynotes focus on the human and cultural dimensions of AI adoption rather than the technology itself, addressing leadership judgment, workforce anxiety, and decision-making in an AI-driven world."
+        },
+        {
+          "question": "What makes Nicky Verd different from other AI speakers?",
+          "answer": "She specializes in human-centric AI adoption, focusing on culture, leadership, and workforce impact rather than technical implementation, and is the author of two books, \"Disrupt Yourself or Be Disrupted\" and \"AI: Humanity's Greatest Frenemy.\""
+        },
+        {
+          "question": "What is Nicky Verd best known for?",
+          "answer": "She is known as a digital futurist and international keynote speaker on human-centric AI adoption, helping organizations and governments address the culture, leadership, and workforce challenges created by AI."
+        }
+      ]
+    },
+    {
+      "slug": "robert-daigle",
+      "name": "Robert Daigle",
+      "title": "Global Director of AI at Lenovo, dedicated to democratizing artificial intelligence by bridging the gap between startup agility and Fortune 200 scale.",
+      "best_for": [
+        "Enterprise AI strategy and go-to-market audiences",
+        "Fortune 500 / large enterprise technology leadership",
+        "AI product development and business development teams",
+        "Corporate innovation and AI center of excellence audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Robert Daigle a good fit for enterprise AI strategy audiences?",
+          "answer": "Yes. As Global Director of AI at Lenovo, he leads the company's worldwide AI strategy, business development, and go-to-market initiatives, and has scaled AI solutions from startups to Fortune 200 companies."
+        },
+        {
+          "question": "What makes Robert Daigle different from other AI speakers?",
+          "answer": "He has direct operating experience building enterprise AI programs at scale, including launching Lenovo's AI Innovators program with over 45 partners and 150+ AI solutions delivered, and establishing Lenovo's first global AI Center of Excellence."
+        },
+        {
+          "question": "What is Robert Daigle best known for?",
+          "answer": "He is known for leading Lenovo's global AI business, which has grown to generate over $2 billion in revenue, and for earlier work launching Arya, one of the first AI-driven recruiting platforms."
+        }
+      ]
+    },
+    {
+      "slug": "russell-wald",
+      "name": "Russell Wald",
+      "title": "A leading authority in AI governance and Executive Director of Stanford HAI, bridging the gap between cutting-edge technology and responsible public policy.",
+      "best_for": [
+        "Government and public policy audiences",
+        "National security and defense conferences",
+        "AI governance and regulatory policy events",
+        "Academic and think-tank audiences on AI policy"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Russell Wald a good fit for policy and government audiences?",
+          "answer": "Yes. As Executive Director of Stanford HAI, he develops AI regulatory frameworks and co-founded the Congressional Tech Policy Boot Camp, which equips lawmakers with the technical literacy to govern emerging technologies."
+        },
+        {
+          "question": "What makes Russell Wald different from other AI speakers?",
+          "answer": "He bridges technical AI research and public policy, drawing on experience managing national security affairs at the Hoover Institution, serving as a Visiting Fellow at the National Security Institute, and as a former member of the Council on Foreign Relations."
+        },
+        {
+          "question": "What is Russell Wald best known for?",
+          "answer": "He is best known for leading Stanford HAI and for his work on AI governance, national security strategy, and legislative education through the Congressional Tech Policy Boot Camp."
+        }
+      ]
+    },
+    {
+      "slug": "shashi-tripathi",
+      "name": "Shashi Tripathi",
+      "title": "",
+      "best_for": [
+        "Venture capital and private equity audiences",
+        "Healthcare and healthtech leadership audiences",
+        "AI and SaaS industry conferences",
+        "Corporate operations and scale-up focused executive audiences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Shashi Tripathi a good fit for venture capital or investor audiences?",
+          "answer": "Yes. He is Managing Partner at Nurture Growth Fund, a venture firm that backs early-stage, revenue-generating companies, and has led portfolio companies across the US, EU, India, and APAC."
+        },
+        {
+          "question": "What is Shashi Tripathi's background in healthcare and technology?",
+          "answer": "He has more than 25 years of experience across technology, healthcare, FinTech, and AI/SaaS, including serving as Chief Operating Officer and Chief Technology Officer at ImpediMed and in executive leadership roles at New Century Health and Springfield Clinic."
+        },
+        {
+          "question": "What makes Shashi Tripathi different from other AI speakers?",
+          "answer": "He combines venture investing with hands-on operating experience, having steered technology and operations as a C-level executive before backing early-stage AI/SaaS and healthtech companies as an investor."
+        }
+      ]
+    },
+    {
+      "slug": "reed-dickson",
+      "name": "Reed Dickson",
+      "title": "Director for Online Faculty Experience & Innovation at PimaOnline",
+      "best_for": [
+        "Higher education and college faculty audiences",
+        "K-12 education leadership events",
+        "EdTech product and startup audiences",
+        "Faculty development and instructional design conferences"
+      ],
+      "custom_faqs": [
+        {
+          "question": "Is Reed Dickson a good fit for higher education audiences?",
+          "answer": "Yes. He serves as Director for Online Faculty Experience and Innovation at PimaOnline, has over 25 years of experience across college and K-12 education, and organizes the PimaOnline Educators' Conference."
+        },
+        {
+          "question": "What makes Reed Dickson different from other AI speakers?",
+          "answer": "He brings a UX and human-centered design perspective to education, applying instructional design principles to faculty development, drawing on experience that spans teaching, writing on EdTech product design, and advising EdTech startups and school districts."
+        },
+        {
+          "question": "What is Reed Dickson best known for?",
+          "answer": "He is known for his leadership in online pedagogy and faculty development at PimaOnline, his prior work directing a K-12 teacher education program at Teachers College, Columbia University, and his advisory work with EdTech startups and school districts."
+        }
+      ]
+    }
+  ]
+}

@@ -165,6 +165,21 @@ const OptimizedSpeakerProfile: React.FC<OptimizedSpeakerProfileProps> = ({ speak
                         </div>
                       )}
 
+                      {/* Best For - hand-authored audience/event fits */}
+                      {speaker.bestFor && speaker.bestFor.length > 0 && (
+                        <div className="mt-6">
+                          <h3 className="text-sm font-semibold text-gray-900 mb-2">Best for:</h3>
+                          <ul className="space-y-1.5">
+                            {speaker.bestFor.map((fit, index) => (
+                              <li key={index} className="flex items-start text-sm text-gray-700">
+                                <CheckCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-[#1E68C6]" />
+                                <span>{fit}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
                       {/* Social Links */}
                       {speaker.linkedin && (
                         <div className="flex justify-center space-x-4 mt-6 pt-6 border-t">
