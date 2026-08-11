@@ -2,9 +2,18 @@ import { notFound } from "next/navigation"
 import { getSpeakerBySlug, getAllSpeakers } from "@/lib/speakers-data"
 import OptimizedSpeakerProfile from "@/components/speaker-profile-optimized"
 import ScrollToTop from "./scroll-to-top"
-import { generateSpeakerStructuredData } from "./structured-data"
 import { findSimilarSpeakers } from "@/lib/speaker-similarity"
-import Script from "next/script"
+import { getSpeakerFaqs } from "@/lib/speaker-faq"
+
+// Social fields may hold a full URL or a bare handle depending on how the
+// record was entered — normalize to a full URL either way for sameAs.
+function toProfileUrl(value: string | undefined, base: string): string | undefined {
+  if (!value) return undefined
+  const trimmed = value.trim()
+  if (!trimmed) return undefined
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed
+  return `${base}${trimmed.replace(/^@/, "")}`
+}
 
 interface SpeakerPageProps {
   params: Promise<{ slug: string }>
@@ -21,6 +30,15 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
   // Find similar speakers using the similarity algorithm
   const allSpeakers = await getAllSpeakers()
   const similarSpeakers = findSimilarSpeakers(speaker, allSpeakers, 3)
+
+  // schema.org "award" expects plain text, but awards are stored as objects
+  const awardStrings = (speaker.awards || [])
+    .map((award: any) =>
+      typeof award === "string"
+        ? award
+        : [award?.title, award?.organization, award?.year].filter(Boolean).join(", ")
+    )
+    .filter(Boolean)
 
   // Generate comprehensive structured data for Google
   const structuredData = {
@@ -39,9 +57,12 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
       "@id": `https://speakabout.ai/speakers/${slug}`
     },
     "sameAs": [
-      speaker.linkedin && `https://linkedin.com/in/${speaker.linkedin}`,
-      speaker.twitter && `https://twitter.com/${speaker.twitter}`,
-      speaker.website
+      toProfileUrl(speaker.linkedin, "https://www.linkedin.com/in/"),
+      toProfileUrl(speaker.twitter, "https://twitter.com/"),
+      toProfileUrl(speaker.website, "https://"),
+      speaker.wikipedia,
+      speaker.googleScholar,
+      ...(speaker.otherProfiles || [])
     ].filter(Boolean),
     "worksFor": {
       "@type": "Organization",
@@ -62,8 +83,7 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
     },
     "knowsAbout": [...(speaker.topics || []), ...(speaker.expertise || []), "Artificial Intelligence", "Machine Learning", "AI Strategy", "Keynote Speaking"].filter(Boolean),
     "knowsLanguage": ["en"],
-    "alumniOf": speaker.education || undefined,
-    "award": speaker.awards || undefined,
+    "award": awardStrings.length > 0 ? awardStrings : undefined,
     "memberOf": {
       "@type": "Organization",
       "name": "Speak About AI",
@@ -92,6 +112,20 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
     }
   }
 
+  // FAQPage schema mirrors the visible FAQ block (both come from getSpeakerFaqs)
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": getSpeakerFaqs(speaker).map((faq) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer,
+      },
+    })),
+  }
+
   return (
     <>
       <script
@@ -101,6 +135,10 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(speakableSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <OptimizedSpeakerProfile speaker={speaker} similarSpeakers={similarSpeakers} />
       <ScrollToTop />

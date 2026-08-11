@@ -1,0 +1,1860 @@
+{
+  "stats": {
+    "total": 86,
+    "covered": 86,
+    "withLinkedin": 85,
+    "withWikipedia": 31,
+    "withScholar": 19,
+    "withWebsite": 73,
+    "high": 76,
+    "medium": 9,
+    "low": 1
+  },
+  "problems": [],
+  "results": [
+    {
+      "slug": "peter-norvig",
+      "name": "Peter Norvig",
+      "title": "Former Director of Research at Google, AI Pioneer",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/pnorvig/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Peter_Norvig",
+        "google_scholar": "https://scholar.google.com/citations?user=6-k6EDgAAAAJ&hl=en",
+        "website": "https://www.norvig.com/",
+        "other": [
+          "https://www.norvig.com/bio.html",
+          "https://research.google.com/pubs/author205.html"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Well-known public figure; all profiles consistent with Google Research / Stanford HAI role."
+    },
+    {
+      "slug": "adam-cheyer",
+      "name": "Adam Cheyer",
+      "title": "VP of AI Experience at Airbnb, Co-Founder of Siri",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/adamcheyer",
+        "wikipedia": "https://en.wikipedia.org/wiki/Adam_Cheyer",
+        "google_scholar": "",
+        "website": "http://www.adam.cheyer.com/",
+        "other": [
+          "https://cwgspeakers.com/speaker/adam-cheyer/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn bio explicitly lists Siri, Viv Labs, Sentient, GamePlanner.AI/Airbnb, matching given title."
+    },
+    {
+      "slug": "vishal-sharma",
+      "name": "Vishal Sharma",
+      "title": "Vice President, Amazon AGI",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/vishal-sharma-379453/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://event.technologyreview.com/emtech-mit-2022/speaker/572276/vishal-sharma",
+          "https://theorg.com/org/amazon/org-chart/vishal-sharma"
+        ]
+      },
+      "confidence": "medium",
+      "notes": "Common name with many similarly-titled LinkedIn profiles. Chosen profile is based in Los Altos, CA and described as VP/GM AGI Information at Amazon, consistent with title/location, but could not fully verify the exact vanity URL; no personal website or Wikipedia found."
+    },
+    {
+      "slug": "maya-ackerman",
+      "name": "Maya Ackerman",
+      "title": "CEO/Co-founder of WaveAI, Santa Clara University Professor",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/mackerma/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Maya_Ackerman",
+        "google_scholar": "https://scholar.google.com/citations?user=0K4-DgcAAAAJ&hl=en",
+        "website": "https://maya-ackerman.com/",
+        "other": [
+          "https://www.scu.edu/engineering/faculty/ackerman-maya/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "All sources consistent: WaveAI CEO and Santa Clara University faculty."
+    },
+    {
+      "slug": "daniel-kraft",
+      "name": "Daniel Kraft",
+      "title": "Stanford and Harvard Trained Physician, Scientist, Entrepreneur, and Inventor",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/dkraft/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://danielkraftmd.net/",
+        "other": [
+          "https://www.ted.com/speakers/daniel_kraft",
+          "https://www.su.org/experts/daniel-kraft"
+        ]
+      },
+      "confidence": "high",
+      "notes": "No standalone Wikipedia article found for him specifically; not primarily an academic researcher so no Google Scholar profile."
+    },
+    {
+      "slug": "gopi-kallayil",
+      "name": "Gopi Kallayil",
+      "title": "Chief Business Strategist for AI at Google",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/gopikallayil",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://kallayil.com/",
+        "other": [
+          "https://www.imd.org/ibyimd/iauthors/gopi-kallayil/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "No Wikipedia article or Google Scholar profile found (not an academic)."
+    },
+    {
+      "slug": "chris-yeh",
+      "name": "Chris Yeh",
+      "title": "Co-Founder of BlitzScaling Ventures",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/chrisyeh/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://chrisyeh.com",
+        "other": [
+          "https://www.blitzscalingvc.com/about",
+          "https://www.crunchbase.com/person/chris-yeh"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Only a Wikidata entry exists, not a full Wikipedia article, so left blank."
+    },
+    {
+      "slug": "lucien-engelen",
+      "name": "Lucien Engelen",
+      "title": "TransformHealth CEO and Healthcare Visionary",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/lucienengelen/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Lucien_Engelen",
+        "google_scholar": "",
+        "website": "https://lucienengelen.com/",
+        "other": [
+          "https://www.speakersacademy.com/en/speaker/lucien-engelen/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Consistent across sources as TransformHealth CEO, Europe-based healthcare innovation speaker."
+    },
+    {
+      "slug": "mo-tiwari",
+      "name": "Mo Tiwari",
+      "title": "Staff Research Scientist at Google, former OpenAI Technical Staff",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/motiwari/",
+        "wikipedia": "",
+        "google_scholar": "https://scholar.google.com/citations?user=5Zw2JPQAAAAJ&hl=en",
+        "website": "https://motiwari.com",
+        "other": [
+          "https://openreview.net/profile?id=~Mo_Tiwari1",
+          "https://www.futureproductdays.com/speakers/mo-tiwari"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn/website/scholar all consistent with Stanford PhD -> OpenAI -> Google Staff Research Scientist path. Sandip Tiwari's Wikipedia page is a different, unrelated person and was excluded."
+    },
+    {
+      "slug": "nancy-xu",
+      "name": "Nancy Xu",
+      "title": "CEO of Moonhub.ai & Early Stage Startup Mentor/Investor",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/xnancy/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.moonhub.ai",
+        "other": [
+          "https://time.com/collections/time100-ai/6310644/nancy-xu/",
+          "https://www.forbes.com/profile/nancy-xu/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "No Wikipedia or Google Scholar profile found. Some 2026 press indicates Moonhub's team joined Salesforce; an unverified snippet suggesting she joined Scale AI could not be corroborated and was excluded."
+    },
+    {
+      "slug": "rana-el-kaliouby",
+      "name": "Rana el Kaliouby",
+      "title": "Co-Founder and General Partner of Blue Tulip Ventures, Former Deputy CEO of Smart Eye, Co-Founder of Affectiva, and Author",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/kaliouby/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Rana_el_Kaliouby",
+        "google_scholar": "https://scholar.google.com/citations?user=tpg6xzgAAAAJ&hl=en",
+        "website": "https://ranaelkaliouby.com/",
+        "other": [
+          "https://www.bluetulip.vc/team",
+          "https://www.hbs.edu/entrepreneurship/mba/expert-advisors/rana-el-kaliouby"
+        ]
+      },
+      "confidence": "high",
+      "notes": "All sources consistent: Boston, MA-based; Affectiva co-founder, former Smart Eye Deputy CEO, now Blue Tulip Ventures."
+    },
+    {
+      "slug": "julie-holmes",
+      "name": "Julie Holmes",
+      "title": "AI Keynote Speaker & Tech Founder",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://uk.linkedin.com/in/thejulieholmes",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://julieholmes.com/",
+        "other": [
+          "https://londonspeakerbureau.com/speaker-profile/julie-holmes/",
+          "https://www.executivespeakers.com/speaker/julie-holmes"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn bio and speaker profile consistent with AI keynote speaker splitting time between USA/UK; no Wikipedia or Scholar page exists for her."
+    },
+    {
+      "slug": "divya-chander",
+      "name": "Divya Chander",
+      "title": "Neuroscientist Applying AI to Cognitive Longevity",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/divyachander/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.divyachander.com/",
+        "other": [
+          "https://www.atlanticcouncil.org/expert/divya-chander/",
+          "https://www.researchgate.net/profile/Divya-Chander"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed anesthesiologist/neuroscientist, Stanford/Singularity University affiliation, Bay Area practice. No verifiable Google Scholar citations page found under her name (searches returned other similarly-named scholars); ResearchGate profile listed instead."
+    },
+    {
+      "slug": "luc-julia",
+      "name": "Dr. Luc Julia",
+      "title": "Chief Scientific Officer for Renault",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/lucjulia/",
+        "wikipedia": "https://fr.wikipedia.org/wiki/Luc_Julia",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://media.renaultgroup.com/luc-julia-world-renowned-expert-in-artificial-intelligence-joins-groupe-renault/",
+          "https://history.siggraph.org/person/dr-luc-julia/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn location (Palo Alto) and Renault CSO role match. Only a French Wikipedia article exists (no English one); note that his role in creating Siri is disputed/contested per recent 2025 French media coverage. No personal website found."
+    },
+    {
+      "slug": "jeremiah-owyang",
+      "name": "Jeremiah Owyang",
+      "title": "General Partner, Blitzscaling Ventures. Llama Lounge, AI Event Founder",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/jowyang/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://web-strategist.com/blog/about/",
+        "other": [
+          "https://www.crunchbase.com/person/jeremiah-owyang"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed Blitzscaling Ventures GP and Llama Lounge founder. No Wikipedia article found."
+    },
+    {
+      "slug": "lital-marom",
+      "name": "Lital Marom",
+      "title": "Founder of UNFOLD, The Academy of Tomorrow, Entrepreneur & Keynote Speaker",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://ca.linkedin.com/in/litalmarom",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.litalmarom.com/about",
+        "other": [
+          "https://speakerscanada.com/keynote-speaker/lital-marom/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed founder of UNFOLD and The Academy of Tomorrow; Canada-based LinkedIn matches Toronto location. No Wikipedia/Scholar page."
+    },
+    {
+      "slug": "ryan-pamplin",
+      "name": "Ryan Pamplin",
+      "title": "CEO of BlendJet, EMMY-Nominated Advertiser, Former VP Evangelist at Meta (now Campfire)",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/ryanpamplin/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://ryanpamplin.com/",
+        "other": [
+          "https://blendjet.com/pages/ryan-pamplin",
+          "https://www.crunchbase.com/person/ryan-m-pamplin"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed BlendJet Co-Founder/CEO, EMMY-nominated ad producer. No Wikipedia/Scholar page."
+    },
+    {
+      "slug": "dag-kittlaus",
+      "name": "Dag Kittlaus",
+      "title": "Former Co-Founder of Siri and Viv Labs, Co-founder/CEO of Riva Health",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/dagkittlaus/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://www.crunchbase.com/person/dag-kittlaus"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn location 'Greater Chicago Area' matches given location; bio confirms Siri/Viv/Riva Health roles. No dedicated Wikipedia article found (only referenced within Adam Cheyer's page) and no distinct personal website found."
+    },
+    {
+      "slug": "jamie-metzl",
+      "name": "Jamie Metzl",
+      "title": "Technology Futurist, Geopolitics Expert, Entrepreneur, Sci-Fi Novelist, Keynote Speaker",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/jamiemetzl/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Jamie_Metzl",
+        "google_scholar": "",
+        "website": "https://jamiemetzl.com/",
+        "other": [
+          "https://www.atlanticcouncil.org/expert/jamie-metzl/",
+          "https://www.weforum.org/stories/authors/jamie-metzl/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Well-documented public figure; a second LinkedIn URL (linkedin.com/in/jamie-metzl-8a4a3610/) also appears for the same person with a fuller bio matching his book/futurist work — both likely valid, vanity handle listed as primary."
+    },
+    {
+      "slug": "shama-hyder",
+      "name": "Shama Hyder",
+      "title": "AI, Business Growth & Innovation Speaker | Strategic Urgency Expert",
+      "existing": {
+        "website": "https://shamahyder.com/",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/shamahyder/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://shamahyder.com/",
+        "other": [
+          "https://www.forbes.com/sites/shamahyder/",
+          "https://muckrack.com/shama/bio"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Existing website verified as correct (matches Zen Media founder/CEO bio, TIME100 Creator). No dedicated Wikipedia article exists (only a Wikidata entry and unrelated disambiguation pages)."
+    },
+    {
+      "slug": "max-sills",
+      "name": "Max Sills",
+      "title": "General Counsel of Midjourney",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/maxsills/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://openadvising.com/team/max",
+        "other": [
+          "https://theorg.com/org/midjourney/org-chart/max-sills"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed Midjourney General Counsel, San Francisco-based. 'Arthur J. Sills' Wikipedia result is a different, unrelated person and was excluded."
+    },
+    {
+      "slug": "robin-farmanfarmaian",
+      "name": "Robin Farmanfarmaian",
+      "title": "Serial Healthcare Entrepreneur",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/robinfarmanfarmaian/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.robinff.com/",
+        "other": [
+          "https://www.ted.com/talks/robin_farmanfarmaian_be_the_ceo_of_your_health/details",
+          "https://democratizinghealthcare.ai/robin-farmanfarmaian/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed healthcare entrepreneur/speaker/author of 'The Patient as CEO', Bay Area based. No Wikipedia/Scholar page found."
+    },
+    {
+      "slug": "simon-pierro",
+      "name": "Simon Pierro",
+      "title": "World Renowned AI Magician",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/simon-pierro-98b5a776/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Simon_Pierro",
+        "google_scholar": "",
+        "website": "https://simonpierro.com/",
+        "other": [
+          "https://www.ted.com/talks/simon_pierro_a_magician_s_take_on_ai",
+          "https://tedai-vienna.ted.com/speakers-2025/simon-pierro"
+        ]
+      },
+      "confidence": "high",
+      "notes": "German AI/iPad magician based in Munich; all sources consistent."
+    },
+    {
+      "slug": "brittany-hodak",
+      "name": "Brittany Hodak",
+      "title": "Expert on Customer Success and Creating Superfans",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/brittanyhodak/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://brittanyhodak.com/",
+        "other": [
+          "https://www.linkedin.com/company/brittanyhodakspeaks"
+        ]
+      },
+      "confidence": "high",
+      "notes": "No Wikipedia article found for her; business address confirmed in Franklin, TN."
+    },
+    {
+      "slug": "cassie-kozyrkov",
+      "name": "Cassie Kozyrkov",
+      "title": "CEO of Kozyr, AI Luminary, Former Chief Decision Scientist at Google, and Pioneer of Decision Intelligence",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/kozyrkov/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Cassie_Kozyrkov",
+        "google_scholar": "",
+        "website": "https://www.kozyr.com/",
+        "other": [
+          "https://www.dataiq.global/dataiq100/cassie-kozyrkov-chief-decision-scientist-google/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "A second LinkedIn URL (linkedin.com/in/cassie-kozyrkov-9531919/) also appeared with identical bio text — likely an older/duplicate profile; primary vanity URL used. No Google Scholar profile found."
+    },
+    {
+      "slug": "dan-russell",
+      "name": "Dan Russell",
+      "title": "Former Principal UX Researcher at Google, Author of “The Joy of Search”, and Research Scientist",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/dan-russell-6901a9/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Daniel_M._Russell",
+        "google_scholar": "https://scholar.google.com/citations?user=PvauA5AAAAAJ&hl=en",
+        "website": "https://sites.google.com/site/dmrussell/",
+        "other": [
+          "https://www.amacad.org/person/daniel-m-russell"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed via Wikipedia fetch: Google search UX researcher, author of The Joy of Search."
+    },
+    {
+      "slug": "joan-bajorek",
+      "name": "Dr. Joan Palmiter Bajorek",
+      "title": "CEO of Clarity AI, AI Expert, Keynote Speaker",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/dr-jpb",
+        "wikipedia": "https://en.wikipedia.org/wiki/Joan_Palmiter_Bajorek",
+        "google_scholar": "https://scholar.google.com/citations?user=dPS1eM4AAAAJ&hl=en",
+        "website": "https://joanpalmiterbajorek.com",
+        "other": [
+          "https://developer.amazon.com/en-US/alexa/champions/joan-bajorek"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed via Wikipedia fetch: CEO of Clarity AI, founder of Women in Voice, PhD Univ. of Arizona."
+    },
+    {
+      "slug": "gary-bolles",
+      "name": "Gary Bolles",
+      "title": "Catalytic Speaker on The Future of Work, Learning, and Leading",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/gbolles/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.gbolles.com/",
+        "other": [
+          "https://www.su.org/experts/gary-bolles"
+        ]
+      },
+      "confidence": "medium",
+      "notes": "LinkedIn profile lists location as Washington, D.C. rather than San Francisco, but bio content (Future of Work/Learning courses, Singularity University) matches strongly."
+    },
+    {
+      "slug": "katie-mcmahon",
+      "name": "Katie McMahon",
+      "title": "Former VP at Shazam, President & COO at Native Voice",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/kwmcmahon/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://theorg.com/org/native-voice/org-chart/katie-mcmahon",
+          "https://techonomy.com/participant/katie-mcmahon/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn bio confirms Shazam VP Business Development and SoundHound background matching title; no personal website found."
+    },
+    {
+      "slug": "tee-ganbold",
+      "name": "Tee Ganbold",
+      "title": "Global tech leader and former ConsenSys and Cambridge Analytica executive, now building cyber-secure sovereign AI infrastructure for frontier markets.",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://uk.linkedin.com/in/teeganbold",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://aimagazine.com/executive/tee-ganbold",
+          "https://leeds.academia.edu/TeeGanbold"
+        ]
+      },
+      "confidence": "high",
+      "notes": "FrontierOne AI company website (frontierone.ai) referenced but not confirmed via a direct search-result link, so omitted."
+    },
+    {
+      "slug": "ben-parr",
+      "name": "Ben Parr",
+      "title": "AI Founder, Investor, Columnist, and Co-Founder of Octane AI",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/benparr/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Ben_Parr",
+        "google_scholar": "",
+        "website": "https://www.benparr.com/",
+        "other": [
+          "https://www.crunchbase.com/person/ben-parr"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed via Wikipedia fetch: Mashable editor-at-large, Octane AI co-founder, Captivology author."
+    },
+    {
+      "slug": "chris-duffey",
+      "name": "Chris Duffey",
+      "title": "Growth Marketer, Tech Futurist, & Best Selling Author",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/chrisduffeycreativeai/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Chris_Duffey",
+        "google_scholar": "",
+        "website": "https://chrisduffey.ai/",
+        "other": [
+          "https://www.koganpage.com/authors/chris-duffey"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Wikipedia article carries a conflict-of-interest notice but content matches (Adobe, Superhuman Innovation book)."
+    },
+    {
+      "slug": "sonal-gupta",
+      "name": "Sonal Gupta",
+      "title": "Principal Engineer (Director) at Google,  Former Senior Engineering Manager at Meta",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/sonalsgupta/",
+        "wikipedia": "",
+        "google_scholar": "https://scholar.google.com/citations?user=CLZ9dLoAAAAJ&hl=en",
+        "website": "https://www.sonalg.org/",
+        "other": []
+      },
+      "confidence": "high",
+      "notes": "Multiple same-name LinkedIn profiles exist; chosen one matches bio (Google DeepMind, Microsoft AI, Meta, Stanford PhD NLP)."
+    },
+    {
+      "slug": "tatyana-mamut",
+      "name": "Tatyana Mamut",
+      "title": "CEO and Founder of Wayfound, Former Chief Product Officer at Nextdoor, General Manager at Amazon, and VP of Product Experience at Salesforce",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/tmamut/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://tmamut.com",
+        "other": [
+          "https://pdsoros.org/fellows/tatyana-mamut/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn confirms CEO of Wayfound.ai, matches title exactly. No Wikipedia article found. Personal site tmamut.com mentioned in search snippets but not independently fetched/verified."
+    },
+    {
+      "slug": "dan-lohrmann",
+      "name": "Dan Lohrmann",
+      "title": "Field Chief information Security Officer for Public Sector at Presidio",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/danlohrmann",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://www.govtech.com/authors/dan-lohrmann.html",
+          "https://www.presidio.com/news/cybersecurity-leader-dan-lohrmann-joins-presidio-as-new-field-chief-information-security-officer/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn and press coverage confirm Field CISO for Public Sector at Presidio. No Wikipedia article or personal website found."
+    },
+    {
+      "slug": "charlene-li",
+      "name": "Charlene Li",
+      "title": "Author, Advisor, and Executive Coach",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/charleneli/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://charleneli.com/",
+        "other": [
+          "https://computerhistory.org/profile/charlene-li/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "No dedicated Wikipedia article found for Charlene Li (only a Wikidata entry and mentions in the Groundswell book article)."
+    },
+    {
+      "slug": "allie-k-miller",
+      "name": "Allie Miller",
+      "title": "Former Global Head of Machine Learning For Startups and Venture Capital at Amazon (AWS)",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/alliekmiller/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Allie_K._Miller",
+        "google_scholar": "",
+        "website": "https://www.alliekmiller.com/",
+        "other": []
+      },
+      "confidence": "high",
+      "notes": "Wikipedia article verified via fetch: confirms AWS Global Head of ML for Startups/VC role and IBM Watson background, matches title exactly."
+    },
+    {
+      "slug": "david-ewing-duncan",
+      "name": "David Ewing Duncan",
+      "title": "Award-Winning Journalist, Entrepreneur & Author",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/duncande/",
+        "wikipedia": "https://en.wikipedia.org/wiki/David_Ewing_Duncan",
+        "google_scholar": "",
+        "website": "http://www.davidewingduncan.com/",
+        "other": [
+          "https://www.penguinrandomhouse.com/authors/7570/david-ewing-duncan/",
+          "https://www.thedailybeast.com/author/david-ewing-duncan/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Wikipedia article verified via fetch: confirms journalist/author covering science, tech and AI; article links his site davidewingduncan.com."
+    },
+    {
+      "slug": "sounil-yu",
+      "name": "Sounil Yu",
+      "title": "Author, CISO, and Former CSS at Bank of America",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/sounil",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://cyberdefensematrix.com/bio",
+        "other": [
+          "https://www.sans.org/profiles/sounil-yu",
+          "https://nationalsecurity.gmu.edu/sounil-yu/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "No dedicated personal domain found; used his Cyber Defense Matrix bio page as the professional website. Bio confirms Bank of America Chief Security Scientist background and CISO/author work."
+    },
+    {
+      "slug": "zac-cramer-",
+      "name": "Zac Cramer",
+      "title": "IT Business Owner, Certified EOS Implementer, & AI Practitioner",
+      "existing": {
+        "website": "https://www.zactalks.com/about",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.zactalks.com/about",
+        "other": [
+          "https://implementer.eosworldwide.com/zac-cramer/"
+        ]
+      },
+      "confidence": "low",
+      "notes": "Could not confidently identify a LinkedIn profile: searches returned multiple different Zac/Zach Cramer LinkedIn profiles (Marathon Petroleum, Amazon, Intel, Rockbot, etc.) none matching 'IT Business Owner / Certified EOS Implementer' in Seattle. Existing website and EOS Worldwide implementer profile confirmed as a match instead."
+    },
+    {
+      "slug": "roman-yampolskiy",
+      "name": "Roman Yampolskiy",
+      "title": "AI Safety Researcher & Professor, University of Louisville",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/romanyam/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Roman_Yampolskiy",
+        "google_scholar": "https://scholar.google.com/citations?user=0_Rq68cAAAAJ&hl=en",
+        "website": "https://faculty.cse.louisville.edu/roman/",
+        "other": [
+          "https://engineering.louisville.edu/faculty/roman-v-yampolskiy/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn location (Prospect, KY, near Louisville) matches. All profiles consistent with AI safety professor at University of Louisville."
+    },
+    {
+      "slug": "brad-templeton",
+      "name": "Brad Templeton",
+      "title": "Speaker & Consultant on Robocars and Exponential Technology",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/brtempleton/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Brad_Templeton",
+        "google_scholar": "",
+        "website": "https://ideas.4brad.com/",
+        "other": [
+          "https://www.eff.org/about/board/brad-templeton"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn headline itself reads 'Speaker/Consultant on Robocars and Exponential Technology', an exact match to given title."
+    },
+    {
+      "slug": "shawna-pandya",
+      "name": "Dr. Shawna Pandya",
+      "title": "Physician, Astronaut, Aquanaut, & Explorer",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://ca.linkedin.com/in/shawnapandya",
+        "wikipedia": "https://en.wikipedia.org/wiki/Shawna_Pandya",
+        "google_scholar": "",
+        "website": "https://shawnapandya.com/",
+        "other": [
+          "https://www.xprize.org/people/dr-shawna-pandya",
+          "https://www.iafastro.org/biographie/shawna-pandya.html"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn shows University of Alberta Faculty of Medicine affiliation, consistent with Alberta, Canada location; physician/astronaut/aquanaut role confirmed across multiple sources."
+    },
+    {
+      "slug": "vicki-reyzelman",
+      "name": "Vicki Reyzelman",
+      "title": "Generative AI and Architecture Lead for UKG, Founder of Chat About AI Videocast",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/vickireyzelman/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://www.womentech.net/speaker/all/all/95993"
+        ]
+      },
+      "confidence": "medium",
+      "notes": "LinkedIn search snippet shows a stale title ('Akamai Technologies') rather than current UKG role, but bio/name/Atlanta-area details and prior history are consistent, so likely correct person. No personal website or Wikipedia found."
+    },
+    {
+      "slug": "rafael-grossmann",
+      "name": "Rafael Grossmann",
+      "title": "Surgeon, Digital Health Innovator, & Educator",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/rafaelgrossmann/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://rafaelgrossmann.com/",
+        "other": [
+          "https://www.nextmed.health/bio-rafaelgrossmann",
+          "https://www.hirux.health/rafael-grossmann"
+        ]
+      },
+      "confidence": "high",
+      "notes": "No genuine Wikipedia article exists for him. Role, location, and Google Glass surgery claim all verified consistent."
+    },
+    {
+      "slug": "stefano-bini",
+      "name": "Stefano Bini",
+      "title": "Academic Surgeon, AI Researcher, Digital Orthopaedics Advocate, and Technology Advisor",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/stefanobinimd/",
+        "wikipedia": "",
+        "google_scholar": "https://scholar.google.com/citations?user=mZjq0fMAAAAJ&hl=en",
+        "website": "https://orthosurgery.ucsf.edu/patient-care/faculty/stefano-bini",
+        "other": [
+          "https://docsf.health/",
+          "https://profiles.ucsf.edu/stefano.bini"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Verified via UCSF affiliation and Digital Health/ML research interests on the Google Scholar profile; a same-named unrelated scholar (labor law) was excluded."
+    },
+    {
+      "slug": "chris-barton",
+      "name": "Chris Barton",
+      "title": "Founder and Creator of Shazam, Entrepreneur, Inventor, and Tech Investor",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/cjpbarton/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Chris_Barton_(businessman)",
+        "google_scholar": "",
+        "website": "https://www.chrisjbarton.com/",
+        "other": []
+      },
+      "confidence": "high",
+      "notes": "Wikipedia article confirmed to be about the Shazam founder, matching bio."
+    },
+    {
+      "slug": "jonathan-brill",
+      "name": "Jonathan Brill",
+      "title": "Jonathan Brill, ranked the world’s #1 futurist by Forbes, helps leaders anticipate disruption and invent What Happens Next™.",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/jonathanbrill1/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Jonathan_Brill",
+        "google_scholar": "",
+        "website": "https://jonathanbrill.com/",
+        "other": [
+          "https://www.forbes.com/sites/jonathanbrill/",
+          "https://www.su.org/experts/jonathan-brill"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Wikipedia and Forbes contributor page both confirm futurist, former HP Global Futurist, author of Rogue Waves and AI and the Octopus Organization."
+    },
+    {
+      "slug": "matthew-blakemore",
+      "name": "Matthew Blakemore",
+      "title": "CEO/Founder of AI Caramba! and Former Head of Product at BBFC (British Board of Film Classification)",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/matthewblakemore/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://matthewblakemore.com/",
+        "other": []
+      },
+      "confidence": "high",
+      "notes": "LinkedIn location (London Area, UK) and AI Caramba/BBFC roles match given title exactly."
+    },
+    {
+      "slug": "simone-bianco",
+      "name": "Simone Bianco",
+      "title": "Vice President of Computation at Altos Labs",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/simone-bianco-altos",
+        "wikipedia": "",
+        "google_scholar": "https://scholar.google.com/citations?user=t5MOzQwAAAAJ&hl=en",
+        "website": "https://www.altoslabs.com/team/simone-bianco",
+        "other": []
+      },
+      "confidence": "medium",
+      "notes": "Common name; a second LinkedIn URL (linkedin.com/in/simone-bianco-a6ab9810/) also plausibly belongs to him, but the chosen one has 'altos' in its slug matching his employer. The Wikipedia 'Simone Bianco' article is an unrelated person (footballer)."
+    },
+    {
+      "slug": "peter-small",
+      "name": "Peter Small",
+      "title": "Acoustic Epidemiologist & Chief Medical Officer at Hyfe",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/peter-small-01ba9571/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.hyfe.com/petersmall",
+        "other": [
+          "https://theorg.com/org/hyfe/org-chart/peter-small"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn profile explicitly tagged 'Hyfe' and based in Seattle; bio matches Gates Foundation TB work exactly. No dedicated Google Scholar author page could be located despite extensive publication record."
+    },
+    {
+      "slug": "zach-rattner",
+      "name": "Zach Rattner",
+      "title": "CTO & Co-Founder at Yembo | Bringing AI to the home services industry | Author of Grow Up Fast: Lessons from an AI Startup",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/zachrattner/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://www.crunchbase.com/person/zach-rattner",
+          "https://books.apple.com/us/book/grow-up-fast/id6451005365"
+        ]
+      },
+      "confidence": "high",
+      "notes": "No standalone personal website found; LinkedIn and Crunchbase confirm CTO/co-founder role at Yembo and authorship of 'Grow Up Fast'."
+    },
+    {
+      "slug": "lee-sanders",
+      "name": "Lee Sanders",
+      "title": "Physician Scientist, Policy Analyst, and AI-Solutions Designer",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/lee-sanders-stanford/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://profiles.stanford.edu/lee-sanders",
+        "other": [
+          "https://healthpolicy.fsi.stanford.edu/people/Lee_M_Sanders",
+          "https://www.nextmed.health/bio-leesanders"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn handle itself includes 'stanford'; faculty/policy profile confirms Stanford pediatrics and health-policy role. A specific Google Scholar profile URL could not be confirmed."
+    },
+    {
+      "slug": "adam-gazzaley",
+      "name": "Adam Gazzaley",
+      "title": "Pioneering neuroscientist redefining medicine through AI-powered experiential technologies.",
+      "existing": {
+        "website": "https://gazzaley.com/",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/adam-gazzaley-6b54366/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Adam_Gazzaley",
+        "google_scholar": "https://scholar.google.com/citations?user=0aOK9u4AAAAJ&hl=en",
+        "website": "https://gazzaley.com/",
+        "other": [
+          "https://neuroscape.ucsf.edu/profile/adam-gazzaley/",
+          "https://profiles.ucsf.edu/adam.gazzaley"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Existing website confirmed correct; all sources consistent (UCSF, Neuroscape founder)."
+    },
+    {
+      "slug": "alison-mccauley",
+      "name": "Alison McCauley",
+      "title": "Pioneer in human-centered tech adoption and bestselling author of How to Think with AI, helping global leaders harness AI to unlock human potential.",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/unblocked/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.alisonmccauley.io/about",
+        "other": [
+          "https://www.thinkwithai.org/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn vanity URL 'unblocked' matches her book title; Wikipedia article for 'Alison McCullough' is a different, unrelated person."
+    },
+    {
+      "slug": "aviv-ovadya",
+      "name": "Aviv Ovadya",
+      "title": "Research Fellow at newDemocracy & founder of the Thoughtful Technology Project",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/avivovadya",
+        "wikipedia": "",
+        "google_scholar": "https://scholar.google.com/citations?user=pxbhfqAAAAAJ&hl=en",
+        "website": "https://aviv.me/",
+        "other": [
+          "https://cyber.harvard.edu/people/aviv-ovadya",
+          "https://www.belfercenter.org/person/aviv-ovadya"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn profile explicitly labeled 'The newDemocracy Foundation', matching title. No dedicated Wikipedia article found. Google Scholar profile matches his AI governance/collective intelligence research focus."
+    },
+    {
+      "slug": "darian-heyman",
+      "name": "Darian Rodriguez Heyman",
+      "title": "Speaker, Author & Consultant",
+      "existing": {
+        "website": "https://helpingpeoplehelp.com/",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/dheyman/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://helpingpeoplehelp.com/",
+        "other": [
+          "https://www.foundersspace.com/mentors/darian-rodriguez-heyman/",
+          "https://bioneers.org/peoples/darian-rodriguez-heyman/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn subtitle 'Helping People Help' matches existing website; located in Orinda, CA per search results, matching given location."
+    },
+    {
+      "slug": "drue-kataoka",
+      "name": "Drue Kataoka",
+      "title": "Empowering leaders to thrive in the AI era through visual intelligence and innovation.",
+      "existing": {
+        "website": "Drue.net",
+        "linkedin": "https://www.linkedin.com/in/druekataoka/",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/druekataoka/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Drue_Kataoka",
+        "google_scholar": "",
+        "website": "https://www.drue.net/",
+        "other": [
+          "https://milkeninstitute.org/events/global-conference-2022/speakers/drue-kataoka",
+          "https://worth.com/eventuser/drue-kataoka-2/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Wikipedia article confirmed via fetch: visual artist/technologist based in Silicon Valley (Portola Valley), matching given details exactly. Existing LinkedIn verified correct."
+    },
+    {
+      "slug": "elizabeth-bieniek",
+      "name": "Elizabeth Bieniek",
+      "title": "Helping organizations unlock exponential results through human-centered AI and systems thinking",
+      "existing": {
+        "website": "https://www.elizabethbieniek.com",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/elizabethbieniek",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.elizabethbieniek.com/",
+        "other": [
+          "https://blog.webex.com/contributors/elizabethbieniek/",
+          "https://www.simonandschuster.com/authors/Elizabeth-Bieniek/264273691"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed Austin, TX based author/speaker who led Webex Hologram at Cisco; LinkedIn title 'Keynote Speaker & Author' consistent."
+    },
+    {
+      "slug": "john-hagel",
+      "name": "John Hagel",
+      "title": "Founder, Beyond Our Edge, LLC",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/jhagel",
+        "wikipedia": "https://en.wikipedia.org/wiki/John_Hagel_III",
+        "google_scholar": "",
+        "website": "https://www.johnhagel.com/",
+        "other": [
+          "https://www.weforum.org/stories/authors/john-hagel-iii/",
+          "https://www.su.org/experts/john-hagel"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn profile explicitly lists 'Beyond Our Edge, LLC' matching title; Wikipedia confirms Deloitte Center for the Edge co-chairman role."
+    },
+    {
+      "slug": "mark-chamness",
+      "name": "Mark Chamness",
+      "title": "Partner & Head of Data Science at Invictus Growth Partners",
+      "existing": {
+        "website": "https://www.invictusgrowth.com/",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/mark-chamness/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.invictusgrowth.com/",
+        "other": [
+          "https://www.invictusgrowth.com/team/mark-chamness",
+          "https://theorg.com/org/invictus-growth-partners/org-chart/mark-chamness"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn and firm bio page both confirm 'Partner & Head of Data Science at Invictus Growth Partners', matching title exactly."
+    },
+    {
+      "slug": "nolan-gasser",
+      "name": "Nolan Gasser",
+      "title": "Co-Creator of Pandora Radio, Best-Selling Author",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/nolan-gasser-89651926/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Nolan_Gasser",
+        "google_scholar": "",
+        "website": "https://www.nolangasser.com/",
+        "other": [
+          "https://www.bigspeak.com/speakers/nolan-gasser/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Wikipedia and LinkedIn both confirm composer/musicologist/Music Genome Project architect; no Google Scholar profile found."
+    },
+    {
+      "slug": "robert-strong",
+      "name": "Robert Strong",
+      "title": "Magician, Author, and Speaker",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/robertstrong/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.strongentertainment.com/",
+        "other": [
+          "https://cleancomedians.com/speakers/robert-strong/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "LinkedIn snippet also identifies him as founder of Speak About AI, consistent with the requesting bureau; comedy magician bio matches title."
+    },
+    {
+      "slug": "mike-cassidy",
+      "name": "Mike Cassidy",
+      "title": "CEO of Apollo Fusion, Project Leader of Project Loon, former VP at Google",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/michaelpcassidy/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Mike_Cassidy_(entrepreneur)",
+        "google_scholar": "",
+        "website": "https://www.mikecassidy.com/",
+        "other": [
+          "https://www.dorbit.com/about"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Wikipedia and LinkedIn confirm Project Loon leadership and Apollo Fusion CEO history (now CEO of D-Orbit USA), consistent with given title's past roles."
+    },
+    {
+      "slug": "shafi-ahmed",
+      "name": "Shafi Ahmed",
+      "title": "Award Winning Surgeon, Futurist, and Entrepreneur",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://uk.linkedin.com/in/professorshafiahmed",
+        "wikipedia": "https://en.wikipedia.org/wiki/Shafi_Ahmed",
+        "google_scholar": "https://scholar.google.co.uk/citations?user=0lIUPKgAAAAJ&hl=en",
+        "website": "https://www.professorshafiahmed.com/",
+        "other": [
+          "https://medical.xrsi.org/team/shafi-ahmed",
+          "https://www.nextmed.health/bio-shafi-ahmed"
+        ]
+      },
+      "confidence": "medium",
+      "notes": "LinkedIn/Wikipedia/website strongly confirmed as London-based VR surgery pioneer. Google Scholar profile shows 'Unknown affiliation' so identity match is plausible but not fully certain — a second, clearly different Shafi Ahmed (Bangladesh) also exists on Scholar and was excluded."
+    },
+    {
+      "slug": "murray-newlands",
+      "name": "Murray Newlands",
+      "title": "Partner, IA Seed Ventures & Founder, Open Future Forum",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/murraynewlands/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.murraynewlands.com/",
+        "other": [
+          "https://openfutureforum.com/about"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed founder of Open Future Forum, Bay Area based, consistent with given title and location; several other unrelated 'Murray Newlands' LinkedIn profiles exist and were excluded."
+    },
+    {
+      "slug": "paolo-privitera",
+      "name": "Paolo Privitera",
+      "title": "Investor, 1521 Ventures",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/paoloprivitera",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://1521.vc/",
+        "other": [
+          "https://www.smau.it/speakers/paolo.privitera",
+          "https://www.healthwildcatters.com/paolo-privitera"
+        ]
+      },
+      "confidence": "high",
+      "notes": "MIT MBA, founder/GP of 1521 Ventures (San Francisco), also EVP Corporate Development at Events.com; details consistent across LinkedIn, Smau, and Health Wildcatters bios."
+    },
+    {
+      "slug": "ashley-tarver",
+      "name": "Ashley Tarver",
+      "title": "Data & AI Cloud Evangelist at Microsoft",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/ashley-ai/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://theorg.com/org/microsoft/org-chart/ashley-tarver"
+        ]
+      },
+      "confidence": "medium",
+      "notes": "Two LinkedIn URLs appear for what looks like the same Microsoft Data/AI/Cloud Evangelist (SF Bay Area, ex-Cloudera, Army veteran): linkedin.com/in/ashley-ai/ and linkedin.com/in/ashley-tarver-ab1321/. Could not confirm which is current/canonical; no personal website found."
+    },
+    {
+      "slug": "larry-magid",
+      "name": "Larry Magid",
+      "title": "CEO at ConnectSafely.org & Tech Journalist",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/larrymagid/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Larry_Magid",
+        "google_scholar": "",
+        "website": "https://connectsafely.org/about-us/larry-magid-ceo/",
+        "other": [
+          "https://www.forbes.com/sites/larrymagid/",
+          "https://www.larrysworld.com/about/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "CEO/co-founder of ConnectSafely.org, ex-CBS News tech analyst, Bay Area based; identity consistent across all sources."
+    },
+    {
+      "slug": "sagar-savla",
+      "name": "Sagar Savla",
+      "title": "Product Management Lead at Google & Author",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/sagarsavla/",
+        "wikipedia": "",
+        "google_scholar": "https://scholar.google.com/citations?user=HGO_5IsAAAAJ&hl=en",
+        "website": "http://sagz.in/",
+        "other": [
+          "https://research.google/people/sagarsavla/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Product/ML lead at Google (Live Transcribe, ML Fairness); consistent across LinkedIn, Google Research profile, and Google Scholar."
+    },
+    {
+      "slug": "joanna-bryson",
+      "name": "Prof. Joanna Bryson, PhD",
+      "title": "Professor of Ethics & Technology at Hertie School, in Berlin",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://de.linkedin.com/in/bryson",
+        "wikipedia": "https://en.wikipedia.org/wiki/Joanna_Bryson",
+        "google_scholar": "https://scholar.google.com/citations?user=QOU1RTUAAAAJ&hl=en",
+        "website": "https://www.joannajbryson.org/",
+        "other": [
+          "https://www.hertie-school.org/en/research/faculty-and-researchers/profile/person/bryson"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Professor of Ethics and Technology at Hertie School, Berlin; formerly Univ. of Bath. All sources consistent."
+    },
+    {
+      "slug": "alex-salkever",
+      "name": "Alex Salkever",
+      "title": "Award-Winning AI Author & Editor",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/alexsalkever/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://alexsalkever.com/",
+        "other": [
+          "https://muckrack.com/alex-salkever",
+          "https://www.leadingauthorities.com/speakers/alex-salkever"
+        ]
+      },
+      "confidence": "high",
+      "notes": "AI/tech author, ex-Mozilla VP, ex-BusinessWeek Technology Editor; consistent across sources."
+    },
+    {
+      "slug": "mark-kelly",
+      "name": "Mark Kelly",
+      "title": "Founder of AI Ireland & Speaker",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/markkellyalldus/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://markkellyai.com/",
+        "other": [
+          "https://aiireland.ie/about-mark-kelly-founder-at-ai-ireland/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed as Founder of AI Ireland & AI Awards, CCO of Alldus, Dublin-based — distinct from Mark Kelly the hurler or the US astronaut/senator, whose Wikipedia pages were excluded."
+    },
+    {
+      "slug": "chris-ategeka",
+      "name": "Christopher Helms Ategeka",
+      "title": "Author, Speaker, and Engineer",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/christopherategeka/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.christopherategeka.com/",
+        "other": [
+          "https://www.ted.com/speakers/christopher_ategeka",
+          "https://fellows.ted.com/fellows/1144806"
+        ]
+      },
+      "confidence": "medium",
+      "notes": "LinkedIn profile (San Francisco, UC Berkeley) matches Uganda-born engineer/entrepreneur/author/TED Fellow bio. No dedicated Wikipedia article found."
+    },
+    {
+      "slug": "ted-selker",
+      "name": "Ted Selker",
+      "title": "AI Visionary, Inventor, Scientist, Professor, and Entrepreneur",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/ted-selker",
+        "wikipedia": "https://en.wikipedia.org/wiki/Ted_Selker",
+        "google_scholar": "https://scholar.google.com/citations?user=4n5ZBd0AAAAJ&hl=en",
+        "website": "http://ted.selker.com/",
+        "other": [
+          "https://www.computerhistory.org/collections/catalog/102740176",
+          "https://www.ithistory.org/honoree/edwin-ted-joseph-selker"
+        ]
+      },
+      "confidence": "high",
+      "notes": "IBM TrackPoint inventor, IBM Fellow, ex-MIT Media Lab; all sources consistent."
+    },
+    {
+      "slug": "vandi-verma",
+      "name": "Vandi Verma",
+      "title": "Deputy Manager for Mobility and Robotics Systems Section at NASA",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/vandi-verma-286678/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Vandi_Verma",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://www-robotics.jpl.nasa.gov/who-we-are/people/vandi_verma/",
+          "https://mars.nasa.gov/people/profile/index.cfm?id=22882"
+        ]
+      },
+      "confidence": "high",
+      "notes": "NASA JPL Deputy Manager, Mobility and Robotics Systems Section; Mars rover driver; LinkedIn location and role consistent."
+    },
+    {
+      "slug": "alfred-poor",
+      "name": "Alfred Poor",
+      "title": "Journalist, Author, & Health Tech Futurist",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/alfredpoor/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://alfredpoor.com/",
+        "other": [
+          "https://muckrack.com/alfred-poor",
+          "https://www.techblick.com/team/alfred-poor"
+        ]
+      },
+      "confidence": "high",
+      "notes": "'The Health Tech Futurist,' editor of Health Tech Insider. An 'Alfred Easton Poor' Wikipedia article exists but is a different person (architect, d. 1988) — excluded."
+    },
+    {
+      "slug": "shawn-flynn",
+      "name": "Shawn Flynn",
+      "title": "Investment Banker, M&A Expert, and Podcast Host",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/shawnpflynn/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://thesiliconvalleypodcast.com/",
+          "https://www.globalcapitalmarkets.com/shawn-flynn"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Confirmed via multiple sources as Principal at Global Capital Markets and host of The Silicon Valley Podcast, matching title. No personal website separate from the podcast site."
+    },
+    {
+      "slug": "rene-caissie",
+      "name": "Rene Caissie",
+      "title": "CEO and Co-Founder at Medeloop.ai and Stanford University Adjunct Professor",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/renecaissie/",
+        "wikipedia": "",
+        "google_scholar": "https://scholar.google.com/citations?user=bpv7YfsAAAAJ&hl=en",
+        "website": "",
+        "other": [
+          "https://profiles.stanford.edu/rene-caissie",
+          "https://med.stanford.edu/master-clinical-informatics-management/mcim-community/mentors/rene-caissie.html"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Google Scholar profile has Stanford-verified email and publications consistent with former surgeon turned Medeloop.ai CEO and Stanford adjunct. No personal website or Wikipedia found."
+    },
+    {
+      "slug": "reza-zadeh",
+      "name": "Reza Zadeh",
+      "title": "CEO of Matroid & Stanford Professor",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/rezab/",
+        "wikipedia": "https://en.wikipedia.org/wiki/Reza_Zadeh",
+        "google_scholar": "https://scholar.google.com/citations?user=TbUEDGIAAAAJ&hl=en",
+        "website": "https://stanford.edu/~rezab/",
+        "other": [
+          "https://icme.stanford.edu/people/reza-zadeh",
+          "https://www.crunchbase.com/person/reza-zadeh"
+        ]
+      },
+      "confidence": "high",
+      "notes": "All profiles consistently describe him as CEO of Matroid and Stanford adjunct professor, matching the given title exactly."
+    },
+    {
+      "slug": "-nikhil-gowda",
+      "name": "Nikhil Gowda",
+      "title": "",
+      "existing": {
+        "website": "https://www.robotsinthewild.ai/",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/ngowda/",
+        "wikipedia": "",
+        "google_scholar": "https://scholar.google.com/citations?user=2zVrP74AAAAJ&hl=en",
+        "website": "https://www.robotsinthewild.ai/",
+        "other": []
+      },
+      "confidence": "medium",
+      "notes": "robotsinthewild.ai identifies him as CEO/Co-Founder, ex-Senior UX Researcher at Amazon Last Mile. Scholar profile matches via co-authorship with Wendy Ju on a paper cited on the site. Common name made search noisy — medium confidence."
+    },
+    {
+      "slug": "nicky-verd",
+      "name": "Nicky Verd",
+      "title": "Digital Futurist Nicky Verd helps people and organizations redefine their relevance and thrive in an AI economy where culture, not tech, is the true catalyst for change.",
+      "existing": {
+        "website": "https://nickyverd.com/",
+        "linkedin": "https://www.linkedin.com/in/nicky-verd-82b3679a/",
+        "twitter": "https://twitter.com/nicky_verd"
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/nicky-verd-82b3679a/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://nickyverd.com/",
+        "other": [
+          "https://www.thinkers360.com/tl/profiles/view/2810",
+          "https://www.southafricaspeakerbureau.com/speaker-profile/nicky-verd"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Existing website and LinkedIn confirmed consistent (Johannesburg, Digital Futurist, author of 'Disrupt Yourself Or Be Disrupted'). No Wikipedia article found."
+    },
+    {
+      "slug": "robert-daigle",
+      "name": "Robert Daigle",
+      "title": "Global Director of AI at Lenovo, dedicated to democratizing artificial intelligence by bridging the gap between startup agility and Fortune 200 scale.",
+      "existing": {
+        "website": "https://robertdaigle.com/",
+        "linkedin": "https://www.linkedin.com/in/rdaigle/",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/rdaigle/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://robertdaigle.com/",
+        "other": [
+          "https://lenovopress.lenovo.com/author/robert-daigle",
+          "https://www.insight.com/en_US/content-and-resources/authors/robert-daigle.html"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Existing LinkedIn and website confirmed consistent (Global Director of AI at Lenovo). A Wikipedia article titled 'Robert Daigle' exists but is about a different person (Pentagon/DoD official) — excluded."
+    },
+    {
+      "slug": "russell-wald",
+      "name": "Russell Wald",
+      "title": "A leading authority in AI governance and Executive Director of Stanford HAI, bridging the gap between cutting-edge technology and responsible public policy.",
+      "existing": {
+        "website": "https://hai.stanford.edu/people/russell-wald",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/russellwald/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://hai.stanford.edu/people/russell-wald",
+        "other": [
+          "https://profiles.stanford.edu/russell-wald",
+          "https://nationalsecurity.gmu.edu/russell-wald/"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Existing website confirmed. LinkedIn confirms role as Executive Director, Stanford HAI. No Wikipedia article for him."
+    },
+    {
+      "slug": "shashi-tripathi",
+      "name": "Shashi Tripathi",
+      "title": "",
+      "existing": {
+        "website": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/shashitripathi/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "",
+        "other": [
+          "https://www.crunchbase.com/person/shashi-tripathi",
+          "https://theorg.com/org/impedimed/org-chart/shashi-tripathi",
+          "https://socal2025.techconglobal.com/team/shashi-tripathi/"
+        ]
+      },
+      "confidence": "medium",
+      "notes": "No title in source data; identity inferred from SpeakAbout.AI bio: Managing Partner at Nurture Growth Fund, former CTO at ImpediMed. LinkedIn URL found on his TechCon SoCal speaker bio page, not independently cross-verified; common name — medium confidence."
+    },
+    {
+      "slug": "reed-dickson",
+      "name": "Reed Dickson",
+      "title": "Director for Online Faculty Experience & Innovation at PimaOnline",
+      "existing": {
+        "website": "https://www.reeddickson.com/",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "proposed": {
+        "linkedin": "https://www.linkedin.com/in/reeddickson/",
+        "wikipedia": "",
+        "google_scholar": "",
+        "website": "https://www.reeddickson.com/",
+        "other": [
+          "https://members.educause.edu/reed-dickson",
+          "https://www.aacu.org/people/reed-dickson-2"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Existing website confirmed. LinkedIn profile described in search results as 'Reed Dickson from Pima Community College located in Tucson, Arizona,' matching title and location exactly."
+    }
+  ]
+}

@@ -59,6 +59,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${BASE_URL}/ai-keynote-speakers`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/conference-directory`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/case-studies`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
   ]
   
   // Industry pages with high SEO value
@@ -128,7 +146,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Individual speaker pages - VERY IMPORTANT FOR SEO
   const speakerPages: MetadataRoute.Sitemap = speakers.map((speaker) => ({
     url: `${BASE_URL}/speakers/${speaker.slug}`,
-    lastModified: now,
+    // Use the real update date when we have one so crawlers can tell what
+    // actually changed instead of seeing every profile as modified daily
+    lastModified: speaker.lastUpdated ? new Date(speaker.lastUpdated) : now,
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }))

@@ -49,12 +49,15 @@ export interface Speaker {
   // Location
   location?: string
   
-  // Social Media (JSONB in DB)
+  // Social Media (JSONB in DB) — keys use the _url suffix in the actual data
   social_media?: {
-    twitter?: string
-    linkedin?: string
-    instagram?: string
-    youtube?: string
+    twitter_url?: string
+    linkedin_url?: string
+    instagram_url?: string
+    youtube_url?: string
+    wikipedia_url?: string
+    google_scholar_url?: string
+    other_urls?: string[]
   }
   
   // Topics and expertise

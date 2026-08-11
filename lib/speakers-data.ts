@@ -19,6 +19,9 @@ export interface Speaker {
   linkedin?: string
   twitter?: string
   website?: string
+  wikipedia?: string
+  googleScholar?: string
+  otherProfiles?: string[] // additional authoritative profile URLs (faculty pages, TED, Crunchbase, etc.) for sameAs
   featured?: boolean
   videos?: {
     id: string
@@ -686,6 +689,9 @@ export async function getSpeakerBySlug(slug: string): Promise<Speaker | undefine
             linkedin: dbSpeaker.social_media?.linkedin_url || '',
             twitter: dbSpeaker.social_media?.twitter_url || '',
             website: dbSpeaker.website || '',
+            wikipedia: dbSpeaker.social_media?.wikipedia_url || '',
+            googleScholar: dbSpeaker.social_media?.google_scholar_url || '',
+            otherProfiles: Array.isArray(dbSpeaker.social_media?.other_urls) ? dbSpeaker.social_media.other_urls : [],
             featured: dbSpeaker.featured || false,
             videos: parseJsonField(dbSpeaker.videos),
             testimonials: parseJsonField(dbSpeaker.testimonials),

@@ -522,8 +522,36 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     contentHtml = "<p>No content available for this post.</p>"
   }
 
+  const blogPostSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt || undefined,
+    "image": featuredImageUrl || undefined,
+    "datePublished": post.publishedDate,
+    "dateModified": (post as any).updatedDate || post.publishedDate,
+    "author": {
+      "@type": post.author?.name ? "Person" : "Organization",
+      "name": post.author?.name || "Speak About AI",
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Speak About AI",
+      "url": "https://speakabout.ai",
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://speakabout.ai/resources/${post.slug}`,
+    },
+    "keywords": post.categories?.map((category) => category.name).join(", ") || undefined,
+  }
+
   return (
     <article className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostSchema) }}
+      />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           href="/resources"

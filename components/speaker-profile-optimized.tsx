@@ -10,6 +10,7 @@ import { MapPin, Linkedin, Globe, Mail, ArrowLeft, Play, Quote, Building, Award,
 import type { Speaker } from "@/lib/speakers-data"
 import { SpeakerRelatedBlogPosts } from "@/components/speaker-related-blog-posts"
 import { SpeakerSimilarSpeakers } from "@/components/speaker-similar-speakers"
+import { getSpeakerFaqs } from "@/lib/speaker-faq"
 
 interface OptimizedSpeakerProfileProps {
   speaker: Speaker
@@ -186,7 +187,7 @@ const OptimizedSpeakerProfile: React.FC<OptimizedSpeakerProfileProps> = ({ speak
                     {speaker.name}
                   </h1>
                   {speaker.title && (
-                    <p className="text-xl text-gray-600">
+                    <p className="speaker-title text-xl text-gray-600">
                       {speaker.title}
                     </p>
                   )}
@@ -319,7 +320,7 @@ const OptimizedSpeakerProfile: React.FC<OptimizedSpeakerProfileProps> = ({ speak
                           <Award className="w-8 h-8 mr-3 text-[#1E68C6]" />
                           About {speaker.name}
                         </h2>
-                        <div className="prose prose-lg max-w-none text-gray-700">
+                        <div className="speaker-bio prose prose-lg max-w-none text-gray-700">
                           {formatBio(speaker.bio)}
                         </div>
                       </section>
@@ -329,7 +330,7 @@ const OptimizedSpeakerProfile: React.FC<OptimizedSpeakerProfileProps> = ({ speak
                     {speaker.expertise && speaker.expertise.length > 0 && (
                       <section>
                         <h2 className="text-3xl font-bold text-gray-900 mb-6">Areas of Expertise</h2>
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="speaker-expertise grid md:grid-cols-2 gap-4">
                           {speaker.expertise.map((skill, index) => (
                             <div key={index} className="bg-gray-50 p-4 rounded-lg">
                               <span className="font-semibold text-gray-900">{skill}</span>
@@ -654,26 +655,12 @@ const OptimizedSpeakerProfile: React.FC<OptimizedSpeakerProfileProps> = ({ speak
               <h2 className="text-2xl font-bold mb-4">
                 Frequently Asked Questions About Booking {speaker.name}
               </h2>
-              <h3 className="text-xl font-semibold mt-6">
-                What is {speaker.name}'s speaking fee?
-              </h3>
-              <p>
-                {speaker.name}'s speaking fee is {speaker.fee || 'available upon request'}. 
-                Final pricing depends on event location, date, and specific requirements.
-              </p>
-              <h3 className="text-xl font-semibold mt-6">
-                What topics does {speaker.name} speak about?
-              </h3>
-              <p>
-                {speaker.name} specializes in {speaker.topics?.slice(0, 3).join(', ') || 'AI and technology topics'}, 
-                delivering customized presentations for your audience.
-              </p>
-              <h3 className="text-xl font-semibold mt-6">
-                Is {speaker.name} available for virtual events?
-              </h3>
-              <p>
-                Yes, {speaker.name} is available for both in-person and virtual keynote presentations worldwide.
-              </p>
+              {getSpeakerFaqs(speaker).map((faq, index) => (
+                <div key={index}>
+                  <h3 className="text-xl font-semibold mt-6">{faq.question}</h3>
+                  <p>{faq.answer}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

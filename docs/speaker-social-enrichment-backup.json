@@ -1,0 +1,648 @@
+{
+  "backedUpAt": "2026-08-11T03:05:30.417Z",
+  "rows": [
+    {
+      "slug": "peter-norvig",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "robin-farmanfarmaian",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "ryan-pamplin",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "simone-bianco",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "shashi-tripathi",
+      "website": "",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "shama-hyder",
+      "website": "https://shamahyder.com/",
+      "social_media": {
+        "twitter": "",
+        "youtube": "",
+        "facebook": "",
+        "linkedin": "",
+        "instagram": ""
+      }
+    },
+    {
+      "slug": "zach-rattner",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "dan-russell",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "vandi-verma",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "reza-zadeh",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "shawn-flynn",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "alfred-poor",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "alex-salkever",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "rafael-grossmann",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "darian-heyman",
+      "website": "https://helpingpeoplehelp.com/",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "shafi-ahmed",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "mo-tiwari",
+      "website": "",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "jonathan-brill",
+      "website": "",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "adam-gazzaley",
+      "website": "https://gazzaley.com/",
+      "social_media": {
+        "twitter": "https://twitter.com/adamgazz",
+        "youtube": "",
+        "facebook": "https://www.facebook.com/adamgazz",
+        "linkedin": "https://www.linkedin.com/in/adam-gazzaley-6b54366",
+        "instagram": "https://instagram.com/adamGazz"
+      }
+    },
+    {
+      "slug": "alison-mccauley",
+      "website": "",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "nicky-verd",
+      "website": "https://nickyverd.com/",
+      "social_media": {
+        "twitter_url": "https://twitter.com/nicky_verd",
+        "youtube_url": "https://www.youtube.com/channel/UCd1re4UWmKW6cz-_bzoz_Dg?view_as=subscriber",
+        "linkedin_url": "https://www.linkedin.com/in/nicky-verd-82b3679a/",
+        "instagram_url": "https://www.instagram.com/nicky_verd/"
+      }
+    },
+    {
+      "slug": "russell-wald",
+      "website": "https://hai.stanford.edu/people/russell-wald",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "reed-dickson",
+      "website": "https://www.reeddickson.com/",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "tatyana-mamut",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "zac-cramer-",
+      "website": "https://www.zactalks.com/about",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "cassie-kozyrkov",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "vicki-reyzelman",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "julie-holmes",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "chris-ategeka",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "peter-small",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "tee-ganbold",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "chris-yeh",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "larry-magid",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "elizabeth-bieniek",
+      "website": "https://www.elizabethbieniek.com",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "rene-caissie",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "brad-templeton",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "adam-cheyer",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "dan-lohrmann",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "roman-yampolskiy",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "sounil-yu",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "david-ewing-duncan",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "gary-bolles",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "-nikhil-gowda",
+      "website": "https://www.robotsinthewild.ai/",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "ted-selker",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "nolan-gasser",
+      "website": "",
+      "social_media": {
+        "twitter": "",
+        "youtube": "",
+        "facebook": "",
+        "linkedin": "",
+        "instagram": ""
+      }
+    },
+    {
+      "slug": "vishal-sharma",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "lee-sanders",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "maya-ackerman",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "ashley-tarver",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "shawna-pandya",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "lital-marom",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "aviv-ovadya",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "joanna-bryson",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "jeremiah-owyang",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "brittany-hodak",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "jamie-metzl",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "john-hagel",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "mark-chamness",
+      "website": "https://www.invictusgrowth.com/",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "paolo-privitera",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "daniel-kraft",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "chris-duffey",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "divya-chander",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "simon-pierro",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "charlene-li",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "rana-el-kaliouby",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "allie-k-miller",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "lucien-engelen",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "max-sills",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "dag-kittlaus",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "gopi-kallayil",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "murray-newlands",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "stefano-bini",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "ben-parr",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "drue-kataoka",
+      "website": " Drue.net",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "https://www.linkedin.com/in/druekataoka/",
+        "instagram_url": "https://www.instagram.com/druekataoka/"
+      }
+    },
+    {
+      "slug": "robert-daigle",
+      "website": "https://robertdaigle.com/",
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "https://www.linkedin.com/in/rdaigle/",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "sonal-gupta",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "mike-cassidy",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "katie-mcmahon",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "matthew-blakemore",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "chris-barton",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "luc-julia",
+      "website": null,
+      "social_media": {}
+    },
+    {
+      "slug": "robert-strong",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "joan-bajorek",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "mark-kelly",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "nancy-xu",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    },
+    {
+      "slug": "sagar-savla",
+      "website": null,
+      "social_media": {
+        "twitter_url": "",
+        "youtube_url": "",
+        "linkedin_url": "",
+        "instagram_url": ""
+      }
+    }
+  ]
+}
