@@ -92,7 +92,7 @@ const faqSchema = {
       name: "How much does it cost to book an AI keynote speaker?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "AI keynote speaker fees typically range from $5K-$20K for emerging experts to $20K+ for industry leaders. Final pricing depends on format, location, date, and speaker requirements."
+        text: "Most AI keynote speakers cost between $15,000 and $65,000: emerging experts run $15K-$20K, established founders and researchers $20K-$30K, and marquee names $30K-$65K+. Most corporate bookings land under $30K. Final pricing depends on format, location, date, and speaker requirements."
       }
     },
     {

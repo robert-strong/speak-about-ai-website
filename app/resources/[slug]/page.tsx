@@ -1,4 +1,5 @@
 import { getBlogPostBySlug, getBlogPosts } from "@/lib/blog-data"
+import { getBlogPostSeo } from "@/lib/blog-post-seo"
 import Image from "next/image"
 
 // Revalidate every 60 seconds so new/updated posts appear without a full redeploy
@@ -387,11 +388,13 @@ export async function generateMetadata({ params }: BlogPostPageProps, parent: Re
     description = description.substring(0, 157) + "..."
   }
 
-  // Ensure title doesn't exceed ~45 chars (template adds "| Speak About AI")
+  // Prefer a hand-written SEO title; otherwise keep titles under ~45 chars
+  // (the layout template appends "| Speak About AI")
+  const seoOverrides = getBlogPostSeo(params.slug)
   const maxTitleLength = 45
-  let pageTitle = post.title
-  if (post.title.length > maxTitleLength) {
-    pageTitle = post.title.substring(0, maxTitleLength - 3) + "..."
+  let pageTitle = seoOverrides?.seoTitle || post.title
+  if (pageTitle.length > maxTitleLength) {
+    pageTitle = pageTitle.substring(0, maxTitleLength - 3) + "..."
   }
 
   return {
@@ -522,6 +525,24 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     contentHtml = "<p>No content available for this post.</p>"
   }
 
+  const faqs = getBlogPostSeo(params.slug)?.faqs
+
+  const faqSchema =
+    faqs && faqs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": faqs.map((faq) => ({
+            "@type": "Question",
+            "name": faq.question,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": faq.answer,
+            },
+          })),
+        }
+      : null
+
   const blogPostSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -552,6 +573,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostSchema) }}
       />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           href="/resources"
@@ -616,6 +643,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                      prose-li:marker:text-gray-500 dark:prose-li:marker:text-gray-400"
           dangerouslySetInnerHTML={{ __html: contentHtml }}
         />
+
+        {faqs && faqs.length > 0 && (
+          <section className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
+              Frequently Asked Questions
+            </h2>
+            <div className="space-y-6">
+              {faqs.map((faq) => (
+                <div key={faq.question}>
+                  <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{faq.question}</h3>
+                  <p className="leading-relaxed text-gray-700 dark:text-gray-300">{faq.answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </article>
   )

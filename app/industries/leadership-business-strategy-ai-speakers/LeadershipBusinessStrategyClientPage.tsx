@@ -207,6 +207,32 @@ export default function LeadershipBusinessStrategyClientPage({ speakers }: Leade
         </div>
       </section>
 
+      {/* Related guides */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center shadow-sm">
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Booking for a Non-Technical Leadership Room?</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Read our guide to the{" "}
+              <Link
+                href="/resources/ai-speakers-non-technical-executive-audiences"
+                className="text-blue-600 font-semibold hover:underline"
+              >
+                AI speakers who actually land with non-technical executive audiences
+              </Link>{" "}
+              , plus{" "}
+              <Link
+                href="/resources/15-questions-to-ask-an-ai-keynote-speaker-before-you-book"
+                className="text-blue-600 font-semibold hover:underline"
+              >
+                the 15 questions to ask before you book
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

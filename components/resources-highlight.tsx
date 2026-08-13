@@ -1,6 +1,29 @@
 import Link from "next/link"
 import { ArrowRight, BookOpen, Sparkles } from "lucide-react"
 
+const popularGuides = [
+  {
+    href: "/resources/how-much-does-an-ai-keynote-speaker-cost-2026",
+    title: "AI Keynote Speaker Cost: 2026 Fee Data",
+    blurb: "Real fee ranges, tier by tier, and what moves the number.",
+  },
+  {
+    href: "/resources/how-to-book-an-ai-keynote-speaker",
+    title: "How to Book an AI Keynote Speaker",
+    blurb: "The full process and honest timelines, inquiry to event.",
+  },
+  {
+    href: "/resources/15-questions-to-ask-an-ai-keynote-speaker-before-you-book",
+    title: "15 Questions to Ask Before You Book",
+    blurb: "The vetting checklist a bureau runs so you don't have to.",
+  },
+  {
+    href: "/resources/top-women-ai-keynote-speakers-2026",
+    title: "Top Women AI Keynote Speakers of 2026",
+    blurb: "Eight of the most credentialed AI voices working today.",
+  },
+]
+
 export default function ResourcesHighlight() {
   return (
     <section className="py-20 bg-gradient-to-b from-white to-gray-50">
@@ -87,6 +110,26 @@ export default function ResourcesHighlight() {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* Popular booking guides */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+          {popularGuides.map((guide) => (
+            <Link
+              key={guide.href}
+              href={guide.href}
+              className="group block bg-white p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-200 hover:border-[#1E68C6]"
+            >
+              <h3 className="font-semibold text-gray-900 font-neue-haas mb-2 group-hover:text-[#1E68C6] transition-colors">
+                {guide.title}
+              </h3>
+              <p className="text-sm text-gray-600 font-montserrat mb-3">{guide.blurb}</p>
+              <span className="inline-flex items-center gap-1.5 text-sm text-[#1E68C6] font-semibold font-montserrat">
+                Read the guide
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

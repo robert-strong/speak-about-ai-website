@@ -487,6 +487,35 @@ export default function HealthcareKeynoteSpeakersClientPage({ speakers }: Health
         </div>
       </section>
 
+      {/* Related guide */}
+      <section className="py-12 md:py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              Not Sure Which Speaker Fits Your Audience?
+            </h2>
+            <p className="text-gray-600 mb-5 max-w-2xl mx-auto">
+              Our guide to the{" "}
+              <Link
+                href="/resources/best-ai-keynote-speakers-healthcare-events"
+                className="text-[#1E68C6] font-semibold hover:underline"
+              >
+                best AI keynote speakers for healthcare events
+              </Link>{" "}
+              matches medically credentialed AI experts to clinical, executive, and payer audiences, from hospital
+              boards to HIMSS. For budgeting, see our{" "}
+              <Link
+                href="/resources/how-much-does-an-ai-keynote-speaker-cost-2026"
+                className="text-[#1E68C6] font-semibold hover:underline"
+              >
+                2026 AI keynote speaker fee guide
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section - Styled like Home Booking CTA */}
       <section className="py-20 md:py-28 bg-gradient-to-r from-blue-600 to-blue-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

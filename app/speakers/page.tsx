@@ -208,6 +208,46 @@ export default async function SpeakersPage() {
           </div>
         </section>
       )}
+
+      {/* SEO + UX: crawlable links from the highest-authority listing page down
+          to the booking-intent guides on the blog */}
+      <section aria-label="AI speaker booking guides" className="bg-gray-50 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Guides to booking an AI speaker</h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2">
+            <li>
+              <a href="/resources/how-much-does-an-ai-keynote-speaker-cost-2026" className="text-sm text-gray-600 hover:text-[#1E68C6] hover:underline">
+                How much does an AI keynote speaker cost in 2026?
+              </a>
+            </li>
+            <li>
+              <a href="/resources/how-to-book-an-ai-keynote-speaker" className="text-sm text-gray-600 hover:text-[#1E68C6] hover:underline">
+                How to book an AI keynote speaker: timeline and process
+              </a>
+            </li>
+            <li>
+              <a href="/resources/15-questions-to-ask-an-ai-keynote-speaker-before-you-book" className="text-sm text-gray-600 hover:text-[#1E68C6] hover:underline">
+                15 questions to ask an AI keynote speaker before you book
+              </a>
+            </li>
+            <li>
+              <a href="/resources/top-women-ai-keynote-speakers-2026" className="text-sm text-gray-600 hover:text-[#1E68C6] hover:underline">
+                The top women AI keynote speakers of 2026
+              </a>
+            </li>
+            <li>
+              <a href="/resources/best-ai-keynote-speakers-healthcare-events" className="text-sm text-gray-600 hover:text-[#1E68C6] hover:underline">
+                Best AI keynote speakers for healthcare events
+              </a>
+            </li>
+            <li>
+              <a href="/resources/ai-speakers-non-technical-executive-audiences" className="text-sm text-gray-600 hover:text-[#1E68C6] hover:underline">
+                AI speakers for non-technical executive audiences
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
     </>
   )
 }

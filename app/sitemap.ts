@@ -159,7 +159,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Individual blog post pages from Contentful
   const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${BASE_URL}/resources/${post.slug}`,
-    lastModified: new Date(post.publishedDate),
+    // Prefer Contentful's real update timestamp so crawlers see edits,
+    // not just the original publish date
+    lastModified: new Date(post.sys?.updatedAt || post.publishedDate),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }))
