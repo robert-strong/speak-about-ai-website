@@ -100,6 +100,28 @@ const nextConfig = {
         destination: '/resources',
         permanent: true,
       },
+      // Old posts that were never migrated to /resources: send to the index
+      // rather than a 404. Must come before the /blog/:slug* wildcard.
+      {
+        source: '/blog/competitive-advantage-strategies',
+        destination: '/resources',
+        permanent: true,
+      },
+      {
+        source: '/blog/motivational-speakers-for-businesses',
+        destination: '/resources',
+        permanent: true,
+      },
+      {
+        source: '/resources/competitive-advantage-strategies',
+        destination: '/resources',
+        permanent: true,
+      },
+      {
+        source: '/resources/motivational-speakers-for-businesses',
+        destination: '/resources',
+        permanent: true,
+      },
       {
         source: '/blog/:slug*',
         destination: '/resources/:slug*',
