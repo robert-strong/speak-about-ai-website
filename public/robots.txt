@@ -11,7 +11,9 @@ Disallow: /debug*
 Disallow: /test*
 Disallow: /apply
 Disallow: /*?source=
+Disallow: /*&source=
 Disallow: /*?utm_
+Disallow: /*&utm_
 
 # Named groups override the * group, so each named crawler gets the full rule set.
 # Search engines
@@ -50,7 +52,9 @@ Disallow: /debug*
 Disallow: /test*
 Disallow: /apply
 Disallow: /*?source=
+Disallow: /*&source=
 Disallow: /*?utm_
+Disallow: /*&utm_
 
 # Sitemap location
 Sitemap: https://speakabout.ai/sitemap.xml

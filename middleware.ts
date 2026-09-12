@@ -64,6 +64,7 @@ export async function middleware(request: NextRequest) {
     '/contact',
     '/about',
     '/resources',
+    '/blog', // legacy blog URL, redirected to /resources in next.config.mjs
     '/our-services',
     '/our-team',
     '/partners',

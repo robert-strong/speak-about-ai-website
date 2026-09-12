@@ -92,6 +92,19 @@ const nextConfig = {
   // SEO redirects for workshops
   async redirects() {
     return [
+      // The blog moved from /blog/* to /resources/*. Old URLs are still linked from
+      // article bodies and external backlinks; without these the middleware's
+      // root-slug rule sent /blog to /speakers/blog (404).
+      {
+        source: '/blog',
+        destination: '/resources',
+        permanent: true,
+      },
+      {
+        source: '/blog/:slug*',
+        destination: '/resources/:slug*',
+        permanent: true,
+      },
       {
         source: '/workshops',
         destination: '/ai-workshops',

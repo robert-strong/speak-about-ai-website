@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
+import { isFormHealthCheckRequest, HEALTH_CHECK_EMAIL } from '@/lib/form-health'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +14,10 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Synthetic submission from the form health monitor (lib/form-health.ts):
+    // exercises the real insert and deletes its own record.
+    const isHealthCheck = isFormHealthCheckRequest(request) && email.toLowerCase() === HEALTH_CHECK_EMAIL
 
     // Get request metadata
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
@@ -29,9 +34,14 @@ export async function POST(request: NextRequest) {
 
     const sql = neon(process.env.DATABASE_URL)
 
+    if (isHealthCheck) {
+      // Clear any leftover from an interrupted previous check, then take the real insert path
+      await sql`DELETE FROM newsletter_signups WHERE email = ${HEALTH_CHECK_EMAIL}`
+    }
+
     // Check if email already exists
     const existing = await sql`
-      SELECT email, status FROM newsletter_signups 
+      SELECT email, status FROM newsletter_signups
       WHERE email = ${email.toLowerCase()}
     `
 
@@ -75,6 +85,11 @@ export async function POST(request: NextRequest) {
         'services-page'
       )
     `
+
+    if (isHealthCheck) {
+      await sql`DELETE FROM newsletter_signups WHERE email = ${HEALTH_CHECK_EMAIL}`
+      return NextResponse.json({ success: true, healthCheck: true })
+    }
 
     return NextResponse.json({
       success: true,

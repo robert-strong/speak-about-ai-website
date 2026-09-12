@@ -35,6 +35,7 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 import { Turnstile } from '@marsidev/react-turnstile'
+import { reportFormFailure } from '@/lib/form-failure-reporter'
 
 interface Speaker {
   id: number
@@ -425,10 +426,18 @@ export function CustomContactForm({
         setHasNoSpeakerInMind(false)
         setHasNoWorkshopInMind(false)
       } else {
-        throw new Error(result.error || 'Failed to submit')
+        // Server answered but rejected the submission; only 5xx/404 are reported as outages
+        reportFormFailure({ formId: 'contact', kind: 'server_error', statusCode: response.status, message: result.error })
+        const submitError = new Error(result.error || 'Failed to submit')
+        ;(submitError as any).reported = true
+        throw submitError
       }
     } catch (error) {
       console.error('Form submission error:', error)
+      if (!(error as any)?.reported) {
+        // Request never completed (network down, route missing, non-JSON error page)
+        reportFormFailure({ formId: 'contact', kind: 'network_error', message: error instanceof Error ? error.message : undefined })
+      }
       toast({
         title: "Submission failed",
         description: error instanceof Error ? error.message : "Please try again or contact us directly.",
@@ -1051,7 +1060,10 @@ export function CustomContactForm({
               <Turnstile
                 siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
                 onSuccess={(token) => setTurnstileToken(token)}
-                onError={() => setTurnstileToken('')}
+                onError={(code) => {
+                  setTurnstileToken('')
+                  reportFormFailure({ formId: 'contact', kind: 'turnstile_error', message: code ? `Turnstile error ${code}` : 'Turnstile widget error' })
+                }}
                 onExpire={() => setTurnstileToken('')}
                 options={{
                   theme: 'light',

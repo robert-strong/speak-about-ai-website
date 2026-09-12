@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Progress } from "@/components/ui/progress"
+import { reportFormFailure } from "@/lib/form-failure-reporter"
 import { 
   Loader2, 
   CheckCircle, 
@@ -304,10 +305,13 @@ export default function SpeakerApplicationPage() {
       if (response.ok) {
         setIsSubmitted(true)
       } else {
+        // Only 5xx/404 are reported as outages; validation errors are not
+        reportFormFailure({ formId: 'speaker-application', kind: 'server_error', statusCode: response.status, message: data.error })
         setError(data.error || "Failed to submit application. Please try again.")
       }
     } catch (error) {
       console.error("Error submitting application:", error)
+      reportFormFailure({ formId: 'speaker-application', kind: 'network_error', message: error instanceof Error ? error.message : undefined })
       setError("An error occurred. Please try again later.")
     } finally {
       setIsSubmitting(false)

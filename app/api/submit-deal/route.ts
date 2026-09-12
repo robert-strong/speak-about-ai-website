@@ -4,6 +4,8 @@ import { sendNewInquiryEmail } from '@/lib/email-service-new'
 // import { getWishlist, clearWishlist, transferWishlistToVisitor } from '@/lib/wishlist-utils'
 import { recordEvent } from '@/lib/analytics-db'
 import { verifyTurnstileToken, getClientIP } from '@/lib/turnstile'
+import { isFormHealthCheckRequest, HEALTH_CHECK_EMAIL } from '@/lib/form-health'
+import { neon } from '@neondatabase/serverless'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,23 +19,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify Turnstile token (spam protection)
-    const turnstileToken = formData.turnstileToken
-    if (!turnstileToken) {
-      return NextResponse.json(
-        { error: 'CAPTCHA verification required. Please complete the CAPTCHA.' },
-        { status: 400 }
-      )
-    }
+    // Synthetic submission from the form health monitor (lib/form-health.ts):
+    // exercises the real code path, skips CAPTCHA + notifications, deletes its own record.
+    const isHealthCheck = isFormHealthCheckRequest(request) && formData.clientEmail === HEALTH_CHECK_EMAIL
 
-    const clientIP = getClientIP(request)
-    const verification = await verifyTurnstileToken(turnstileToken, clientIP)
+    if (!isHealthCheck) {
+      // Verify Turnstile token (spam protection)
+      const turnstileToken = formData.turnstileToken
+      if (!turnstileToken) {
+        return NextResponse.json(
+          { error: 'CAPTCHA verification required. Please complete the CAPTCHA.' },
+          { status: 400 }
+        )
+      }
 
-    if (!verification.success) {
-      return NextResponse.json(
-        { error: verification.error || 'CAPTCHA verification failed. Please try again.' },
-        { status: 403 }
-      )
+      const clientIP = getClientIP(request)
+      const verification = await verifyTurnstileToken(turnstileToken, clientIP)
+
+      if (!verification.success) {
+        return NextResponse.json(
+          { error: verification.error || 'CAPTCHA verification failed. Please try again.' },
+          { status: 403 }
+        )
+      }
     }
 
     // Get session info
@@ -83,6 +91,13 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to create deal' },
         { status: 500 }
       )
+    }
+
+    if (isHealthCheck) {
+      // Remove the test deal immediately; no emails, no analytics
+      const sql = neon(process.env.DATABASE_URL!)
+      await sql`DELETE FROM deals WHERE id = ${dealId} AND client_email = ${HEALTH_CHECK_EMAIL}`
+      return NextResponse.json({ success: true, healthCheck: true, dealId })
     }
 
     // Get the created deal for email notification

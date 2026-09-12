@@ -451,6 +451,15 @@ export function AdminSidebar({ className, isLayoutInstance }: AdminSidebarProps)
           permissionKey: "settings"
         },
         {
+          title: "Form Health",
+          href: "/admin/form-health",
+          icon: Activity,
+          description: "Website Form Monitoring",
+          color: "text-emerald-600",
+          bgColor: "bg-emerald-50",
+          permissionKey: "system"
+        },
+        {
           title: "Database",
           href: "/debug-neon",
           icon: Database,

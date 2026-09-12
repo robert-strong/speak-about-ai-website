@@ -3,6 +3,7 @@ import { neon } from "@neondatabase/serverless"
 import { requireAdminAuth } from "@/lib/auth-middleware"
 import { sendEmail } from "@/lib/email"
 import { getAdminEmails } from "@/lib/admin-emails"
+import { isFormHealthCheckRequest, HEALTH_CHECK_EMAIL } from "@/lib/form-health"
 
 const sql = neon(process.env.DATABASE_URL!)
 
@@ -29,6 +30,14 @@ export async function POST(request: NextRequest) {
         { error: "Invalid email address" },
         { status: 400 }
       )
+    }
+
+    // Synthetic submission from the form health monitor (lib/form-health.ts):
+    // exercises the real insert, skips the admin email, deletes its own record.
+    const isHealthCheck = isFormHealthCheckRequest(request) && body.email.toLowerCase() === HEALTH_CHECK_EMAIL
+    if (isHealthCheck) {
+      // Clear any leftover from an interrupted previous check so the duplicate guard passes
+      await sql`DELETE FROM speaker_applications WHERE email = ${HEALTH_CHECK_EMAIL}`
     }
 
     // Check if email already exists
@@ -153,6 +162,11 @@ export async function POST(request: NextRequest) {
       )
       RETURNING id, email, first_name, last_name
     `
+
+    if (isHealthCheck) {
+      await sql`DELETE FROM speaker_applications WHERE id = ${application.id}`
+      return NextResponse.json({ success: true, healthCheck: true, applicationId: application.id })
+    }
 
     // Send notification email to admin about new application
     try {
