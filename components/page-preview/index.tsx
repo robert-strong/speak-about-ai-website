@@ -4,6 +4,16 @@ import { useState } from "react"
 import { Award, MapPin, Globe, Shield, Clock, Users, Headphones, Target, DollarSign, Globe2, Check, Calendar, ArrowRight, Mic, GraduationCap } from "lucide-react"
 import { EditableText, EditableImage, LogoListEditor, OfferingsListEditor, SimpleListEditor, TeamMembersListEditor, BudgetRangesListEditor, DeliveryOptionsListEditor, FooterLinkListEditor, type ServiceOffering, type TeamMember, type BudgetRange, type DeliveryOption, type FooterLink } from "@/components/editable-text"
 import { Button } from "@/components/ui/button"
+import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
+
+// Shown in the editor wherever a phone/email field is hidden on the live site
+function HiddenContactNote({ what }: { what: string }) {
+  return (
+    <p className="text-xs italic opacity-70">
+      {what} hidden on the live site (visitors are sent to the contact form). Values are kept and can be re-enabled.
+    </p>
+  )
+}
 
 interface PagePreviewProps {
   page: "home" | "services" | "team" | "speakers" | "workshops" | "contact" | "footer" | "settings"
@@ -1054,6 +1064,12 @@ function HomeBookingCTAPreview({
         </div>
 
         {/* Contact Info */}
+        {!SHOW_DIRECT_CONTACT_INFO ? (
+          <div className="text-sm text-blue-200 font-montserrat">
+            <p>Questions? <span className="font-semibold underline">Send us a message</span> and we will respond within 24 hours.</p>
+            <HiddenContactNote what="WhatsApp number and email" />
+          </div>
+        ) : (
         <div className="text-sm text-blue-200 font-montserrat space-y-2">
           <div className="flex items-center justify-center gap-2">
             <span>WhatsApp:</span>
@@ -1076,6 +1092,7 @@ function HomeBookingCTAPreview({
             />
           </div>
         </div>
+        )}
       </div>
     </section>
   )
@@ -1794,15 +1811,22 @@ function JoinTeamPreview({
             isModified={isModified('team.cta.button_text', content, originalContent)}
             editorMode={editorMode}
           />
-          <div className="text-white text-sm">
-            Email: <EditableText
-              value={email}
-              onChange={(v) => onContentChange('team.cta.email', v)}
-              className="underline"
-              isModified={isModified('team.cta.email', content, originalContent)}
-              editorMode={editorMode}
-            />
-          </div>
+          {SHOW_DIRECT_CONTACT_INFO ? (
+            <div className="text-white text-sm">
+              Email: <EditableText
+                value={email}
+                onChange={(v) => onContentChange('team.cta.email', v)}
+                className="underline"
+                isModified={isModified('team.cta.email', content, originalContent)}
+                editorMode={editorMode}
+              />
+            </div>
+          ) : (
+            <div className="text-white text-sm">
+              <span>Button links to the contact form.</span>
+              <HiddenContactNote what="Email" />
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -2594,6 +2618,15 @@ function ContactPreview({
             isModified={isModified('contact.help.title', content, originalContent)}
             editorMode={editorMode}
           />
+          {!SHOW_DIRECT_CONTACT_INFO ? (
+            <div className="text-gray-600 space-y-2">
+              <p>
+                Submit the form above and a member of our team will get back to you within 24 hours.
+                If you would prefer a phone call, let us know in the additional information field and we will set one up.
+              </p>
+              <HiddenContactNote what="Phone number and email" />
+            </div>
+          ) : (
           <div className="grid md:grid-cols-2 gap-6">
             <div className="flex items-start gap-3">
               <span className="text-gray-400 text-xl">📞</span>
@@ -2636,6 +2669,7 @@ function ContactPreview({
               </div>
             </div>
           </div>
+          )}
         </div>
 
         {/* Success Message Preview */}
@@ -2855,27 +2889,39 @@ function FooterPreview({
               editorMode={editorMode}
             />
             <div className="space-y-2">
-              <div className="flex items-start">
-                <span className="w-4 h-4 mr-3 text-blue-500 mt-1">📞</span>
-                <EditableText
-                  value={phone}
-                  onChange={(v) => onContentChange('footer.company.phone', v)}
-                  className="text-gray-300 whitespace-pre-line"
-                  isModified={isModified('footer.company.phone', content, originalContent)}
-                  editorMode={editorMode}
-                  multiline={true}
-                />
-              </div>
-              <div className="flex items-center">
-                <span className="w-4 h-4 mr-3 text-blue-500">✉️</span>
-                <EditableText
-                  value={email}
-                  onChange={(v) => onContentChange('footer.company.email', v)}
-                  className="text-gray-300"
-                  isModified={isModified('footer.company.email', content, originalContent)}
-                  editorMode={editorMode}
-                />
-              </div>
+              {!SHOW_DIRECT_CONTACT_INFO ? (
+                <div className="text-gray-300">
+                  <div className="flex items-center">
+                    <span className="w-4 h-4 mr-3 text-blue-500">💬</span>
+                    <span>Get in touch through our contact form</span>
+                  </div>
+                  <HiddenContactNote what="Phone number and email" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-start">
+                    <span className="w-4 h-4 mr-3 text-blue-500 mt-1">📞</span>
+                    <EditableText
+                      value={phone}
+                      onChange={(v) => onContentChange('footer.company.phone', v)}
+                      className="text-gray-300 whitespace-pre-line"
+                      isModified={isModified('footer.company.phone', content, originalContent)}
+                      editorMode={editorMode}
+                      multiline={true}
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-4 h-4 mr-3 text-blue-500">✉️</span>
+                    <EditableText
+                      value={email}
+                      onChange={(v) => onContentChange('footer.company.email', v)}
+                      className="text-gray-300"
+                      isModified={isModified('footer.company.email', content, originalContent)}
+                      editorMode={editorMode}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
