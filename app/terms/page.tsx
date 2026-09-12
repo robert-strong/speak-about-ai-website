@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { SHOW_DIRECT_CONTACT_INFO, CONTACT_FORM_PATH } from "@/lib/contact-visibility"
 
 export const metadata: Metadata = {
   title: "Terms of Service | Speak About AI",
@@ -122,21 +123,33 @@ export default function TermsOfServicePage() {
             </p>
 
             <h2 className="text-2xl font-bold pt-6">9. Contact Us</h2>
-            <p>If you have any questions about these Terms, please contact us:</p>
-            <ul>
-              <li>
-                Email:{" "}
-                <a href="mailto:human@speakabout.ai" className="text-blue-600 dark:text-blue-400 hover:underline">
-                  human@speakabout.ai
-                </a>
-              </li>
-              <li>
-                Phone:{" "}
-                <a href="tel:+14156652442" className="text-blue-600 dark:text-blue-400 hover:underline">
-                  +1 (415) 665-2442
-                </a>
-              </li>
-            </ul>
+            {SHOW_DIRECT_CONTACT_INFO ? (
+              <>
+                <p>If you have any questions about these Terms, please contact us:</p>
+                <ul>
+                  <li>
+                    Email:{" "}
+                    <a href="mailto:human@speakabout.ai" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      human@speakabout.ai
+                    </a>
+                  </li>
+                  <li>
+                    Phone:{" "}
+                    <a href="tel:+14156652442" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      +1 (415) 665-2442
+                    </a>
+                  </li>
+                </ul>
+              </>
+            ) : (
+              <p>
+                If you have any questions about these Terms, please contact us through our{" "}
+                <Link href={CONTACT_FORM_PATH} className="text-blue-600 dark:text-blue-400 hover:underline">
+                  contact form
+                </Link>
+                .
+              </p>
+            )}
             <p className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <em className="text-sm text-gray-500 dark:text-gray-400">
                 Disclaimer: This Terms of Service document is a template and is not a substitute for legal advice. You

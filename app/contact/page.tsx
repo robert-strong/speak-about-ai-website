@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { ContactFormWrapper } from "@/components/contact-form-wrapper"
 import { getPageContent, getFromContent } from "@/lib/website-content"
+import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
 
 // Force dynamic rendering to prevent hydration mismatches
 export const dynamic = 'force-dynamic'
@@ -50,9 +51,11 @@ export default async function ContactPage() {
     // Help
     needHelpTitle: getFromContent(content, 'contact', 'help', 'title') || 'Need Help?',
     callLabel: getFromContent(content, 'contact', 'help', 'call_label') || 'Call us directly',
-    phone: getFromContent(content, 'contact', 'help', 'phone') || '+1 (415) 665-2442',
+    // Direct contact details are only sent to the browser when SHOW_DIRECT_CONTACT_INFO is on
+    // (client component props end up in the page HTML even if they are not rendered)
+    phone: SHOW_DIRECT_CONTACT_INFO ? (getFromContent(content, 'contact', 'help', 'phone') || '+1 (415) 665-2442') : '',
     emailLabel: getFromContent(content, 'contact', 'help', 'email_label') || 'Email us',
-    email: getFromContent(content, 'contact', 'help', 'email') || 'human@speakabout.ai',
+    email: SHOW_DIRECT_CONTACT_INFO ? (getFromContent(content, 'contact', 'help', 'email') || 'human@speakabout.ai') : '',
     // Newsletter
     newsletterTitle: getFromContent(content, 'contact', 'newsletter', 'title') || 'Subscribe to our newsletter',
     newsletterDescription: getFromContent(content, 'contact', 'newsletter', 'description') || 'Get exclusive AI speaker insights, event trends, and industry updates delivered to your inbox.',

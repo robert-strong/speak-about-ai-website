@@ -1,3 +1,5 @@
+import { SHOW_DIRECT_CONTACT_INFO } from "./contact-visibility"
+
 export function generateOrganizationSchema() {
   return {
     "@context": "https://schema.org",
@@ -12,7 +14,7 @@ export function generateOrganizationSchema() {
     ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+1-650-123-4567",
+      ...(SHOW_DIRECT_CONTACT_INFO ? { "telephone": "+1-650-123-4567" } : { "url": "https://www.speakabout.ai/contact" }),
       "contactType": "sales",
       "areaServed": "Worldwide",
       "availableLanguage": ["English"]

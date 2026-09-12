@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import Link from "next/link"
+import { SHOW_DIRECT_CONTACT_INFO, CONTACT_FORM_PATH } from "@/lib/contact-visibility"
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Speak About AI", // 33 chars
@@ -263,8 +265,19 @@ export default function PrivacyPolicyPage() {
                 <p className="text-gray-700 mb-2">
                   <strong>Speak About AI</strong>
                 </p>
-                <p className="text-gray-700 mb-2">Email: human@speakabout.ai</p>
-                <p className="text-gray-700 mb-2">Phone: +1 (415) 665-2442</p>
+                {SHOW_DIRECT_CONTACT_INFO ? (
+                  <>
+                    <p className="text-gray-700 mb-2">Email: human@speakabout.ai</p>
+                    <p className="text-gray-700 mb-2">Phone: +1 (415) 665-2442</p>
+                  </>
+                ) : (
+                  <p className="text-gray-700 mb-2">
+                    Contact:{" "}
+                    <Link href={CONTACT_FORM_PATH} className="text-blue-600 hover:underline">
+                      speakabout.ai/contact
+                    </Link>
+                  </p>
+                )}
                 <p className="text-gray-700">Address: Palo Alto, CA</p>
               </div>
             </section>

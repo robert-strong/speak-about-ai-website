@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertCircle } from "lucide-react"
+import { SHOW_DIRECT_CONTACT_INFO, CONTACT_FORM_PATH } from "@/lib/contact-visibility"
 
 function LoginForm() {
   const router = useRouter()
@@ -148,10 +149,19 @@ function LoginForm() {
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Need help? Contact{" "}
-            <a href="mailto:hello@speakabout.ai" className="text-blue-600 hover:underline">
-              hello@speakabout.ai
-            </a>
+            Need help?{" "}
+            {SHOW_DIRECT_CONTACT_INFO ? (
+              <>
+                Contact{" "}
+                <a href="mailto:hello@speakabout.ai" className="text-blue-600 hover:underline">
+                  hello@speakabout.ai
+                </a>
+              </>
+            ) : (
+              <a href={CONTACT_FORM_PATH} className="text-blue-600 hover:underline">
+                Send us a message
+              </a>
+            )}
           </p>
         </CardContent>
       </Card>

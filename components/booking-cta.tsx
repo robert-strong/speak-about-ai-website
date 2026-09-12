@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Calendar } from "lucide-react"
 import { getPageContent, getFromContent } from "@/lib/website-content"
+import { SHOW_DIRECT_CONTACT_INFO, CONTACT_FORM_PATH } from "@/lib/contact-visibility"
 
 export default async function BookingCTA() {
   // Fetch content from database
@@ -54,7 +55,15 @@ export default async function BookingCTA() {
             </Link>
           </Button>
         </div>
-        {contactInfoOverride ? (
+        {!SHOW_DIRECT_CONTACT_INFO ? (
+          <p className="mt-8 text-sm text-blue-200 font-montserrat">
+            Questions?{" "}
+            <Link href={`${CONTACT_FORM_PATH}?source=home_page_cta_contact`} className="font-semibold hover:underline">
+              Send us a message
+            </Link>{" "}
+            and we will respond within 24 hours.
+          </p>
+        ) : contactInfoOverride ? (
           <p className="mt-8 text-sm text-blue-200 font-montserrat">{contactInfoOverride}</p>
         ) : (
           <p className="mt-8 text-sm text-blue-200 font-montserrat">

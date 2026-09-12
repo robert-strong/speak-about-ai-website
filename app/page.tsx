@@ -9,6 +9,7 @@ import HomeFAQSection from "@/components/home-faq-section"
 import BookingCTA from "@/components/booking-cta"
 import { getFeaturedSpeakers, type Speaker } from "@/lib/speakers-data"
 import { getPageContent, getFromContent } from "@/lib/website-content"
+import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
 
 export const metadata: Metadata = {
   title: "AI Keynote Speakers | Book Artificial Intelligence Speakers for Events",
@@ -75,9 +76,10 @@ const organizationSchema = {
   ],
   contactPoint: {
     "@type": "ContactPoint",
-    telephone: "+1-415-665-2442",
     contactType: "sales",
-    email: "hello@speakabout.ai",
+    url: "https://speakabout.ai/contact",
+    // Direct phone/email are only published when SHOW_DIRECT_CONTACT_INFO is on
+    ...(SHOW_DIRECT_CONTACT_INFO ? { telephone: "+1-415-665-2442", email: "hello@speakabout.ai" } : {}),
     availableLanguage: ["en"],
     areaServed: "Worldwide",
   },

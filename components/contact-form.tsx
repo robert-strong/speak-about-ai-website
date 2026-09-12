@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
 
 function ContactFormContent() {
   const searchParams = useSearchParams()
@@ -100,27 +101,31 @@ function ContactFormContent() {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Get in Touch</h2>
 
               <div className="space-y-6">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <Phone className="h-6 w-6 text-[#1E68C6]" />
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900">Call Us</h3>
-                    <p className="mt-1 text-gray-600">+1 (415) 665-2442</p>
-                    <p className="mt-1 text-sm text-gray-500">Monday-Friday, 9am-6pm PT</p>
-                  </div>
-                </div>
+                {SHOW_DIRECT_CONTACT_INFO && (
+                  <>
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <Phone className="h-6 w-6 text-[#1E68C6]" />
+                      </div>
+                      <div className="ml-4">
+                        <h3 className="text-lg font-medium text-gray-900">Call Us</h3>
+                        <p className="mt-1 text-gray-600">+1 (415) 665-2442</p>
+                        <p className="mt-1 text-sm text-gray-500">Monday-Friday, 9am-6pm PT</p>
+                      </div>
+                    </div>
 
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <Mail className="h-6 w-6 text-[#1E68C6]" />
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900">Email Us</h3>
-                    <p className="mt-1 text-gray-600">human@speakabout.ai</p>
-                    <p className="mt-1 text-sm text-gray-500">We respond within 24 hours</p>
-                  </div>
-                </div>
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <Mail className="h-6 w-6 text-[#1E68C6]" />
+                      </div>
+                      <div className="ml-4">
+                        <h3 className="text-lg font-medium text-gray-900">Email Us</h3>
+                        <p className="mt-1 text-gray-600">human@speakabout.ai</p>
+                        <p className="mt-1 text-sm text-gray-500">We respond within 24 hours</p>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <div className="flex items-start">
                   <div className="flex-shrink-0">

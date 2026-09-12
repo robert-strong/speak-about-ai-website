@@ -2,6 +2,7 @@ import { CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { SHOW_DIRECT_CONTACT_INFO, CONTACT_FORM_PATH } from "@/lib/contact-visibility"
 
 export default function SpeakerThankYouPage() {
   return (
@@ -47,10 +48,22 @@ export default function SpeakerThankYouPage() {
           </div>
           
           <p className="text-gray-600 mb-8">
-            In the meantime, feel free to reach out if you have any questions at{" "}
-            <a href="mailto:speakers@speakaboutai.com" className="text-blue-600 hover:underline">
-              speakers@speakaboutai.com
-            </a>
+            In the meantime, feel free to reach out if you have any questions{" "}
+            {SHOW_DIRECT_CONTACT_INFO ? (
+              <>
+                at{" "}
+                <a href="mailto:speakers@speakaboutai.com" className="text-blue-600 hover:underline">
+                  speakers@speakaboutai.com
+                </a>
+              </>
+            ) : (
+              <>
+                through our{" "}
+                <Link href={CONTACT_FORM_PATH} className="text-blue-600 hover:underline">
+                  contact form
+                </Link>
+              </>
+            )}
           </p>
           
           <div className="flex justify-center gap-4">

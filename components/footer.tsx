@@ -1,7 +1,8 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Phone, Mail, Linkedin } from "lucide-react"
+import { Phone, Mail, Linkedin, MessageSquare } from "lucide-react"
 import { getPageContent, getFromContent } from "@/lib/website-content"
+import { SHOW_DIRECT_CONTACT_INFO, CONTACT_FORM_PATH } from "@/lib/contact-visibility"
 
 export default async function Footer() {
   // Fetch footer content from database
@@ -95,14 +96,25 @@ export default async function Footer() {
               {description}
             </p>
             <div className="space-y-2">
-              <div className="flex items-start">
-                <Phone className="w-4 h-4 mr-3 mt-1 text-[#1E68C6]" />
-                <span className="text-[#EAEAEE] whitespace-pre-line">{phone}</span>
-              </div>
-              <div className="flex items-center">
-                <Mail className="w-4 h-4 mr-3 text-[#1E68C6]" />
-                <span className="text-[#EAEAEE]">{email}</span>
-              </div>
+              {SHOW_DIRECT_CONTACT_INFO ? (
+                <>
+                  <div className="flex items-start">
+                    <Phone className="w-4 h-4 mr-3 mt-1 text-[#1E68C6]" />
+                    <span className="text-[#EAEAEE] whitespace-pre-line">{phone}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Mail className="w-4 h-4 mr-3 text-[#1E68C6]" />
+                    <span className="text-[#EAEAEE]">{email}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center">
+                  <MessageSquare className="w-4 h-4 mr-3 text-[#1E68C6]" />
+                  <Link href={`${CONTACT_FORM_PATH}?source=footer`} className="text-[#EAEAEE] hover:text-white">
+                    Get in touch through our contact form
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 

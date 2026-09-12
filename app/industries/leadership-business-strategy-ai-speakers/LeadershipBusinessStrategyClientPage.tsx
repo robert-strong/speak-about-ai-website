@@ -5,6 +5,7 @@ import { SpeakerCard } from "@/components/speaker-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
+import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
 import {
   TrendingUp,
   Users,
@@ -254,11 +255,13 @@ export default function LeadershipBusinessStrategyClientPage({ speakers }: Leade
               <Link href="/our-services">Learn About Our Services</Link>
             </Button>
           </div>
-          <div className="mt-8 text-lg">
-            <p>
-              Call us directly: <span className="font-semibold">+1 (415) 665-2442</span>
-            </p>
-          </div>
+          {SHOW_DIRECT_CONTACT_INFO && (
+            <div className="mt-8 text-lg">
+              <p>
+                Call us directly: <span className="font-semibold">+1 (415) 665-2442</span>
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </div>

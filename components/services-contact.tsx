@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Phone, Mail, Calendar } from "lucide-react"
 import Link from "next/link"
 import { getPageContent, getFromContent } from "@/lib/website-content"
+import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
 
 export default async function ServicesContact() {
   // Fetch content from database
@@ -42,28 +43,32 @@ export default async function ServicesContact() {
               {buttonText}
             </Link>
           </Button>
-          <Button
-            asChild
-            variant="default"
-            size="lg"
-            className="bg-white text-[#1E68C6] hover:bg-gray-100 text-lg px-8 py-4 font-montserrat"
-          >
-            <a href={`tel:${phoneNumber}`}>
-              <Phone className="w-5 h-5 mr-2" />
-              Call: ({displayPhone.slice(0, 3)}) {displayPhone.slice(4)}
-            </a>
-          </Button>
-          <Button
-            asChild
-            variant="default"
-            size="lg"
-            className="bg-white text-[#1E68C6] hover:bg-gray-100 text-lg px-8 py-4 font-montserrat"
-          >
-            <a href={`mailto:${email}`}>
-              <Mail className="w-5 h-5 mr-2" />
-              Email Us
-            </a>
-          </Button>
+          {SHOW_DIRECT_CONTACT_INFO && (
+            <>
+              <Button
+                asChild
+                variant="default"
+                size="lg"
+                className="bg-white text-[#1E68C6] hover:bg-gray-100 text-lg px-8 py-4 font-montserrat"
+              >
+                <a href={`tel:${phoneNumber}`}>
+                  <Phone className="w-5 h-5 mr-2" />
+                  Call: ({displayPhone.slice(0, 3)}) {displayPhone.slice(4)}
+                </a>
+              </Button>
+              <Button
+                asChild
+                variant="default"
+                size="lg"
+                className="bg-white text-[#1E68C6] hover:bg-gray-100 text-lg px-8 py-4 font-montserrat"
+              >
+                <a href={`mailto:${email}`}>
+                  <Mail className="w-5 h-5 mr-2" />
+                  Email Us
+                </a>
+              </Button>
+            </>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">

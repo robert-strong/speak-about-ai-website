@@ -10,6 +10,12 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Star, Sparkles } from "lucide-react"
 import { submitContactForm } from "@/app/actions/submit-contact-form"
+import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
+
+// Fallback instruction shown when a submission fails
+const RETRY_HINT = SHOW_DIRECT_CONTACT_INFO
+  ? "Please try again or call us directly at +1 (415) 665-2442."
+  : "Please try again in a few minutes."
 
 interface FormDataState {
   name: string
@@ -60,7 +66,7 @@ export default function HighConvertingContactForm() {
           console.error("Client: Server action submission failed.", result.message)
           setSubmissionError(result.message || "Submission failed. Please try again.")
           alert(
-            `There was an error submitting your request: ${result.message || "Unknown error"}. Please try again or call us directly at +1 (415) 665-2442.`,
+            `There was an error submitting your request: ${result.message || "Unknown error"}. ${RETRY_HINT}`,
           )
         }
       } catch (error: any) {
@@ -70,7 +76,7 @@ export default function HighConvertingContactForm() {
           errorObject: error,
         })
         setSubmissionError("An unexpected error occurred. Please try again.")
-        alert("There was an error submitting your request. Please try again or call us directly at +1 (415) 665-2442.")
+        alert(`There was an error submitting your request. ${RETRY_HINT}`)
       }
     })
   }
@@ -111,9 +117,11 @@ export default function HighConvertingContactForm() {
           ) : (
             <p className="text-sm text-gray-600 mb-4">You have been unsubscribed from our newsletter.</p>
           )}
-          <p className="text-gray-600 mb-4">
-            Questions? Call us directly: <span className="font-semibold text-orange-600">+1 (415) 665-2442</span>
-          </p>
+          {SHOW_DIRECT_CONTACT_INFO && (
+            <p className="text-gray-600 mb-4">
+              Questions? Call us directly: <span className="font-semibold text-orange-600">+1 (415) 665-2442</span>
+            </p>
+          )}
         </div>
       </div>
     )

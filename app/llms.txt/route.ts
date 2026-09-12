@@ -1,4 +1,5 @@
 import { getAllSpeakers } from "@/lib/speakers-data"
+import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
 
 // llms.txt — a machine-readable site guide for AI assistants (https://llmstxt.org).
 // Served dynamically so the speaker roster stays current.
@@ -33,7 +34,7 @@ export async function GET() {
 Key facts:
 - Based in Silicon Valley, CA; serving events worldwide
 - Every speaker page lists fee range, topics, industries, testimonials, and booking FAQs
-- Contact: ${BASE_URL}/contact (hello@speakabout.ai, +1-415-665-2442)
+- Contact: ${BASE_URL}/contact${SHOW_DIRECT_CONTACT_INFO ? " (hello@speakabout.ai, +1-415-665-2442)" : " (contact form; the team responds within 24 hours)"}
 
 ## Main pages
 

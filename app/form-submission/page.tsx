@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Linkedin, Mail, Phone } from "lucide-react"
+import { SHOW_DIRECT_CONTACT_INFO, CONTACT_FORM_PATH } from "@/lib/contact-visibility"
 
 export const metadata: Metadata = {
   title: "Thank You for Your Inquiry | Speak About AI",
@@ -85,24 +86,37 @@ export default function ThankYouPage() {
             </div>
 
             <div className="pt-6 border-t border-gray-200">
-              <p className="mb-4">
-                Should you have any immediate questions or additional information to share about your event, please do
-                not hesitate to contact us directly:
-              </p>
-              <div className="space-y-3">
-                <p className="flex items-center">
-                  <Mail size={20} className={`mr-3 text-[${brandBlue}]`} />
-                  <a href="mailto:human@speakabout.ai" className={`text-[${brandBlue}] hover:underline`}>
-                    human@speakabout.ai
-                  </a>
+              {SHOW_DIRECT_CONTACT_INFO ? (
+                <>
+                  <p className="mb-4">
+                    Should you have any immediate questions or additional information to share about your event, please do
+                    not hesitate to contact us directly:
+                  </p>
+                  <div className="space-y-3">
+                    <p className="flex items-center">
+                      <Mail size={20} className={`mr-3 text-[${brandBlue}]`} />
+                      <a href="mailto:human@speakabout.ai" className={`text-[${brandBlue}] hover:underline`}>
+                        human@speakabout.ai
+                      </a>
+                    </p>
+                    <p className="flex items-center">
+                      <Phone size={20} className={`mr-3 text-[${brandBlue}]`} />
+                      <a href="tel:+1-415-665-2442" className={`text-[${brandBlue}] hover:underline`}>
+                        +1 (415) 665-2442
+                      </a>
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <p className="mb-4">
+                  Should you have any immediate questions or additional information to share about your event, simply
+                  reply to the confirmation email you will receive, or{" "}
+                  <Link href={CONTACT_FORM_PATH} className={`text-[${brandBlue}] hover:underline`}>
+                    send us another message
+                  </Link>
+                  .
                 </p>
-                <p className="flex items-center">
-                  <Phone size={20} className={`mr-3 text-[${brandBlue}]`} />
-                  <a href="tel:+1-415-665-2442" className={`text-[${brandBlue}] hover:underline`}>
-                    +1 (415) 665-2442
-                  </a>
-                </p>
-              </div>
+              )}
             </div>
 
             <p className="pt-6 text-lg">

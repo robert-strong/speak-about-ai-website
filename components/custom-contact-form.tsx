@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { reportFormFailure } from '@/lib/form-failure-reporter'
+import { SHOW_DIRECT_CONTACT_INFO } from '@/lib/contact-visibility'
 
 interface Speaker {
   id: number
@@ -1097,27 +1098,34 @@ export function CustomContactForm({
           <CardTitle className="text-lg">{content.needHelpTitle}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="flex items-start gap-3">
-              <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
-              <div>
-                <p className="font-medium text-gray-900">{content.callLabel}</p>
-                <a href={`tel:${content.phone.replace(/[^0-9+]/g, '')}`} className="text-blue-600 hover:underline">
-                  {content.phone}
-                </a>
+          {SHOW_DIRECT_CONTACT_INFO ? (
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="flex items-start gap-3">
+                <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">{content.callLabel}</p>
+                  <a href={`tel:${content.phone.replace(/[^0-9+]/g, '')}`} className="text-blue-600 hover:underline">
+                    {content.phone}
+                  </a>
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-start gap-3">
-              <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
-              <div>
-                <p className="font-medium text-gray-900">{content.emailLabel}</p>
-                <a href={`mailto:${content.email}`} className="text-blue-600 hover:underline">
-                  {content.email}
-                </a>
+              <div className="flex items-start gap-3">
+                <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">{content.emailLabel}</p>
+                  <a href={`mailto:${content.email}`} className="text-blue-600 hover:underline">
+                    {content.email}
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <p className="text-gray-600">
+              Submit the form above and a member of our team will get back to you within 24 hours.
+              If you would prefer a phone call, let us know in the additional information field and we will set one up.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import TeamHero from "@/components/team-hero"
 import TeamMembers from "@/components/team-members"
 import JoinTeam from "@/components/join-team"
+import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
 import { getPageContent, getFromContent } from "@/lib/website-content"
 
 export const metadata: Metadata = {
@@ -24,7 +25,8 @@ export default async function OurTeamPage() {
     title: getFromContent(content, 'team', 'cta', 'title'),
     subtitle: getFromContent(content, 'team', 'cta', 'subtitle'),
     buttonText: getFromContent(content, 'team', 'cta', 'button_text'),
-    email: getFromContent(content, 'team', 'cta', 'email'),
+    // Only sent to the browser when direct contact details are public (see lib/contact-visibility.ts)
+    email: SHOW_DIRECT_CONTACT_INFO ? getFromContent(content, 'team', 'cta', 'email') : undefined,
   }
 
   return (
