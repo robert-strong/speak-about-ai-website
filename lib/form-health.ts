@@ -784,6 +784,19 @@ const KIND_LABELS: Record<ReportableKind, string> = {
 /** Minimum gap between visitor-failure alert emails for the same form */
 const REPORT_ALERT_COOLDOWN_MINUTES = 60
 
+/**
+ * Turnstile error families that only describe the visitor's own browser
+ * (300xxx = generic client execution error, 600xxx = challenge execution
+ * failure, i.e. the client looked automated or had scripts blocked). They are
+ * stored on the dashboard but never emailed, because nothing on our side can
+ * fix them. Config problems (106xxx bad sitekey, 110xxx domain/config) still alert.
+ */
+const NON_ACTIONABLE_TURNSTILE_CODE = /Turnstile error [36][0-9]{5}(?![0-9])/
+
+export function isNonActionableClientFailure(input: Pick<FailureReportInput, 'kind' | 'message'>): boolean {
+  return input.kind === 'turnstile_error' && NON_ACTIONABLE_TURNSTILE_CODE.test(input.message || '')
+}
+
 export interface FailureReportInput {
   formId: ReportableFormId
   kind: ReportableKind
@@ -796,7 +809,8 @@ export interface FailureReportInput {
 
 /**
  * Store a browser-reported submission failure and email the team if this form
- * has not already triggered an alert in the last hour.
+ * has not already triggered an alert in the last hour. Client-only Turnstile
+ * failures (see isNonActionableClientFailure) are stored but never emailed.
  */
 export async function recordVisitorFailureReport(input: FailureReportInput): Promise<{ stored: boolean; alerted: boolean }> {
   await ensureFormHealthTables()
@@ -808,7 +822,7 @@ export async function recordVisitorFailureReport(input: FailureReportInput): Pro
       AND created_at > NOW() - (${REPORT_ALERT_COOLDOWN_MINUTES} || ' minutes')::interval
     ORDER BY created_at DESC LIMIT 1
   `
-  const shouldAlert = !recentAlert
+  const shouldAlert = !recentAlert && !isNonActionableClientFailure(input)
 
   const [row] = await sql`
     INSERT INTO form_failure_reports (form_id, kind, status_code, message, page_url, user_agent, ip_address, alerted)

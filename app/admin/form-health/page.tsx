@@ -237,7 +237,7 @@ export default function FormHealthPage() {
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Visitor-reported failures</CardTitle>
           <p className="text-sm text-gray-600">
-            Sent by a visitor's browser when a real submission failed because of a server or CAPTCHA error. At most one email per form per hour.
+            Sent by a visitor's browser when a real submission failed because of a server or CAPTCHA error. At most one email per form per hour. Turnstile 300xxx / 600xxx codes (the visitor&apos;s own browser failed the challenge) are logged here but not emailed.
           </p>
         </CardHeader>
         <CardContent>
