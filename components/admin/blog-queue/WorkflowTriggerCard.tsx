@@ -50,6 +50,7 @@ export function WorkflowTriggerCard() {
   const [loading, setLoading] = useState(false)
   const [triggering, setTriggering] = useState<string | null>(null)
   const [briefCount, setBriefCount] = useState('5')
+  const [runsError, setRunsError] = useState<string | null>(null)
 
   const fetchRuns = async () => {
     setLoading(true)
@@ -57,12 +58,23 @@ export function WorkflowTriggerCard() {
       const response = await fetch('/api/admin/blog-queue/workflow-runs', {
         headers: { 'x-admin-request': 'true' }
       })
+      const data = await response.json().catch(() => ({}))
       if (response.ok) {
-        const data = await response.json()
         setRuns(data.runs || [])
+        setRunsError(null)
+      } else {
+        setRuns([])
+        setRunsError(
+          data.details
+            ? `${data.error}: ${data.details}`
+            : data.error || (response.status === 401
+              ? 'Your admin session has expired. Sign in again.'
+              : 'Failed to fetch workflow runs')
+        )
       }
     } catch (error) {
       console.error('Error fetching workflow runs:', error)
+      setRunsError('Failed to fetch workflow runs')
     } finally {
       setLoading(false)
     }
@@ -102,8 +114,10 @@ export function WorkflowTriggerCard() {
         setTimeout(fetchRuns, 2000)
       } else {
         toast({
-          title: 'Error',
-          description: data.error || 'Failed to trigger workflow',
+          title: data.error || 'Failed to trigger workflow',
+          description: data.details || (response.status === 401
+            ? 'Your admin session has expired. Sign in again and retry.'
+            : undefined),
           variant: 'destructive'
         })
       }
@@ -296,6 +310,10 @@ export function WorkflowTriggerCard() {
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
             </div>
+          ) : runsError ? (
+            <p className="text-center py-8 text-red-600 text-sm">
+              {runsError}
+            </p>
           ) : runs.length === 0 ? (
             <p className="text-center py-8 text-gray-500">
               No workflow runs yet. Configure GitHub Actions to enable pipeline automation.
