@@ -122,9 +122,45 @@ const nextConfig = {
         destination: '/resources',
         permanent: true,
       },
+      // The migrated post uses "health-care", so the wildcard below sent the old
+      // "healthcare" URL to a 404.
+      {
+        source: '/blog/lucien-engelen-innovating-the-future-of-healthcare',
+        destination: '/resources/lucien-engelen-innovating-the-future-of-health-care',
+        permanent: true,
+      },
+      {
+        source: '/resources/lucien-engelen-innovating-the-future-of-healthcare',
+        destination: '/resources/lucien-engelen-innovating-the-future-of-health-care',
+        permanent: true,
+      },
       {
         source: '/blog/:slug*',
         destination: '/resources/:slug*',
+        permanent: true,
+      },
+      // Legacy site URLs still crawled by Google (GSC "Not found (404)", Sep 2026).
+      // Without these the middleware root-slug rule sends them to /speakers/<x> (404).
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/other-industries',
+        destination: '/speakers',
+        permanent: true,
+      },
+      {
+        source: '/businessdevelopment',
+        destination: '/industries/sales-marketing-ai-speakers',
+        permanent: true,
+      },
+      // /industries has no index page (only /industries/<slug>) but is on the
+      // middleware's known-routes list, so it 404'd instead of redirecting.
+      {
+        source: '/industries',
+        destination: '/speakers',
         permanent: true,
       },
       {
