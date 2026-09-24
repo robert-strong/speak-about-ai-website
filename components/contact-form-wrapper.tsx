@@ -43,7 +43,10 @@ export interface ContactPageContent {
 
 function ContactFormContent({ content }: { content: ContactPageContent }) {
   const searchParams = useSearchParams()
-  const speakerName = searchParams.get("speakerName")
+  // Speaker profile pages and /top-ai-speakers link here with ?speaker=<name>;
+  // older CTAs use ?speakerName=<name>. Accept both so the "Book this speaker"
+  // button actually pre-selects the speaker in the form.
+  const speakerName = searchParams.get("speakerName") || searchParams.get("speaker")
   const workshopId = searchParams.get("workshop")
 
   // Determine initial tab based on URL parameters
