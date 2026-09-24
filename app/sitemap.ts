@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next"
 import { getAllSpeakers } from "@/lib/speakers-data"
+import { getPublishedConferences } from "@/lib/conferences-db"
 import { getBlogPosts } from "@/lib/blog-data"
 import { getAllLandingPages } from "@/lib/landing-page-data"
 import { TOPIC_PAGES } from "@/lib/topic-pages"
@@ -174,5 +175,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
   
-  return [...mainPages, ...industryPages, ...topicPages, ...speakerPages, ...blogPages, ...toolPages]
+  // Published conference directory entries (server-rendered detail pages)
+  let conferencePages: MetadataRoute.Sitemap = []
+  try {
+    const conferences = await getPublishedConferences()
+    conferencePages = conferences
+      .filter((c) => typeof c.slug === "string" && c.slug.trim().length > 0)
+      .map((c) => ({
+        url: `${BASE_URL}/conference-directory/conferences/${c.slug}`,
+        lastModified: c.updated_at ? new Date(c.updated_at) : now,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      }))
+  } catch (error) {
+    console.error("Sitemap: failed to load conferences:", error)
+  }
+
+  return [...mainPages, ...industryPages, ...topicPages, ...speakerPages, ...blogPages, ...toolPages, ...conferencePages]
 }

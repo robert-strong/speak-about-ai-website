@@ -30,6 +30,10 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  // Without this the page inherits the root layout's canonical (the homepage).
+  alternates: {
+    canonical: "https://speakabout.ai/conference-directory",
+  },
 }
 
 export default function ConferenceDirectoryLayout({
