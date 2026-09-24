@@ -9,11 +9,12 @@ Disallow: /admin/
 Disallow: /portal/
 Disallow: /debug*
 Disallow: /test*
-Disallow: /apply
-Disallow: /*?source=
-Disallow: /*&source=
-Disallow: /*?utm_
-Disallow: /*&utm_
+
+# NOTE: /apply and ?source= / ?utm_ URLs are deliberately NOT disallowed here.
+# Blocking them let Google index them from links without ever fetching the
+# page ("Indexed, though blocked by robots.txt"), so it never saw the
+# canonical/noindex tags. Tracking-parameter URLs consolidate through each
+# page's self-referencing canonical; /apply carries a noindex meta tag.
 
 # Named groups override the * group, so each named crawler gets the full rule set.
 # Search engines
@@ -50,11 +51,6 @@ Disallow: /admin/
 Disallow: /portal/
 Disallow: /debug*
 Disallow: /test*
-Disallow: /apply
-Disallow: /*?source=
-Disallow: /*&source=
-Disallow: /*?utm_
-Disallow: /*&utm_
 
 # Sitemap location
 Sitemap: https://speakabout.ai/sitemap.xml
