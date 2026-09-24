@@ -32,7 +32,10 @@ export function SpeakerSimilarSpeakers({ similarSpeakers, currentSpeakerName }: 
           <SpeakerCard
             key={speaker.slug}
             speaker={speaker}
-            contactSource={`similar-to-${currentSpeakerName.toLowerCase().replace(/\s+/g, '-')}`}
+            // One fixed value rather than similar-to-<speaker>: the per-speaker
+            // variant multiplied by the speakerName param produced hundreds of
+            // unique /contact URLs for crawlers with no extra attribution value.
+            contactSource="similar_speakers"
           />
         ))}
       </div>
