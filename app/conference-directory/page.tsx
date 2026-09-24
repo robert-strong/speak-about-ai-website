@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Mail, User, Building, ArrowRight, CheckCircle, Users, Award, Megaphone } from "lucide-react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -360,6 +361,16 @@ export default function ConferenceDirectoryPage() {
                   >
                     {isSignup ? "Log in instead" : "Sign up for access"}
                   </Button>
+                  {/* Real anchor so crawlers (and visitors) can reach the
+                      directory; browsing is allowed without an account. */}
+                  <p className="mt-3 text-sm text-gray-600">
+                    <Link
+                      href="/conference-directory/conferences"
+                      className="text-blue-600 hover:text-blue-700 underline"
+                    >
+                      Browse all conferences
+                    </Link>
+                  </p>
                 </div>
               </CardContent>
             </Card>
