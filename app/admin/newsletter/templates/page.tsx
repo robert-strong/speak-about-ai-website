@@ -129,7 +129,7 @@ export default function NewsletterTemplatesPage() {
   return (
     <div className="flex h-screen bg-gray-50">
       <AdminSidebar />
-      <div className="flex-1 overflow-y-auto">
+      <div className="lg:ml-72 flex-1 overflow-y-auto">
         <div className="p-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">

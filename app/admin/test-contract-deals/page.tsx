@@ -47,7 +47,7 @@ export default function TestContractDealsPage() {
   }
   
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+    <div className="lg:ml-72" style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h1>Test Contract Deals Selection</h1>
       
       <div style={{ marginBottom: "20px" }}>

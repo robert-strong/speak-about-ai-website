@@ -188,7 +188,7 @@ export default function EditConferencePage() {
     return (
       <div className="flex min-h-screen bg-gray-50">
         <AdminSidebar />
-        <div className="flex-1 p-8">
+        <div className="lg:ml-72 flex-1 p-8">
           <div className="flex items-center justify-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
           </div>
@@ -205,7 +205,7 @@ export default function EditConferencePage() {
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar />
 
-      <div className="flex-1 p-8">
+      <div className="lg:ml-72 flex-1 p-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">

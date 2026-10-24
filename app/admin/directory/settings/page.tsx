@@ -345,7 +345,7 @@ export default function DirectorySettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="lg:ml-72 flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading settings...</p>
@@ -355,7 +355,7 @@ export default function DirectorySettingsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 px-4 max-w-7xl">
+    <div className="lg:ml-72 container mx-auto py-6 px-4 max-w-7xl">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between">

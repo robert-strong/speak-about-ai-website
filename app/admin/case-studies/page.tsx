@@ -487,7 +487,7 @@ export default function CaseStudiesManagementPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="lg:ml-72 p-6 space-y-6">
           <Card className="border-gray-700 bg-gray-800">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>

@@ -187,7 +187,7 @@ export default function EventDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="lg:ml-72 flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
       </div>
     )
@@ -195,7 +195,7 @@ export default function EventDetailPage() {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="lg:ml-72 min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="text-center py-12">
             <p className="text-gray-500 mb-4">Event not found</p>
@@ -215,7 +215,7 @@ export default function EventDetailPage() {
   const isOverdue = daysUntilEvent !== null && daysUntilEvent < 0
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="lg:ml-72 min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">

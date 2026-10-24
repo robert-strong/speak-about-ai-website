@@ -113,7 +113,7 @@ export default function SearchConsolePage() {
 
   if (error === 'not_configured' && data?.setup) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="lg:ml-72 container mx-auto p-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Google Search Console</h1>
           <p className="text-muted-foreground">Setup required to connect to Google Search Console</p>
@@ -187,7 +187,7 @@ export default function SearchConsolePage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="lg:ml-72 container mx-auto p-6">
       <div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold mb-2">Google Search Console</h1>

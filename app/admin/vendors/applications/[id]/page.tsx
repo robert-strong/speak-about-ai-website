@@ -243,7 +243,7 @@ export default function VendorApplicationDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="lg:ml-72 flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     )
@@ -251,7 +251,7 @@ export default function VendorApplicationDetailPage() {
 
   if (!application) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="lg:ml-72 flex items-center justify-center min-h-screen">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Application not found</AlertTitle>
@@ -264,7 +264,7 @@ export default function VendorApplicationDetailPage() {
   }
 
   return (
-    <div className="flex">
+    <div className="lg:ml-72 flex">
       <AdminSidebar />
       <div className="flex-1 p-8 max-w-7xl mx-auto">
         {/* Header */}

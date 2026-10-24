@@ -179,7 +179,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar />
       
-      <div className="flex-1 lg:pl-64">
+      <div className="flex-1 lg:ml-72">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           {/* Header */}
           <div className="mb-8">

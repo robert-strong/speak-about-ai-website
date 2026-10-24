@@ -319,7 +319,7 @@ export default function SpeakerApplicationsPage() {
   const counts = getSpeakerCounts()
 
   return (
-    <div className="space-y-6">
+    <div className="lg:ml-72 p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Speaker Applications</h1>
         <p className="text-gray-600">Review and approve speaker applications</p>

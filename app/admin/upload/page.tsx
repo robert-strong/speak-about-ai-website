@@ -4,7 +4,7 @@ import EnvironmentCheck from "./environment-check"
 
 export default function UploadPage() {
   return (
-    <div className="p-8 max-w-2xl mx-auto">
+    <div className="lg:ml-72 p-8 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Upload Speaker Images</h1>
 
       {/* Environment Check - Server Component */}

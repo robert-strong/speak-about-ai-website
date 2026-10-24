@@ -18,7 +18,7 @@ export default function EditProposalPage({
   }, [proposalId, router])
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="lg:ml-72 flex items-center justify-center min-h-screen">
       <p className="text-gray-500">Loading proposal editor...</p>
     </div>
   )

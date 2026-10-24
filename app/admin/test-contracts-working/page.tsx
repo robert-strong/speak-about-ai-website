@@ -53,7 +53,7 @@ export default function TestContractsWorkingPage() {
   }
   
   return (
-    <div style={{ padding: "20px", fontFamily: "monospace" }}>
+    <div className="lg:ml-72" style={{ padding: "20px", fontFamily: "monospace" }}>
       <h1>Contract System Test</h1>
       
       <div style={{ marginBottom: "20px" }}>

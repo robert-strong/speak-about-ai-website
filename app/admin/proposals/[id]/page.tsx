@@ -76,7 +76,7 @@ export default function AdminProposalViewPage({
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="lg:ml-72 min-h-screen bg-gray-50 flex items-center justify-center">
         <p className="text-gray-500">Loading proposal...</p>
       </div>
     )
@@ -89,7 +89,7 @@ export default function AdminProposalViewPage({
   const publicUrl = `${window.location.origin}/proposal/${proposal.access_token}`
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="lg:ml-72 min-h-screen bg-gray-50">
       {/* Admin Header */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

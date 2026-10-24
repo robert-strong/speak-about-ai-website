@@ -149,7 +149,7 @@ export default function AdminConferencesPage() {
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar />
 
-      <div className="flex-1 p-8">
+      <div className="lg:ml-72 flex-1 p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">

@@ -269,7 +269,7 @@ export default function AdminActivityPage() {
     return (
       <div className="flex">
         <AdminSidebar />
-        <div className="flex-1 flex items-center justify-center min-h-screen">
+        <div className="lg:ml-72 flex-1 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
             <p>Loading activity log...</p>
@@ -282,7 +282,7 @@ export default function AdminActivityPage() {
   return (
     <div className="flex">
       <AdminSidebar />
-      <div className="flex-1">
+      <div className="lg:ml-72 flex-1">
         <div className="p-8">
           {/* Header */}
           <div className="mb-8">

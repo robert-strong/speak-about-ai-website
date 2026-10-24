@@ -252,7 +252,7 @@ Unsubscribe: {{unsubscribe_url}}`,
     return (
       <div className="flex h-screen bg-gray-50">
         <AdminSidebar />
-        <div className="flex-1 flex items-center justify-center">
+        <div className="lg:ml-72 flex-1 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </div>
@@ -263,7 +263,7 @@ Unsubscribe: {{unsubscribe_url}}`,
     <div className="flex h-screen bg-gray-50">
       <AdminSidebar />
       
-      <div className="flex-1 overflow-y-auto">
+      <div className="lg:ml-72 flex-1 overflow-y-auto">
         <div className="p-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">

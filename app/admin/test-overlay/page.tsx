@@ -49,7 +49,7 @@ export default function TestOverlayPage() {
   }
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="lg:ml-72" style={{ padding: "20px" }}>
       <h1>Overlay and Click Test</h1>
       
       {/* Test different z-index levels */}

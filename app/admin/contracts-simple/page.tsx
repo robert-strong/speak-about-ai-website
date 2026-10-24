@@ -145,7 +145,7 @@ export default function SimpleContractsPage() {
   }
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", maxWidth: "1200px", margin: "0 auto" }}>
+    <div className="lg:ml-72" style={{ padding: "20px", fontFamily: "Arial, sans-serif", maxWidth: "1200px", margin: "0 auto" }}>
       <h1>Simple Contracts Page</h1>
       
       {/* Debug Info */}

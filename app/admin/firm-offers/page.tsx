@@ -554,7 +554,7 @@ export default function AdminFirmOffersPage() {
   return (
     <div className="flex h-screen bg-gray-100">
       <AdminSidebar />
-      <div className="flex-1 overflow-auto">
+      <div className="lg:ml-72 flex-1 overflow-auto">
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
             <div>
