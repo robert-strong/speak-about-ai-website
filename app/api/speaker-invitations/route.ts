@@ -62,8 +62,11 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Verify the email matches the speaker's registered email
-      if (existingSpeaker[0].email.toLowerCase() !== email.toLowerCase()) {
+      // Verify the email matches the speaker's registered email.
+      // speakers.email is nullable (placeholders were cleared in migration 027);
+      // a speaker with no email on file can be invited at any address.
+      const registeredEmail = existingSpeaker[0].email
+      if (registeredEmail && registeredEmail.toLowerCase() !== email.toLowerCase()) {
         return NextResponse.json(
           { error: "Email does not match the speaker's registered email address" },
           { status: 400 }
