@@ -17,7 +17,6 @@ import { neon } from "@neondatabase/serverless"
 import {
   getProjectById,
   createProject,
-  updateProject,
   type Project,
 } from "@/lib/projects-db"
 import {
@@ -113,7 +112,8 @@ export interface DigestAnalysis {
 export interface FieldDef {
   key: string
   label: string
-  type: "string" | "number" | "boolean" | "date" | "enum"
+  // "integer" maps to an INTEGER column: values are rounded so "45.5" can't fail the insert.
+  type: "string" | "number" | "integer" | "boolean" | "date" | "enum"
   options?: string[]
 }
 
@@ -132,13 +132,13 @@ export const PROJECT_FIELDS: FieldDef[] = [
   { key: "event_website", label: "Event website", type: "string" },
   { key: "venue_name", label: "Venue name", type: "string" },
   { key: "venue_address", label: "Venue address", type: "string" },
-  { key: "attendee_count", label: "Attendee count", type: "number" },
+  { key: "attendee_count", label: "Attendee count", type: "integer" },
   { key: "audience_demographics", label: "Audience", type: "string" },
   { key: "requested_speaker_name", label: "Requested speaker", type: "string" },
   { key: "program_topic", label: "Program topic", type: "string" },
   { key: "program_type", label: "Program type", type: "string" },
-  { key: "program_length", label: "Program length (min)", type: "number" },
-  { key: "qa_length", label: "Q&A length (min)", type: "number" },
+  { key: "program_length", label: "Program length (min)", type: "integer" },
+  { key: "qa_length", label: "Q&A length (min)", type: "integer" },
   { key: "speaker_presentation_title", label: "Presentation title", type: "string" },
   { key: "event_start_time", label: "Event start time", type: "string" },
   { key: "event_end_time", label: "Event end time", type: "string" },
@@ -189,7 +189,7 @@ export const DEAL_FIELDS: FieldDef[] = [
   { key: "event_location", label: "Event location", type: "string" },
   { key: "event_type", label: "Event type", type: "string" },
   { key: "speaker_requested", label: "Speaker requested", type: "string" },
-  { key: "attendee_count", label: "Attendee count", type: "number" },
+  { key: "attendee_count", label: "Attendee count", type: "integer" },
   { key: "budget_range", label: "Budget range", type: "string" },
   { key: "deal_value", label: "Deal value ($)", type: "number" },
   { key: "next_follow_up", label: "Next follow-up", type: "date" },
@@ -472,7 +472,11 @@ DECIDING THE ACTION
 - no_action: newsletters, vendor pitches, spam, speaker-side chatter with no client facts, duplicates, or anything that does not change the record.
 
 EXTRACTION RULES
-- proposed_project_fields and proposed_deal_fields are LISTS of {"key", "value"} pairs. Include a pair only for fields the email actually provides; omit everything else. Every value is a string: numbers without formatting ("35000"), booleans as "true"/"false", dates as YYYY-MM-DD, times as "9:30 AM".
+- proposed_project_fields and proposed_deal_fields are LISTS of {"key", "value"} pairs. Include a pair only for fields the email actually provides; omit everything else. Every value is a string, formatted by the field's type shown in the lists below:
+  - number fields: digits only, no units, currency symbols, commas, or words. Durations are whole minutes ("45", never "45 minutes"); money is dollars ("35000", never "$35,000"); counts are integers ("400").
+  - boolean fields: exactly "true" or "false".
+  - date fields: YYYY-MM-DD.
+  - time fields (event_start_time, event_end_time, program_start_time, speaker_arrival_time): "9:30 AM" style, with the timezone in event_timezone (an IANA name such as "America/Chicago").
 - Only extract facts stated or clearly implied in the email. Never invent values.
 - Fees and deal values are numbers in USD with no formatting. If a range is given, put it in budget_range (deals) and leave deal_value null.
 - Speaker names: normalize to the exact spelling in the SPEAKERS list when the person is clearly one of them.
@@ -546,9 +550,10 @@ function coerceFields(raw: any, defs: FieldDef[]): Record<string, string | numbe
     const v = raw[def.key]
     if (v === undefined || v === null || v === "") continue
     switch (def.type) {
-      case "number": {
+      case "number":
+      case "integer": {
         const n = typeof v === "number" ? v : parseFloat(String(v).replace(/[^0-9.-]/g, ""))
-        if (!isNaN(n)) out[def.key] = n
+        if (!isNaN(n)) out[def.key] = def.type === "integer" ? Math.round(n) : n
         break
       }
       case "boolean":
@@ -617,43 +622,28 @@ export async function analyzeEmail(emailText: string, candidates: DigestCandidat
   const system = buildSystemPrompt(today)
   const userContent = `${compactCandidates(candidates)}\n\n=== EMAIL ===\n${emailText.trim()}\n=== END EMAIL ===`
 
-  // The installed SDK (0.71.x) predates output_config / server-side fallbacks in its
-  // typings, but the request body is passed through verbatim, so we cast.
-  const baseRequest: any = {
+  // Structured output guarantees the JSON matches ANALYSIS_SCHEMA. Server-side
+  // fallback re-runs the request on another model if a safety classifier declines.
+  const response = await client.beta.messages.create({
     model: MODEL,
     max_tokens: 16000,
     system,
     messages: [{ role: "user", content: userContent }],
-  }
-
-  let response: any
-  try {
-    response = await (client.beta.messages as any).create({
-      ...baseRequest,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      output_config: {
-        effort: "high",
-        format: { type: "json_schema", schema: ANALYSIS_SCHEMA },
-      },
-    })
-  } catch (err) {
-    // If the structured-output request is rejected (schema or beta mismatch),
-    // fall back to a plain request and parse the JSON out of the text.
-    if (err instanceof Anthropic.BadRequestError) {
-      console.warn("email-digest: structured output rejected, retrying plain:", err.message)
-      response = await client.messages.create(baseRequest)
-    } else {
-      throw err
-    }
-  }
+    betas: ["server-side-fallback-2026-07-01"],
+    fallbacks: "default",
+    output_config: {
+      effort: "high",
+      format: { type: "json_schema", schema: ANALYSIS_SCHEMA },
+    },
+  })
 
   if (response.stop_reason === "refusal") {
     throw new Error("The model declined to analyze this email")
   }
 
-  const textBlock = (response.content || []).find((b: any) => b.type === "text")
-  if (!textBlock) throw new Error("Model returned no text")
+  // Read by block type, not position: with adaptive thinking the first block can be a thinking block.
+  const textBlock = response.content.find((b) => b.type === "text")
+  if (!textBlock || textBlock.type !== "text") throw new Error("Model returned no text")
 
   return normalizeAnalysis(extractJson(textBlock.text))
 }
@@ -722,6 +712,25 @@ function appendNote(existing: string | null | undefined, note: string): string {
   return existing && existing.trim() ? `${existing.trimEnd()}\n\n${entry}` : entry
 }
 
+/**
+ * Targeted UPDATE of only the chosen columns. Unlike updateProject() (which rewrites
+ * 117 columns and swallows errors), this touches just the whitelisted keys and lets
+ * the real Postgres error reach the admin, e.g. "invalid input syntax for type integer".
+ */
+const PROJECT_UPDATABLE_COLUMNS = new Set<string>([...PROJECT_FIELDS.map((f) => f.key), "status", "notes"])
+
+async function updateProjectFields(id: number, updates: Record<string, unknown>): Promise<void> {
+  const entries = Object.entries(updates).filter(([k, v]) => PROJECT_UPDATABLE_COLUMNS.has(k) && v !== undefined)
+  if (entries.length === 0) return
+  const sql = getSql()
+  const setClauses = entries.map(([k], i) => `"${k}" = $${i + 1}`)
+  const params = entries.map(([, v]) => v)
+  params.push(id)
+  const text = `UPDATE projects SET ${setClauses.join(", ")}, updated_at = NOW() WHERE id = $${params.length} RETURNING id`
+  const rows = await sql.query(text, params)
+  if (!rows || (rows as any[]).length === 0) throw new Error(`Project ${id} not found`)
+}
+
 function isForwardOrTerminal(current: string, next: string): boolean {
   if (next === "cancelled" || next === "lost") return true
   const ci = PROJECT_STATUS_ORDER.indexOf(current as ProjectWorkflowStatus)
@@ -771,9 +780,8 @@ export async function applyDigest(input: ApplyDigestInput): Promise<ApplyDigestR
       return { action: input.action, entity_type: "project", entity_id: project.id, entity_label: project.project_name, changed_fields: [], status_changed: false, message: "Nothing selected to apply" }
     }
 
-    if (changed.length > 0 || updates.notes) {
-      const updated = await updateProject(project.id, updates)
-      if (!updated) throw new Error("Project update failed")
+    if (changed.length > 0 || updates.notes || (updates as any).status) {
+      await updateProjectFields(project.id, updates as Record<string, unknown>)
 
       // Same propagation the PUT /api/projects/[id] route does: keep linked deal/contract
       // columns (client info, event date, fee) in step. Non-blocking.
@@ -917,7 +925,7 @@ export async function applyDigest(input: ApplyDigestInput): Promise<ApplyDigestR
 
     // createProject only inserts the core columns; push the rest through update.
     const extra = Object.fromEntries(Object.entries(rest).filter(([k]) => !["client_name", "client_email", "client_phone", "company", "event_date", "event_location", "event_type", "attendee_count", "speaker_fee", "requested_speaker_name"].includes(k)))
-    if (Object.keys(extra).length) await updateProject(project.id, extra as any)
+    if (Object.keys(extra).length) await updateProjectFields(project.id, extra)
 
     return {
       action: input.action,

@@ -19,7 +19,7 @@ type DigestAction = "update_project" | "update_deal" | "create_project" | "creat
 interface FieldDef {
   key: string
   label: string
-  type: "string" | "number" | "boolean" | "date" | "enum"
+  type: "string" | "number" | "integer" | "boolean" | "date" | "enum"
   options?: string[]
 }
 
@@ -260,8 +260,10 @@ export function EmailDigestDialog({ open, onOpenChange, onApplied }: EmailDigest
         const raw = row.value.trim()
         if (raw === "") continue
         if (def?.type === "boolean") chosenFields[key] = raw === "true"
-        else if (def?.type === "number") chosenFields[key] = parseFloat(raw.replace(/[^0-9.-]/g, ""))
-        else chosenFields[key] = raw
+        else if (def?.type === "number" || def?.type === "integer") {
+          const n = parseFloat(raw.replace(/[^0-9.-]/g, ""))
+          if (!isNaN(n)) chosenFields[key] = def.type === "integer" ? Math.round(n) : n
+        } else chosenFields[key] = raw
       }
 
       const res = await authPost("/api/admin/email-digest/apply", {

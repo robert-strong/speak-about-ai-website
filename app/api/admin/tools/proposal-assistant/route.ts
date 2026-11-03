@@ -64,9 +64,9 @@ Be thorough but concise.`
     const contextStr = context ? `\n\nCurrent context:\n${JSON.stringify(context, null, 2)}` : ''
 
     // Build conversation history
-    const messages = [
+    const messages: Array<{ role: "user" | "assistant"; content: string }> = [
       {
-        role: "user" as const,
+        role: "user",
         content: systemPrompt + contextStr + "\n\nUser message: " + message
       }
     ]
@@ -96,8 +96,9 @@ Be thorough but concise.`
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1024,
+        model: 'claude-sonnet-5-5',
+        max_tokens: 4096,
+        output_config: { effort: 'low' },
         messages: messages
       })
     })
@@ -111,7 +112,8 @@ Be thorough but concise.`
     }
 
     const data = await response.json()
-    const assistantResponse = data.content[0].text
+    // Read by block type: with adaptive thinking the first block can be a thinking block.
+    const assistantResponse = (data.content || []).find((b: any) => b.type === 'text')?.text || ''
 
     return NextResponse.json({
       response: assistantResponse,

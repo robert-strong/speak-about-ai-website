@@ -51,13 +51,15 @@ Return your response as JSON:
 Only return the JSON object, no other text. If you cannot determine a field with confidence, use null for that field.`
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1024,
+      model: "claude-sonnet-5-5",
+      max_tokens: 4096,
+      output_config: { effort: "low" },
       messages: [{ role: "user", content: prompt }]
     })
 
-    const content = response.content[0]
-    if (content.type !== "text") {
+    // Read by block type: with adaptive thinking the first block can be a thinking block.
+    const content = response.content.find((b) => b.type === "text")
+    if (!content || content.type !== "text") {
       throw new Error("Unexpected response type")
     }
 

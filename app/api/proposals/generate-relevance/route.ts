@@ -41,8 +41,9 @@ Requirements:
 Return ONLY the sentence, nothing else.`
 
     const message = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      max_tokens: 100,
+      model: "claude-sonnet-5-5",
+      max_tokens: 1024,
+      output_config: { effort: "low" },
       messages: [
         {
           role: "user",
@@ -51,9 +52,9 @@ Return ONLY the sentence, nothing else.`
       ],
     })
 
-    const relevance = message.content[0].type === "text"
-      ? message.content[0].text.trim()
-      : ""
+    // Read by block type: with adaptive thinking the first block can be a thinking block.
+    const textBlock = message.content.find((b) => b.type === "text")
+    const relevance = textBlock?.type === "text" ? textBlock.text.trim() : ""
 
     return NextResponse.json({ relevance })
   } catch (error) {

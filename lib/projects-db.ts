@@ -541,6 +541,7 @@ export async function updateProject(id: number, projectData: Partial<Project>): 
     `
     return project as Project
   } catch (error) {
+    console.error(`updateProject(${id}) failed:`, error instanceof Error ? error.message : error)
     return null
   }
 }
