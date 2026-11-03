@@ -73,6 +73,7 @@ import { ProjectDetailsManager } from "@/components/project-details-manager"
 import { ProjectDetails } from "@/lib/project-details-schema"
 import { authGet, authPost, authPut, authDelete, authFetch } from "@/lib/auth-fetch"
 import { EmailActivity } from "@/components/email-activity"
+import { EmailDigestDialog } from "@/components/email-digest-dialog"
 
 interface Project {
   id: number
@@ -91,7 +92,10 @@ interface Project {
   event_type: string
   event_classification?: "virtual" | "local" | "travel"
   attendee_count?: number
-  status: "2plus_months" | "1to2_months" | "less_than_month" | "final_week" | "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled" | "lost"
+  status: "2plus_months" | "1to2_months" | "less_than_month" | "final_week" | "qualified" | "proposal" | "contracts_signed" | "logistics_planning" | "pre_event" | "event_week" | "follow_up" | "completed" | "cancelled" | "lost" | "pending_lost"
+  previous_status?: string | null
+  pending_lost_reason?: string | null
+  pending_lost_at?: string | null
   priority: "low" | "medium" | "high" | "urgent"
   budget: string
   speaker_fee?: string
@@ -279,6 +283,11 @@ const PROJECT_STATUSES: Record<string, { label: string; color: string; descripti
     color: "bg-red-500",
     description: "Project cancelled"
   },
+  pending_lost: {
+    label: "Pending Lost",
+    color: "bg-amber-500",
+    description: "Flagged as probably lost — needs confirmation"
+  },
   lost: {
     label: "Lost",
     color: "bg-gray-500",
@@ -458,6 +467,8 @@ function EnhancedProjectManagementPage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [selectedProjectForDetails, setSelectedProjectForDetails] = useState<Project | null>(null)
   const [showCreateInvoice, setShowCreateInvoice] = useState(false)
+  const [showEmailDigest, setShowEmailDigest] = useState(false)
+  const [pendingLostBusy, setPendingLostBusy] = useState<number | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showCreateProject, setShowCreateProject] = useState(false)
   const [isParsingDescription, setIsParsingDescription] = useState(false)
@@ -1667,8 +1678,95 @@ function EnhancedProjectManagementPage() {
                     <FileText className="mr-2 h-4 w-4" />
                     New Contract
                   </Button>
+                  <Button onClick={() => setShowEmailDigest(true)} variant="outline">
+                    <Mail className="mr-2 h-4 w-4" />
+                    Email Digester
+                  </Button>
                 </div>
               </div>
+
+              <EmailDigestDialog
+                open={showEmailDigest}
+                onOpenChange={setShowEmailDigest}
+                onApplied={() => loadData(false)}
+              />
+
+              {/* Pending Lost — projects flagged as probably lost that need a human decision */}
+              {(() => {
+                const pendingLost = projects.filter(p => p.status === "pending_lost")
+                if (pendingLost.length === 0) return null
+                const resolve = async (projectId: number, decision: "confirm" | "cancel") => {
+                  setPendingLostBusy(projectId)
+                  try {
+                    const response = await authPost(`/api/projects/${projectId}/pending-lost`, { decision })
+                    const json = await response.json().catch(() => ({}))
+                    if (!response.ok) {
+                      toast({ title: "Could not update project", description: json.details || json.error || "Unknown error", variant: "destructive" })
+                    } else {
+                      toast({ title: decision === "confirm" ? "Marked as lost" : "Restored", description: json.message })
+                    }
+                    await loadData(false)
+                  } finally {
+                    setPendingLostBusy(null)
+                  }
+                }
+                return (
+                  <Card className="border-l-4 border-amber-500 bg-amber-50/40 mb-8">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg flex items-center gap-2 text-amber-800">
+                        <AlertTriangle className="h-5 w-5" />
+                        Needs Lost Confirmation
+                        <Badge variant="outline" className="ml-2 border-amber-300 text-amber-800">
+                          {pendingLost.length}
+                        </Badge>
+                      </CardTitle>
+                      <CardDescription>
+                        Review the correspondence for each project, then confirm it as lost or cancel to send it back to its previous stage.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-2">
+                        {pendingLost.map((project) => {
+                          const busy = pendingLostBusy === project.id
+                          const previousLabel = project.previous_status
+                            ? (PROJECT_STATUSES[project.previous_status]?.label || project.previous_status)
+                            : "Qualified"
+                          return (
+                            <div key={project.id} className="flex items-start justify-between gap-4 p-3 rounded-lg bg-white border border-amber-200">
+                              <div className="min-w-0">
+                                <div className="font-medium text-gray-900 flex items-center gap-2 flex-wrap">
+                                  {project.event_name || project.project_name}
+                                  {(project.requested_speaker_name || project.speaker_name) && (
+                                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">
+                                      {project.requested_speaker_name || project.speaker_name}
+                                    </span>
+                                  )}
+                                  <span className="text-xs text-gray-500">was in {previousLabel}</span>
+                                </div>
+                                <div className="text-sm text-gray-600">{project.client_name}{project.company ? ` · ${project.company}` : ""} • {formatEventDate(project.event_date)}</div>
+                                {project.pending_lost_reason && (
+                                  <div className="text-sm text-amber-900 mt-1">{project.pending_lost_reason}</div>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <Button size="sm" variant="ghost" title="Open project" onClick={() => router.push(`/admin/projects/${project.id}/edit`)}>
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button size="sm" variant="outline" disabled={busy} onClick={() => resolve(project.id, "cancel")}>
+                                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <><X className="mr-1 h-4 w-4" /> Cancel</>}
+                                </Button>
+                                <Button size="sm" variant="destructive" disabled={busy} onClick={() => resolve(project.id, "confirm")}>
+                                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="mr-1 h-4 w-4" /> Confirm Lost</>}
+                                </Button>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })()}
 
               {/* Stats Overview */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
