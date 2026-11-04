@@ -62,7 +62,9 @@ import {
   LayoutGrid,
   List,
   ArrowUpDown,
-  Sparkles
+  Sparkles,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react"
 import { AdminSidebar } from "@/components/admin-sidebar"
 import { useToast } from "@/hooks/use-toast"
@@ -469,6 +471,21 @@ function EnhancedProjectManagementPage() {
   const [showCreateInvoice, setShowCreateInvoice] = useState(false)
   const [showEmailDigest, setShowEmailDigest] = useState(false)
   const [pendingLostBusy, setPendingLostBusy] = useState<number | null>(null)
+  // Accordion state for the stage boxes (true = collapsed). Persisted per browser.
+  const [collapsedStages, setCollapsedStages] = useState<Record<string, boolean>>({})
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("projects.collapsedStages")
+      if (saved) setCollapsedStages(JSON.parse(saved))
+    } catch {}
+  }, [])
+  const toggleStageCollapsed = (stageId: string) => {
+    setCollapsedStages(prev => {
+      const next = { ...prev, [stageId]: !prev[stageId] }
+      try { localStorage.setItem("projects.collapsedStages", JSON.stringify(next)) } catch {}
+      return next
+    })
+  }
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showCreateProject, setShowCreateProject] = useState(false)
   const [isParsingDescription, setIsParsingDescription] = useState(false)
@@ -1712,8 +1729,16 @@ function EnhancedProjectManagementPage() {
                 }
                 return (
                   <Card className="border-l-4 border-amber-500 bg-amber-50/40 mb-8">
-                    <CardHeader className="pb-3">
+                    <CardHeader
+                      className="pb-3 cursor-pointer select-none"
+                      onClick={() => toggleStageCollapsed("pending_lost")}
+                      role="button"
+                      aria-expanded={!collapsedStages["pending_lost"]}
+                    >
                       <CardTitle className="text-lg flex items-center gap-2 text-amber-800">
+                        {collapsedStages["pending_lost"]
+                          ? <ChevronRight className="h-5 w-5 text-amber-700" />
+                          : <ChevronDown className="h-5 w-5 text-amber-700" />}
                         <AlertTriangle className="h-5 w-5" />
                         Needs Lost Confirmation
                         <Badge variant="outline" className="ml-2 border-amber-300 text-amber-800">
@@ -1724,8 +1749,9 @@ function EnhancedProjectManagementPage() {
                         Review the correspondence for each project, then confirm it as lost or cancel to send it back to its previous stage.
                       </CardDescription>
                     </CardHeader>
+                    {!collapsedStages["pending_lost"] && (
                     <CardContent>
-                      <div className="grid gap-2">
+                      <div className="grid gap-2 max-h-[28rem] overflow-y-auto pr-2">
                         {pendingLost.map((project) => {
                           const busy = pendingLostBusy === project.id
                           const previousLabel = project.previous_status
@@ -1764,6 +1790,7 @@ function EnhancedProjectManagementPage() {
                         })}
                       </div>
                     </CardContent>
+                    )}
                   </Card>
                 )
               })()}
@@ -2333,12 +2360,22 @@ function EnhancedProjectManagementPage() {
                       p.event_location?.toLowerCase().includes(searchTerm.toLowerCase())
                     )
 
+                    const isCollapsed = !!collapsedStages[stage.id]
+
                     return (
                       <Card key={stage.id} className={`border-l-4 ${stage.borderColor}`}>
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-full ${stage.color} text-white flex items-center justify-center text-lg font-bold shadow-md`}>
+                            <div
+                              className="flex items-center gap-3 cursor-pointer select-none flex-1 min-w-0"
+                              onClick={() => toggleStageCollapsed(stage.id)}
+                              role="button"
+                              aria-expanded={!isCollapsed}
+                            >
+                              {isCollapsed
+                                ? <ChevronRight className="h-5 w-5 text-gray-500 shrink-0" />
+                                : <ChevronDown className="h-5 w-5 text-gray-500 shrink-0" />}
+                              <div className={`w-10 h-10 rounded-full ${stage.color} text-white flex items-center justify-center text-lg font-bold shadow-md shrink-0`}>
                                 {stage.step}
                               </div>
                               <div>
@@ -2364,7 +2401,7 @@ function EnhancedProjectManagementPage() {
                             </div>
                           </div>
                         </CardHeader>
-                        {filteredStageProjects.length > 0 && (
+                        {!isCollapsed && filteredStageProjects.length > 0 && (
                           <CardContent>
                             <div className="grid gap-3">
                               {filteredStageProjects.map((project) => {
@@ -3036,7 +3073,7 @@ function EnhancedProjectManagementPage() {
                             </div>
                           </CardContent>
                         )}
-                        {filteredStageProjects.length === 0 && (
+                        {!isCollapsed && filteredStageProjects.length === 0 && (
                           <CardContent>
                             <div className="text-center py-6 text-gray-500">
                               <Target className="h-8 w-8 mx-auto mb-2 opacity-30" />
