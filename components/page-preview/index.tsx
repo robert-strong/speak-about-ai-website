@@ -1697,7 +1697,7 @@ const defaultTeamMembers: TeamMember[] = [
     name: 'Robert Strong',
     title: 'CEO',
     image: '/team/robert-strong-headshot.png',
-    bio: "Speak About AI was founded by author, speaker, and entertainer Robert Strong and is a division of Strong Entertainment, LLC. With 30+ years of experience booking speakers and entertainers globally, Robert brings unparalleled expertise to the AI speaking circuit.",
+    bio: "Speak About AI was founded by author, speaker, and entertainer Robert Strong. With 30+ years of experience booking speakers and entertainers globally, Robert brings unparalleled expertise to the AI speaking circuit.",
     linkedin: 'https://linkedin.com/in/robertstrong',
   },
 ]
