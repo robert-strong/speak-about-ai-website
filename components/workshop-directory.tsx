@@ -10,7 +10,7 @@ import { Search, Clock, Users, ChevronRight, Loader2, MapPin, Filter } from "luc
 import Link from "next/link"
 import Image from "next/image"
 
-interface Workshop {
+export interface Workshop {
   id: number
   title: string
   slug: string
@@ -66,6 +66,12 @@ interface WorkshopDirectoryContent {
 
 interface WorkshopDirectoryProps {
   content?: WorkshopDirectoryContent
+  /**
+   * Workshops fetched on the server (app/ai-workshops/page.tsx). When given,
+   * the grid is in the initial HTML so crawlers see real content instead of
+   * "0 workshops" (GSC flagged /ai-workshops as a Soft 404 in Sep 2026).
+   */
+  initialWorkshops?: Workshop[]
 }
 
 const DEFAULT_CONTENT: WorkshopDirectoryContent = {
@@ -101,9 +107,9 @@ const DEFAULT_CONTENT: WorkshopDirectoryContent = {
   },
 }
 
-export default function WorkshopDirectory({ content = DEFAULT_CONTENT }: WorkshopDirectoryProps) {
-  const [workshops, setWorkshops] = useState<Workshop[]>([])
-  const [filteredWorkshops, setFilteredWorkshops] = useState<Workshop[]>([])
+export default function WorkshopDirectory({ content = DEFAULT_CONTENT, initialWorkshops }: WorkshopDirectoryProps) {
+  const [workshops, setWorkshops] = useState<Workshop[]>(initialWorkshops ?? [])
+  const [filteredWorkshops, setFilteredWorkshops] = useState<Workshop[]>(initialWorkshops ?? [])
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedFormat, setSelectedFormat] = useState<string>("all")
@@ -140,10 +146,11 @@ export default function WorkshopDirectory({ content = DEFAULT_CONTENT }: Worksho
     }
   }, [])
 
-  // Load workshops on mount
+  // Load workshops on mount, unless the server already supplied them
   useEffect(() => {
+    if (initialWorkshops) return
     loadWorkshops()
-  }, [loadWorkshops])
+  }, [loadWorkshops, initialWorkshops])
 
   const filterWorkshops = useCallback(() => {
     // Ensure workshops is always an array

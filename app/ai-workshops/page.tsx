@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
-import WorkshopDirectory from "@/components/workshop-directory"
+import WorkshopDirectory, { type Workshop as DirectoryWorkshop } from "@/components/workshop-directory"
+import { getActiveWorkshops } from "@/lib/workshops-db"
 import { getPageContent, getFromContent } from "@/lib/website-content"
 
 // Force dynamic rendering to always fetch fresh workshop data
@@ -38,8 +39,38 @@ export const metadata: Metadata = {
 }
 
 export default async function WorkshopsPage() {
-  // Fetch content from database
-  const pageContent = await getPageContent('workshops')
+  // Fetch content and the workshop list on the server so the grid is in the
+  // initial HTML. The old client-only fetch left crawlers seeing "0 workshops"
+  // and Google classified the page as a Soft 404.
+  const [pageContent, workshops] = await Promise.all([
+    getPageContent('workshops'),
+    getActiveWorkshops().catch((error) => {
+      console.error('Workshops page: failed to load workshops on the server:', error)
+      return null
+    }),
+  ])
+  const initialWorkshops: DirectoryWorkshop[] | undefined = workshops
+    ? workshops.map((w) => ({
+        id: w.id,
+        title: w.title,
+        slug: w.slug,
+        speaker_id: w.speaker_id,
+        speaker_name: w.speaker_name,
+        speaker_slug: w.speaker_slug,
+        speaker_headshot: w.speaker_headshot,
+        speaker_location: w.speaker_location,
+        short_description: w.short_description,
+        duration_minutes: w.duration_minutes,
+        format: w.format,
+        target_audience: w.target_audience,
+        price_range: w.price_range,
+        topics: w.topics,
+        thumbnail_url: w.thumbnail_url,
+        thumbnail_position: w.thumbnail_position,
+        featured: w.featured,
+        active: w.active,
+      }))
+    : undefined
 
   // Build content object for the directory component
   const directoryContent = {
@@ -75,5 +106,5 @@ export default async function WorkshopsPage() {
     },
   }
 
-  return <WorkshopDirectory content={directoryContent} />
+  return <WorkshopDirectory content={directoryContent} initialWorkshops={initialWorkshops} />
 }

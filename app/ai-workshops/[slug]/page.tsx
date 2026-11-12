@@ -762,9 +762,15 @@ export async function generateMetadata({ params }: PageProps) {
     }
   }
 
+  // Root layout's title template appends " | Speak About AI", so don't repeat it.
+  // Root layout also sets canonical to the homepage; without an override here
+  // every workshop page told Google it was a duplicate of "/".
   return {
-    title: workshop.meta_title || `${workshop.title} | AI Workshop | Speak About AI`,
+    title: workshop.meta_title || `${workshop.title} | AI Workshop`,
     description: workshop.meta_description || workshop.short_description || workshop.description?.substring(0, 160),
     keywords: workshop.keywords?.join(", ") || workshop.topics?.join(", "),
+    alternates: {
+      canonical: `https://speakabout.ai/ai-workshops/${workshop.slug}`,
+    },
   }
 }

@@ -67,6 +67,22 @@ const nextConfig = {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
           },
+          // Build assets (CSS, fonts) are not pages. Google still fetches them to
+          // render, but noindex keeps them out of the "Crawled - currently not
+          // indexed" report where ?dpl= CSS URLs were cluttering it.
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
+        ],
+      },
+      {
+        source: '/site.webmanifest',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
         ],
       },
       {

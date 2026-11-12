@@ -7,7 +7,7 @@ import { SHOW_DIRECT_CONTACT_INFO } from "@/lib/contact-visibility"
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: "Contact AI Speaker Bureau | Speak About AI", // 43 chars
   description:
     "Contact Speak About AI to book top AI keynote speakers. Get personalized recommendations and check availability for your event. Reach out today.",
@@ -15,6 +15,23 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://speakabout.ai/contact",
   },
+}
+
+/**
+ * /contact?speaker=...&source=... variants (every Book CTA links one) are
+ * pre-fill parameters, not pages. They already canonicalize to /contact, but
+ * Google kept listing ~60 of them as "Crawled - currently not indexed".
+ * Mark the parameterised variants noindex,follow; the bare /contact stays indexable.
+ */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const hasParams = Object.keys(params ?? {}).length > 0
+  if (!hasParams) return baseMetadata
+  return { ...baseMetadata, robots: { index: false, follow: true } }
 }
 
 export default async function ContactPage() {

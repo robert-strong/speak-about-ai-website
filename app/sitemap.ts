@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { getAllSpeakers } from "@/lib/speakers-data"
 import { getPublishedConferences } from "@/lib/conferences-db"
+import { getActiveWorkshops } from "@/lib/workshops-db"
 import { getBlogPosts } from "@/lib/blog-data"
 import { getAllLandingPages } from "@/lib/landing-page-data"
 import { TOPIC_PAGES } from "@/lib/topic-pages"
@@ -30,6 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.95,
+    },
+    {
+      url: `${BASE_URL}/ai-workshops`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
     {
       url: `${BASE_URL}/top-ai-speakers`,
@@ -197,5 +204,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Sitemap: failed to load conferences:", error)
   }
 
-  return [...mainPages, ...industryPages, ...topicPages, ...speakerPages, ...blogPages, ...toolPages, ...conferencePages]
+  // Active workshops (server-rendered detail pages with their own canonical)
+  let workshopPages: MetadataRoute.Sitemap = []
+  try {
+    const workshops = await getActiveWorkshops()
+    workshopPages = workshops
+      .filter((w) => typeof w.slug === "string" && w.slug.trim().length > 0)
+      .map((w) => ({
+        url: `${BASE_URL}/ai-workshops/${w.slug}`,
+        lastModified: w.updated_at ? new Date(w.updated_at) : now,
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      }))
+  } catch (error) {
+    console.error("Sitemap: failed to load workshops:", error)
+  }
+
+  return [...mainPages, ...industryPages, ...topicPages, ...speakerPages, ...blogPages, ...toolPages, ...conferencePages, ...workshopPages]
 }
