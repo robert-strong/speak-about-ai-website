@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation"
+import { notFound, permanentRedirect } from "next/navigation"
 import { getWorkshopBySlug, incrementWorkshopPopularity } from "@/lib/workshops-db"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -17,6 +17,13 @@ export const dynamic = 'force-dynamic'
 
 export default async function WorkshopDetailPage({ params }: PageProps) {
   const { slug } = await params
+
+  // Workshop slugs are lowercase; old links with capitals (e.g.
+  // /ai-workshops/AI-savy-zach-rattner) 404'd instead of resolving.
+  if (slug !== slug.toLowerCase()) {
+    permanentRedirect(`/ai-workshops/${slug.toLowerCase()}`)
+  }
+
   const workshop = await getWorkshopBySlug(slug)
 
   if (!workshop) {

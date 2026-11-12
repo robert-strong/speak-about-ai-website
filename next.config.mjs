@@ -172,6 +172,12 @@ const nextConfig = {
         destination: '/industries/sales-marketing-ai-speakers',
         permanent: true,
       },
+      // Malformed legacy link still crawled by Google (GSC 404, Nov 2026).
+      {
+        source: '/speakers/robert-strongMagic',
+        destination: '/speakers/robert-strong',
+        permanent: true,
+      },
       // /industries has no index page (only /industries/<slug>) but is on the
       // middleware's known-routes list, so it 404'd instead of redirecting.
       {
