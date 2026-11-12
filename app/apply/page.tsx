@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Progress } from "@/components/ui/progress"
 import { reportFormFailure } from "@/lib/form-failure-reporter"
+import { SPEAKER_APPLICATION_LIMITS } from "@/lib/speaker-application-limits"
 import { 
   Loader2, 
   CheckCircle, 
@@ -306,7 +307,12 @@ export default function SpeakerApplicationPage() {
         setIsSubmitted(true)
       } else {
         // Only 5xx/404 are reported as outages; validation errors are not
-        reportFormFailure({ formId: 'speaker-application', kind: 'server_error', statusCode: response.status, message: data.error })
+        reportFormFailure({
+          formId: 'speaker-application',
+          kind: 'server_error',
+          statusCode: response.status,
+          message: data.details ? `${data.error}: ${data.details}` : data.error
+        })
         setError(data.error || "Failed to submit application. Please try again.")
       }
     } catch (error) {
@@ -540,6 +546,7 @@ export default function SpeakerApplicationPage() {
                     <Label htmlFor="first_name">First Name *</Label>
                     <Input
                       id="first_name"
+                      maxLength={SPEAKER_APPLICATION_LIMITS.first_name}
                       required
                       value={formData.first_name}
                       onChange={(e) => setFormData({...formData, first_name: e.target.value})}
@@ -550,6 +557,7 @@ export default function SpeakerApplicationPage() {
                     <Label htmlFor="last_name">Last Name *</Label>
                     <Input
                       id="last_name"
+                      maxLength={SPEAKER_APPLICATION_LIMITS.last_name}
                       required
                       value={formData.last_name}
                       onChange={(e) => setFormData({...formData, last_name: e.target.value})}
@@ -565,6 +573,7 @@ export default function SpeakerApplicationPage() {
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="email"
+                        maxLength={SPEAKER_APPLICATION_LIMITS.email}
                         type="email"
                         required
                         className="pl-10"
@@ -579,6 +588,7 @@ export default function SpeakerApplicationPage() {
                       <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="phone"
+                        maxLength={SPEAKER_APPLICATION_LIMITS.phone}
                         type="tel"
                         required
                         className="pl-10"
@@ -596,6 +606,7 @@ export default function SpeakerApplicationPage() {
                       <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="location"
+                        maxLength={SPEAKER_APPLICATION_LIMITS.location}
                         required
                         placeholder="e.g., San Francisco, CA"
                         className="pl-10"
@@ -608,6 +619,7 @@ export default function SpeakerApplicationPage() {
                     <Label htmlFor="timezone">Timezone</Label>
                     <Input
                       id="timezone"
+                      maxLength={SPEAKER_APPLICATION_LIMITS.timezone}
                       placeholder="e.g., PST, EST, GMT"
                       className="mt-2"
                       value={formData.timezone}
@@ -620,6 +632,7 @@ export default function SpeakerApplicationPage() {
                   <Label htmlFor="headshot_url">Professional Headshot URL</Label>
                   <Input
                     id="headshot_url"
+                    maxLength={SPEAKER_APPLICATION_LIMITS.headshot_url}
                     type="url"
                     placeholder="https://... (High-resolution professional photo)"
                     className="mt-2"
@@ -650,6 +663,7 @@ export default function SpeakerApplicationPage() {
                     <Label htmlFor="title">Current Title/Position *</Label>
                     <Input
                       id="title"
+                      maxLength={SPEAKER_APPLICATION_LIMITS.title}
                       required
                       placeholder="e.g., Chief AI Officer, Founder & CEO"
                       value={formData.title}
@@ -661,6 +675,7 @@ export default function SpeakerApplicationPage() {
                     <Label htmlFor="company">Company/Organization *</Label>
                     <Input
                       id="company"
+                      maxLength={SPEAKER_APPLICATION_LIMITS.company}
                       required
                       value={formData.company}
                       onChange={(e) => setFormData({...formData, company: e.target.value})}
@@ -862,6 +877,7 @@ export default function SpeakerApplicationPage() {
                     <Label htmlFor="total_engagements">Approximate Total Speaking Engagements</Label>
                     <Input
                       id="total_engagements"
+                      maxLength={SPEAKER_APPLICATION_LIMITS.total_engagements}
                       placeholder="e.g., 50+"
                       value={formData.total_engagements}
                       onChange={(e) => setFormData({...formData, total_engagements: e.target.value})}
@@ -970,6 +986,7 @@ export default function SpeakerApplicationPage() {
                       <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="website"
+                        maxLength={SPEAKER_APPLICATION_LIMITS.website}
                         type="url"
                         placeholder="https://..."
                         className="pl-10"
@@ -984,6 +1001,7 @@ export default function SpeakerApplicationPage() {
                       <Linkedin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="linkedin_url"
+                        maxLength={SPEAKER_APPLICATION_LIMITS.linkedin_url}
                         type="url"
                         placeholder="https://linkedin.com/in/..."
                         className="pl-10"
@@ -1001,6 +1019,7 @@ export default function SpeakerApplicationPage() {
                       <Twitter className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="twitter_url"
+                        maxLength={SPEAKER_APPLICATION_LIMITS.twitter_url}
                         type="url"
                         placeholder="https://twitter.com/..."
                         className="pl-10"
@@ -1015,6 +1034,7 @@ export default function SpeakerApplicationPage() {
                       <Youtube className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="youtube_url"
+                        maxLength={SPEAKER_APPLICATION_LIMITS.youtube_url}
                         type="url"
                         placeholder="https://youtube.com/..."
                         className="pl-10"
@@ -1032,6 +1052,7 @@ export default function SpeakerApplicationPage() {
                       <Instagram className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="instagram_url"
+                        maxLength={SPEAKER_APPLICATION_LIMITS.instagram_url}
                         type="url"
                         placeholder="https://instagram.com/..."
                         className="pl-10"
@@ -1046,6 +1067,7 @@ export default function SpeakerApplicationPage() {
                       <BookOpen className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="blog_url"
+                        maxLength={SPEAKER_APPLICATION_LIMITS.blog_url}
                         type="url"
                         placeholder="https://..."
                         className="pl-10"
@@ -1151,6 +1173,7 @@ export default function SpeakerApplicationPage() {
                     <Label htmlFor="booking_lead_time">Typical Booking Lead Time</Label>
                     <Input
                       id="booking_lead_time"
+                      maxLength={SPEAKER_APPLICATION_LIMITS.booking_lead_time}
                       placeholder="e.g., 4-6 weeks minimum"
                       value={formData.booking_lead_time}
                       onChange={(e) => setFormData({...formData, booking_lead_time: e.target.value})}

@@ -4,6 +4,7 @@ import { requireAdminAuth } from "@/lib/auth-middleware"
 import { sendEmail } from "@/lib/email"
 import { getAdminEmails } from "@/lib/admin-emails"
 import { isFormHealthCheckRequest, HEALTH_CHECK_EMAIL } from "@/lib/form-health"
+import { findOverlongField } from "@/lib/speaker-application-limits"
 
 const sql = neon(process.env.DATABASE_URL!)
 
@@ -21,6 +22,14 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
+    }
+
+    // Reject over-long values with a readable 400 instead of a database error.
+    // (Before migration 028 several of these columns were VARCHAR(50)/(100);
+    // visitors writing a sentence in "timezone" got an opaque 500.)
+    const tooLong = findOverlongField(body)
+    if (tooLong) {
+      return NextResponse.json({ error: tooLong }, { status: 400 })
     }
 
     // Validate email format
@@ -265,6 +274,17 @@ Review at: https://speakabout.ai/admin/speaker-applications
 
   } catch (error) {
     console.error("Error submitting speaker application:", error)
+
+    // Postgres 22001 = string_data_right_truncation ("value too long for type
+    // character varying(n)"). That is the visitor's input, not an outage:
+    // answer 400 so they can fix it and the health monitor is not alerted.
+    if (isStringTooLongError(error)) {
+      return NextResponse.json(
+        { error: "One of your answers is too long for its field. Please shorten it and try again.", details: error.message },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { 
         error: "Failed to submit application",
@@ -273,6 +293,12 @@ Review at: https://speakabout.ai/admin/speaker-applications
       { status: 500 }
     )
   }
+}
+
+function isStringTooLongError(error: unknown): error is Error & { code?: string } {
+  if (!(error instanceof Error)) return false
+  const code = (error as { code?: string }).code
+  return code === '22001' || /value too long for type/i.test(error.message)
 }
 
 // Admin endpoint to get all applications (requires auth)
