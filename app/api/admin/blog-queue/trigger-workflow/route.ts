@@ -50,7 +50,9 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           ref: 'main',
-          inputs: inputs || {},
+          // generate-briefs takes no inputs: the batch size is fixed at 2 in
+          // the Blog repo, and GitHub rejects inputs a workflow doesn't declare.
+          inputs: workflow === 'generate-briefs' ? {} : inputs || {},
         }),
       }
     )

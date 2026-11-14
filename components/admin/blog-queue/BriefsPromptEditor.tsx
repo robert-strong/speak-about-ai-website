@@ -163,22 +163,6 @@ export function BriefsPromptEditor({
                   Ratio of briefs that should include a speaker bureau CTA (0.0 to 1.0)
                 </p>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="default_brief_count">Default Brief Count</Label>
-                <Input
-                  id="default_brief_count"
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={currentSettings.default_brief_count || '5'}
-                  onChange={(e) => updateSetting('default_brief_count', e.target.value)}
-                  className="w-24"
-                />
-                <p className="text-xs text-gray-500">
-                  Default number of briefs to generate per batch
-                </p>
-              </div>
             </div>
 
             {/* Length Settings */}
@@ -416,7 +400,7 @@ Available variables: {title}, {brief}, {article_length_min}, {article_length_max
                   <AlertDescription>
                     <p className="font-medium mb-2">Available template variables:</p>
                     <ul className="list-disc list-inside text-sm space-y-1">
-                      <li><code className="bg-gray-100 px-1 rounded">{'{count}'}</code> - Number of briefs to generate</li>
+                      <li><code className="bg-gray-100 px-1 rounded">{'{count}'}</code> - Number of briefs to generate (always 2)</li>
                       <li><code className="bg-gray-100 px-1 rounded">{'{cta_count}'}</code> - Number of briefs with CTA hook</li>
                       <li><code className="bg-gray-100 px-1 rounded">{'{non_cta_count}'}</code> - Number of briefs without CTA</li>
                       <li><code className="bg-gray-100 px-1 rounded">{'{existing_briefs}'}</code> - Recent briefs for de-duplication</li>

@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,7 +47,6 @@ export function WorkflowTriggerCard() {
   const [runs, setRuns] = useState<WorkflowRun[]>([])
   const [loading, setLoading] = useState(false)
   const [triggering, setTriggering] = useState<string | null>(null)
-  const [briefCount, setBriefCount] = useState('5')
   const [runsError, setRunsError] = useState<string | null>(null)
 
   const fetchRuns = async () => {
@@ -195,21 +192,12 @@ export function WorkflowTriggerCard() {
             <p className="text-sm text-gray-500">
               Use Claude to generate new blog briefs with web search
             </p>
-            <div className="flex items-center gap-2">
-              <Label htmlFor="count" className="text-sm">Count:</Label>
-              <Input
-                id="count"
-                type="number"
-                min="1"
-                max="10"
-                value={briefCount}
-                onChange={(e) => setBriefCount(e.target.value)}
-                className="w-16 h-8"
-              />
-            </div>
+            <p className="text-sm text-gray-500">
+              Each run generates 2 briefs.
+            </p>
             <Button
               className="w-full"
-              onClick={() => triggerWorkflow('generate-briefs', { count: briefCount })}
+              onClick={() => triggerWorkflow('generate-briefs')}
               disabled={triggering === 'generate-briefs'}
             >
               {triggering === 'generate-briefs' ? (
